@@ -1,7 +1,6 @@
-package com.example.booking_tour_app;
+package com.example.Tour_Booking_App;
 
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,7 +8,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.booking_tour_app.databinding.ActivityRegisterBinding;
+import com.example.Tour_Booking_App.databinding.ActivityRegisterBinding;
 
 public class RegisterActivity extends AppCompatActivity {
     ActivityRegisterBinding binding;

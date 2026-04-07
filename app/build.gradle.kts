@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.booking_tour_app"
+    namespace = "com.example.Tour_Booking_App"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.booking_tour_app"
+        applicationId = "com.example.Tour_Booking_App"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

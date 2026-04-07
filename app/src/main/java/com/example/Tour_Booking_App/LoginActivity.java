@@ -1,4 +1,4 @@
-package com.example.booking_tour_app;
+package com.example.Tour_Booking_App;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.booking_tour_app.databinding.ActivityLoginBinding;
+import com.example.Tour_Booking_App.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         if(session.isLoggedIn()){
-            Intent intent = new Intent(LoginActivity.this, TempActivity.class);
+            Intent intent = new Intent(LoginActivity.this, TempActivity.class); //TODO: Change to HomeActivity
             startActivity(intent);
             finish();
         }
@@ -57,6 +57,12 @@ public class LoginActivity extends AppCompatActivity {
             String token = "";  //from DB
             String userID = ""; //from DB
             Boolean result = false; //from DB
+
+            if(result){
+                Intent intent = new Intent(LoginActivity.this, TempActivity.class); //TODO: Change to HomeActivity
+                startActivity(intent);
+                finish();
+            }
 
             if(binding.cbLoginRemember.isChecked() && result){
                 session.saveSession(token, userID);

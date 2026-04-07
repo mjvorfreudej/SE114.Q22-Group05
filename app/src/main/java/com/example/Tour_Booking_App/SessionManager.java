@@ -1,4 +1,4 @@
-package com.example.booking_tour_app;
+package com.example.Tour_Booking_App;
 
 import android.content.Context;
 import android.content.SharedPreferences;

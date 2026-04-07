@@ -1,4 +1,4 @@
-package com.example.booking_tour_app;
+package com.example.Tour_Booking_App;
 
 import android.os.Bundle;
 
@@ -8,21 +8,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.booking_tour_app.databinding.ActivityForgotPassBinding;
-
-public class ForgotPassActivity extends AppCompatActivity {
-    private ActivityForgotPassBinding binding;
+public class TempActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityForgotPassBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.layoutForgotPassRoot, (v, insets) -> {
+        setContentView(R.layout.activity_temp);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
     }

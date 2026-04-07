@@ -1,17 +1,39 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local config
+local.properties
+
+# Android Studio
+.idea/
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+
+# Logs
+*.log
+
+# OS
 .DS_Store
-/build
+Thumbs.db
+
+# Build outputs
 /captures
 .externalNativeBuild
-.cxx
-local.properties
-app/src/main/java/com/example/booking_tour_app/TempActivity.java
-app/src/main/res/layout/activity_register.xml
+.cxx/
+
+# Kotlin
+*.kotlin_module
+
+# IntelliJ
+out/
+
+# Navigation
+.navigation/
+
+# Keystore (quan trọng)
+*.jks
+*.keystore
+
+# Google services (nếu có)
+google-services.json
