@@ -176,8 +176,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvLoginSignUp"
             app:layout_constraintHorizontal_chainStyle="packed"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
 
         <TextView
             android:id="@+id/tvLoginSignUp"
@@ -191,7 +191,7 @@
             app:layout_constraintStart_toEndOf="@id/tvLoginNoAccount"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

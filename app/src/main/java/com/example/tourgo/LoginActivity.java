@@ -56,6 +56,16 @@ public class LoginActivity extends AppCompatActivity {
             String email = binding.etLoginEmail.getText().toString().trim();
             String password = binding.etLoginPassword.getText().toString();
 
+            if(email.isEmpty() || password.isEmpty()) {
+                if(email.isEmpty()) {
+                    binding.tilLoginEmail.setError("Địa chỉ email không được để trống");
+                }
+                if(password.isEmpty()) {
+                    binding.tilLoginPassword.setError("Mật khẩu không được để trống");
+                }
+                return;
+            }
+
             SupabaseClient.login(email, password, new AuthCallback() {
                 @Override
                 public void onSuccess(String responseData) {
