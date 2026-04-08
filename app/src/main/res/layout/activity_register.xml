@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#42c8f5"
     android:orientation="vertical"
-    tools:context=".RegisterActivity">
+    tools:context=".ui.auth.RegisterActivity">
 
     <View
         android:id="@+id/viewRegisterSpaceTop"

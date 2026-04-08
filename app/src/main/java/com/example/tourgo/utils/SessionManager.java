@@ -1,4 +1,4 @@
-package com.example.tourgo;
+package com.example.tourgo.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

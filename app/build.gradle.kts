@@ -20,6 +20,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
     defaultConfig {
         applicationId = "com.example.tourgo"
@@ -46,9 +47,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        viewBinding = true
     }
 }
 

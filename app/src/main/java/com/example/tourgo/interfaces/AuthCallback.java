@@ -1,4 +1,4 @@
-package com.example.tourgo;
+package com.example.tourgo.interfaces;
 
 public interface AuthCallback {
     void onSuccess(String responseData);

@@ -1,4 +1,4 @@
-package com.example.tourgo;
+package com.example.tourgo.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
+import com.example.tourgo.interfaces.AuthCallback;
 
 public class RegisterActivity extends AppCompatActivity {
     ActivityRegisterBinding binding;

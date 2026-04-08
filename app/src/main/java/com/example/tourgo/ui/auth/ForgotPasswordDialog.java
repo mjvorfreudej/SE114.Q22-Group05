@@ -1,4 +1,4 @@
-package com.example.tourgo;
+package com.example.tourgo.ui.auth;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.tourgo.R;
+import com.example.tourgo.remote.SupabaseClient;
+import com.example.tourgo.interfaces.AuthCallback;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class ForgotPasswordDialog extends DialogFragment {

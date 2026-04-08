@@ -1,4 +1,7 @@
-package com.example.tourgo;
+package com.example.tourgo.remote;
+
+import com.example.tourgo.BuildConfig;
+import com.example.tourgo.interfaces.AuthCallback;
 
 import org.json.JSONObject;
 
@@ -86,6 +89,34 @@ public class SupabaseClient {
         } catch (Exception e) {
             callback.onError(e.getMessage());
         }
+    }
+
+    public static void logout(String accessToken, AuthCallback callback) {
+        String url = SUPABASE_URL + "/auth/v1/logout";
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("apikey", ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .post(RequestBody.create("", JSON))
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError("Lỗi mạng: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    callback.onSuccess("Đăng xuất thành công");
+                } else {
+                    String resBody = response.body() != null ? response.body().string() : "";
+                    callback.onError(resBody);
+                }
+            }
+        });
     }
 
     public static void resetPassword(String email, AuthCallback callback) {

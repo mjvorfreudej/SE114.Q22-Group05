@@ -1,4 +1,4 @@
-package com.example.tourgo;
+package com.example.tourgo.ui.auth;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -13,9 +13,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityResetPasswordBinding;
-
-import okio.Timeout;
+import com.example.tourgo.interfaces.AuthCallback;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
