@@ -1,4 +1,4 @@
-package com.example.Tour_Booking_App;
+package com.example.tourgo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,12 +7,11 @@ import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
 public class SessionManager {
-    private static final String PREF_NAME = "secure_session";
+    private static final String PREF_NAME = "user_session";
     private SharedPreferences sharedPreferences;
 
     public SessionManager(Context context) {
         try {
-            @Deprecated
             MasterKey masterKey = new MasterKey.Builder(context)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build();
@@ -24,28 +23,33 @@ public class SessionManager {
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                     EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             );
-        } catch (Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void saveSession(String token, String userID) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("token", token);
-        editor.putString("userID", userID);
-        editor.putBoolean("is_login", true);
-        editor.apply();
+    public void saveUser(String email, String password) {
+        sharedPreferences.edit()
+                .putString("email", email)
+                .putString("password", password)
+                .putBoolean("isLoggedIn", true)
+                .apply();
     }
 
-    public String getToken() {
-        return sharedPreferences.getString("token", null);
+    public String getEmail() {
+        return sharedPreferences.getString("email", null);
     }
 
-    public Boolean isLoggedIn() {
-        return sharedPreferences.getBoolean("is_login", false);
+    public String getPassword() {
+        return sharedPreferences.getString("password", null);
     }
 
-    public void clearSession() {
+    public boolean isLoggedIn() {
+        return sharedPreferences.getBoolean("isLoggedIn", false);
+    }
+
+    public void clear() {
         sharedPreferences.edit().clear().apply();
     }
 }

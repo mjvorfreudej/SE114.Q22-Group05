@@ -18,6 +18,9 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = "com.example.tourgo"
         minSdk = 29
@@ -29,10 +32,6 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties.getProperty("SUPABASE_ANON_KEY")}\"")
-
-        buildFeatures {
-            buildConfig = true
-        }
     }
 
     buildTypes {

@@ -94,6 +94,8 @@ public class SupabaseClient {
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("email", email);
+            jsonBody.put("redirect_to", "https://temp-tour-go-app.vercel.app/");
+            //TODO: update redirect at Site URL (URL Configuration)
 
             RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
             Request request = buildAuthRequest(url, body);
@@ -109,7 +111,51 @@ public class SupabaseClient {
                     if (response.isSuccessful()) {
                         callback.onSuccess("Đã gửi email khôi phục!");
                     } else {
-                        callback.onError("Có lỗi xảy ra, vui lòng thử lại.");
+                        String resBody = response.body() != null ? response.body().string() : "";
+                        if(response.code() == 429 || resBody.contains("rate_limit")){
+                            callback.onError("Quá nhiều yêu cầu, vui lòng thử lại sau vài tiếng :) .");
+                            return;
+                        }else {
+                            callback.onError("Có lỗi xảy ra, vui lòng thử lại.");
+                        }
+                    }
+                }
+            });
+        } catch (Exception e) {
+            callback.onError(e.getMessage());
+        }
+    }
+
+    public static void updatePassword(String accessToken, String newPassword, AuthCallback callback) {
+        String url = SUPABASE_URL + "/auth/v1/user";
+
+        try {
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("password", newPassword);
+
+            RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("apikey", ANON_KEY)
+                    .addHeader("Authorization", "Bearer " + accessToken)
+                    .addHeader("Content-Type", "application/json")
+                    .put(body)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    callback.onError("Lỗi mạng: " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String resBody = response.body() != null ? response.body().string() : "";
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(resBody);
+                    } else {
+                        callback.onError(resBody);
                     }
                 }
             });
