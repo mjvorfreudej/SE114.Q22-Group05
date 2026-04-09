@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,15 +17,11 @@ import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
 import com.example.tourgo.interfaces.AuthCallback;
 
-public class RegisterActivity extends AppCompatActivity {
-    ActivityRegisterBinding binding;
-    Boolean isValid = true;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-    public abstract class SimpleTextWatcher implements TextWatcher {
-        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        @Override public abstract void afterTextChanged(Editable s);
-    }
+public class RegisterActivity extends AppCompatActivity {
+    private ActivityRegisterBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,121 +35,129 @@ public class RegisterActivity extends AppCompatActivity {
             return insets;
         });
 
-        binding.tvRegisterSignIn.setOnClickListener(v -> {
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
+        binding.tvRegisterSignIn.setOnClickListener(v -> finish());
 
-        validateName();
-        validateEmail();
-        validatePassword();
-        validateConfirmPassword();
+        setupValidation();
 
         binding.btnRegister.setOnClickListener(v -> {
-            if (checkEmptyInput() || !isValid) return;
+            if (!validateAllFields()) return;
 
-            String name = binding.etRegisterName.getText().toString().trim();
-            String email = binding.etRegisterEmail.getText().toString().trim();
-            String password = binding.etRegisterPassword.getText().toString();
+            Editable nameEditable = binding.etRegisterName.getText();
+            Editable emailEditable = binding.etRegisterEmail.getText();
+            Editable passEditable = binding.etRegisterPassword.getText();
+
+            if (nameEditable == null || emailEditable == null || passEditable == null) return;
+
+            String name = nameEditable.toString().trim();
+            String email = emailEditable.toString().trim();
+            String password = passEditable.toString();
+
+            setLoading(true);
 
             SupabaseClient.register(email, password, name, new AuthCallback() {
                 @Override
                 public void onSuccess(String responseData) {
-                    Intent itent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(itent);
+                    runOnUiThread(() -> {
+                        setLoading(false);
+                        try {
+                            JSONObject json = new JSONObject(responseData);
+                            JSONArray identities = json.optJSONArray("identities");
+                            
+                            if (identities != null && identities.length() == 0) {
+                                binding.tilRegisterEmail.setError("Email này đã được đăng ký");
+                                binding.etRegisterEmail.requestFocus();
+                                return;
+                            }
+
+                            Toast.makeText(RegisterActivity.this, "Đăng ký thành công! Hãy xác nhận email.", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        } catch (Exception e) {
+                            Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
                 }
 
                 @Override
                 public void onError(String errorMessage) {
                     runOnUiThread(() -> {
-                        binding.tilRegisterEmail.setError(errorMessage);
+                        setLoading(false);
+                        if (errorMessage.toLowerCase().contains("mạng") || errorMessage.toLowerCase().contains("connect")) {
+                            Toast.makeText(RegisterActivity.this, "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+                        } else if (errorMessage.contains("đã được đăng ký") || errorMessage.contains("already exists")) {
+                            binding.tilRegisterEmail.setError("Email này đã được đăng ký");
+                            binding.etRegisterEmail.requestFocus();
+                        } else {
+                            Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                        }
                     });
                 }
             });
         });
     }
 
-    private void validateName() {
-        binding.etRegisterName.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().trim().isEmpty()) {
-                    binding.tilRegisterName.setError("Tên không được để trống");
-                    isValid = false;
-                } else {
-                    binding.tilRegisterName.setError(null);
-                    isValid = true;
-                }
-            }
+    private void setLoading(boolean loading) {
+        binding.btnRegister.setEnabled(!loading);
+        binding.progressBarRegister.setVisibility(loading ? View.VISIBLE : View.GONE);
+        binding.btnRegister.setText(loading ? "" : "Sign Up");
+    }
+
+    private void setupValidation() {
+        binding.etRegisterName.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { binding.tilRegisterName.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        binding.etRegisterEmail.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { binding.tilRegisterEmail.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        binding.etRegisterPassword.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { binding.tilRegisterPassword.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        binding.etRegisterConfirmPassword.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { binding.tilRegisterConfirmPassword.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
         });
     }
 
-    private void validateEmail() {
-        binding.etRegisterEmail.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(s).matches()) {
-                    binding.tilRegisterEmail.setError("Địa chỉ email không hợp lệ");
-                    isValid = false;
-                } else {
-                    binding.tilRegisterEmail.setError(null);
-                    isValid = true;
-                }
-            }
-        });
-    }
+    private boolean validateAllFields() {
+        Editable nameEdit = binding.etRegisterName.getText();
+        Editable emailEdit = binding.etRegisterEmail.getText();
+        Editable passEdit = binding.etRegisterPassword.getText();
+        Editable confirmEdit = binding.etRegisterConfirmPassword.getText();
 
-    private void validatePassword() {
-        binding.etRegisterPassword.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.toString().isEmpty()) {
-                    binding.tilRegisterPassword.setError("Mật khẩu không được để trống");
-                    isValid = false;
-                } else if (s.toString().length() < 6) {
-                    binding.tilRegisterPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-                    isValid = false;
-                } else {
-                    binding.tilRegisterPassword.setError(null);
-                    isValid = true;
-                }
-            }
-        });
-    }
+        String name = nameEdit != null ? nameEdit.toString().trim() : "";
+        String email = emailEdit != null ? emailEdit.toString().trim() : "";
+        String password = passEdit != null ? passEdit.toString() : "";
+        String confirm = confirmEdit != null ? confirmEdit.toString() : "";
 
-    private void validateConfirmPassword() {
-        binding.etRegisterConfirmPassword.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (!s.toString().equals(binding.etRegisterPassword.getText().toString())) {
-                    binding.tilRegisterConfirmPassword.setError("Mật khẩu không khớp");
-                    isValid = false;
-                } else {
-                    binding.tilRegisterConfirmPassword.setError(null);
-                    isValid = true;
-                }
-            }
-        });
-    }
-
-    private Boolean checkEmptyInput() {
-        Boolean isEmpty = false;
-        if(binding.etRegisterName.getText().toString().trim().isEmpty()) {
+        if (name.isEmpty()) {
             binding.tilRegisterName.setError("Tên không được để trống");
-            isEmpty = true;
+            return false;
         }
-        if(binding.etRegisterEmail.getText().toString().trim().isEmpty()) {
-            binding.tilRegisterEmail.setError("Email không được để trống");
-            isEmpty = true;
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.tilRegisterEmail.setError("Email không hợp lệ");
+            return false;
         }
-        if(binding.etRegisterPassword.getText().toString().isEmpty()) {
-            binding.tilRegisterPassword.setError("Mật khẩu không được để trống");
-            isEmpty = true;
+        if (password.length() < 6) {
+            binding.tilRegisterPassword.setError("Mật khẩu phải từ 6 ký tự");
+            return false;
         }
-        if(binding.etRegisterConfirmPassword.getText().toString().isEmpty()) {
-            binding.tilRegisterConfirmPassword.setError("Xác nhận mật khẩu không được để trống");
-            isEmpty = true;
+        if (!confirm.equals(password)) {
+            binding.tilRegisterConfirmPassword.setError("Mật khẩu không khớp");
+            return false;
         }
-        return isEmpty;
+        return true;
     }
 }

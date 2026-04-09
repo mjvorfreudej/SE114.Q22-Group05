@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,30 +39,50 @@ public class ResetPasswordActivity extends AppCompatActivity {
         accessToken = extractToken(getIntent());
 
         if (accessToken == null) {
-            binding.tvResetError.setVisibility(View.VISIBLE);
-            binding.tvResetError.setText("Liên kết không hợp lệ hoặc đã hết hạn.");
-
-
+            Toast.makeText(this, "Liên kết không hợp lệ hoặc đã hết hạn.", Toast.LENGTH_LONG).show();
+            binding.btnResetPassword.setEnabled(false);
             return;
         }
 
-        validatePassword();
-        validateConfirmPassword();
+        setupTextWatchers();
 
         binding.btnResetPassword.setOnClickListener(v -> {
             String password = binding.etResetPassword.getText().toString();
             String confirm  = binding.etResetConfirmPassword.getText().toString();
 
+            boolean hasError = false;
             if (password.length() < 6) {
                 binding.tilResetPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-                return;
+                hasError = true;
             }
             if (!password.equals(confirm)) {
-                binding.tilResetConfirmPassword.setError("Mật khẩu không khớp");
-                return;
+                binding.tilResetConfirmPassword.setError("Mật khẩu xác nhận không khớp");
+                hasError = true;
             }
-            submitNewPassword(password);
+
+            if (!hasError) {
+                submitNewPassword(password);
+            }
         });
+    }
+
+    private void setupTextWatchers() {
+        TextWatcher clearErrorWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                binding.tilResetPassword.setError(null);
+                binding.tilResetConfirmPassword.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+
+        binding.etResetPassword.addTextChangedListener(clearErrorWatcher);
+        binding.etResetConfirmPassword.addTextChangedListener(clearErrorWatcher);
     }
 
     private String extractToken(Intent intent) {
@@ -82,41 +103,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
         return null;
     }
 
-    private void validatePassword() {
-        binding.etResetPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                binding.tilResetPassword.setError(
-                        s.toString().length() < 6 ? "Mật khẩu phải có ít nhất 6 ký tự" : null
-                );
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        });
-    }
-
-    private void validateConfirmPassword() {
-        binding.etResetConfirmPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                String pass = binding.etResetPassword.getText().toString();
-                binding.tilResetConfirmPassword.setError(
-                        !s.toString().equals(pass) ? "Mật khẩu không khớp" : null
-                );
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-        });
-    }
-
     private void submitNewPassword(String newPassword) {
         setLoading(true);
 
@@ -125,9 +111,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
             public void onSuccess(String responseData) {
                 runOnUiThread(() -> {
                     setLoading(false);
+                    Toast.makeText(ResetPasswordActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    finish();
                 });
             }
 
@@ -135,8 +123,22 @@ public class ResetPasswordActivity extends AppCompatActivity {
             public void onError(String errorMessage) {
                 runOnUiThread(() -> {
                     setLoading(false);
-                    binding.tvResetError.setVisibility(View.VISIBLE);
-                    binding.tvResetError.setText("Lỗi: " + errorMessage);
+                    
+                    if (errorMessage.toLowerCase().contains("unable to resolve host") || 
+                        errorMessage.toLowerCase().contains("failed to connect") ||
+                        errorMessage.toLowerCase().contains("timeout") ||
+                        errorMessage.startsWith("Lỗi mạng")) {
+                        
+                        Toast.makeText(ResetPasswordActivity.this, 
+                                "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
+                    } 
+                    else if (errorMessage.contains("trùng") || errorMessage.contains("cũ")) {
+                        binding.tilResetPassword.setError(errorMessage);
+                        binding.etResetPassword.requestFocus();
+                    } 
+                    else {
+                        Toast.makeText(ResetPasswordActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    }
                 });
             }
         });
@@ -145,5 +147,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void setLoading(boolean loading) {
         binding.btnResetPassword.setEnabled(!loading);
         binding.progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+        if (loading) {
+            binding.tilResetPassword.setError(null);
+            binding.tilResetConfirmPassword.setError(null);
+        }
     }
 }
