@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="155dp"
+    android:layout_height="110dp"
+    android:layout_marginEnd="14dp">
+
+    <ImageView
+        android:id="@+id/imgTrendingHotel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:background="#DDDDDD"
+        android:clipToOutline="true" />
+
+    <TextView
+        android:id="@+id/tvTrendingRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/bg_rating_chip"
+        android:paddingStart="9dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="9dp"
+        android:paddingBottom="4dp"
+        android:text="★ 4.5"
+        android:textColor="@android:color/white"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/imgTrendingFavorite"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="12dp"
+        android:src="@drawable/ic_heart_outline_18"
+        android:tint="@android:color/white"
+        android:visibility="gone" />
+
+</FrameLayout>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="230dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="14dp"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="230dp"
+        android:layout_height="165dp">
+
+        <ImageView
+            android:id="@+id/imgPopularHotel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#DDDDDD"
+            android:clipToOutline="true" />
+
+        <TextView
+            android:id="@+id/tvPopularRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:background="@drawable/bg_rating_chip"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="★ 4.5"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="14dp"
+            android:src="@drawable/ic_heart_outline_18"
+            android:tint="@android:color/white" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvPopularName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:maxLines="1"
+        android:text="The Grand Orchid Resort"
+        android:textColor="#1C1F26"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvPopularPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="From $199 / nights"
+        android:textColor="#7B818C"
+        android:textSize="14sp" />
+
+</LinearLayout>
