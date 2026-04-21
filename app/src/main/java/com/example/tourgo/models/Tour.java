@@ -1,5 +1,8 @@
 package com.example.tourgo.models;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,12 +13,14 @@ public class Tour {
     private double price;
     private List<String> imageUrls;
     private String destination;
-    private String region; // "North", "Central", "South"
+    private String region;
     private String duration;
-    private String status; // "PENDING", "APPROVED", "REJECTED"
+    private String status;
     private String ownerId;
     private float rating;
     private int reviewCount;
+    private String createdAt;
+
 
     private int imageResId;
     private String location;
@@ -25,6 +30,7 @@ public class Tour {
         this.imageUrls = new ArrayList<>();
     }
 
+
     public Tour(int imageResId, String name, String location, String priceString, double rating, String duration) {
         this.imageResId = imageResId;
         this.name = name;
@@ -32,18 +38,18 @@ public class Tour {
         this.priceString = priceString;
         this.rating = (float) rating;
         this.duration = duration;
+        this.imageUrls = new ArrayList<>();
     }
 
-    public int getImageResId() { return imageResId; }
-    public String getLocation() { return location; }
-    public String getPriceString() { return priceString; }
 
-    public Tour(String id, String name, String description, double price, List<String> imageUrls, String destination, String region, String duration, String status, String ownerId, float rating, int reviewCount) {
+    public Tour(String id, String name, String description, double price, List<String> imageUrls,
+                String destination, String region, String duration, String status, String ownerId,
+                float rating, int reviewCount) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.imageUrls = imageUrls;
+        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
         this.destination = destination;
         this.region = region;
         this.duration = duration;
@@ -52,6 +58,59 @@ public class Tour {
         this.rating = rating;
         this.reviewCount = reviewCount;
     }
+
+
+    public static Tour fromJson(JSONObject json) {
+        Tour t = new Tour();
+        t.id = json.optString("id", null);
+        t.name = json.optString("name", "");
+        t.description = json.optString("description", "");
+        t.price = json.optDouble("price", 0);
+        t.destination = json.optString("destination", "");
+        t.region = json.optString("region", "");
+        t.duration = json.optString("duration", "");
+        t.status = json.optString("status", "APPROVED");
+        t.ownerId = json.optString("owner_id", null);
+        t.rating = (float) json.optDouble("rating", 0);
+        t.reviewCount = json.optInt("review_count", 0);
+        t.createdAt = json.optString("created_at", null);
+
+
+        t.imageUrls = new ArrayList<>();
+        JSONArray images = json.optJSONArray("tour_images");
+        if (images != null) {
+            for (int i = 0; i < images.length(); i++) {
+                JSONObject img = images.optJSONObject(i);
+                if (img != null) {
+                    String url = img.optString("image_url", "");
+                    if (!url.isEmpty()) {
+                        t.imageUrls.add(url);
+                    }
+                }
+            }
+        }
+
+
+        t.location = t.destination;
+        t.priceString = String.format("%,.0f₫", t.price);
+
+        return t;
+    }
+
+
+    public static List<Tour> fromJsonArray(JSONArray array) {
+        List<Tour> list = new ArrayList<>();
+        if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject obj = array.optJSONObject(i);
+                if (obj != null) {
+                    list.add(Tour.fromJson(obj));
+                }
+            }
+        }
+        return list;
+    }
+
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -88,4 +147,12 @@ public class Tour {
 
     public int getReviewCount() { return reviewCount; }
     public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+
+    public int getImageResId() { return imageResId; }
+    public String getLocation() { return location != null ? location : destination; }
+    public String getPriceString() { return priceString != null ? priceString : String.format("%,.0f₫", price); }
 }

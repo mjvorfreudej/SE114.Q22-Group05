@@ -9,7 +9,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-//DÙNG CLASS NÀY ĐỂ LÀM LỚP CHA KẾ THỪA CÁC LỚP NHƯ TOURSERVICE, HOTELSERVICE, ETC sau này
 public class SupabaseConfig {
     public static final String SUPABASE_URL = BuildConfig.SUPABASE_URL;
     public static final String ANON_KEY = BuildConfig.SUPABASE_ANON_KEY;
