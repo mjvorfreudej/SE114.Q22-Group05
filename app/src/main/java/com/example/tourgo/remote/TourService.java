@@ -1,5 +1,6 @@
 package com.example.tourgo.remote;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Tour;
 
@@ -35,7 +36,7 @@ public class TourService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -47,10 +48,10 @@ public class TourService {
                         List<Tour> tours = Tour.fromJsonArray(array);
                         callback.onSuccess(tours);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });
@@ -77,7 +78,7 @@ public class TourService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -89,10 +90,10 @@ public class TourService {
                         List<Tour> tours = Tour.fromJsonArray(array);
                         callback.onSuccess(tours);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });
@@ -117,7 +118,7 @@ public class TourService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -130,13 +131,13 @@ public class TourService {
                             Tour tour = Tour.fromJson(array.getJSONObject(0));
                             callback.onSuccess(tour);
                         } else {
-                            callback.onError("Không tìm thấy tour");
+                            callback.onError(ApiErrorCode.NOT_FOUND, body);
                         }
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });
@@ -163,7 +164,7 @@ public class TourService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -175,10 +176,10 @@ public class TourService {
                         List<Tour> tours = Tour.fromJsonArray(array);
                         callback.onSuccess(tours);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });

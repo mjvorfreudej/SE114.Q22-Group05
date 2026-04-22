@@ -24,6 +24,7 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Use the existing activity_profile.xml layout for this fragment
         return inflater.inflate(R.layout.activity_profile, container, false);
     }
 
@@ -31,18 +32,21 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Find views in the activity_profile layout
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
         btnLogout = view.findViewById(R.id.btnLogout);
 
+        // Populate user data
         User user = AppFakeData.getUser();
         if (user != null) {
-            tvProfileName.setText(user.getName());
-            tvProfileEmail.setText(user.getEmail());
-            tvProfilePhone.setText(user.getPhone());
+            if (tvProfileName != null) tvProfileName.setText(user.getName());
+            if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
+            if (tvProfilePhone != null) tvProfilePhone.setText(user.getPhone());
         }
 
+        // Set up logout button
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), LoginActivity.class);

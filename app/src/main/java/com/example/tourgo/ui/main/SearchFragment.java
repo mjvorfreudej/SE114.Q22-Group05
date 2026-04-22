@@ -1,6 +1,8 @@
 package com.example.tourgo.ui.main;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +33,33 @@ public class SearchFragment extends Fragment {
         
         binding.btnBackSearch.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
-                // Logic to go back home
+                ((MainActivity) getActivity()).onBackPressed();
             }
         });
         
         setupRecentSearches();
         setupRecentViewed();
+        setupSearchLogic();
+    }
+
+    private void setupSearchLogic() {
+        binding.etSearchQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString();
+                if (query.length() > 0) {
+                    // Logic to show search results
+                } else {
+                    // Logic to show recent searches
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private void setupRecentSearches() {

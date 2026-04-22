@@ -1,5 +1,6 @@
 package com.example.tourgo.remote;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Booking;
 
@@ -39,7 +40,7 @@ public class BookingService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -52,13 +53,13 @@ public class BookingService {
                             Booking created = Booking.fromJson(array.getJSONObject(0));
                             callback.onSuccess(created);
                         } else {
-                            callback.onError("Không thể tạo booking");
+                            callback.onError(ApiErrorCode.BOOKING_ERROR, resBody);
                         }
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + resBody);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
                 }
             }
         });
@@ -82,7 +83,7 @@ public class BookingService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -97,10 +98,10 @@ public class BookingService {
                         }
                         callback.onSuccess(bookings);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });
@@ -132,7 +133,7 @@ public class BookingService {
             SupabaseConfig.client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    callback.onError("Lỗi kết nối: " + e.getMessage());
+                    callback.onError(ApiErrorCode.NETWORK, e.getMessage());
                 }
 
                 @Override
@@ -141,12 +142,12 @@ public class BookingService {
                         callback.onSuccess(null);
                     } else {
                         String resBody = response.body() != null ? response.body().string() : "";
-                        callback.onError("Lỗi server: " + resBody);
+                        callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
                     }
                 }
             });
         } catch (Exception e) {
-            callback.onError("Lỗi: " + e.getMessage());
+            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
     }
 }

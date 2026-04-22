@@ -1,5 +1,8 @@
 package com.example.tourgo.remote;
 
+import static com.example.tourgo.remote.SupabaseConfig.mapHttp;
+
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
 
@@ -34,7 +37,7 @@ public class HotelService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -46,10 +49,10 @@ public class HotelService {
                         List<Hotel> hotels = Hotel.fromJsonArray(array);
                         callback.onSuccess(hotels);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(mapHttp(response.code()), body);
                 }
             }
         });
@@ -74,7 +77,7 @@ public class HotelService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -87,13 +90,13 @@ public class HotelService {
                             Hotel hotel = Hotel.fromJson(array.getJSONObject(0));
                             callback.onSuccess(hotel);
                         } else {
-                            callback.onError("Không tìm thấy hotel");
+                            callback.onError(ApiErrorCode.NOT_FOUND, body);
                         }
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN,e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(mapHttp(response.code()), body);
                 }
             }
         });
@@ -119,7 +122,7 @@ public class HotelService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -131,10 +134,10 @@ public class HotelService {
                         List<Hotel> hotels = Hotel.fromJsonArray(array);
                         callback.onSuccess(hotels);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(mapHttp(response.code()), body);
                 }
             }
         });

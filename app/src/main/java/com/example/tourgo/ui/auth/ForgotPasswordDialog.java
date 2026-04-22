@@ -25,6 +25,7 @@ import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.utils.ApiErrorMapper;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class ForgotPasswordDialog extends DialogFragment {
@@ -86,7 +87,7 @@ public class ForgotPasswordDialog extends DialogFragment {
         btnReset.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                tilEmail.setError("Email không hợp lệ");
+                tilEmail.setError(getString(R.string.err_email_invalid));
                 return;
             }
             sendRecoveryEmail(email);
@@ -106,33 +107,20 @@ public class ForgotPasswordDialog extends DialogFragment {
             }
 
             @Override
-            public void onError(ApiErrorCode code, String errorMessage) {
+            public void onError(ApiErrorCode code, String raw) {  // ← chữ ký mới
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     setLoading(false);
-                    handleErrorMessage(code, errorMessage);
+                    if (code == ApiErrorCode.NETWORK) {
+                        Toast.makeText(requireContext(),
+                                R.string.err_network, Toast.LENGTH_SHORT).show();
+                    } else {
+                        tilEmail.setError(
+                                ApiErrorMapper.messageOf(requireContext(), code));
+                    }
                 });
             }
         });
-    }
-
-    private void handleErrorMessage(ApiErrorCode code, String rawError) {
-        if (code == ApiErrorCode.NETWORK) {
-            Toast.makeText(requireContext(), "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (code == ApiErrorCode.USER_NOT_FOUND) {
-            tilEmail.setError("Email này chưa được đăng ký");
-            return;
-        }
-
-        if (code == ApiErrorCode.RATE_LIMIT) {
-            tilEmail.setError("Gửi quá nhanh, vui lòng thử lại sau vài phút");
-            return;
-        }
-
-        tilEmail.setError(rawError);
     }
 
     private void setLoading(boolean loading) {
@@ -150,7 +138,7 @@ public class ForgotPasswordDialog extends DialogFragment {
         tilEmail.setVisibility(View.GONE);
         btnReset.setVisibility(View.GONE);
         tvSuccess.setVisibility(View.VISIBLE);
-        tvSuccess.setText("Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.");
+        tvSuccess.setText(getString(R.string.msg_recovery_sent));
         tvSuccess.postDelayed(() -> { if (isAdded()) dismiss(); }, 4000);
     }
 }

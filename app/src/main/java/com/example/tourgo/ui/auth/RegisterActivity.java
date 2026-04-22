@@ -13,10 +13,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
 import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.utils.ApiErrorMapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,34 +67,34 @@ public class RegisterActivity extends AppCompatActivity {
                             JSONArray identities = json.optJSONArray("identities");
                             
                             if (identities != null && identities.length() == 0) {
-                                binding.tilRegisterEmail.setError("Email này đã được đăng ký");
+                                binding.tilRegisterEmail.setError(getString(R.string.err_email_registered));
                                 binding.etRegisterEmail.requestFocus();
                                 return;
                             }
 
-                            Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this, getString(R.string.msg_register_success), Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
                         } catch (Exception e) {
-                            Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     });
                 }
 
                 @Override
-                public void onError(ApiErrorCode code, String errorMessage) {
+                public void onError(ApiErrorCode code, String raw) {
                     runOnUiThread(() -> {
                         setLoading(false);
-                        if (code == ApiErrorCode.NETWORK) {
-                            Toast.makeText(RegisterActivity.this, "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-                        } else if (code == ApiErrorCode.EMAIL_ALREADY_REGISTERED) {
-                            binding.tilRegisterEmail.setError("Email này đã được đăng ký");
+                        if (code == ApiErrorCode.EMAIL_ALREADY_REGISTERED) {
+                            binding.tilRegisterEmail.setError(getString(R.string.err_email_registered));
                             binding.etRegisterEmail.requestFocus();
                         } else {
-                            Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this,
+                                    ApiErrorMapper.messageOf(RegisterActivity.this, code),
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -103,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void setLoading(boolean loading) {
         binding.btnRegister.setEnabled(!loading);
         binding.progressBarRegister.setVisibility(loading ? View.VISIBLE : View.GONE);
-        binding.btnRegister.setText(loading ? "" : "Sign Up");
+        binding.btnRegister.setText(loading ? "" : getString(R.string.login_sign_up));
     }
 
     private void setupValidation() {
@@ -144,19 +146,19 @@ public class RegisterActivity extends AppCompatActivity {
         String confirm = confirmEdit != null ? confirmEdit.toString() : "";
 
         if (name.isEmpty()) {
-            binding.tilRegisterName.setError("Tên không được để trống");
+            binding.tilRegisterName.setError(getString(R.string.err_name_empty));
             return false;
         }
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.tilRegisterEmail.setError("Email không hợp lệ");
+            binding.tilRegisterEmail.setError(getString(R.string.err_email_invalid));
             return false;
         }
         if (password.length() < 6) {
-            binding.tilRegisterPassword.setError("Mật khẩu phải từ 6 ký tự");
+            binding.tilRegisterPassword.setError(getString(R.string.err_password_too_short));
             return false;
         }
         if (!confirm.equals(password)) {
-            binding.tilRegisterConfirmPassword.setError("Mật khẩu không khớp");
+            binding.tilRegisterConfirmPassword.setError(getString(R.string.err_password_mismatch));
             return false;
         }
         return true;

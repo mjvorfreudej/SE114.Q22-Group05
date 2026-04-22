@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.Toast; // Thêm Toast
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,8 +13,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.ui.main.MainActivity;
+import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
@@ -30,12 +33,6 @@ public class LoginActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        if (session.isLoggedIn()) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
-            return;
-        }
-
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
@@ -45,6 +42,13 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
+        // NOTE: Không nên đăng nhập trực tiếp khi có sesion sẽ gây lỗi nếu đăng xuất
+        if (session.isLoggedIn()) {
+            binding.etLoginEmail.setText(session.getEmail());
+            binding.etLoginPassword.setText(session.getPassword());
+            binding.cbLoginRemember.setChecked(true);
+        }
 
         validateEmail();
         validatePassword();
@@ -63,11 +67,11 @@ public class LoginActivity extends AppCompatActivity {
             String password = binding.etLoginPassword.getText().toString();
 
             if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                binding.tilLoginEmail.setError("Vui lòng nhập email hợp lệ");
+                binding.tilLoginEmail.setError(getString(R.string.err_email_invalid));
                 return;
             }
             if (password.isEmpty()) {
-                binding.tilLoginPassword.setError("Vui lòng nhập mật khẩu");
+                binding.tilLoginPassword.setError(getString(R.string.err_password_empty));
                 return;
             }
 
@@ -76,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
             binding.pbLoginLoading.setVisibility(android.view.View.VISIBLE);
 
             // DÙNG FAKE DATA ĐỂ TEST NHANH
+            // TODO: Dùng xong nhớ xóa
             if (email.equals("admin@gmail.com") && password.equals("123456")) {
                 session.saveUser(email, password);
                 Toast.makeText(LoginActivity.this, "Đăng nhập giả thành công!", Toast.LENGTH_SHORT).show();
@@ -95,18 +100,25 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             session.clear();
                         }
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     });
                 }
 
                 @Override
-                public void onError(ApiErrorCode code, String errorMessage) {
+                public void onError(ApiErrorCode code, String raw) {
                     runOnUiThread(() -> {
-                        binding.btnLogin.setVisibility(android.view.View.VISIBLE);
-                        binding.pbLoginLoading.setVisibility(android.view.View.GONE);
-                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                        binding.btnLogin.setVisibility(View.VISIBLE);
+                        binding.pbLoginLoading.setVisibility(View.GONE);
+                        if (code == ApiErrorCode.INVALID_CREDENTIALS) {
+                            binding.tilLoginPassword.setError(
+                                    getString(R.string.err_invalid_credentials));
+                        } else {
+                            Toast.makeText(LoginActivity.this,
+                                    ApiErrorMapper.messageOf(LoginActivity.this, code),
+                                    Toast.LENGTH_LONG).show();
+                        }
                     });
                 }
             });
@@ -119,9 +131,9 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 String email = s.toString().trim();
                 if (email.isEmpty()) {
-                    binding.tilLoginEmail.setError("Email không được để trống");
+                    binding.tilLoginEmail.setError(getString(R.string.err_email_empty));
                 } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    binding.tilLoginEmail.setError("Định dạng email không hợp lệ");
+                    binding.tilLoginEmail.setError(getString(R.string.err_email_invalid));
                 } else {
                     binding.tilLoginEmail.setError(null);
                 }
@@ -138,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) {
-                    binding.tilLoginPassword.setError("Mật khẩu không được để trống");
+                    binding.tilLoginPassword.setError(getString(R.string.err_password_empty));
                 } else {
                     binding.tilLoginPassword.setError(null);
                 }

@@ -1,12 +1,109 @@
 <resources>
     <string name="app_name">TourGo</string>
-    <string name="err_network">Network error. Please try again.</string>
-    <string name="err_email_registered">Email already registered.</string>
-    <string name="err_invalid_credentials">Invalid email or password.</string>
-    <string name="err_password_too_short">Password is too short.</string>
-    <string name="err_user_not_found">User not found.</string>
-    <string name="err_rate_limit">Too many requests. Please slow down.</string>
-    <string name="err_invalid_token">Invalid session. Please login again.</string>
-    <string name="err_password_same_as_old">New password must be different from old one.</string>
-    <string name="err_unknown">An unknown error occurred.</string>
+
+    <string name="profile_language">Ngôn ngữ</string>
+    <string name="lang_vi">Tiếng Việt</string>
+    <string name="lang_en">Tiếng Anh</string>
+    <string name="lang_system">Theo hệ thống</string>
+    <string name="action_cancel">Hủy</string>
+
+    <!-- Auth chung -->
+    <string name="login_button">Đăng nhập</string>
+    <string name="tv_email_address">Địa chỉ email</string>
+    <string name="tv_password">Mật khẩu</string>
+    <string name="tv_confirm_password">Xác nhận mật khẩu</string>
+
+    <!-- activity_login.xml -->
+    <string name="login_welcome">Chào mừng trở lại</string>
+    <string name="login_details">Nhập thông tin của bạn bên dưới để\nđăng nhập lại tài khoản</string>
+    <string name="login_email_hint">example@gmail.com</string>
+    <string name="login_password_hint">********</string>
+    <string name="login_remember_me">Ghi nhớ đăng nhập</string>
+    <string name="login_forgot_password">Quên mật khẩu?</string>
+    <string name="login_no_account">Chưa có tài khoản?</string>
+    <string name="login_sign_up">Đăng ký</string>
+
+    <!-- activity_register.xml -->
+    <string name="register_create">Tạo tài khoản</string>
+    <string name="register_details">Điền thông tin bên dưới để tạo\ntài khoản mới</string>
+    <string name="register_full_name">Họ và tên</string>
+    <string name="register_full_name_hint">Nhập họ và tên của bạn</string>
+    <string name="register_email_hint">Nhập địa chỉ email của bạn</string>
+    <string name="register_button">Đăng ký</string>
+    <string name="register_have_account">Đã có tài khoản?</string>
+    <string name="register_sign_in">Đăng nhập</string>
+
+    <!-- activity_reset_password.xml -->
+    <string name="reset_title">Đặt lại mật khẩu</string>
+    <string name="reset_new_password_hint">Mật khẩu mới</string>
+    <string name="reset_confirm_password_hint">Xác nhận mật khẩu mới</string>
+    <string name="reset_update_button">Cập nhật mật khẩu</string>
+
+    <!-- dialog_forgot_password.xml -->
+    <string name="fpass_title">Quên mật khẩu</string>
+    <string name="fpass_description">Nhập email của bạn để nhận liên kết đặt lại mật khẩu</string>
+    <string name="fpass_email_hint">Email</string>
+    <string name="fpass_send_button">Gửi liên kết đặt lại</string>
+
+    <!-- activity_main.xml -->
+    <string name="main_time_placeholder">07:12</string>
+    <string name="main_greeting">Xin chào, Harry Bender</string>
+    <string name="main_question">Lần tới bạn muốn check-in ở đâu?</string>
+    <string name="main_search_destination">Nhập điểm đến</string>
+    <string name="main_check_in_out">Nhận phòng - Trả phòng</string>
+    <string name="main_guest">Khách</string>
+    <string name="main_find">Tìm kiếm</string>
+    <string name="main_most_popular">Phổ biến nhất</string>
+    <string name="main_see_all">Xem tất cả</string>
+    <string name="main_trending_hotels">Khách sạn xu hướng</string>
+    <string name="main_nav_home">Home</string>
+
+    <!-- activity_profile.xml -->
+    <string name="profile_name_placeholder">Harry Bender</string>
+    <string name="profile_email_placeholder">harry@gmail.com</string>
+    <string name="profile_personal_info">Thông tin cá nhân</string>
+    <string name="profile_phone_label">Số điện thoại</string>
+    <string name="profile_phone_placeholder">+84 912 345 678</string>
+    <string name="profile_about_label">Giới thiệu</string>
+    <string name="profile_about_placeholder">Người yêu du lịch…</string>
+    <string name="profile_edit_button">Chỉnh sửa hồ sơ</string>
+    <string name="profile_logout">Đăng xuất</string>
+
+    <!-- dialog_edit_profile.xml -->
+    <string name="edprofile_title">Sửa thông tin cá nhân</string>
+
+    <!-- Auth errors -->
+    <string name="err_network">Lỗi kết nối mạng, vui lòng thử lại</string>
+    <string name="err_email_registered">Email này đã được đăng ký</string>
+    <string name="err_invalid_credentials">Email hoặc mật khẩu không chính xác</string>
+    <string name="err_password_too_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="err_user_not_found">Email này chưa được đăng ký</string>
+    <string name="err_rate_limit">Gửi quá nhanh, vui lòng thử lại sau vài phút</string>
+    <string name="err_invalid_token">Liên kết không hợp lệ hoặc đã hết hạn</string>
+    <string name="err_password_same_as_old">Mật khẩu mới không được trùng mật khẩu cũ</string>
+    <string name="err_unknown">Có lỗi xảy ra, vui lòng thử lại</string>
+
+    <!-- Validation inline -->
+    <string name="err_email_empty">Email không được để trống</string>
+    <string name="err_email_invalid">Email không hợp lệ</string>
+    <string name="err_password_empty">Mật khẩu không được để trống</string>
+    <string name="err_password_mismatch">Mật khẩu xác nhận không khớp</string>
+    <string name="err_name_empty">Tên không được để trống</string>
+
+    <!-- Success messages -->
+    <string name="msg_login_success">Đăng nhập thành công!</string>
+    <string name="msg_register_success">Đăng ký thành công!</string>
+    <string name="msg_reset_success">Đổi mật khẩu thành công!</string>
+    <string name="msg_recovery_sent">Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.</string>
+
+    <!--  Error Code  -->
+    <string name="err_unauthorized">Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại</string>
+    <string name="err_forbidden">Bạn không có quyền thực hiện thao tác này</string>
+    <string name="err_not_found">Không tìm thấy dữ liệu</string>
+    <string name="err_server">Lỗi máy chủ, vui lòng thử lại</string>
+    <string name="err_already_booked">Bạn đã đặt tour này</string>
+    <string name="err_invalid_date">Ngày không hợp lệ</string>
+    <string name="err_tour_full">Tour đã đầy chỗ</string>
+    <string name="err_already_favorited">Đã có trong danh sách yêu thích</string>
+    <string name="booking_error">Không thể tạo booking</string>
 </resources>

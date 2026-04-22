@@ -1,7 +1,8 @@
 package com.example.tourgo.remote;
 
 import com.example.tourgo.BuildConfig;
-import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.ApiCallback;
 import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -15,7 +16,7 @@ public class SupabaseConfig {
     public static final OkHttpClient client = new OkHttpClient();
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static void executeRequest(Request request, AuthCallback callback) {
+    public static void executeRequest(Request request, ApiCallback callback) {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -32,5 +33,48 @@ public class SupabaseConfig {
                 }
             }
         });
+    }
+
+    public static void handleHttpError(int httpCode, String resBody, ApiCallback cb) {
+        if (httpCode == 401) {
+            cb.onError(ApiErrorCode.UNAUTHORIZED, resBody);
+            return;
+        }
+        if (httpCode == 403) {
+            cb.onError(ApiErrorCode.FORBIDDEN, resBody);
+            return;
+        }
+        if (httpCode == 404) {
+            cb.onError(ApiErrorCode.NOT_FOUND, resBody);
+            return;
+        }
+        if (httpCode == 429) {
+            cb.onError(ApiErrorCode.RATE_LIMIT, resBody);
+            return;
+        }
+        if (httpCode >= 500) {
+            cb.onError(ApiErrorCode.SERVER_ERROR, resBody);
+            return;
+        }
+        cb.onError(ApiErrorCode.UNKNOWN, resBody);
+    }
+
+    public static Request buildGet(String url) {
+        return new Request.Builder()
+                .url(url)
+                .addHeader("apikey", SupabaseConfig.ANON_KEY)
+                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
+                .addHeader("Accept", "application/json")
+                .get()
+                .build();
+    }
+
+    public static ApiErrorCode mapHttp(int code) {
+        if (code == 401) return ApiErrorCode.UNAUTHORIZED;
+        if (code == 403) return ApiErrorCode.FORBIDDEN;
+        if (code == 404) return ApiErrorCode.NOT_FOUND;
+        if (code == 429) return ApiErrorCode.RATE_LIMIT;
+        if (code >= 500) return ApiErrorCode.SERVER_ERROR;
+        return ApiErrorCode.UNKNOWN;
     }
 }

@@ -26,7 +26,7 @@
             android:id="@+id/tvRegisterCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create Account"
+            android:text="@string/register_create"
             android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +38,7 @@
             android:id="@+id/tvRegisterDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fill up this form to create a new \n account"
+            android:text="@string/register_details"
             android:textAlignment="center"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@+id/tvRegisterCreate"
@@ -50,7 +50,7 @@
             android:id="@+id/tvRegisterName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Full name"
+            android:text="@string/register_full_name"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/tvRegisterDetails"
@@ -81,7 +81,7 @@
                 android:id="@+id/etRegisterName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter your full name" />
+                android:hint="@string/register_full_name_hint" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -89,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="Email address"
+            android:text="@string/tv_email_address"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +119,7 @@
                 android:id="@+id/etRegisterEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter your email address"
+                android:hint="@string/register_email_hint"
                 android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -127,7 +127,7 @@
             android:id="@+id/tvRegisterPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Password"
+            android:text="@string/tv_password"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/tilRegisterEmail"
@@ -159,7 +159,7 @@
                 android:id="@+id/etRegisterPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="******"
+                android:hint="@string/login_password_hint"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -167,7 +167,7 @@
             android:id="@+id/tvRegisterConfirmPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirm password"
+            android:text="@string/tv_confirm_password"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/tilRegisterPassword"
@@ -199,7 +199,7 @@
                 android:id="@+id/etRegisterConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="******"
+                android:hint="@string/login_password_hint"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -207,7 +207,7 @@
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
+            android:text="@string/register_button"
             app:layout_constraintTop_toBottomOf="@id/tilRegisterConfirmPassword"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -233,7 +233,7 @@
             android:id="@+id/tvRegisterHaveAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Already have an account?"
+            android:text="@string/register_have_account"
             app:layout_constraintTop_toBottomOf="@id/btnRegister"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -246,7 +246,7 @@
             android:id="@+id/tvRegisterSignIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign in"
+            android:text="@string/register_sign_in"
             android:textStyle="bold"
             android:textColor="#42a4f5"
             app:layout_constraintTop_toBottomOf="@id/btnRegister"
