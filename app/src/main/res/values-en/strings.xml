@@ -1,3 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">TourGo</string>
+
+    <string name="profile_language">Language</string>
+    <string name="lang_vi">Vietnamese</string>
+    <string name="lang_en">English</string>
+    <string name="lang_system">System default</string>
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Auth common -->
+    <string name="login_button">Log in</string>
+    <string name="tv_email_address">Email address</string>
+    <string name="tv_password">Password</string>
+    <string name="tv_confirm_password">Confirm password</string>
+
+    <!-- activity_login.xml -->
+    <string name="login_welcome">Welcome Back</string>
+    <string name="login_details">Enter your details below to log back into\nyour account</string>
+    <string name="login_email_hint">example@gmail.com</string>
+    <string name="login_password_hint">********</string>
+    <string name="login_remember_me">Remember me</string>
+    <string name="login_forgot_password">Forgot password?</string>
+    <string name="login_no_account">Don\'t have an account?</string>
+    <string name="login_sign_up">Sign up</string>
+
+    <!-- activity_register.xml -->
+    <string name="register_create">Create Account</string>
+    <string name="register_details">Fill up this form to create a new\naccount</string>
+    <string name="register_full_name">Full name</string>
+    <string name="register_full_name_hint">Enter your full name</string>
+    <string name="register_email_hint">Enter your email address</string>
+    <string name="register_button">Sign Up</string>
+    <string name="register_have_account">Already have an account?</string>
+    <string name="register_sign_in">Sign in</string>
+
+    <!-- activity_reset_password.xml -->
+    <string name="reset_title">Reset Password</string>
+    <string name="reset_new_password_hint">New Password</string>
+    <string name="reset_confirm_password_hint">Confirm New Password</string>
+    <string name="reset_update_button">Update Password</string>
+
+    <!-- dialog_forgot_password.xml -->
+    <string name="fpass_title">Forgot Password</string>
+    <string name="fpass_description">Enter your email to receive a password reset link</string>
+    <string name="fpass_email_hint">Email</string>
+    <string name="fpass_send_button">Send Reset Link</string>
+
+    <!-- activity_main.xml -->
+    <string name="main_time_placeholder">07:12</string>
+    <string name="main_greeting">Hey, Harry Bender</string>
+    <string name="main_question">Where will you check in next?</string>
+    <string name="main_search_destination">Enter Destination</string>
+    <string name="main_check_in_out">Check In - Check out</string>
+    <string name="main_guest">Guest</string>
+    <string name="main_find">Find</string>
+    <string name="main_most_popular">Most Popular</string>
+    <string name="main_see_all">See all</string>
+    <string name="main_trending_hotels">Trending Hotels</string>
+    <string name="main_nav_home">Home</string>
+
+    <!-- activity_profile.xml -->
+    <string name="profile_name_placeholder">Harry Bender</string>
+    <string name="profile_email_placeholder">harry@gmail.com</string>
+    <string name="profile_personal_info">Personal Information</string>
+    <string name="profile_phone_label">Phone</string>
+    <string name="profile_phone_placeholder">+84 912 345 678</string>
+    <string name="profile_about_label">About Me</string>
+    <string name="profile_about_placeholder">Travel lover…</string>
+    <string name="profile_edit_button">Edit Profile</string>
+    <string name="profile_logout">Logout</string>
+
+    <!-- dialog_edit_profile.xml -->
+    <string name="edprofile_title">Edit profile</string>
+
+    <!-- Auth errors -->
+    <string name="err_network">Network error, please try again</string>
+    <string name="err_email_registered">This email is already registered</string>
+    <string name="err_invalid_credentials">Email or password is incorrect</string>
+    <string name="err_password_too_short">Password must be at least 6 characters</string>
+    <string name="err_user_not_found">This email is not registered</string>
+    <string name="err_rate_limit">Too many requests, please try again in a few minutes</string>
+    <string name="err_invalid_token">Invalid or expired link</string>
+    <string name="err_password_same_as_old">New password must differ from the old one</string>
+    <string name="err_unknown">Something went wrong, please try again</string>
+
+    <!-- Validation inline -->
+    <string name="err_email_empty">Email cannot be empty</string>
+    <string name="err_email_invalid">Invalid email</string>
+    <string name="err_password_empty">Password cannot be empty</string>
+    <string name="err_password_mismatch">Passwords do not match</string>
+    <string name="err_name_empty">Name cannot be empty</string>
+
+    <!-- Success messages -->
+    <string name="msg_login_success">Signed in successfully!</string>
+    <string name="msg_register_success">Account created!</string>
+    <string name="msg_reset_success">Password updated!</string>
+    <string name="msg_recovery_sent">Recovery email sent!\nPlease check your inbox.</string>
+
+    <!--  Error Code  -->
+    <string name="err_unauthorized">Session expired, please sign in again</string>
+    <string name="err_forbidden">You don\'t have permission to do that</string>
+    <string name="err_not_found">Not found</string>
+    <string name="err_server">Server error, please try again</string>
+    <string name="err_already_booked">You already booked this tour</string>
+    <string name="err_invalid_date">Invalid date</string>
+    <string name="err_tour_full">Tour is fully booked</string>
+    <string name="err_already_favorited">Already in favorites</string>
+    <string name="booking_error">Can not create booking</string>
 </resources>

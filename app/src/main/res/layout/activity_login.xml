@@ -26,7 +26,7 @@
             android:id="@+id/tvLoginWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome Back"
+            android:text="@string/login_welcome"
             android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +38,7 @@
             android:id="@+id/tvLoginDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter your details below to log back into \n your account"
+            android:text="@string/login_details"
             android:textAlignment="center"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@+id/tvLoginWelcome"
@@ -50,7 +50,7 @@
             android:id="@+id/tvLoginEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Email address"
+            android:text="@string/tv_email_address"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/tvLoginDetails"
@@ -84,15 +84,16 @@
                 android:id="@+id/etLoginEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="example@gmail.com"
+                android:hint="@string/login_email_hint"
                 android:inputType="textEmailAddress"/>
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/tvLoginPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Password"
+            android:text="@string/tv_password"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/tilLoginEmail"
@@ -127,7 +128,7 @@
                 android:id="@+id/etLoginPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="********"
+                android:hint="@string/login_password_hint"
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -135,7 +136,7 @@
             android:id="@+id/cbLoginRemember"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Remember me"
+            android:text="@string/login_remember_me"
             app:layout_constraintTop_toBottomOf="@+id/tilLoginPassword"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_margin="12dp"/>
@@ -144,7 +145,7 @@
             android:id="@+id/tvForgotPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Forgot password?"
+            android:text="@string/login_forgot_password"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@id/tilLoginPassword"
             app:layout_constraintEnd_toEndOf="parent"
@@ -156,7 +157,7 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log in"
+            android:text="@string/login_button"
             app:layout_constraintTop_toBottomOf="@id/cbLoginRemember"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -170,7 +171,7 @@
             android:id="@+id/tvLoginNoAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Don't have an account?"
+            android:text="@string/login_no_account"
             app:layout_constraintTop_toBottomOf="@id/btnLogin"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -183,7 +184,7 @@
             android:id="@+id/tvLoginSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign up"
+            android:text="@string/login_sign_up"
             android:textStyle="bold"
             android:textColor="#42a4f5"
             app:layout_constraintTop_toBottomOf="@id/btnLogin"
@@ -193,5 +194,17 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
+
+        <ProgressBar
+            android:id="@+id/pbLoginLoading"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

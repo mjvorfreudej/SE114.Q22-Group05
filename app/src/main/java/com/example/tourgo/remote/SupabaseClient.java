@@ -1,7 +1,9 @@
 package com.example.tourgo.remote;
 
 import com.example.tourgo.BuildConfig;
-import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.interfaces.ApiCallback;
+import com.example.tourgo.interfaces.ApiErrorCode;
+
 import org.json.JSONObject;
 import java.io.IOException;
 import okhttp3.Call;
@@ -18,7 +20,7 @@ public class SupabaseClient {
     private static final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static void register(String email, String password, String name, AuthCallback callback) {
+    public static void register(String email, String password, String name, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/signup";
         try {
             JSONObject metadata = new JSONObject();
@@ -51,7 +53,7 @@ public class SupabaseClient {
         }
     }
 
-    public static void login(String email, String password, AuthCallback callback) {
+    public static void login(String email, String password, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/token?grant_type=password";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -88,37 +90,49 @@ public class SupabaseClient {
                 .build();
     }
 
-    private static void handleError(String resBody, AuthCallback callback) {
+    private static void handleError(String resBody, ApiCallback callback) {
         if (resBody == null || resBody.isEmpty()) {
-            callback.onError("Có lỗi xảy ra, vui lòng thử lại");
+            callback.onError(ApiErrorCode.UNKNOWN, "");
             return;
         }
-        String lowerRes = resBody.toLowerCase();
-        if (lowerRes.contains("unable to resolve host") || lowerRes.contains("failed to connect") || lowerRes.contains("timeout")) {
-            callback.onError("Lỗi kết nối mạng, vui lòng thử lại");
+        String lower = resBody.toLowerCase();
+        if (lower.contains("unable to resolve host")
+                || lower.contains("failed to connect")
+                || lower.contains("timeout")) {
+            callback.onError(ApiErrorCode.NETWORK, resBody);
             return;
         }
         try {
-            JSONObject errorJson = new JSONObject(resBody);
-            String msg = errorJson.optString("msg", errorJson.optString("message", errorJson.optString("error_description", "")));
+            JSONObject json = new JSONObject(resBody);
+            String msg = json.optString("msg",
+                    json.optString("message", json.optString("error_description", "")));
             if (msg.isEmpty()) msg = resBody;
-            String lowerMsg = msg.toLowerCase();
+            String m = msg.toLowerCase();
 
-            if (lowerMsg.contains("already registered") || lowerMsg.contains("already exists")) {
-                callback.onError("Email này đã được đăng ký");
-            } else if (lowerMsg.contains("invalid login credentials")) {
-                callback.onError("Email hoặc mật khẩu không chính xác");
-            } else if (lowerMsg.contains("at least 6 characters")) {
-                callback.onError("Mật khẩu phải có ít nhất 6 ký tự");
+            if (m.contains("already registered") || m.contains("already exists")) {
+                callback.onError(ApiErrorCode.EMAIL_ALREADY_REGISTERED, msg);
+            } else if (m.contains("invalid login credentials")) {
+                callback.onError(ApiErrorCode.INVALID_CREDENTIALS, msg);
+            } else if (m.contains("at least 6 characters")) {
+                callback.onError(ApiErrorCode.PASSWORD_TOO_SHORT, msg);
+            } else if (m.contains("user not found")) {
+                callback.onError(ApiErrorCode.USER_NOT_FOUND, msg);
+            } else if (m.contains("rate limit")) {
+                callback.onError(ApiErrorCode.RATE_LIMIT, msg);
+            } else if (m.contains("invalid token") || m.contains("expired")) {
+                callback.onError(ApiErrorCode.INVALID_TOKEN, msg);
+            } else if (m.contains("new password should be different")
+                    || m.contains("same as the old")) {
+                callback.onError(ApiErrorCode.PASSWORD_SAME_AS_OLD, msg);
             } else {
-                callback.onError(msg);
+                callback.onError(ApiErrorCode.UNKNOWN, msg);
             }
         } catch (Exception e) {
-            callback.onError(resBody);
+            callback.onError(ApiErrorCode.UNKNOWN, resBody);
         }
     }
 
-    public static void resetPassword(String email, AuthCallback callback) {
+    public static void resetPassword(String email, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/recover";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -138,7 +152,7 @@ public class SupabaseClient {
         } catch (Exception e) { callback.onError(e.getMessage()); }
     }
 
-    public static void updatePassword(String accessToken, String newPassword, AuthCallback callback) {
+    public static void updatePassword(String accessToken, String newPassword, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/user";
         try {
             JSONObject jsonBody = new JSONObject();
