@@ -36,11 +36,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+<!--                    TODO: Nên hiện bằng thời gian thực-->
                     <TextView
                         android:id="@+id/tvTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="07:12"
+                        android:text="@string/main_time_placeholder"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -60,7 +61,7 @@
                             android:layout_height="20dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_bell_20"
-                            android:tint="@android:color/white" />
+                            app:tint="@android:color/white" />
                     </FrameLayout>
                 </RelativeLayout>
 
@@ -69,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
-                    android:text="Hey, Harry Bender"
+                    android:text="@string/main_greeting"
                     android:textColor="#DAECFF"
                     android:textSize="18sp" />
 
@@ -78,7 +79,7 @@
                     android:layout_width="260dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Where will you check in next?"
+                    android:text="@string/main_question"
                     android:textColor="@android:color/white"
                     android:textSize="28sp"
                     android:textStyle="bold" />
@@ -102,14 +103,14 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_location_20"
-                        android:tint="@android:color/white" />
+                        app:tint="@android:color/white" />
 
                     <TextView
                         android:id="@+id/tvSearchDestination"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="Enter Destination"
+                        android:text="@string/main_search_destination"
                         android:textColor="#F4F8FF"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -139,14 +140,14 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_calendar_20"
-                            android:tint="@android:color/white" />
+                            app:tint="@android:color/white" />
 
                         <TextView
                             android:id="@+id/tvCheckInOut"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:text="Check In- Check out"
+                            android:text="@string/main_check_in_out"
                             android:textColor="#F4F8FF"
                             android:textSize="15sp" />
                     </LinearLayout>
@@ -173,14 +174,14 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_guest_20"
-                            android:tint="@android:color/white" />
+                            app:tint="@android:color/white" />
 
                         <TextView
                             android:id="@+id/tvGuest"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:text="Guest"
+                            android:text="@string/main_guest"
                             android:textColor="#F4F8FF"
                             android:textSize="15sp" />
                     </LinearLayout>
@@ -203,13 +204,13 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/ic_search_24"
-                        android:tint="#2F5AC2" />
+                        app:tint="#2F5AC2" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Find"
+                        android:text="@string/main_find"
                         android:textColor="#2F5AC2"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -237,7 +238,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Most Popular"
+                        android:text="@string/main_most_popular"
                         android:textColor="#1C1F26"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -246,7 +247,7 @@
                         android:id="@+id/tvSeeAllTours"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="See all"
+                        android:text="@string/main_see_all"
                         android:textColor="#1E6DEA"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -273,7 +274,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Trending Hotels"
+                        android:text="@string/main_trending_hotels"
                         android:textColor="#1C1F26"
                         android:textSize="24sp"
                         android:textStyle="bold" />
@@ -282,7 +283,7 @@
                         android:id="@+id/tvSeeAllHotels"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="See all"
+                        android:text="@string/main_see_all"
                         android:textColor="#1E6DEA"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -324,13 +325,13 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/ic_home_24"
-                            android:tint="#1F2430" />
+                            app:tint="#1F2430" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:text="Home"
+                            android:text="@string/main_nav_home"
                             android:textColor="#1F2430"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -350,7 +351,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:src="@drawable/ic_search_24"
-                            android:tint="#9AA1AF" />
+                            app:tint="#9AA1AF" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -368,7 +369,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:src="@drawable/ic_favorite_24"
-                            android:tint="#9AA1AF" />
+                            app:tint="#9AA1AF" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -386,7 +387,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:src="@drawable/ic_person_24"
-                            android:tint="#9AA1AF" />
+                            app:tint="#9AA1AF" />
                     </LinearLayout>
                 </LinearLayout>
 

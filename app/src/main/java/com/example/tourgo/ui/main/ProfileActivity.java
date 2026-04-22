@@ -11,6 +11,7 @@ import com.example.tourgo.R;
 import com.example.tourgo.data.AppFakeData;
 import com.example.tourgo.models.User;
 import com.example.tourgo.ui.auth.LoginActivity;
+import com.example.tourgo.utils.LocaleHelper;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -35,6 +36,8 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         setupLogout();
+
+        setupLanguage();
     }
 
     private void setupLogout() {
@@ -44,5 +47,43 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+    }
+
+    private void setupLanguage() {
+        TextView tvCurrent = findViewById(R.id.tvCurrentLang);
+        tvCurrent.setText(labelOf(LocaleHelper.getCurrentLanguageTag()));
+
+        findViewById(R.id.btnLanguage).setOnClickListener(v -> showLanguageDialog(tvCurrent));
+    }
+
+    private void showLanguageDialog(TextView tvCurrent) {
+        final String[] tags   = { "vi", "en", "" };
+        final String[] labels = {
+                getString(R.string.lang_vi),
+                getString(R.string.lang_en),
+                getString(R.string.lang_system)
+        };
+
+        String current = LocaleHelper.getCurrentLanguageTag();
+        int checked = 2;
+        for (int i = 0; i < tags.length; i++) {
+            if (tags[i].equals(current)) { checked = i; break; }
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(R.string.profile_language)
+                .setSingleChoiceItems(labels, checked, (d, which) -> {
+                    LocaleHelper.setAppLocale(tags[which]);
+                    tvCurrent.setText(labels[which]);
+                    d.dismiss();
+                })
+                .setNegativeButton(R.string.action_cancel, null)
+                .show();
+    }
+
+    private String labelOf(String tag) {
+        if ("vi".equals(tag)) return getString(R.string.lang_vi);
+        if ("en".equals(tag)) return getString(R.string.lang_en);
+        return getString(R.string.lang_system);
     }
 }

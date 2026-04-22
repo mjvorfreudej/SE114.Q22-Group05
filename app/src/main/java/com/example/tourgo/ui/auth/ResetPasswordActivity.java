@@ -14,9 +14,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityResetPasswordBinding;
-import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.interfaces.ApiCallback;
+import com.example.tourgo.utils.ApiErrorMapper;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
@@ -39,7 +42,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         accessToken = extractToken(getIntent());
 
         if (accessToken == null) {
-            Toast.makeText(this, "Liên kết không hợp lệ hoặc đã hết hạn.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.err_invalid_token, Toast.LENGTH_LONG).show();
             binding.btnResetPassword.setEnabled(false);
             return;
         }
@@ -52,11 +55,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
             boolean hasError = false;
             if (password.length() < 6) {
-                binding.tilResetPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
+                binding.tilResetPassword.setError(getText(R.string.err_password_too_short));
                 hasError = true;
             }
             if (!password.equals(confirm)) {
-                binding.tilResetConfirmPassword.setError("Mật khẩu xác nhận không khớp");
+                binding.tilResetConfirmPassword.setError(getText(R.string.err_password_mismatch));
                 hasError = true;
             }
 
@@ -106,12 +109,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void submitNewPassword(String newPassword) {
         setLoading(true);
 
-        SupabaseClient.updatePassword(accessToken, newPassword, new AuthCallback() {
+        SupabaseClient.updatePassword(accessToken, newPassword, new ApiCallback() {
             @Override
             public void onSuccess(String responseData) {
                 runOnUiThread(() -> {
                     setLoading(false);
-                    Toast.makeText(ResetPasswordActivity.this, "Đổi mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ResetPasswordActivity.this, R.string.msg_reset_success, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -120,24 +123,22 @@ public class ResetPasswordActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError(ApiErrorCode code, String raw) {
                 runOnUiThread(() -> {
                     setLoading(false);
-                    
-                    if (errorMessage.toLowerCase().contains("unable to resolve host") || 
-                        errorMessage.toLowerCase().contains("failed to connect") ||
-                        errorMessage.toLowerCase().contains("timeout") ||
-                        errorMessage.startsWith("Lỗi mạng")) {
-                        
-                        Toast.makeText(ResetPasswordActivity.this, 
-                                "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-                    } 
-                    else if (errorMessage.contains("trùng") || errorMessage.contains("cũ")) {
-                        binding.tilResetPassword.setError(errorMessage);
-                        binding.etResetPassword.requestFocus();
-                    } 
-                    else {
-                        Toast.makeText(ResetPasswordActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                    switch (code) {
+                        case NETWORK:
+                            Toast.makeText(ResetPasswordActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
+                            break;
+                        case PASSWORD_SAME_AS_OLD:
+                            binding.tilResetPassword.setError(getString(R.string.err_password_same_as_old));
+                            binding.etResetPassword.requestFocus();
+                            break;
+                        case INVALID_TOKEN:
+                            Toast.makeText(ResetPasswordActivity.this, R.string.err_invalid_token, Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Toast.makeText(ResetPasswordActivity.this, ApiErrorMapper.messageOf(ResetPasswordActivity.this, code), Toast.LENGTH_LONG).show();
                     }
                 });
             }

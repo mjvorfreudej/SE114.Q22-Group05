@@ -1,5 +1,6 @@
 package com.example.tourgo.remote;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Favorite;
 
@@ -38,7 +39,7 @@ public class FavoriteService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -48,9 +49,9 @@ public class FavoriteService {
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
                     if (resBody.contains("duplicate") || resBody.contains("unique")) {
-                        callback.onError("Đã có trong danh sách yêu thích");
+                        callback.onError(ApiErrorCode.ALREADY_FAVORITED, resBody);
                     } else {
-                        callback.onError("Lỗi server: " + resBody);
+                        callback.onError(ApiErrorCode.NETWORK, resBody);
                     }
                 }
             }
@@ -73,7 +74,7 @@ public class FavoriteService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -82,7 +83,7 @@ public class FavoriteService {
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError("Lỗi server: " + resBody);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
                 }
             }
         });
@@ -105,7 +106,7 @@ public class FavoriteService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -114,7 +115,7 @@ public class FavoriteService {
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError("Lỗi server: " + resBody);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
                 }
             }
         });
@@ -137,7 +138,7 @@ public class FavoriteService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -146,7 +147,7 @@ public class FavoriteService {
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError("Lỗi server: " + resBody);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
                 }
             }
         });
@@ -170,7 +171,7 @@ public class FavoriteService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
@@ -185,10 +186,10 @@ public class FavoriteService {
                         }
                         callback.onSuccess(favorites);
                     } catch (Exception e) {
-                        callback.onError("Lỗi parse dữ liệu: " + e.getMessage());
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError("Lỗi server: " + body);
+                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
                 }
             }
         });

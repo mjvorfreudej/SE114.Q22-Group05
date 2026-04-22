@@ -22,11 +22,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
-import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.interfaces.ApiCallback;
+import com.example.tourgo.utils.ApiErrorMapper;
 import com.google.android.material.textfield.TextInputLayout;
-
-import org.json.JSONObject;
 
 public class ForgotPasswordDialog extends DialogFragment {
 
@@ -87,7 +87,7 @@ public class ForgotPasswordDialog extends DialogFragment {
         btnReset.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                tilEmail.setError("Email không hợp lệ");
+                tilEmail.setError(getString(R.string.err_email_invalid));
                 return;
             }
             sendRecoveryEmail(email);
@@ -96,7 +96,7 @@ public class ForgotPasswordDialog extends DialogFragment {
 
     private void sendRecoveryEmail(String email) {
         setLoading(true);
-        SupabaseClient.resetPassword(email, new AuthCallback() {
+        SupabaseClient.resetPassword(email, new ApiCallback() {
             @Override
             public void onSuccess(String responseData) {
                 if (!isAdded()) return;
@@ -107,46 +107,20 @@ public class ForgotPasswordDialog extends DialogFragment {
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError(ApiErrorCode code, String raw) {  // ← chữ ký mới
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     setLoading(false);
-                    handleErrorMessage(errorMessage);
+                    if (code == ApiErrorCode.NETWORK) {
+                        Toast.makeText(requireContext(),
+                                R.string.err_network, Toast.LENGTH_SHORT).show();
+                    } else {
+                        tilEmail.setError(
+                                ApiErrorMapper.messageOf(requireContext(), code));
+                    }
                 });
             }
         });
-    }
-
-    private void handleErrorMessage(String rawError) {
-        // Kiểm tra lỗi mạng hoặc các lỗi kỹ thuật dài dòng
-        if (rawError.contains("Unable to resolve host") || 
-            rawError.contains("Failed to connect") || 
-            rawError.contains("timeout") ||
-            rawError.startsWith("Lỗi mạng")) {
-            
-            Toast.makeText(requireContext(), "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        try {
-            if (!rawError.startsWith("{")) {
-                tilEmail.setError(rawError);
-                return;
-            }
-            
-            JSONObject json = new JSONObject(rawError);
-            String msg = json.optString("msg", json.optString("error_description", "Có lỗi xảy ra"));
-            
-            if (msg.contains("User not found")) {
-                tilEmail.setError("Email này chưa được đăng ký");
-            } else if (msg.contains("rate limit")) {
-                tilEmail.setError("Gửi quá nhanh, vui lòng thử lại sau vài phút");
-            } else {
-                tilEmail.setError(msg);
-            }
-        } catch (Exception e) {
-            tilEmail.setError("Có lỗi xảy ra, vui lòng thử lại sau");
-        }
     }
 
     private void setLoading(boolean loading) {
@@ -164,7 +138,7 @@ public class ForgotPasswordDialog extends DialogFragment {
         tilEmail.setVisibility(View.GONE);
         btnReset.setVisibility(View.GONE);
         tvSuccess.setVisibility(View.VISIBLE);
-        tvSuccess.setText("Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.");
+        tvSuccess.setText(getString(R.string.msg_recovery_sent));
         tvSuccess.postDelayed(() -> { if (isAdded()) dismiss(); }, 4000);
     }
 }
