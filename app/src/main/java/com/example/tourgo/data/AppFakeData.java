@@ -47,17 +47,17 @@ public class AppFakeData {
 
     public static List<HotelItem> getPopularHotelItems() {
         List<HotelItem> list = new ArrayList<>();
-        list.add(new HotelItem(R.drawable.hotel_1, "Grand Orchid Resort", "$199", 4.5, true));
-        list.add(new HotelItem(R.drawable.hotel_2, "Prestige Palm Hotel", "$235", 4.6, false));
-        list.add(new HotelItem(R.drawable.hotel_3, "Sea Breeze Suites", "$145", 4.7, true));
+        list.add(new HotelItem(R.drawable.hotel_1, "Grand Orchid Resort", "$199", 4.8, true, "Bangkok, Thailand", "Nestled in the heart of the city, The Grand Orchid offers a luxurious retreat with stunning views and unparalleled service. Our rooms are elegantly designed, providing a serene escape from the bustling city life."));
+        list.add(new HotelItem(R.drawable.hotel_2, "Prestige Palm Hotel", "$235", 4.6, false, "Dubai, UAE", "Experience world-class luxury at the heart of Dubai. Featuring an infinity pool and premium dining options."));
+        list.add(new HotelItem(R.drawable.hotel_3, "Sea Breeze Suites", "$145", 4.7, true, "Phuket, Thailand", "Enjoy the ultimate beach getaway with private access to crystal clear waters and white sandy beaches."));
         return list;
     }
 
     public static List<HotelItem> getTrendingHotelItems() {
         List<HotelItem> list = new ArrayList<>();
-        list.add(new HotelItem(R.drawable.hotel_4, "Urban Bay Inn", "$180", 4.5, false));
-        list.add(new HotelItem(R.drawable.hotel_1, "Ocean Pearl Resort", "$120", 4.4, true));
-        list.add(new HotelItem(R.drawable.hotel_3, "Sunset Coast Hotel", "$98", 4.3, false));
+        list.add(new HotelItem(R.drawable.hotel_4, "Urban Bay Inn", "$180", 4.5, false, "Singapore", "Modern living in the city center. Perfect for business travelers and city explorers."));
+        list.add(new HotelItem(R.drawable.hotel_1, "Ocean Pearl Resort", "$120", 4.4, true, "Da Nang, Vietnam", "Beautiful ocean views and authentic Vietnamese hospitality."));
+        list.add(new HotelItem(R.drawable.hotel_3, "Sunset Coast Hotel", "$98", 4.3, false, "Nha Trang, Vietnam", "Affordable comfort just steps away from the vibrant nightlife of Nha Trang."));
         return list;
     }
 }

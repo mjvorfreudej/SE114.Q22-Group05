@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.play.services.maps)
 
     implementation("androidx.security:security-crypto:1.1.0")
 

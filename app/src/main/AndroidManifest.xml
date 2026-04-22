@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TourGo">
         <activity
+            android:name=".ui.main.DetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.auth.ResetPasswordActivity"
             android:exported="true" >
             <intent-filter>
