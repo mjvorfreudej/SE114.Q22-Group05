@@ -1,6 +1,7 @@
 package com.example.tourgo.remote;
 
 import com.example.tourgo.BuildConfig;
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.AuthCallback;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class SupabaseClient {
                 }
             });
         } catch (Exception e) {
-            callback.onError(e.getMessage());
+            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
     }
 
@@ -75,7 +76,7 @@ public class SupabaseClient {
                 }
             });
         } catch (Exception e) {
-            callback.onError(e.getMessage());
+            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
     }
 
@@ -90,12 +91,12 @@ public class SupabaseClient {
 
     private static void handleError(String resBody, AuthCallback callback) {
         if (resBody == null || resBody.isEmpty()) {
-            callback.onError("Có lỗi xảy ra, vui lòng thử lại");
+            callback.onError(ApiErrorCode.UNKNOWN, "Có lỗi xảy ra, vui lòng thử lại");
             return;
         }
         String lowerRes = resBody.toLowerCase();
         if (lowerRes.contains("unable to resolve host") || lowerRes.contains("failed to connect") || lowerRes.contains("timeout")) {
-            callback.onError("Lỗi kết nối mạng, vui lòng thử lại");
+            callback.onError(ApiErrorCode.NETWORK, "Lỗi kết nối mạng, vui lòng thử lại");
             return;
         }
         try {
@@ -105,16 +106,20 @@ public class SupabaseClient {
             String lowerMsg = msg.toLowerCase();
 
             if (lowerMsg.contains("already registered") || lowerMsg.contains("already exists")) {
-                callback.onError("Email này đã được đăng ký");
+                callback.onError(ApiErrorCode.EMAIL_ALREADY_REGISTERED, "Email này đã được đăng ký");
             } else if (lowerMsg.contains("invalid login credentials")) {
-                callback.onError("Email hoặc mật khẩu không chính xác");
+                callback.onError(ApiErrorCode.INVALID_CREDENTIALS, "Email hoặc mật khẩu không chính xác");
             } else if (lowerMsg.contains("at least 6 characters")) {
-                callback.onError("Mật khẩu phải có ít nhất 6 ký tự");
+                callback.onError(ApiErrorCode.PASSWORD_TOO_SHORT, "Mật khẩu phải có ít nhất 6 ký tự");
+            } else if (lowerMsg.contains("user not found")) {
+                callback.onError(ApiErrorCode.USER_NOT_FOUND, "Người dùng không tồn tại");
+            } else if (lowerMsg.contains("rate limit")) {
+                callback.onError(ApiErrorCode.RATE_LIMIT, "Gửi quá nhanh, vui lòng thử lại sau vài phút");
             } else {
-                callback.onError(msg);
+                callback.onError(ApiErrorCode.UNKNOWN, msg);
             }
         } catch (Exception e) {
-            callback.onError(resBody);
+            callback.onError(ApiErrorCode.UNKNOWN, resBody);
         }
     }
 
@@ -132,10 +137,13 @@ public class SupabaseClient {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) callback.onSuccess("OK");
-                    else handleError(response.body().string(), callback);
+                    else {
+                        String resBody = response.body() != null ? response.body().string() : "Error";
+                        handleError(resBody, callback);
+                    }
                 }
             });
-        } catch (Exception e) { callback.onError(e.getMessage()); }
+        } catch (Exception e) { callback.onError(ApiErrorCode.UNKNOWN, e.getMessage()); }
     }
 
     public static void updatePassword(String accessToken, String newPassword, AuthCallback callback) {
@@ -151,9 +159,12 @@ public class SupabaseClient {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     if (response.isSuccessful()) callback.onSuccess("OK");
-                    else handleError(response.body().string(), callback);
+                    else {
+                        String resBody = response.body() != null ? response.body().string() : "Error";
+                        handleError(resBody, callback);
+                    }
                 }
             });
-        } catch (Exception e) { callback.onError(e.getMessage()); }
+        } catch (Exception e) { callback.onError(ApiErrorCode.UNKNOWN, e.getMessage()); }
     }
 }

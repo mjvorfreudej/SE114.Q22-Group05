@@ -1,6 +1,6 @@
 package com.example.tourgo.interfaces;
 
-public interface AuthCallback {
+public interface ApiCallback {
     void onSuccess(String responseData);
     /** Kèm mã lỗi để UI map sang R.string.* tương ứng. */
     void onError(ApiErrorCode code, String rawMessage);

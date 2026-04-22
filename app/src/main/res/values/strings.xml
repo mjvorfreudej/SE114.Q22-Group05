@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TourGo</string>
+    <string name="err_network">Network error. Please try again.</string>
+    <string name="err_email_registered">Email already registered.</string>
+    <string name="err_invalid_credentials">Invalid email or password.</string>
+    <string name="err_password_too_short">Password is too short.</string>
+    <string name="err_user_not_found">User not found.</string>
+    <string name="err_rate_limit">Too many requests. Please slow down.</string>
+    <string name="err_invalid_token">Invalid session. Please login again.</string>
+    <string name="err_password_same_as_old">New password must be different from old one.</string>
+    <string name="err_unknown">An unknown error occurred.</string>
 </resources>

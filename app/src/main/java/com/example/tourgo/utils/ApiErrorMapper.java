@@ -4,8 +4,8 @@ import android.content.Context;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 
-public final class AuthErrorMapper {
-    private AuthErrorMapper() {
+public final class ApiErrorMapper {
+    private ApiErrorMapper() {
     }
 
     public static int messageResOf(ApiErrorCode code) {

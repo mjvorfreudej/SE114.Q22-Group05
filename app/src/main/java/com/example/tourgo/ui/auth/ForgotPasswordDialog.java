@@ -22,11 +22,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.interfaces.AuthCallback;
 import com.google.android.material.textfield.TextInputLayout;
-
-import org.json.JSONObject;
 
 public class ForgotPasswordDialog extends DialogFragment {
 
@@ -107,46 +106,33 @@ public class ForgotPasswordDialog extends DialogFragment {
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError(ApiErrorCode code, String errorMessage) {
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     setLoading(false);
-                    handleErrorMessage(errorMessage);
+                    handleErrorMessage(code, errorMessage);
                 });
             }
         });
     }
 
-    private void handleErrorMessage(String rawError) {
-        // Kiểm tra lỗi mạng hoặc các lỗi kỹ thuật dài dòng
-        if (rawError.contains("Unable to resolve host") || 
-            rawError.contains("Failed to connect") || 
-            rawError.contains("timeout") ||
-            rawError.startsWith("Lỗi mạng")) {
-            
+    private void handleErrorMessage(ApiErrorCode code, String rawError) {
+        if (code == ApiErrorCode.NETWORK) {
             Toast.makeText(requireContext(), "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        try {
-            if (!rawError.startsWith("{")) {
-                tilEmail.setError(rawError);
-                return;
-            }
-            
-            JSONObject json = new JSONObject(rawError);
-            String msg = json.optString("msg", json.optString("error_description", "Có lỗi xảy ra"));
-            
-            if (msg.contains("User not found")) {
-                tilEmail.setError("Email này chưa được đăng ký");
-            } else if (msg.contains("rate limit")) {
-                tilEmail.setError("Gửi quá nhanh, vui lòng thử lại sau vài phút");
-            } else {
-                tilEmail.setError(msg);
-            }
-        } catch (Exception e) {
-            tilEmail.setError("Có lỗi xảy ra, vui lòng thử lại sau");
+        if (code == ApiErrorCode.USER_NOT_FOUND) {
+            tilEmail.setError("Email này chưa được đăng ký");
+            return;
         }
+
+        if (code == ApiErrorCode.RATE_LIMIT) {
+            tilEmail.setError("Gửi quá nhanh, vui lòng thử lại sau vài phút");
+            return;
+        }
+
+        tilEmail.setError(rawError);
     }
 
     private void setLoading(boolean loading) {

@@ -1,6 +1,6 @@
 package com.example.tourgo.interfaces;
 
-public enum AuthErrorCode {
+public enum ApiErrorCode {
     NETWORK,                 // lỗi mạng, timeout, unable to resolve host
     EMAIL_ALREADY_REGISTERED,
     INVALID_CREDENTIALS,

@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.Toast; // Thêm Toast
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
@@ -101,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onError(String errorMessage) {
+                public void onError(ApiErrorCode code, String errorMessage) {
                     runOnUiThread(() -> {
                         binding.btnLogin.setVisibility(android.view.View.VISIBLE);
                         binding.pbLoginLoading.setVisibility(android.view.View.GONE);

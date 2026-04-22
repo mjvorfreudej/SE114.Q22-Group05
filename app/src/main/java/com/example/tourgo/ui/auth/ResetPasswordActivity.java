@@ -14,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityResetPasswordBinding;
 import com.example.tourgo.interfaces.AuthCallback;
@@ -120,19 +121,15 @@ public class ResetPasswordActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(String errorMessage) {
+            public void onError(ApiErrorCode code, String errorMessage) {
                 runOnUiThread(() -> {
                     setLoading(false);
                     
-                    if (errorMessage.toLowerCase().contains("unable to resolve host") || 
-                        errorMessage.toLowerCase().contains("failed to connect") ||
-                        errorMessage.toLowerCase().contains("timeout") ||
-                        errorMessage.startsWith("Lỗi mạng")) {
-                        
+                    if (code == ApiErrorCode.NETWORK) {
                         Toast.makeText(ResetPasswordActivity.this, 
                                 "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
                     } 
-                    else if (errorMessage.contains("trùng") || errorMessage.contains("cũ")) {
+                    else if (code == ApiErrorCode.PASSWORD_SAME_AS_OLD || errorMessage.contains("trùng") || errorMessage.contains("cũ")) {
                         binding.tilResetPassword.setError(errorMessage);
                         binding.etResetPassword.requestFocus();
                     } 

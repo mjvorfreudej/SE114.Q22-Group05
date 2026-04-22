@@ -166,6 +166,16 @@
             android:textAllCaps="false"
             android:padding="16dp"/>
 
+        <ProgressBar
+            android:id="@+id/pbLoginLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@id/btnLogin"
+            app:layout_constraintBottom_toBottomOf="@id/btnLogin"
+            app:layout_constraintStart_toStartOf="@id/btnLogin"
+            app:layout_constraintEnd_toEndOf="@id/btnLogin"/>
+
         <TextView
             android:id="@+id/tvLoginNoAccount"
             android:layout_width="wrap_content"

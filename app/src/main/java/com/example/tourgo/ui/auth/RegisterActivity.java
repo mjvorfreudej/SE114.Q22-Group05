@@ -13,6 +13,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
 import com.example.tourgo.interfaces.AuthCallback;
@@ -82,12 +83,12 @@ public class RegisterActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onError(String errorMessage) {
+                public void onError(ApiErrorCode code, String errorMessage) {
                     runOnUiThread(() -> {
                         setLoading(false);
-                        if (errorMessage.toLowerCase().contains("mạng") || errorMessage.toLowerCase().contains("connect")) {
+                        if (code == ApiErrorCode.NETWORK) {
                             Toast.makeText(RegisterActivity.this, "Lỗi kết nối mạng, vui lòng thử lại sau", Toast.LENGTH_SHORT).show();
-                        } else if (errorMessage.contains("đã được đăng ký") || errorMessage.contains("already exists")) {
+                        } else if (code == ApiErrorCode.EMAIL_ALREADY_REGISTERED) {
                             binding.tilRegisterEmail.setError("Email này đã được đăng ký");
                             binding.etRegisterEmail.requestFocus();
                         } else {
