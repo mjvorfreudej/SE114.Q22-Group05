@@ -15,11 +15,13 @@ import com.example.tourgo.R;
 import com.example.tourgo.data.AppFakeData;
 import com.example.tourgo.models.User;
 import com.example.tourgo.ui.auth.LoginActivity;
+import com.example.tourgo.utils.SessionManager;
 
 public class ProfileFragment extends Fragment {
 
     private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
     private View btnLogout;
+    private SessionManager session;
 
     @Nullable
     @Override
@@ -31,6 +33,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        session = new SessionManager(requireContext());
 
         // Find views in the activity_profile layout
         tvProfileName = view.findViewById(R.id.tvProfileName);
@@ -49,6 +53,7 @@ public class ProfileFragment extends Fragment {
         // Set up logout button
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
+                session.clear();
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);

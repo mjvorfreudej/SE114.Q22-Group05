@@ -31,10 +31,16 @@ public class SessionManager {
         }
     }
 
-    public void saveUser(String email, String password) {
+    /**
+     * Lưu session sau khi login thành công.
+     * Lưu access_token và refresh_token thay vì mật khẩu.
+     */
+    public void saveSession(String email, String userId, String accessToken, String refreshToken) {
         sharedPreferences.edit()
                 .putString("email", email)
-                .putString("password", password)
+                .putString("user_id", userId)
+                .putString("access_token", accessToken)
+                .putString("refresh_token", refreshToken)
                 .putBoolean("isLoggedIn", true)
                 .apply();
     }
@@ -43,8 +49,16 @@ public class SessionManager {
         return sharedPreferences.getString("email", null);
     }
 
-    public String getPassword() {
-        return sharedPreferences.getString("password", null);
+    public String getUserId() {
+        return sharedPreferences.getString("user_id", null);
+    }
+
+    public String getAccessToken() {
+        return sharedPreferences.getString("access_token", null);
+    }
+
+    public String getRefreshToken() {
+        return sharedPreferences.getString("refresh_token", null);
     }
 
     public boolean isLoggedIn() {
