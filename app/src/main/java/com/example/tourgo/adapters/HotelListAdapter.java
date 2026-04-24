@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
 
@@ -60,22 +61,38 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         holder.tvDescription.setText(item.getDescription());
         holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
 
-        // Mặc định lúc đầu là tim trắng (Reset trạng thái khi tái sử dụng ViewHolder)
-        holder.btnFavorite.setSelected(false);
-        holder.btnFavorite.setColorFilter(ContextCompat.getColor(holder.btnFavorite.getContext(), android.R.color.white));
+        if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
+            String imageUrl = item.getImageUrls().get(0);
+
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.hotel_1) // ảnh loading
+                    .error(R.drawable.hotel_1)       // ảnh lỗi
+                    .into(holder.imgHotel);
+        } else {
+            holder.imgHotel.setImageResource(R.drawable.hotel_1);
+        }
+
+        boolean isFav = item.isFavorite();
+
+        holder.btnFavorite.setSelected(isFav);
+
+        if (isFav) {
+            holder.btnFavorite.setColorFilter(
+                    ContextCompat.getColor(holder.btnFavorite.getContext(), android.R.color.holo_red_dark)
+            );
+        } else {
+            holder.btnFavorite.setColorFilter(
+                    ContextCompat.getColor(holder.btnFavorite.getContext(), android.R.color.white)
+            );
+        }
 
         holder.btnFavorite.setOnClickListener(v -> {
-            // Đảo ngược trạng thái selected
-            v.setSelected(!v.isSelected());
-            
-            if (v.isSelected()) {
-                // Khi bấm vào: Đổi sang màu đỏ
-                ((ImageView)v).setColorFilter(ContextCompat.getColor(v.getContext(), android.R.color.holo_red_dark));
-            } else {
-                // Khi bấm lần nữa: Quay lại màu trắng
-                ((ImageView)v).setColorFilter(ContextCompat.getColor(v.getContext(), android.R.color.white));
-            }
-            
+            boolean newState = !item.isFavorite();
+            item.setFavorite(newState);
+
+            notifyItemChanged(position); // update lại item
+
             // Hiệu ứng nảy (Animation)
             v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> {
                 v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
@@ -103,5 +120,15 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
             tvRating = itemView.findViewById(R.id.tvHotelRating);
             tvDescription = itemView.findViewById(R.id.tvHotelDescription);
         }
+    }
+
+    public void setData(List<Hotel> newList) {
+        if (newList == null) return;
+
+        originalList.clear();
+        originalList.addAll(newList);
+
+        filteredList = new ArrayList<>(originalList);
+        notifyDataSetChanged();
     }
 }

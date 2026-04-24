@@ -12,6 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TourGo">
+        <activity
+            android:name=".ui.main.WishlistActivity"
+            android:exported="false" />
+
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
@@ -20,19 +24,22 @@
                 android:name="autoStoredLocales"
                 android:value="true" />
         </service>
+
         <activity
             android:name=".ui.main.DetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.ResetPasswordActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
-                    android:scheme="tourgo"
-                    android:host="reset" />
+                    android:host="reset"
+                    android:scheme="tourgo" />
             </intent-filter>
         </activity>
         <activity
@@ -40,14 +47,14 @@
             android:exported="false" />
         <activity
             android:name=".ui.main.MainActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.TourGo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

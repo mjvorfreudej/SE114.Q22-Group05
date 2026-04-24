@@ -14,13 +14,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
+import com.example.tourgo.adapters.HotelListAdapter;
+import com.example.tourgo.data.HotelRepository;
+import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Hotel;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
-import com.example.tourgo.interfaces.AuthCallback;
+
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -43,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // NOTE: Không nên đăng nhập trực tiếp khi có sesion sẽ gây lỗi nếu đăng xuất
+        // NOTE: Không nên đăng nhập trực tiếp khi có session sẽ gây lỗi nếu đăng xuất
         if (session.isLoggedIn()) {
             binding.etLoginEmail.setText(session.getEmail());
             binding.etLoginPassword.setText(session.getPassword());
@@ -89,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            SupabaseClient.login(email, password, new AuthCallback() {
+            SupabaseClient.login(email, password, new ApiCallback() {
                 @Override
                 public void onSuccess(String responseData) {
                     runOnUiThread(() -> {
