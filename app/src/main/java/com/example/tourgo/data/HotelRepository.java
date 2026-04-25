@@ -19,27 +19,32 @@ public class HotelRepository {
         return instance;
     }
 
+    public List<Hotel> getCachedHotels() {
+        return cachedHotels;
+    }
+
     public void loadHotels(DataCallback<List<Hotel>> callback) {
         if (cachedHotels != null) {
-            callback.onSuccess(cachedHotels);
+            runOnMain(() -> callback.onSuccess(cachedHotels));
             return;
         }
+
         HotelService.getHotels(new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 cachedHotels = data;
-                callback.onSuccess(data);
+                runOnMain(() -> callback.onSuccess(data));
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
-                callback.onError(code, msg);
+                runOnMain(() -> callback.onError(code, msg));
             }
         });
     }
 
-    public List<Hotel> getCachedHotels() {
-        return cachedHotels;
+    private void runOnMain(Runnable r) {
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(r);
     }
 
     public void clearCache() {

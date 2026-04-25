@@ -17,8 +17,10 @@ import com.example.tourgo.data.HotelRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.remote.SupabaseConfig;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FavoriteFragment extends Fragment {
@@ -43,27 +45,24 @@ public class FavoriteFragment extends Fragment {
         HotelListAdapter adapter = new HotelListAdapter(new ArrayList<>());
         rv.setAdapter(adapter);
 
-        List<Hotel> cached = HotelRepository.getInstance().getCachedHotels();
-
-        if (cached != null) {
-            adapter.setData(cached);
-        } else {
-            HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
-                @Override
-                public void onSuccess(List<Hotel> data) {
-                    requireActivity().runOnUiThread(() -> {
-                        adapter.setData(data);
-                    });
+        HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
+            @Override
+            public void onSuccess(List<Hotel> data) {
+                List<Hotel> hotels = new ArrayList<>();
+                for(Hotel hotel : data) {
+                    if(hotel.isFavorite()){
+                        hotels.add(hotel);
+                    }
                 }
+                Collections.reverse(hotels);
+                adapter.setData(hotels);
+            }
 
-                @Override
-                public void onError(ApiErrorCode code, String msg) {
-                    requireActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
-        }
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return view;
     }
