@@ -12,15 +12,19 @@ import com.example.tourgo.data.AppFakeData;
 import com.example.tourgo.models.User;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
+import com.example.tourgo.utils.SessionManager;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView tvProfileName, tvProfileEmail, tvProfilePhone, tvProfileDescription;
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        session = new SessionManager(this);
 
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
@@ -42,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setupLogout() {
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
+            session.clear();
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

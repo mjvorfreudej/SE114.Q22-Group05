@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Toast; // Thêm Toast
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
-import com.example.tourgo.adapters.HotelListAdapter;
-import com.example.tourgo.data.HotelRepository;
-import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
-import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Hotel;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
@@ -27,6 +22,8 @@ import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
 
 import java.util.List;
+
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -49,10 +46,12 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // NOTE: Không nên đăng nhập trực tiếp khi có session sẽ gây lỗi nếu đăng xuất
+        // Nếu đã đăng nhập trước đó, auto-fill email (không fill password vì không lưu nữa)
         if (session.isLoggedIn()) {
-            binding.etLoginEmail.setText(session.getEmail());
-            binding.etLoginPassword.setText(session.getPassword());
+            String savedEmail = session.getEmail();
+            if (savedEmail != null) {
+                binding.etLoginEmail.setText(savedEmail);
+            }
             binding.cbLoginRemember.setChecked(true);
         }
 
@@ -85,30 +84,38 @@ public class LoginActivity extends AppCompatActivity {
             binding.btnLogin.setVisibility(android.view.View.INVISIBLE);
             binding.pbLoginLoading.setVisibility(android.view.View.VISIBLE);
 
-            // DÙNG FAKE DATA ĐỂ TEST NHANH
-            // TODO: Dùng xong nhớ xóa
-            if (email.equals("admin@gmail.com") && password.equals("123456")) {
-                session.saveUser(email, password);
-                Toast.makeText(LoginActivity.this, "Đăng nhập giả thành công!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
-                return;
-            }
-
-            SupabaseClient.login(email, password, new ApiCallback() {
+            SupabaseClient.login(email, password, new AuthCallback() {
                 @Override
                 public void onSuccess(String responseData) {
                     runOnUiThread(() -> {
                         binding.btnLogin.setVisibility(android.view.View.VISIBLE);
                         binding.pbLoginLoading.setVisibility(android.view.View.GONE);
-                        if (binding.cbLoginRemember.isChecked()) {
-                            session.saveUser(email, password);
-                        } else {
-                            session.clear();
+
+                        try {
+                            // Parse Supabase auth response để lấy token và user info
+                            JSONObject json = new JSONObject(responseData);
+                            String accessToken = json.getString("access_token");
+                            String refreshToken = json.getString("refresh_token");
+                            JSONObject user = json.getJSONObject("user");
+                            String userId = user.getString("id");
+                            String userEmail = user.getString("email");
+
+                            // Lưu session với token (không lưu password)
+                            if (binding.cbLoginRemember.isChecked()) {
+                                session.saveSession(userEmail, userId, accessToken, refreshToken);
+                            } else {
+                                // Vẫn lưu token cho phiên hiện tại, nhưng không đánh dấu "remember"
+                                session.saveSession(userEmail, userId, accessToken, refreshToken);
+                            }
+
+                            Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        } catch (Exception e) {
+                            Toast.makeText(LoginActivity.this,
+                                    "Lỗi xử lý phản hồi: " + e.getMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
                     });
                 }
 
