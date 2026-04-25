@@ -107,4 +107,10 @@
     <string name="err_tour_full">Tour is fully booked</string>
     <string name="err_already_favorited">Already in favorites</string>
     <string name="booking_error">Can not create booking</string>
+
+    <!--  Nav  -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_favorite">Favorites</string>
+    <string name="nav_profile">Profile</string>
 </resources>

@@ -14,10 +14,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
-import com.example.tourgo.interfaces.AuthCallback;
 import com.example.tourgo.utils.ApiErrorMapper;
 
 import org.json.JSONArray;
@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             setLoading(true);
 
-            SupabaseClient.register(email, password, name, new AuthCallback() {
+            SupabaseClient.register(email, password, name, new ApiCallback() {
                 @Override
                 public void onSuccess(String responseData) {
                     runOnUiThread(() -> {

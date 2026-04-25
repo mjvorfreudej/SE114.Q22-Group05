@@ -22,9 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.remote.SupabaseClient;
-import com.example.tourgo.interfaces.AuthCallback;
 import com.example.tourgo.utils.ApiErrorMapper;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -96,7 +96,7 @@ public class ForgotPasswordDialog extends DialogFragment {
 
     private void sendRecoveryEmail(String email) {
         setLoading(true);
-        SupabaseClient.resetPassword(email, new AuthCallback() {
+        SupabaseClient.resetPassword(email, new ApiCallback() {
             @Override
             public void onSuccess(String responseData) {
                 if (!isAdded()) return;

@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,8 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tourgo.R;
+import com.example.tourgo.data.HotelRepository;
 import com.example.tourgo.fragments.HotelListFragment;
 import com.example.tourgo.fragments.ProfileFragment;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Hotel;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     View currentTab;
@@ -35,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         navHotels = findViewById(R.id.navHotels);
         navProfile = findViewById(R.id.navProfile);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutNavMain), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -47,6 +54,20 @@ public class MainActivity extends AppCompatActivity {
             updateTabUI(navHome);
             loadFragment(new HomeFragment());
         }
+
+        HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
+            @Override
+            public void onSuccess(List<Hotel> data) {
+                // data đã được cache, các màn khác lấy được ngay
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                runOnUiThread(() -> {
+                    Toast.makeText(MainActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private void setupNavigation() {
@@ -65,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         navHotels.setOnClickListener(v -> {
             if (currentTab == navHotels) return;
             updateTabUI(navHotels);
-            // loadFragment(new FavoriteFragment());
+            loadFragment(new FavoriteFragment());
         });
 
         navProfile.setOnClickListener(v -> {

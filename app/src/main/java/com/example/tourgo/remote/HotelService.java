@@ -2,6 +2,8 @@ package com.example.tourgo.remote;
 
 import static com.example.tourgo.remote.SupabaseConfig.mapHttp;
 
+import android.util.Log;
+
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
@@ -18,13 +20,11 @@ import okhttp3.Response;
 
 public class HotelService {
 
-
     public static void getHotels(DataCallback<List<Hotel>> callback) {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/hotels"
-                + "?select=*,hotel_images(*)"
-                + "&order=rating.desc"
-                + "&hotel_images.order=display_order.asc";
+                + "?select=*"
+                + "&order=rating.desc";
 
         Request request = new Request.Builder()
                 .url(url)
@@ -37,12 +37,17 @@ public class HotelService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.e("API_ERROR", "Network error: " + e.getMessage());
                 callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body() != null ? response.body().string() : "";
+
+                Log.d("API_RESPONSE", "Code: " + response.code());
+                Log.d("API_RESPONSE", "Body: " + body);
+
                 if (response.isSuccessful()) {
                     try {
                         JSONArray array = new JSONArray(body);
@@ -63,7 +68,7 @@ public class HotelService {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/hotels"
                 + "?id=eq." + hotelId
-                + "&select=*,hotel_images(*)"
+                + "&select=*"
                 + "&hotel_images.order=display_order.asc";
 
         Request request = new Request.Builder()
@@ -77,12 +82,17 @@ public class HotelService {
         SupabaseConfig.client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.e("API_ERROR", "Network error: " + e.getMessage());
                 callback.onError(ApiErrorCode.NETWORK, e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body() != null ? response.body().string() : "";
+
+                Log.d("API_RESPONSE", "Code: " + response.code());
+                Log.d("API_RESPONSE", "Body: " + body);
+
                 if (response.isSuccessful()) {
                     try {
                         JSONArray array = new JSONArray(body);

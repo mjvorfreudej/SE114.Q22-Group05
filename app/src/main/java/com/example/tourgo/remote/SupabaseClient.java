@@ -1,8 +1,8 @@
 package com.example.tourgo.remote;
 
 import com.example.tourgo.BuildConfig;
+import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
-import com.example.tourgo.interfaces.AuthCallback;
 import org.json.JSONObject;
 import java.io.IOException;
 import okhttp3.Call;
@@ -19,7 +19,7 @@ public class SupabaseClient {
     private static final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static void register(String email, String password, String name, AuthCallback callback) {
+    public static void register(String email, String password, String name, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/signup";
         try {
             JSONObject metadata = new JSONObject();
@@ -52,7 +52,7 @@ public class SupabaseClient {
         }
     }
 
-    public static void login(String email, String password, AuthCallback callback) {
+    public static void login(String email, String password, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/token?grant_type=password";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -89,7 +89,7 @@ public class SupabaseClient {
                 .build();
     }
 
-    private static void handleError(String resBody, AuthCallback callback) {
+    private static void handleError(String resBody, ApiCallback callback) {
         if (resBody == null || resBody.isEmpty()) {
             callback.onError(ApiErrorCode.UNKNOWN, "Có lỗi xảy ra, vui lòng thử lại");
             return;
@@ -123,7 +123,7 @@ public class SupabaseClient {
         }
     }
 
-    public static void resetPassword(String email, AuthCallback callback) {
+    public static void resetPassword(String email, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/recover";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -146,7 +146,7 @@ public class SupabaseClient {
         } catch (Exception e) { callback.onError(ApiErrorCode.UNKNOWN, e.getMessage()); }
     }
 
-    public static void updatePassword(String accessToken, String newPassword, AuthCallback callback) {
+    public static void updatePassword(String accessToken, String newPassword, ApiCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/user";
         try {
             JSONObject jsonBody = new JSONObject();

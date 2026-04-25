@@ -20,7 +20,8 @@ import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
-import com.example.tourgo.interfaces.AuthCallback;
+
+import java.util.List;
 
 import org.json.JSONObject;
 

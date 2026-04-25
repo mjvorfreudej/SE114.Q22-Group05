@@ -18,6 +18,15 @@ public class Hotel {
     private int reviewCount;
     private String createdAt;
 
+    private boolean isFavorite;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     private int imageResId;
     private String priceString;
@@ -64,16 +73,12 @@ public class Hotel {
         h.createdAt = json.optString("created_at", null);
 
 
-        h.imageUrls = new ArrayList<>();
-        JSONArray images = json.optJSONArray("hotel_images");
+        JSONArray images = json.optJSONArray("image_urls");
         if (images != null) {
             for (int i = 0; i < images.length(); i++) {
-                JSONObject img = images.optJSONObject(i);
-                if (img != null) {
-                    String url = img.optString("image_url", "");
-                    if (!url.isEmpty()) {
-                        h.imageUrls.add(url);
-                    }
+                String url = images.optString(i);
+                if (!url.isEmpty()) {
+                    h.imageUrls.add(url);
                 }
             }
         }
