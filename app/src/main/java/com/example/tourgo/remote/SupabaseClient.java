@@ -1,7 +1,7 @@
 package com.example.tourgo.remote;
 
 import com.example.tourgo.BuildConfig;
-import com.example.tourgo.interfaces.ApiCallback;
+import com.example.tourgo.interfaces.AuthCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class SupabaseClient {
     private static final OkHttpClient client = new OkHttpClient();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static void register(String email, String password, String name, ApiCallback callback) {
+    public static void register(String email, String password, String name, AuthCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/signup";
         try {
             JSONObject metadata = new JSONObject();
@@ -52,7 +52,7 @@ public class SupabaseClient {
         }
     }
 
-    public static void login(String email, String password, ApiCallback callback) {
+    public static void login(String email, String password, AuthCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/token?grant_type=password";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -89,7 +89,7 @@ public class SupabaseClient {
                 .build();
     }
 
-    private static void handleError(String resBody, ApiCallback callback) {
+    private static void handleError(String resBody, AuthCallback callback) {
         if (resBody == null || resBody.isEmpty()) {
             callback.onError(ApiErrorCode.UNKNOWN, "Có lỗi xảy ra, vui lòng thử lại");
             return;
@@ -123,7 +123,7 @@ public class SupabaseClient {
         }
     }
 
-    public static void resetPassword(String email, ApiCallback callback) {
+    public static void resetPassword(String email, AuthCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/recover";
         try {
             JSONObject jsonBody = new JSONObject();
@@ -136,9 +136,10 @@ public class SupabaseClient {
                 public void onFailure(Call call, IOException e) { handleError(e.getMessage(), callback); }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) callback.onSuccess("OK");
-                    else {
-                        String resBody = response.body() != null ? response.body().string() : "Error";
+                    String resBody = response.body() != null ? response.body().string() : "OK";
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(resBody);
+                    } else {
                         handleError(resBody, callback);
                     }
                 }
@@ -146,21 +147,27 @@ public class SupabaseClient {
         } catch (Exception e) { callback.onError(ApiErrorCode.UNKNOWN, e.getMessage()); }
     }
 
-    public static void updatePassword(String accessToken, String newPassword, ApiCallback callback) {
+    public static void updatePassword(String accessToken, String newPassword, AuthCallback callback) {
         String url = SUPABASE_URL + "/auth/v1/user";
         try {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("password", newPassword);
             RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
-            Request request = new Request.Builder().url(url).addHeader("apikey", ANON_KEY).addHeader("Authorization", "Bearer " + accessToken).put(body).build();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("apikey", ANON_KEY)
+                    .addHeader("Authorization", "Bearer " + accessToken)
+                    .put(body)
+                    .build();
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) { handleError(e.getMessage(), callback); }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) callback.onSuccess("OK");
-                    else {
-                        String resBody = response.body() != null ? response.body().string() : "Error";
+                    String resBody = response.body() != null ? response.body().string() : "OK";
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(resBody);
+                    } else {
                         handleError(resBody, callback);
                     }
                 }

@@ -20,8 +20,7 @@ import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
-
-import java.util.List;
+import com.example.tourgo.interfaces.AuthCallback;
 
 import org.json.JSONObject;
 
@@ -68,8 +67,11 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         binding.btnLogin.setOnClickListener(v -> {
-            String email = binding.etLoginEmail.getText().toString().trim();
-            String password = binding.etLoginPassword.getText().toString();
+            Editable emailEditable = binding.etLoginEmail.getText();
+            Editable passEditable = binding.etLoginPassword.getText();
+            
+            String email = emailEditable != null ? emailEditable.toString().trim() : "";
+            String password = passEditable != null ? passEditable.toString() : "";
 
             if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 binding.tilLoginEmail.setError(getString(R.string.err_email_invalid));
@@ -101,12 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                             String userEmail = user.getString("email");
 
                             // Lưu session với token (không lưu password)
-                            if (binding.cbLoginRemember.isChecked()) {
-                                session.saveSession(userEmail, userId, accessToken, refreshToken);
-                            } else {
-                                // Vẫn lưu token cho phiên hiện tại, nhưng không đánh dấu "remember"
-                                session.saveSession(userEmail, userId, accessToken, refreshToken);
-                            }
+                            session.saveSession(userEmail, userId, accessToken, refreshToken);
 
                             Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));

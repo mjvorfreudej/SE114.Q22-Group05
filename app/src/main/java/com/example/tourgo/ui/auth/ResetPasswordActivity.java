@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.AuthCallback;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityResetPasswordBinding;
 import com.example.tourgo.utils.ApiErrorMapper;
@@ -109,7 +110,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private void submitNewPassword(String newPassword) {
         setLoading(true);
 
-        SupabaseClient.updatePassword(accessToken, newPassword, new ApiCallback() {
+        SupabaseClient.updatePassword(accessToken, newPassword, new AuthCallback() {
             @Override
             public void onSuccess(String responseData) {
                 runOnUiThread(() -> {
