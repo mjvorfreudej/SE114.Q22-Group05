@@ -20,7 +20,7 @@ import com.example.tourgo.utils.ApiErrorMapper;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityLoginBinding;
-import com.example.tourgo.interfaces.AuthCallback;
+import com.example.tourgo.interfaces.ApiCallback;
 
 import org.json.JSONObject;
 
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             binding.btnLogin.setVisibility(android.view.View.INVISIBLE);
             binding.pbLoginLoading.setVisibility(android.view.View.VISIBLE);
 
-            SupabaseClient.login(email, password, new AuthCallback() {
+            SupabaseClient.login(email, password, new ApiCallback() {
                 @Override
                 public void onSuccess(String responseData) {
                     runOnUiThread(() -> {
@@ -127,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             Toast.makeText(LoginActivity.this,
                                     ApiErrorMapper.messageOf(LoginActivity.this, code),
-                                    Toast.LENGTH_LONG).show();
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
