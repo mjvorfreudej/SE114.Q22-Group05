@@ -136,9 +136,10 @@ public class SupabaseClient {
                 public void onFailure(Call call, IOException e) { handleError(e.getMessage(), callback); }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) callback.onSuccess("OK");
-                    else {
-                        String resBody = response.body() != null ? response.body().string() : "Error";
+                    String resBody = response.body() != null ? response.body().string() : "OK";
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(resBody);
+                    } else {
                         handleError(resBody, callback);
                     }
                 }
@@ -152,15 +153,21 @@ public class SupabaseClient {
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("password", newPassword);
             RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
-            Request request = new Request.Builder().url(url).addHeader("apikey", ANON_KEY).addHeader("Authorization", "Bearer " + accessToken).put(body).build();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("apikey", ANON_KEY)
+                    .addHeader("Authorization", "Bearer " + accessToken)
+                    .put(body)
+                    .build();
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) { handleError(e.getMessage(), callback); }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) callback.onSuccess("OK");
-                    else {
-                        String resBody = response.body() != null ? response.body().string() : "Error";
+                    String resBody = response.body() != null ? response.body().string() : "OK";
+                    if (response.isSuccessful()) {
+                        callback.onSuccess(resBody);
+                    } else {
                         handleError(resBody, callback);
                     }
                 }

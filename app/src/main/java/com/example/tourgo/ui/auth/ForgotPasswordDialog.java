@@ -22,8 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.tourgo.R;
-import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.utils.ApiErrorMapper;
 import com.google.android.material.textfield.TextInputLayout;
@@ -107,7 +107,7 @@ public class ForgotPasswordDialog extends DialogFragment {
             }
 
             @Override
-            public void onError(ApiErrorCode code, String raw) {  // ← chữ ký mới
+            public void onError(ApiErrorCode code, String raw) {
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     setLoading(false);
