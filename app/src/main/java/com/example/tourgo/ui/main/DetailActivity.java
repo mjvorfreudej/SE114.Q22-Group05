@@ -1,5 +1,6 @@
 package com.example.tourgo.ui.main;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,8 +19,13 @@ import com.example.tourgo.R;
 import com.example.tourgo.adapters.CommentAdapter;
 import com.example.tourgo.adapters.GalleryAdapter;
 import com.example.tourgo.databinding.ActivityDetailBinding;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Comment;
-import com.example.tourgo.models.HotelItem;
+import com.example.tourgo.models.Favorite;
+import com.example.tourgo.models.Hotel;
+import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,52 +36,37 @@ import java.util.stream.Collectors;
 public class DetailActivity extends AppCompatActivity {
 
     private ActivityDetailBinding binding;
-    private HotelItem item;
-    private Handler sliderHandler = new Handler(Looper.getMainLooper());
+    private Hotel hotel;
+    private final Handler sliderHandler = new Handler(Looper.getMainLooper());
     private Runnable sliderRunnable;
     private CommentAdapter commentAdapter;
     private List<Comment> allComments = new ArrayList<>();
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        
+        session = new SessionManager(this);
+        hotel = (Hotel) getIntent().getSerializableExtra("hotel_object");
 
-        item = (HotelItem) getIntent().getSerializableExtra("hotel_item");
-
-        if (item != null) {
-            // Mock gallery images
-            if (item.getGalleryImages().size() <= 1) {
-                item.setGalleryImages(Arrays.asList(item.getImageResId(), R.drawable.hotel_2, R.drawable.hotel_3, R.drawable.hotel_4));
-            }
-            
-            // Mock comments with images and varying ratings
-            if (item.getComments().isEmpty()) {
-                List<Comment> mockComments = new ArrayList<>();
-                mockComments.add(new Comment("Alex Johnson", null, "Amazing place! The view from the balcony was breathtaking.", 5.0f, "Today", Arrays.asList(R.drawable.hotel_1, R.drawable.hotel_2)));
-                mockComments.add(new Comment("Maria Garcia", null, "Very clean and professional staff. Highly recommend for families.", 4.5f, "2 days ago"));
-                mockComments.add(new Comment("David Chen", null, "Good location but a bit noisy at night.", 3.0f, "1 week ago"));
-                mockComments.add(new Comment("Emma Wilson", null, "Perfect stay! Loved the pool area.", 5.0f, "3 days ago", Arrays.asList(R.drawable.hotel_3)));
-                mockComments.add(new Comment("Lucas Brown", null, "It was okay, but the breakfast could be better.", 2.0f, "2 weeks ago"));
-                mockComments.add(new Comment("Sophie Taylor", null, "Not worth the price. Small rooms.", 1.5f, "1 month ago"));
-                item.setComments(mockComments);
-            }
-
-            allComments.addAll(item.getComments());
+        if (hotel != null) {
             setupUI();
+        } else {
+            finish();
+            return;
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
         
-        binding.btnFavoriteDetail.setOnClickListener(v -> {
-            item.setFavorite(!item.isFavorite());
-            animateHeart(binding.btnFavoriteDetail);
-            updateHeartIcon(item.isFavorite());
-        });
+        binding.btnFavoriteDetail.setOnClickListener(v -> toggleFavorite());
 
         binding.btnBookNow.setOnClickListener(v -> {
-            Toast.makeText(this, "Booking: " + item.getName(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, BookingActivity.class);
+            intent.putExtra("hotel_item", hotel);
+            startActivity(intent);
         });
 
         setupFilters();
@@ -86,82 +77,94 @@ public class DetailActivity extends AppCompatActivity {
         setupComments();
         updateRatingSummary();
         
-        binding.tvDetailName.setText(item.getName());
-        binding.tvDetailLocation.setText(item.getLocation() != null && !item.getLocation().isEmpty() ? item.getLocation() : "Location details");
-        binding.tvDetailPrice.setText(item.getPrice());
-        
-        if (item.getDescription() != null && !item.getDescription().isEmpty()) {
-            binding.tvDetailDescription.setText(item.getDescription());
+        binding.tvDetailName.setText(hotel.getName());
+        binding.tvDetailLocation.setText(hotel.getAddress());
+        binding.tvDetailPrice.setText(hotel.getPriceString());
+        binding.tvDetailDescription.setText(hotel.getDescription());
+
+        updateHeartIcon(hotel.isFavorite());
+    }
+
+    private void toggleFavorite() {
+        if (!session.isLoggedIn()) {
+            Toast.makeText(this, "Vui lòng đăng nhập để thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        updateHeartIcon(item.isFavorite());
+        final boolean currentState = hotel.isFavorite();
+        final boolean newState = !currentState;
+        
+        hotel.setFavorite(newState);
+        updateHeartIcon(newState);
+        animateHeart(binding.btnFavoriteDetail);
+
+        final String userId = session.getUserId();
+        final String token = session.getAccessToken();
+        final String hotelId = hotel.getId();
+
+        if (newState) {
+            Favorite favorite = new Favorite(userId, null, hotelId);
+            FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
+                @Override public void onSuccess(Void data) {}
+                @Override public void onError(ApiErrorCode code, String msg) {
+                    runOnUiThread(() -> {
+                        hotel.setFavorite(currentState);
+                        updateHeartIcon(currentState);
+                        Toast.makeText(DetailActivity.this, "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        } else {
+            FavoriteService.removeFavoriteHotel(userId, hotelId, token, new DataCallback<Void>() {
+                @Override public void onSuccess(Void data) {}
+                @Override public void onError(ApiErrorCode code, String msg) {
+                    runOnUiThread(() -> {
+                        hotel.setFavorite(currentState);
+                        updateHeartIcon(currentState);
+                        Toast.makeText(DetailActivity.this, "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        }
     }
 
     private void updateRatingSummary() {
-        if (allComments.isEmpty()) return;
-
-        double sum = 0;
-        for (Comment c : allComments) {
-            sum += c.getRating();
-        }
-
-        double average = sum / allComments.size();
-        
-        binding.tvHeaderRating.setText(String.format(Locale.US, "★ %.1f (%d Reviews)", average, allComments.size()));
-        binding.tvBigRating.setText(String.format(Locale.US, "%.1f", average));
-        binding.tvReviewCount.setText(String.format(Locale.US, "%d reviews", allComments.size()));
+        binding.tvHeaderRating.setText(String.format(Locale.US, "★ %.1f (%d Reviews)", hotel.getRating(), hotel.getReviewCount()));
+        binding.tvBigRating.setText(String.format(Locale.US, "%.1f", hotel.getRating()));
+        binding.tvReviewCount.setText(String.format(Locale.US, "%d reviews", hotel.getReviewCount()));
     }
 
     private void setupFilters() {
         binding.cgFilterRating.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
-            
             int checkedId = checkedIds.get(0);
-            if (checkedId == R.id.chipAll) {
-                filterComments("all");
-            } else if (checkedId == R.id.chipWithPhotos) {
-                filterComments("photos");
-            } else if (checkedId == R.id.chip5) {
-                filterComments("5");
-            } else if (checkedId == R.id.chip4) {
-                filterComments("4");
-            } else if (checkedId == R.id.chip3) {
-                filterComments("3");
-            } else if (checkedId == R.id.chip2) {
-                filterComments("2");
-            } else if (checkedId == R.id.chip1) {
-                filterComments("1");
-            }
+            if (checkedId == R.id.chipAll) filterComments("all");
+            else if (checkedId == R.id.chipWithPhotos) filterComments("photos");
+            else if (checkedId == R.id.chip5) filterComments("5");
+            else if (checkedId == R.id.chip4) filterComments("4");
+            else if (checkedId == R.id.chip3) filterComments("3");
+            else if (checkedId == R.id.chip2) filterComments("2");
+            else if (checkedId == R.id.chip1) filterComments("1");
         });
     }
 
     private void filterComments(String type) {
-        List<Comment> filtered;
-        switch (type) {
-            case "5":
-            case "4":
-            case "3":
-            case "2":
-            case "1":
-                int stars = Integer.parseInt(type);
-                filtered = allComments.stream().filter(c -> Math.floor(c.getRating()) == stars).collect(Collectors.toList());
-                break;
-            case "photos":
-                filtered = allComments.stream().filter(Comment::hasImages).collect(Collectors.toList());
-                break;
-            default:
-                filtered = new ArrayList<>(allComments);
-                break;
-        }
-        
-        // Use submitList for smooth DiffUtil animation
-        commentAdapter.submitList(filtered);
+        // Mock filter logic
+        commentAdapter.submitList(new ArrayList<>(allComments));
     }
 
     private void setupGallery() {
-        GalleryAdapter galleryAdapter = new GalleryAdapter(item.getGalleryImages());
+        List<String> imageUrls = hotel.getImageUrls();
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            imageUrls = new ArrayList<>();
+            imageUrls.add("android.resource://" + getPackageName() + "/" + R.drawable.hotel_1);
+        }
+        final List<String> images = imageUrls;
+        
+        GalleryAdapter galleryAdapter = new GalleryAdapter(images);
         binding.vpGallery.setAdapter(galleryAdapter);
-        setupDots(item.getGalleryImages().size());
+        
+        setupDots(images.size());
         
         binding.vpGallery.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -174,8 +177,9 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         sliderRunnable = () -> {
-            int nextItem = (binding.vpGallery.getCurrentItem() + 1) % item.getGalleryImages().size();
-            binding.vpGallery.setCurrentItem(nextItem);
+            int current = binding.vpGallery.getCurrentItem();
+            int next = (current + 1) % images.size();
+            binding.vpGallery.setCurrentItem(next, true);
         };
     }
 
@@ -183,7 +187,7 @@ public class DetailActivity extends AppCompatActivity {
         binding.layoutDots.removeAllViews();
         for (int i = 0; i < count; i++) {
             ImageView dot = new ImageView(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(16, 16);
             params.setMargins(8, 0, 8, 0);
             dot.setLayoutParams(params);
             dot.setImageResource(R.drawable.dot_inactive);
@@ -201,7 +205,6 @@ public class DetailActivity extends AppCompatActivity {
         commentAdapter = new CommentAdapter();
         binding.rvComments.setLayoutManager(new LinearLayoutManager(this));
         binding.rvComments.setAdapter(commentAdapter);
-        commentAdapter.submitList(new ArrayList<>(allComments));
     }
 
     private void updateHeartIcon(boolean isFavorite) {
@@ -215,7 +218,16 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }
+    protected void onPause() {
+        super.onPause();
+        sliderHandler.removeCallbacks(sliderRunnable);
+    }
+
     @Override
-    protected void onResume() { super.onResume(); sliderHandler.postDelayed(sliderRunnable, 3000); }
+    protected void onResume() {
+        super.onResume();
+        if (sliderRunnable != null) {
+            sliderHandler.postDelayed(sliderRunnable, 3000);
+        }
+    }
 }

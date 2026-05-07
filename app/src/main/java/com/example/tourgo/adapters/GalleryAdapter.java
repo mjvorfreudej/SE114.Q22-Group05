@@ -8,15 +8,16 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 
 import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
-    private final List<Integer> images;
+    private final List<String> images;
 
-    public GalleryAdapter(List<Integer> images) {
+    public GalleryAdapter(List<String> images) {
         this.images = images;
     }
 
@@ -29,12 +30,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     @Override
     public void onBindViewHolder(@NonNull GalleryViewHolder holder, int position) {
-        holder.imageView.setImageResource(images.get(position));
+        String imageUrl = images.get(position);
+        Glide.with(holder.itemView.getContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.hotel_1)
+                .centerCrop()
+                .into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return images.size();
+        return images != null ? images.size() : 0;
     }
 
     static class GalleryViewHolder extends RecyclerView.ViewHolder {

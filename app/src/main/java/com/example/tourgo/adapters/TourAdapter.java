@@ -5,12 +5,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Tour;
+import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +28,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
 
     private final List<Tour> originalList;
     private List<Tour> filteredList;
+    private SessionManager session;
 
     public TourAdapter(List<Tour> list) {
         this.originalList = list;
@@ -46,6 +55,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     @Override
     public TourViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tour, parent, false);
+        session = new SessionManager(parent.getContext());
         return new TourViewHolder(view);
     }
 
@@ -53,12 +63,70 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     public void onBindViewHolder(@NonNull TourViewHolder holder, int position) {
         Tour item = filteredList.get(position);
 
-        holder.imgTour.setImageResource(item.getImageResId());
+        if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(item.getImageUrls().get(0))
+                    .placeholder(R.drawable.hotel_1)
+                    .centerCrop()
+                    .into(holder.imgTour);
+        } else {
+            holder.imgTour.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
+        }
+
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getLocation());
         holder.tvPrice.setText(item.getPriceString());
         holder.tvDuration.setText(item.getDuration());
         holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+
+        updateHeartIcon(holder.btnFavorite, item.isFavorite());
+
+        holder.btnFavorite.setOnClickListener(v -> {
+            if (!session.isLoggedIn()) {
+                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            boolean newState = !item.isFavorite();
+            item.setFavorite(newState);
+            updateHeartIcon(holder.btnFavorite, newState);
+
+            v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> {
+                v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
+            }).start();
+
+            String token = session.getAccessToken();
+            String userId = session.getUserId();
+
+            if (newState) {
+                Favorite favorite = new Favorite(userId, item.getId(), null);
+                FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
+                    @Override public void onSuccess(Void data) {}
+                    @Override public void onError(ApiErrorCode code, String msg) {
+                        item.setFavorite(false);
+                        updateHeartIcon(holder.btnFavorite, false);
+                    }
+                });
+            } else {
+                FavoriteService.removeFavoriteTour(userId, item.getId(), token, new DataCallback<Void>() {
+                    @Override public void onSuccess(Void data) {}
+                    @Override public void onError(ApiErrorCode code, String msg) {
+                        item.setFavorite(true);
+                        updateHeartIcon(holder.btnFavorite, true);
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
+        if (isFavorite) {
+            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
+            imgHeart.setBackgroundResource(R.drawable.bg_circle_white);
+        } else {
+            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
+            imgHeart.setBackgroundResource(R.drawable.bg_circle_white_alpha);
+        }
     }
 
     @Override
@@ -67,17 +135,25 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     }
 
     static class TourViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgTour;
+        ImageView imgTour, btnFavorite;
         TextView tvName, tvLocation, tvPrice, tvRating, tvDuration;
 
         public TourViewHolder(@NonNull View itemView) {
             super(itemView);
             imgTour = itemView.findViewById(R.id.imgTour);
+            btnFavorite = itemView.findViewById(R.id.btnFavoriteTour);
             tvName = itemView.findViewById(R.id.tvTourName);
             tvLocation = itemView.findViewById(R.id.tvTourLocation);
             tvPrice = itemView.findViewById(R.id.tvTourPrice);
             tvRating = itemView.findViewById(R.id.tvTourRating);
             tvDuration = itemView.findViewById(R.id.tvTourDuration);
         }
+    }
+
+    public void setData(List<Tour> newList) {
+        originalList.clear();
+        originalList.addAll(newList);
+        filteredList = new ArrayList<>(originalList);
+        notifyDataSetChanged();
     }
 }

@@ -3,10 +3,11 @@ package com.example.tourgo.models;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tour {
+public class Tour implements Serializable {
     private String id;
     private String name;
     private String description;
@@ -21,6 +22,15 @@ public class Tour {
     private int reviewCount;
     private String createdAt;
 
+    private boolean isFavorite;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
 
     private int imageResId;
     private String location;
@@ -29,7 +39,6 @@ public class Tour {
     public Tour() {
         this.imageUrls = new ArrayList<>();
     }
-
 
     public Tour(int imageResId, String name, String location, String priceString, double rating, String duration) {
         this.imageResId = imageResId;
@@ -40,25 +49,6 @@ public class Tour {
         this.duration = duration;
         this.imageUrls = new ArrayList<>();
     }
-
-
-    public Tour(String id, String name, String description, double price, List<String> imageUrls,
-                String destination, String region, String duration, String status, String ownerId,
-                float rating, int reviewCount) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
-        this.destination = destination;
-        this.region = region;
-        this.duration = duration;
-        this.status = status;
-        this.ownerId = ownerId;
-        this.rating = rating;
-        this.reviewCount = reviewCount;
-    }
-
 
     public static Tour fromJson(JSONObject json) {
         Tour t = new Tour();
@@ -75,7 +65,6 @@ public class Tour {
         t.reviewCount = json.optInt("review_count", 0);
         t.createdAt = json.optString("created_at", null);
 
-
         t.imageUrls = new ArrayList<>();
         JSONArray images = json.optJSONArray("tour_images");
         if (images != null) {
@@ -90,13 +79,11 @@ public class Tour {
             }
         }
 
-
         t.location = t.destination;
         t.priceString = String.format("%,.0f₫", t.price);
 
         return t;
     }
-
 
     public static List<Tour> fromJsonArray(JSONArray array) {
         List<Tour> list = new ArrayList<>();
@@ -110,7 +97,6 @@ public class Tour {
         }
         return list;
     }
-
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -150,7 +136,6 @@ public class Tour {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
-
 
     public int getImageResId() { return imageResId; }
     public String getLocation() { return location != null ? location : destination; }

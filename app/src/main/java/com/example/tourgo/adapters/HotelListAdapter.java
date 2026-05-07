@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -12,7 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,7 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
 
     private final List<Hotel> originalList;
     private List<Hotel> filteredList;
+    private SessionManager session;
 
     public HotelListAdapter(List<Hotel> list) {
         this.originalList = list;
@@ -48,6 +55,7 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
     @Override
     public HotelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_hotel_list, parent, false);
+        session = new SessionManager(parent.getContext());
         return new HotelViewHolder(view);
     }
 
@@ -57,47 +65,66 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
 
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getAddress());
-        holder.tvPrice.setText(String.format(Locale.US, "%.0f$", item.getPricePerNight()));
+        holder.tvPrice.setText(item.getPriceString());
         holder.tvDescription.setText(item.getDescription());
         holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
 
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
-            String imageUrl = item.getImageUrls().get(0);
-
             Glide.with(holder.itemView.getContext())
-                    .load(imageUrl)
-                    .placeholder(R.drawable.hotel_1) // ảnh loading
-                    .error(R.drawable.hotel_1)       // ảnh lỗi
+                    .load(item.getImageUrls().get(0))
+                    .placeholder(R.drawable.hotel_1)
+                    .centerCrop()
                     .into(holder.imgHotel);
         } else {
-            holder.imgHotel.setImageResource(R.drawable.hotel_1);
+            holder.imgHotel.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
 
-        boolean isFav = item.isFavorite();
-
-        holder.btnFavorite.setSelected(isFav);
-
-        if (isFav) {
-            holder.btnFavorite.setColorFilter(
-                    ContextCompat.getColor(holder.btnFavorite.getContext(), android.R.color.holo_red_dark)
-            );
-        } else {
-            holder.btnFavorite.setColorFilter(
-                    ContextCompat.getColor(holder.btnFavorite.getContext(), android.R.color.white)
-            );
-        }
+        updateHeartIcon(holder.btnFavorite, item.isFavorite());
 
         holder.btnFavorite.setOnClickListener(v -> {
+            if (!session.isLoggedIn()) {
+                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             boolean newState = !item.isFavorite();
             item.setFavorite(newState);
+            updateHeartIcon(holder.btnFavorite, newState);
 
-            notifyItemChanged(position); // update lại item
-
-            // Hiệu ứng nảy (Animation)
             v.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() -> {
                 v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
             }).start();
+
+            String token = session.getAccessToken();
+            String userId = session.getUserId();
+
+            if (newState) {
+                Favorite favorite = new Favorite(userId, null, item.getId());
+                FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
+                    @Override public void onSuccess(Void data) {}
+                    @Override public void onError(ApiErrorCode code, String msg) {
+                        item.setFavorite(false);
+                        updateHeartIcon(holder.btnFavorite, false);
+                    }
+                });
+            } else {
+                FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<Void>() {
+                    @Override public void onSuccess(Void data) {}
+                    @Override public void onError(ApiErrorCode code, String msg) {
+                        item.setFavorite(true);
+                        updateHeartIcon(holder.btnFavorite, true);
+                    }
+                });
+            }
         });
+    }
+
+    private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
+        if (isFavorite) {
+            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
+        } else {
+            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
+        }
     }
 
     @Override
@@ -124,10 +151,8 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
 
     public void setData(List<Hotel> newList) {
         if (newList == null) return;
-
         originalList.clear();
         originalList.addAll(newList);
-
         filteredList = new ArrayList<>(originalList);
         notifyDataSetChanged();
     }

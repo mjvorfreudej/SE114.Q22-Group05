@@ -23,6 +23,7 @@ import com.example.tourgo.fragments.ProfileFragment;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.utils.SessionManager;
 
 import java.util.List;
 
@@ -30,12 +31,15 @@ public class MainActivity extends AppCompatActivity {
     View currentTab;
 
     LinearLayout navHome, navTours, navHotels, navProfile;
+    SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        session = new SessionManager(this);
 
         navHome = findViewById(R.id.navHome);
         navTours = findViewById(R.id.navTours);
@@ -52,13 +56,15 @@ public class MainActivity extends AppCompatActivity {
         
         if (savedInstanceState == null) {
             updateTabUI(navHome);
-            loadFragment(new HomeFragment());
+            loadFragment(new HomeFragment(), false);
         }
 
         HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
-                // data đã được cache, các màn khác lấy được ngay
+                if (session.isLoggedIn()) {
+                    HotelRepository.getInstance().syncFavorites(session.getUserId(), session.getAccessToken());
+                }
             }
 
             @Override
@@ -74,31 +80,31 @@ public class MainActivity extends AppCompatActivity {
         navHome.setOnClickListener(v -> {
             if (currentTab == navHome) return;
             updateTabUI(navHome);
-            loadFragment(new HomeFragment());
+            loadFragment(new HomeFragment(), true);
         });
 
         navTours.setOnClickListener(v -> {
             if (currentTab == navTours) return;
             updateTabUI(navTours);
-            loadFragment(new SearchFragment());
+            loadFragment(new SearchFragment(), true);
         });
 
         navHotels.setOnClickListener(v -> {
             if (currentTab == navHotels) return;
             updateTabUI(navHotels);
-            loadFragment(new FavoriteFragment());
+            loadFragment(new FavoriteFragment(), true);
         });
 
         navProfile.setOnClickListener(v -> {
             if (currentTab == navProfile) return;
             updateTabUI(navProfile);
-            loadFragment(new ProfileFragment());
+            loadFragment(new ProfileFragment(), true);
         });
     }
 
     public void switchToSearch() {
         updateTabUI(navTours);
-        loadFragment(new SearchFragment());
+        loadFragment(new SearchFragment(), true);
     }
 
     public void switchToHotelList(String destination, String date, String guest) {
@@ -108,12 +114,21 @@ public class MainActivity extends AppCompatActivity {
         args.putString("date", date);
         args.putString("guest", guest);
         fragment.setArguments(args);
-        loadFragment(fragment);
+        loadFragment(fragment, true);
     }
 
-    private void loadFragment(Fragment fragment) {
+    private void loadFragment(Fragment fragment, boolean animate) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        if (animate) {
+            transaction.setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            );
+        } else {
+            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
     }
@@ -139,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Weight adjustment
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
-            params.weight = 1.5f; // Active tab is wider
+            params.weight = 1.5f; 
             layout.setLayoutParams(params);
         }
         
@@ -161,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Weight adjustment
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
-            params.weight = 1.0f; // Inactive tabs are standard
+            params.weight = 1.0f;
             layout.setLayoutParams(params);
         }
     }

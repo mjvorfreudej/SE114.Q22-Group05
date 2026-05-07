@@ -23,7 +23,7 @@ public class HotelService {
     public static void getHotels(DataCallback<List<Hotel>> callback) {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/hotels"
-                + "?select=*"
+                + "?select=*,hotel_images(*)"
                 + "&order=rating.desc";
 
         Request request = new Request.Builder()
@@ -68,8 +68,7 @@ public class HotelService {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/hotels"
                 + "?id=eq." + hotelId
-                + "&select=*"
-                + "&hotel_images.order=display_order.asc";
+                + "&select=*,hotel_images(*)";
 
         Request request = new Request.Builder()
                 .url(url)
@@ -118,8 +117,7 @@ public class HotelService {
                 + "/rest/v1/hotels"
                 + "?name=ilike.*" + keyword + "*"
                 + "&select=*,hotel_images(*)"
-                + "&order=rating.desc"
-                + "&hotel_images.order=display_order.asc";
+                + "&order=rating.desc";
 
         Request request = new Request.Builder()
                 .url(url)
