@@ -72,7 +72,12 @@ public class BookingConfirmFragment extends Fragment {
             double service = getArguments().getDouble("service_charge", 0.0);
             totalPrice = getArguments().getDouble("total_price", 0.0);
 
-            tvNights.setText(nights + " Night" + (nights > 1 ? "s" : ""));
+            if (nights == 1) {
+                tvNights.setText(getString(R.string.booking_night_single, nights));
+            } else {
+                tvNights.setText(getString(R.string.booking_night_plural, nights));
+            }
+            
             tvRoomPrice.setText(hotel.formatPrice(roomPrice));
             tvTaxes.setText(hotel.formatPrice(taxes));
             tvServiceCharge.setText(hotel.formatPrice(service));
@@ -126,7 +131,7 @@ public class BookingConfirmFragment extends Fragment {
             layoutPaymentMethods.setVisibility(isWallet ? View.VISIBLE : View.GONE);
         }
         if (tvAddMethod != null) {
-            tvAddMethod.setText(isWallet ? "+ Add New Wallet" : "+ Add New Bank");
+            tvAddMethod.setText(isWallet ? getString(R.string.booking_add_wallet) : getString(R.string.booking_add_bank));
         }
     }
 }

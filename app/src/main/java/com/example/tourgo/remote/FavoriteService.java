@@ -18,7 +18,6 @@ import okhttp3.Response;
 
 public class FavoriteService {
 
-
     public static void addFavorite(Favorite favorite, String accessToken, DataCallback<Void> callback) {
         String url = SupabaseConfig.SUPABASE_URL + "/rest/v1/favorites";
 
@@ -44,51 +43,19 @@ public class FavoriteService {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() || response.code() == 409) { // 409 Conflict means already exists
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
                     if (resBody.contains("duplicate") || resBody.contains("unique")) {
-                        callback.onError(ApiErrorCode.ALREADY_FAVORITED, resBody);
+                        callback.onSuccess(null); // Treat duplicate as success for UI
                     } else {
-                        callback.onError(ApiErrorCode.NETWORK, resBody);
+                        callback.onError(SupabaseConfig.mapHttp(response.code()), resBody);
                     }
                 }
             }
         });
     }
-
-
-    public static void removeFavorite(String favoriteId, String accessToken, DataCallback<Void> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/favorites"
-                + "?id=eq." + favoriteId;
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + accessToken)
-                .delete()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    callback.onSuccess(null);
-                } else {
-                    String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
-                }
-            }
-        });
-    }
-
 
     public static void removeFavoriteTour(String userId, String tourId, String accessToken, DataCallback<Void> callback) {
         String url = SupabaseConfig.SUPABASE_URL
@@ -115,12 +82,11 @@ public class FavoriteService {
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
+                    callback.onError(SupabaseConfig.mapHttp(response.code()), resBody);
                 }
             }
         });
     }
-
 
     public static void removeFavoriteHotel(String userId, String hotelId, String accessToken, DataCallback<Void> callback) {
         String url = SupabaseConfig.SUPABASE_URL
@@ -147,24 +113,21 @@ public class FavoriteService {
                     callback.onSuccess(null);
                 } else {
                     String resBody = response.body() != null ? response.body().string() : "";
-                    callback.onError(ApiErrorCode.SERVER_ERROR, resBody);
+                    callback.onError(SupabaseConfig.mapHttp(response.code()), resBody);
                 }
             }
         });
     }
 
-
     public static void getMyFavorites(String userId, String accessToken, DataCallback<List<Favorite>> callback) {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/favorites"
-                + "?user_id=eq." + userId
-                + "&order=created_at.desc";
+                + "?user_id=eq." + userId;
 
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("apikey", SupabaseConfig.ANON_KEY)
                 .addHeader("Authorization", "Bearer " + accessToken)
-                .addHeader("Accept", "application/json")
                 .get()
                 .build();
 
@@ -176,7 +139,7 @@ public class FavoriteService {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
+                String body = response.body() != null ? response.body().string() : "[]";
                 if (response.isSuccessful()) {
                     try {
                         JSONArray array = new JSONArray(body);
@@ -189,7 +152,7 @@ public class FavoriteService {
                         callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
                 } else {
-                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
+                    callback.onError(SupabaseConfig.mapHttp(response.code()), body);
                 }
             }
         });

@@ -13,17 +13,27 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.PopularHotelAdapter;
-import com.example.tourgo.data.AppFakeData;
+import com.example.tourgo.data.HotelRepository;
 import com.example.tourgo.databinding.ActivitySearchBinding;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Hotel;
+import com.example.tourgo.utils.SessionManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchFragment extends Fragment {
 
     private ActivitySearchBinding binding;
+    private PopularHotelAdapter recentViewedAdapter;
+    private SessionManager session;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ActivitySearchBinding.inflate(inflater, container, false);
+        session = new SessionManager(requireContext());
         return binding.getRoot();
     }
 
@@ -40,6 +50,7 @@ public class SearchFragment extends Fragment {
         setupRecentSearches();
         setupRecentViewed();
         setupSearchLogic();
+        loadRecentHotels();
     }
 
     private void setupSearchLogic() {
@@ -51,9 +62,7 @@ public class SearchFragment extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString();
                 if (query.length() > 0) {
-                    // Logic to show search results
-                } else {
-                    // Logic to show recent searches
+                    // Logic tìm kiếm thực tế có thể thêm ở đây
                 }
             }
 
@@ -64,11 +73,8 @@ public class SearchFragment extends Fragment {
 
     private void setupRecentSearches() {
         binding.llRecentSearches.removeAllViews();
-        
-        addRecentSearchItem("Phuket", "Dominic Hotel, Luxury Royale Hotel, Hotel Santika...");
-        addRecentSearchItem("Pattaya City", "Hilton Bandung, Namin Hotel, Clove Garden Hotel...");
-        addRecentSearchItem("Surat Thani", "Diamond Heart Hotel, Infinity Castle Hotel, Horizon...");
-        
+        addRecentSearchItem("Phuket", "Dominic Hotel, Luxury Royale Hotel...");
+        addRecentSearchItem("Pattaya City", "Hilton Bandung, Namin Hotel...");
         binding.btnClearRecent.setOnClickListener(v -> binding.llRecentSearches.removeAllViews());
     }
 
@@ -76,16 +82,45 @@ public class SearchFragment extends Fragment {
         View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_recent_search, binding.llRecentSearches, false);
         TextView tvCity = itemView.findViewById(R.id.tvRecentCity);
         TextView tvDetails = itemView.findViewById(R.id.tvRecentHotelDetails);
-        
         tvCity.setText(city);
         tvDetails.setText(details);
-        
         binding.llRecentSearches.addView(itemView);
     }
 
     private void setupRecentViewed() {
+        recentViewedAdapter = new PopularHotelAdapter(new ArrayList<>());
         binding.rvRecentViewed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvRecentViewed.setAdapter(new PopularHotelAdapter(AppFakeData.getPopularHotelItems()));
+        binding.rvRecentViewed.setAdapter(recentViewedAdapter);
+    }
+
+    private void loadRecentHotels() {
+        String userId = session.getUserId();
+        String token = session.getAccessToken();
+
+        // Sử dụng dữ liệu thật từ Repository thay vì AppFakeData
+        HotelRepository.getInstance().loadHotels(userId, token, new DataCallback<List<Hotel>>() {
+            @Override
+            public void onSuccess(List<Hotel> data) {
+                if (binding == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (data != null && !data.isEmpty()) {
+                        // Lấy 5 khách sạn đầu tiên làm "Vừa xem"
+                        recentViewedAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (recentViewedAdapter != null) recentViewedAdapter.notifyDataSetChanged();
     }
 
     @Override

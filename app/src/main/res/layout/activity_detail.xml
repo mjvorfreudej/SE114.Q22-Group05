@@ -139,7 +139,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:text="Description"
+                    android:text="@string/detail_description_label"
                     android:textColor="#1C1F26"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -160,7 +160,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reviews"
+                        android:text="@string/detail_reviews_label"
                         android:textColor="#1C1F26"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -169,7 +169,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="See All"
+                        android:text="@string/main_see_all"
                         android:textColor="#1E6DEA"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -221,14 +221,14 @@
                                 style="@style/Widget.Material3.Chip.Filter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="All"
+                                android:text="@string/filter_all"
                                 android:checked="true"/>
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chipWithPhotos"
                                 style="@style/Widget.Material3.Chip.Filter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="With Photos"/>
+                                android:text="@string/filter_with_photos"/>
                             <com.google.android.material.chip.Chip
                                 android:id="@+id/chip5"
                                 style="@style/Widget.Material3.Chip.Filter"
@@ -293,7 +293,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Staying Price"
+                android:text="@string/detail_staying_price_label"
                 android:textColor="#7B818C"
                 android:textSize="12sp" />
             <TextView
@@ -312,7 +312,7 @@
             android:layout_height="56dp"
             android:layout_alignParentEnd="true"
             android:background="@drawable/bg_book_button"
-            android:text="Book Now"
+            android:text="@string/detail_book_now_button"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="16sp"

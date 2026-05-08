@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Tour implements Serializable {
     private String id;
@@ -34,7 +35,6 @@ public class Tour implements Serializable {
 
     private int imageResId;
     private String location;
-    private String priceString;
 
     public Tour() {
         this.imageUrls = new ArrayList<>();
@@ -44,10 +44,22 @@ public class Tour implements Serializable {
         this.imageResId = imageResId;
         this.name = name;
         this.location = location;
-        this.priceString = priceString;
+        // Chú ý: priceString cũ từ fake data sẽ không còn dùng nữa, dùng price double
         this.rating = (float) rating;
         this.duration = duration;
         this.imageUrls = new ArrayList<>();
+    }
+
+    public String formatPrice(double amount) {
+        if (Locale.getDefault().getLanguage().equals("vi")) {
+            return String.format(Locale.getDefault(), "%,.0f₫", amount);
+        } else {
+            return String.format(Locale.getDefault(), "VND %,.0f", amount);
+        }
+    }
+
+    public String getPriceString() {
+        return formatPrice(price);
     }
 
     public static Tour fromJson(JSONObject json) {
@@ -80,8 +92,6 @@ public class Tour implements Serializable {
         }
 
         t.location = t.destination;
-        t.priceString = String.format("%,.0f₫", t.price);
-
         return t;
     }
 
@@ -139,5 +149,4 @@ public class Tour implements Serializable {
 
     public int getImageResId() { return imageResId; }
     public String getLocation() { return location != null ? location : destination; }
-    public String getPriceString() { return priceString != null ? priceString : String.format("%,.0f₫", price); }
 }
