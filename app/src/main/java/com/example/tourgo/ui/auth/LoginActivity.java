@@ -35,6 +35,13 @@ public class LoginActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
+        // Auto-login if "Remember Me" was checked previously
+        if (session.isLoggedIn() && session.isRememberMe()) {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+            return;
+        }
+
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
@@ -45,13 +52,9 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Nếu đã đăng nhập trước đó, auto-fill email (không fill password vì không lưu nữa)
-        if (session.isLoggedIn()) {
-            String savedEmail = session.getEmail();
-            if (savedEmail != null) {
-                binding.etLoginEmail.setText(savedEmail);
-            }
-            binding.cbLoginRemember.setChecked(true);
+        if (session.getEmail() != null) {
+            binding.etLoginEmail.setText(session.getEmail());
+            binding.cbLoginRemember.setChecked(session.isRememberMe());
         }
 
         validateEmail();
@@ -82,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // Hiển thị loading
             binding.btnLogin.setVisibility(android.view.View.INVISIBLE);
             binding.pbLoginLoading.setVisibility(android.view.View.VISIBLE);
 
@@ -94,24 +96,29 @@ public class LoginActivity extends AppCompatActivity {
                         binding.pbLoginLoading.setVisibility(android.view.View.GONE);
 
                         try {
-                            // Parse Supabase auth response để lấy token và user info
                             JSONObject json = new JSONObject(responseData);
                             String accessToken = json.getString("access_token");
                             String refreshToken = json.getString("refresh_token");
                             JSONObject user = json.getJSONObject("user");
                             String userId = user.getString("id");
                             String userEmail = user.getString("email");
+                            
+                            // Lấy tên từ metadata (kiểm tra cả user_metadata và raw_user_meta_data)
+                            String userName = "";
+                            if (user.has("user_metadata")) {
+                                userName = user.getJSONObject("user_metadata").optString("name", "");
+                            }
+                            if (userName.isEmpty() && user.has("raw_user_meta_data")) {
+                                userName = user.getJSONObject("raw_user_meta_data").optString("name", "");
+                            }
 
-                            // Lưu session với token (không lưu password)
-                            session.saveSession(userEmail, userId, accessToken, refreshToken);
+                            session.saveSession(userEmail, userId, accessToken, refreshToken, userName, binding.cbLoginRemember.isChecked());
 
                             Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         } catch (Exception e) {
-                            Toast.makeText(LoginActivity.this,
-                                    "Lỗi xử lý phản hồi: " + e.getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "Lỗi xử lý phản hồi: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
                 }
@@ -122,12 +129,9 @@ public class LoginActivity extends AppCompatActivity {
                         binding.btnLogin.setVisibility(View.VISIBLE);
                         binding.pbLoginLoading.setVisibility(View.GONE);
                         if (code == ApiErrorCode.INVALID_CREDENTIALS) {
-                            binding.tilLoginPassword.setError(
-                                    getString(R.string.err_invalid_credentials));
+                            binding.tilLoginPassword.setError(getString(R.string.err_invalid_credentials));
                         } else {
-                            Toast.makeText(LoginActivity.this,
-                                    ApiErrorMapper.messageOf(LoginActivity.this, code),
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, ApiErrorMapper.messageOf(LoginActivity.this, code), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -148,10 +152,8 @@ public class LoginActivity extends AppCompatActivity {
                     binding.tilLoginEmail.setError(null);
                 }
             }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
     }
 
@@ -165,10 +167,8 @@ public class LoginActivity extends AppCompatActivity {
                     binding.tilLoginPassword.setError(null);
                 }
             }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
         });
     }
 }

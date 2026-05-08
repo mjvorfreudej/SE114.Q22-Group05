@@ -74,12 +74,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-<!--            <androidx.appcompat.widget.Toolbar-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="?attr/actionBarSize"-->
-<!--                app:layout_collapseMode="pin"-->
-<!--                app:navigationIcon="@drawable/ic_home_24" />-->
-
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -202,13 +196,9 @@
             </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
-                android:id="@+id/btnLanguage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="12dp">
@@ -229,12 +219,33 @@
                     android:textSize="16sp"
                     android:textStyle="bold"/>
 
-                <TextView
-                    android:id="@+id/tvCurrentLang"
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleLanguage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#7B818C"
-                    android:textSize="14sp"/>
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    app:checkedButton="@id/btnLangVi">
+
+                    <Button
+                        android:id="@+id/btnLangVi"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="40dp"
+                        android:padding="0dp"
+                        android:text="@string/lang_vi_short"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/btnLangEn"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="40dp"
+                        android:padding="0dp"
+                        android:text="@string/lang_en_short"
+                        android:textSize="12sp" />
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
             </LinearLayout>
 
             <Button

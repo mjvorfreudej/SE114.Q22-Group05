@@ -2,21 +2,19 @@ package com.example.tourgo.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tourgo.R;
-import com.example.tourgo.data.AppFakeData;
-import com.example.tourgo.models.User;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.utils.SessionManager;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView tvProfileName, tvProfileEmail, tvProfilePhone, tvProfileDescription;
+    private TextView tvProfileName, tvProfileEmail, tvProfilePhone;
     private SessionManager session;
 
     @Override
@@ -29,18 +27,14 @@ public class ProfileActivity extends AppCompatActivity {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
         tvProfilePhone = findViewById(R.id.tvProfilePhone);
-        tvProfileDescription = findViewById(R.id.tvProfileDescription);
 
-        User user = AppFakeData.getUser();
-        if (user != null) {
-            tvProfileName.setText(user.getName());
-            tvProfileEmail.setText(user.getEmail());
-            tvProfilePhone.setText(user.getPhone());
-            // tvProfileDescription.setText(user.getDescription()); // Field might not exist in current User model
+        // Đổ dữ liệu từ session thực tế
+        if (session.isLoggedIn()) {
+            if (tvProfileName != null) tvProfileName.setText(session.getShortName());
+            if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
         }
 
         setupLogout();
-
         setupLanguage();
     }
 
@@ -55,40 +49,25 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupLanguage() {
-        TextView tvCurrent = findViewById(R.id.tvCurrentLang);
-        tvCurrent.setText(labelOf(LocaleHelper.getCurrentLanguageTag()));
+        MaterialButtonToggleGroup toggleLanguage = findViewById(R.id.toggleLanguage);
+        if (toggleLanguage == null) return;
 
-        findViewById(R.id.btnLanguage).setOnClickListener(v -> showLanguageDialog(tvCurrent));
-    }
-
-    private void showLanguageDialog(TextView tvCurrent) {
-        final String[] tags   = { "vi", "en", "" };
-        final String[] labels = {
-                getString(R.string.lang_vi),
-                getString(R.string.lang_en),
-                getString(R.string.lang_system)
-        };
-
-        String current = LocaleHelper.getCurrentLanguageTag();
-        int checked = 2;
-        for (int i = 0; i < tags.length; i++) {
-            if (tags[i].equals(current)) { checked = i; break; }
+        // Set trạng thái nút trước khi gán listener
+        String currentLang = LocaleHelper.getCurrentLanguageTag();
+        if ("en".equals(currentLang)) {
+            toggleLanguage.check(R.id.btnLangEn);
+        } else {
+            toggleLanguage.check(R.id.btnLangVi);
         }
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle(R.string.profile_language)
-                .setSingleChoiceItems(labels, checked, (d, which) -> {
-                    LocaleHelper.setAppLocale(tags[which]);
-                    tvCurrent.setText(labels[which]);
-                    d.dismiss();
-                })
-                .setNegativeButton(R.string.action_cancel, null)
-                .show();
-    }
-
-    private String labelOf(String tag) {
-        if ("vi".equals(tag)) return getString(R.string.lang_vi);
-        if ("en".equals(tag)) return getString(R.string.lang_en);
-        return getString(R.string.lang_system);
+        toggleLanguage.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                String newLang = (checkedId == R.id.btnLangVi) ? "vi" : "en";
+                // Chỉ chuyển đổi nếu ngôn ngữ khác với hiện tại để tránh giật màn hình
+                if (!newLang.equals(LocaleHelper.getCurrentLanguageTag())) {
+                    LocaleHelper.setAppLocale(newLang);
+                }
+            }
+        });
     }
 }

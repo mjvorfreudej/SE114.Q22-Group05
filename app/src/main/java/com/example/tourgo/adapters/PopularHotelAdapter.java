@@ -1,6 +1,7 @@
 package com.example.tourgo.adapters;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,29 +70,38 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
                 return;
             }
 
-            boolean newState = !item.isFavorite();
+            final boolean oldState = item.isFavorite();
+            final boolean newState = !oldState;
+            
+            // Cập nhật UI ngay lập tức
             item.setFavorite(newState);
+            updateHeartIcon(holder.imgHeart, newState);
             animateHeart(holder.imgHeart);
-            updateHeartIcon(holder.imgHeart, item.isFavorite());
 
             String token = session.getAccessToken();
             String userId = session.getUserId();
 
             if (newState) {
                 Favorite favorite = new Favorite(userId, null, item.getId());
-                FavoriteService.addFavorite(favorite, token, new DataCallback<>() {
+                FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(false);
-                        updateHeartIcon(holder.imgHeart, false);
+                        holder.imgHeart.post(() -> {
+                            item.setFavorite(false);
+                            updateHeartIcon(holder.imgHeart, false);
+                            Toast.makeText(v.getContext(), "Lỗi yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             } else {
-                FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<>() {
+                FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(true);
-                        updateHeartIcon(holder.imgHeart, true);
+                        holder.imgHeart.post(() -> {
+                            item.setFavorite(true);
+                            updateHeartIcon(holder.imgHeart, true);
+                            Toast.makeText(v.getContext(), "Lỗi xóa yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
@@ -105,11 +115,9 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        if (isFavorite) {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
-        } else {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
-        }
+        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
+                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageTintList(ColorStateList.valueOf(color));
     }
 
     private void animateHeart(View view) {

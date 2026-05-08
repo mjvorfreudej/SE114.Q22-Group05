@@ -4,6 +4,8 @@
     <string name="profile_language">Ngôn ngữ</string>
     <string name="lang_vi">Tiếng Việt</string>
     <string name="lang_en">Tiếng Anh</string>
+    <string name="lang_vi_short">VI</string>
+    <string name="lang_en_short">EN</string>
     <string name="lang_system">Theo hệ thống</string>
     <string name="action_cancel">Hủy</string>
 
@@ -47,7 +49,8 @@
 
     <!-- activity_main.xml -->
     <string name="main_time_placeholder">07:12</string>
-    <string name="main_greeting">Xin chào, Harry Bender</string>
+    <string name="main_greeting">Xin chào, %s</string>
+    <string name="main_greeting_default">Xin chào, Khách</string>
     <string name="main_question">Lần tới bạn muốn check-in ở đâu?</string>
     <string name="main_search_destination">Nhập điểm đến</string>
     <string name="main_check_in_out">Nhận phòng - Trả phòng</string>
@@ -59,11 +62,11 @@
     <string name="main_nav_home">Home</string>
 
     <!-- activity_profile.xml -->
-    <string name="profile_name_placeholder">Harry Bender</string>
-    <string name="profile_email_placeholder">harry@gmail.com</string>
+    <string name="profile_name_placeholder">Người dùng</string>
+    <string name="profile_email_placeholder">email@example.com</string>
     <string name="profile_personal_info">Thông tin cá nhân</string>
     <string name="profile_phone_label">Số điện thoại</string>
-    <string name="profile_phone_placeholder">+84 912 345 678</string>
+    <string name="profile_phone_placeholder">+84 000 000 000</string>
     <string name="profile_about_label">Giới thiệu</string>
     <string name="profile_about_placeholder">Người yêu du lịch…</string>
     <string name="profile_edit_button">Chỉnh sửa hồ sơ</string>

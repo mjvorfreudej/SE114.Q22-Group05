@@ -5,6 +5,8 @@
     <string name="profile_language">Language</string>
     <string name="lang_vi">Vietnamese</string>
     <string name="lang_en">English</string>
+    <string name="lang_vi_short">VI</string>
+    <string name="lang_en_short">EN</string>
     <string name="lang_system">System default</string>
     <string name="action_cancel">Cancel</string>
 
@@ -48,7 +50,7 @@
 
     <!-- activity_main.xml -->
     <string name="main_time_placeholder">07:12</string>
-    <string name="main_greeting">Hey, Harry Bender</string>
+    <string name="main_greeting">Hey, %s</string>
     <string name="main_question">Where will you check in next?</string>
     <string name="main_search_destination">Enter Destination</string>
     <string name="main_check_in_out">Check In - Check out</string>
@@ -60,11 +62,11 @@
     <string name="main_nav_home">Home</string>
 
     <!-- activity_profile.xml -->
-    <string name="profile_name_placeholder">Harry Bender</string>
-    <string name="profile_email_placeholder">harry@gmail.com</string>
+    <string name="profile_name_placeholder">User</string>
+    <string name="profile_email_placeholder">email@example.com</string>
     <string name="profile_personal_info">Personal Information</string>
     <string name="profile_phone_label">Phone</string>
-    <string name="profile_phone_placeholder">+84 912 345 678</string>
+    <string name="profile_phone_placeholder">+84 000 000 000</string>
     <string name="profile_about_label">About Me</string>
     <string name="profile_about_placeholder">Travel lover…</string>
     <string name="profile_edit_button">Edit Profile</string>

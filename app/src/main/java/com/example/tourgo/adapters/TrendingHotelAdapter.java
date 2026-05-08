@@ -1,6 +1,7 @@
 package com.example.tourgo.adapters;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,10 +68,12 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
                 return;
             }
 
-            boolean newState = !item.isFavorite();
+            final boolean oldState = item.isFavorite();
+            final boolean newState = !oldState;
+            
             item.setFavorite(newState);
+            updateHeartIcon(holder.imgFavorite, newState);
             animateHeart(holder.imgFavorite);
-            updateHeartIcon(holder.imgFavorite, item.isFavorite());
 
             String token = session.getAccessToken();
             String userId = session.getUserId();
@@ -80,16 +83,22 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
                 FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(false);
-                        updateHeartIcon(holder.imgFavorite, false);
+                        holder.imgFavorite.post(() -> {
+                            item.setFavorite(false);
+                            updateHeartIcon(holder.imgFavorite, false);
+                            Toast.makeText(v.getContext(), "Lỗi yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             } else {
                 FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(true);
-                        updateHeartIcon(holder.imgFavorite, true);
+                        holder.imgFavorite.post(() -> {
+                            item.setFavorite(true);
+                            updateHeartIcon(holder.imgFavorite, true);
+                            Toast.makeText(v.getContext(), "Lỗi xóa yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
@@ -103,11 +112,9 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        if (isFavorite) {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
-        } else {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
-        }
+        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
+                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageTintList(ColorStateList.valueOf(color));
     }
 
     private void animateHeart(View view) {

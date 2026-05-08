@@ -17,13 +17,14 @@ import com.example.tourgo.adapters.PopularHotelAdapter;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.adapters.TrendingHotelAdapter;
 import com.example.tourgo.data.HotelRepository;
+import com.example.tourgo.data.TourRepository;
 import com.example.tourgo.databinding.FragmentHomeBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.models.Tour;
-import com.example.tourgo.remote.TourService;
 import com.example.tourgo.utils.ImageLoader;
+import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +35,21 @@ public class HomeFragment extends Fragment {
     private PopularHotelAdapter popularAdapter;
     private TrendingHotelAdapter trendingAdapter;
     private TourAdapter tourAdapter;
+    private SessionManager session;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+        session = new SessionManager(requireContext());
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        updateGreeting();
 
         setupRecyclerViews();
         showLoading(true);
@@ -62,6 +67,15 @@ public class HomeFragment extends Fragment {
                 ((MainActivity) getActivity()).switchToSearch();
             }
         });
+    }
+
+    private void updateGreeting() {
+        if (binding == null || session == null) return;
+        if (session.isLoggedIn()) {
+            binding.tvGreeting.setText(getString(R.string.main_greeting, session.getShortName()));
+        } else {
+            binding.tvGreeting.setText(R.string.main_greeting_default);
+        }
     }
 
     private void setupRecyclerViews() {
@@ -90,22 +104,21 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadData() {
-        HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
+        String userId = session.getUserId();
+        String token = session.getAccessToken();
+
+        HotelRepository.getInstance().loadHotels(userId, token, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (binding == null) return;
                 showLoading(false);
                 if (data != null && !data.isEmpty()) {
-                    // Cắt bớt để hiển thị trang chủ (Ví dụ: 5 cái đầu là Popular, 5 cái sau là Trending)
                     popularAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
-                    
                     if (data.size() > 5) {
                         trendingAdapter.setData(data.subList(5, Math.min(data.size(), 10)));
                     } else {
                         trendingAdapter.setData(new ArrayList<>(data));
                     }
-
-                    // Preload ảnh đầu tiên để giảm giật khi scroll
                     preloadImages(data);
                 }
             }
@@ -123,7 +136,11 @@ public class HomeFragment extends Fragment {
 
     private void loadTours() {
         binding.progressBarTours.setVisibility(View.VISIBLE);
-        TourService.getTours(new DataCallback<List<Tour>>() {
+        
+        String userId = session.getUserId();
+        String token = session.getAccessToken();
+        
+        TourRepository.getInstance().loadTours(userId, token, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 if (binding == null || getActivity() == null) return;
@@ -169,9 +186,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Cập nhật lại UI để đồng bộ trạng thái tim nếu đã thay đổi ở màn chi tiết
+        updateGreeting();
         if (popularAdapter != null) popularAdapter.notifyDataSetChanged();
         if (trendingAdapter != null) trendingAdapter.notifyDataSetChanged();
+        if (tourAdapter != null) tourAdapter.notifyDataSetChanged();
     }
 
     @Override

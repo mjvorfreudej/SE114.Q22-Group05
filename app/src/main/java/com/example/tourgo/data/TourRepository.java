@@ -6,67 +6,49 @@ import android.os.Looper;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.Tour;
 import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.HotelService;
+import com.example.tourgo.remote.TourService;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class HotelRepository {
-    private static HotelRepository instance;
-    private List<Hotel> cachedHotels;
+public class TourRepository {
+    private static TourRepository instance;
+    private List<Tour> cachedTours;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private HotelRepository() {}
+    private TourRepository() {}
 
-    public static HotelRepository getInstance() {
-        if (instance == null) instance = new HotelRepository();
+    public static TourRepository getInstance() {
+        if (instance == null) instance = new TourRepository();
         return instance;
     }
 
-    public List<Hotel> getCachedHotels() {
-        return cachedHotels;
+    public List<Tour> getCachedTours() {
+        return cachedTours;
     }
 
-    // Hàm load cũ để không làm hỏng code hiện tại
-    public void loadHotels(DataCallback<List<Hotel>> callback) {
-        if (cachedHotels != null) {
-            callback.onSuccess(cachedHotels);
-            return;
-        }
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
+    public void loadTours(String userId, String token, DataCallback<List<Tour>> callback) {
+        TourService.getTours(new DataCallback<List<Tour>>() {
             @Override
-            public void onSuccess(List<Hotel> data) {
-                cachedHotels = data;
-                mainHandler.post(() -> callback.onSuccess(data));
-            }
-            @Override
-            public void onError(ApiErrorCode code, String msg) {
-                mainHandler.post(() -> callback.onError(code, msg));
-            }
-        });
-    }
-
-    public void loadHotels(String userId, String token, DataCallback<List<Hotel>> callback) {
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
-            @Override
-            public void onSuccess(List<Hotel> hotels) {
-                cachedHotels = hotels;
+            public void onSuccess(List<Tour> tours) {
+                cachedTours = tours;
                 if (userId != null && token != null) {
                     syncFavorites(userId, token, new DataCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
-                            mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                            mainHandler.post(() -> callback.onSuccess(cachedTours));
                         }
+
                         @Override
                         public void onError(ApiErrorCode code, String msg) {
-                            mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                            mainHandler.post(() -> callback.onSuccess(cachedTours));
                         }
                     });
                 } else {
-                    mainHandler.post(() -> callback.onSuccess(hotels));
+                    mainHandler.post(() -> callback.onSuccess(tours));
                 }
             }
 
@@ -82,7 +64,7 @@ public class HotelRepository {
     }
 
     public void syncFavorites(String userId, String token, DataCallback<Void> callback) {
-        if (userId == null || token == null || cachedHotels == null) {
+        if (userId == null || token == null || cachedTours == null) {
             if (callback != null) callback.onSuccess(null);
             return;
         }
@@ -90,13 +72,13 @@ public class HotelRepository {
         FavoriteService.getMyFavorites(userId, token, new DataCallback<List<Favorite>>() {
             @Override
             public void onSuccess(List<Favorite> favorites) {
-                Set<String> favHotelIds = new HashSet<>();
+                Set<String> favTourIds = new HashSet<>();
                 for (Favorite f : favorites) {
-                    if (f.getHotelId() != null) favHotelIds.add(f.getHotelId());
+                    if (f.getTourId() != null) favTourIds.add(f.getTourId());
                 }
 
-                for (Hotel h : cachedHotels) {
-                    h.setFavorite(favHotelIds.contains(h.getId()));
+                for (Tour t : cachedTours) {
+                    t.setFavorite(favTourIds.contains(t.getId()));
                 }
                 if (callback != null) callback.onSuccess(null);
             }
@@ -109,6 +91,6 @@ public class HotelRepository {
     }
 
     public void clearCache() {
-        cachedHotels = null;
+        cachedTours = null;
     }
 }

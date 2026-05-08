@@ -1,5 +1,6 @@
 package com.example.tourgo.adapters;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
@@ -70,11 +72,7 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
 
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getImageUrls().get(0))
-                    .placeholder(R.drawable.hotel_1)
-                    .centerCrop()
-                    .into(holder.imgHotel);
+            ImageLoader.loadThumbnail(holder.imgHotel, item.getImageUrls().get(0));
         } else {
             holder.imgHotel.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
@@ -87,7 +85,10 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
                 return;
             }
 
-            boolean newState = !item.isFavorite();
+            final boolean oldState = item.isFavorite();
+            final boolean newState = !oldState;
+            
+            // Cập nhật UI ngay lập tức
             item.setFavorite(newState);
             updateHeartIcon(holder.btnFavorite, newState);
 
@@ -103,16 +104,22 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
                 FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(false);
-                        updateHeartIcon(holder.btnFavorite, false);
+                        // Revert nếu lỗi (Chạy trên UI thread)
+                        holder.btnFavorite.post(() -> {
+                            item.setFavorite(false);
+                            updateHeartIcon(holder.btnFavorite, false);
+                            Toast.makeText(v.getContext(), "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             } else {
                 FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(true);
-                        updateHeartIcon(holder.btnFavorite, true);
+                        holder.btnFavorite.post(() -> {
+                            item.setFavorite(true);
+                            updateHeartIcon(holder.btnFavorite, true);
+                        });
                     }
                 });
             }
@@ -120,11 +127,9 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        if (isFavorite) {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
-        } else {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
-        }
+        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
+                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageTintList(ColorStateList.valueOf(color));
     }
 
     @Override
