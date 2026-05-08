@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -20,6 +19,7 @@ import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.ui.main.DetailActivity;
+import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.utils.SessionManager;
 
 import java.util.List;
@@ -52,11 +52,7 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
         Hotel item = hotelList.get(position);
 
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getImageUrls().get(0))
-                    .placeholder(R.drawable.hotel_1)
-                    .centerCrop()
-                    .into(holder.imgHotel);
+            ImageLoader.loadThumbnail(holder.imgHotel, item.getImageUrls().get(0));
         } else {
             holder.imgHotel.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
