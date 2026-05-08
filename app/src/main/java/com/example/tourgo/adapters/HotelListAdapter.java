@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -67,9 +66,13 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
 
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getAddress());
-        holder.tvPrice.setText(item.getPriceString());
+        
+        // Cập nhật hiển thị giá tiền đa ngôn ngữ
+        String formattedPrice = item.formatPrice(item.getPricePerNight());
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.price_per_night_format, formattedPrice));
+
         holder.tvDescription.setText(item.getDescription());
-        holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+        holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
 
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
             ImageLoader.loadThumbnail(holder.imgHotel, item.getImageUrls().get(0));
@@ -81,14 +84,13 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
 
         holder.btnFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), R.string.err_login_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             final boolean oldState = item.isFavorite();
             final boolean newState = !oldState;
             
-            // Cập nhật UI ngay lập tức
             item.setFavorite(newState);
             updateHeartIcon(holder.btnFavorite, newState);
 
@@ -104,11 +106,10 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
                 FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        // Revert nếu lỗi (Chạy trên UI thread)
                         holder.btnFavorite.post(() -> {
                             item.setFavorite(false);
                             updateHeartIcon(holder.btnFavorite, false);
-                            Toast.makeText(v.getContext(), "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });

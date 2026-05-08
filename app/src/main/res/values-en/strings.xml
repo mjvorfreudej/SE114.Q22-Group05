@@ -51,6 +51,7 @@
     <!-- activity_main.xml -->
     <string name="main_time_placeholder">07:12</string>
     <string name="main_greeting">Hey, %s</string>
+    <string name="main_greeting_default">Hello, Guest</string>
     <string name="main_question">Where will you check in next?</string>
     <string name="main_search_destination">Enter Destination</string>
     <string name="main_check_in_out">Check In - Check out</string>
@@ -85,6 +86,8 @@
     <string name="err_invalid_token">Invalid or expired link</string>
     <string name="err_password_same_as_old">New password must differ from the old one</string>
     <string name="err_unknown">Something went wrong, please try again</string>
+    <string name="err_login_required">Please login to perform this action</string>
+    <string name="err_prefix">Error: %s</string>
 
     <!-- Validation inline -->
     <string name="err_email_empty">Email cannot be empty</string>
@@ -109,6 +112,71 @@
     <string name="err_tour_full">Tour is fully booked</string>
     <string name="err_already_favorited">Already in favorites</string>
     <string name="booking_error">Can not create booking</string>
+
+    <!-- Search -->
+    <string name="search_no_results">No results found</string>
+    <string name="search_timeout">Search timeout, please try again</string>
+    <string name="search_hint">Search tour</string>
+    <string name="search_recent">Recent searches</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_recent_viewed">Recently viewed</string>
+
+    <!-- Favorites -->
+    <string name="no_favorites">No favorites yet</string>
+    <string name="err_load_favorites">Error loading favorites</string>
+
+    <!-- Booking -->
+    <string name="booking_request_title">Request a Book</string>
+    <string name="booking_select_date">Select Date</string>
+    <string name="main_check_in">Check In</string>
+    <string name="main_check_out">Check Out</string>
+    <string name="booking_room_guest">Room and Guest</string>
+    <string name="booking_bedroom">Bed Room</string>
+    <string name="booking_special_req">Special Requirement</string>
+    <string name="booking_req_hint">Type your message here…</string>
+    <string name="booking_next_step">Next Step</string>
+
+    <string name="booking_confirm_title">Confirm Your Stay</string>
+    <string name="booking_price_summary">Price Summary</string>
+    <string name="booking_taxes">Taxes</string>
+    <string name="booking_service_charge">Service Charge</string>
+    <string name="booking_total_payable">Total Payable Amount</string>
+    <string name="booking_select_payment">Select payment</string>
+    <string name="booking_view_all">View All</string>
+    <string name="booking_wallet">E-Wallet</string>
+    <string name="booking_bank">Bank</string>
+    <string name="booking_ending_in">Ending in %s</string>
+    <string name="booking_confirm_payment">Confirm Payment</string>
+
+    <string name="booking_select_return">Select return date</string>
+    <string name="booking_nights_format"> (%d nights)</string>
+    <string name="booking_night_single">%d Night</string>
+    <string name="booking_night_plural">%d Nights</string>
+    <string name="booking_guest_info_format">%1$d Person (%2$d Bed)</string>
+    <string name="booking_add_wallet">+ Add New Wallet</string>
+    <string name="booking_add_bank">+ Add New Bank</string>
+
+    <string name="booking_success_title">Booking Success!</string>
+    <string name="booking_stay_confirmed">Your Stay is confirmed</string>
+    <string name="booking_success_msg">Your booking request has been sent. Please check your email for confirmation.</string>
+    <string name="booking_date_label">Booking Date</string>
+    <string name="booking_room_type">Room Type</string>
+    <string name="booking_total_cost">Total Cost</string>
+    <string name="booking_confirm_number">Confirmation Number</string>
+    <string name="booking_view_booking">View Booking</string>
+    <string name="booking_back_home">Back to Home</string>
+
+    <!-- Detail Activity -->
+    <string name="detail_description_label">Description</string>
+    <string name="detail_reviews_label">Reviews</string>
+    <string name="detail_staying_price_label">Staying Price</string>
+    <string name="detail_book_now_button">Book Now</string>
+    <string name="filter_all">All</string>
+    <string name="filter_with_photos">With Photos</string>
+
+    <!-- Hotel/Tour -->
+    <string name="price_per_night_format">%s / night</string>
+    <string name="reviews_count_label">Reviews</string>
 
     <!--  Nav  -->
     <string name="nav_home">Home</string>

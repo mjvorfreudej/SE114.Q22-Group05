@@ -85,6 +85,8 @@
     <string name="err_invalid_token">Liên kết không hợp lệ hoặc đã hết hạn</string>
     <string name="err_password_same_as_old">Mật khẩu mới không được trùng mật khẩu cũ</string>
     <string name="err_unknown">Có lỗi xảy ra, vui lòng thử lại</string>
+    <string name="err_login_required">Vui lòng đăng nhập để thực hiện</string>
+    <string name="err_prefix">Lỗi: %s</string>
 
     <!-- Validation inline -->
     <string name="err_email_empty">Email không được để trống</string>
@@ -113,12 +115,71 @@
     <!-- Search -->
     <string name="search_no_results">Không tìm thấy kết quả</string>
     <string name="search_timeout">Hết thời gian chờ, vui lòng thử lại</string>
+    <string name="search_hint">Tìm kiếm tour</string>
+    <string name="search_recent">Tìm kiếm gần đây</string>
+    <string name="search_clear">Xóa</string>
+    <string name="search_recent_viewed">Đã xem gần đây</string>
+
+    <!-- Favorites -->
+    <string name="no_favorites">Chưa có mục yêu thích nào</string>
+    <string name="err_load_favorites">Lỗi tải danh sách yêu thích</string>
+
+    <!-- Booking -->
+    <string name="booking_request_title">Yêu cầu đặt phòng</string>
+    <string name="booking_select_date">Chọn ngày</string>
+    <string name="main_check_in">Nhận phòng</string>
+    <string name="main_check_out">Trả phòng</string>
+    <string name="booking_room_guest">Phòng và Khách</string>
+    <string name="booking_bedroom">Phòng ngủ</string>
+    <string name="booking_special_req">Yêu cầu đặc biệt</string>
+    <string name="booking_req_hint">Nhập tin nhắn của bạn ở đây...</string>
+    <string name="booking_next_step">Tiếp theo</string>
+
+    <string name="booking_confirm_title">Xác nhận đặt phòng</string>
+    <string name="booking_price_summary">Tóm tắt giá</string>
+    <string name="booking_taxes">Thuế</string>
+    <string name="booking_service_charge">Phí dịch vụ</string>
+    <string name="booking_total_payable">Tổng cộng thanh toán</string>
+    <string name="booking_select_payment">Chọn thanh toán</string>
+    <string name="booking_view_all">Xem tất cả</string>
+    <string name="booking_wallet">Ví điện tử</string>
+    <string name="booking_bank">Ngân hàng</string>
+    <string name="booking_ending_in">Kết thúc bằng %s</string>
+    <string name="booking_confirm_payment">Xác nhận thanh toán</string>
+
+    <string name="booking_select_return">Chọn ngày về</string>
+    <string name="booking_nights_format"> (%d đêm)</string>
+    <string name="booking_night_single">%d Đêm</string>
+    <string name="booking_night_plural">%d Đêm</string>
+    <string name="booking_guest_info_format">%1$d Người (%2$d Giường)</string>
+    <string name="booking_add_wallet">+ Thêm ví mới</string>
+    <string name="booking_add_bank">+ Thêm ngân hàng mới</string>
+
+    <string name="booking_success_title">Đặt phòng thành công!</string>
+    <string name="booking_stay_confirmed">Chỗ ở của bạn đã được xác nhận</string>
+    <string name="booking_success_msg">Yêu cầu đặt phòng của bạn đã được gửi đi. Vui lòng kiểm tra email để xác nhận.</string>
+    <string name="booking_date_label">Ngày đặt</string>
+    <string name="booking_room_type">Loại phòng</string>
+    <string name="booking_total_cost">Tổng chi phí</string>
+    <string name="booking_confirm_number">Mã xác nhận</string>
+    <string name="booking_view_booking">Xem đơn đặt</string>
+    <string name="booking_back_home">Quay lại trang chủ</string>
+
+    <!-- Detail Activity -->
+    <string name="detail_description_label">Mô tả</string>
+    <string name="detail_reviews_label">Đánh giá</string>
+    <string name="detail_staying_price_label">Giá phòng</string>
+    <string name="detail_book_now_button">Đặt ngay</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_with_photos">Có ảnh</string>
+
+    <!-- Hotel/Tour -->
+    <string name="price_per_night_format">%s / đêm</string>
+    <string name="reviews_count_label">Đánh giá</string>
 
     <!--  Nav  -->
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_favorite">Yêu thích</string>
     <string name="nav_profile">Hồ sơ</string>
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

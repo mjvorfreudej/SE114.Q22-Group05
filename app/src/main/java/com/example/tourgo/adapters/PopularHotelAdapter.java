@@ -59,21 +59,24 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
         }
 
         holder.tvName.setText(item.getName());
-        holder.tvPrice.setText(item.getPriceString());
-        holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+        
+        // Hiển thị giá tiền đa ngôn ngữ
+        String formattedPrice = item.formatPrice(item.getPricePerNight());
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.price_per_night_format, formattedPrice));
+        
+        holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
 
         updateHeartIcon(holder.imgHeart, item.isFavorite());
 
         holder.imgHeart.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), R.string.err_login_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             final boolean oldState = item.isFavorite();
             final boolean newState = !oldState;
             
-            // Cập nhật UI ngay lập tức
             item.setFavorite(newState);
             updateHeartIcon(holder.imgHeart, newState);
             animateHeart(holder.imgHeart);
@@ -89,7 +92,7 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
                         holder.imgHeart.post(() -> {
                             item.setFavorite(false);
                             updateHeartIcon(holder.imgHeart, false);
-                            Toast.makeText(v.getContext(), "Lỗi yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });
@@ -100,7 +103,7 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
                         holder.imgHeart.post(() -> {
                             item.setFavorite(true);
                             updateHeartIcon(holder.imgHeart, true);
-                            Toast.makeText(v.getContext(), "Lỗi xóa yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });

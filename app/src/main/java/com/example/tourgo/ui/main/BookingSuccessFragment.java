@@ -18,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
 
+import java.util.Locale;
+
 public class BookingSuccessFragment extends Fragment {
 
     @Nullable
@@ -64,7 +66,12 @@ public class BookingSuccessFragment extends Fragment {
             if (hotel != null) {
                 tvTotalCost.setText(hotel.formatPrice(total));
             } else {
-                tvTotalCost.setText(String.format(java.util.Locale.US, "$%.2f", total));
+                // Mặc định format nếu không có hotel object (phòng hờ)
+                if (Locale.getDefault().getLanguage().equals("vi")) {
+                    tvTotalCost.setText(String.format(Locale.getDefault(), "%,.0f₫", total));
+                } else {
+                    tvTotalCost.setText(String.format(Locale.getDefault(), "VND %,.0f", total));
+                }
             }
             
             tvBookingDate.setText(bookingDate);

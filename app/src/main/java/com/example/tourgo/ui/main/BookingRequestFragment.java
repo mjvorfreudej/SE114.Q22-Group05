@@ -20,9 +20,7 @@ import com.example.tourgo.models.Hotel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 public class BookingRequestFragment extends Fragment {
@@ -36,9 +34,9 @@ public class BookingRequestFragment extends Fragment {
     private Calendar endDate;
     private Calendar calendarDisplay; 
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-    private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.US);
-    private final SimpleDateFormat summaryFormat = new SimpleDateFormat("dd MMM", Locale.US);
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat summaryFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
 
     @Nullable
     @Override
@@ -86,12 +84,11 @@ public class BookingRequestFragment extends Fragment {
                     double roomPrice = pricePerNight * nights;
                     double taxes = roomPrice * 0.1;
                     
-                    // Đồng bộ phí dịch vụ theo đơn vị tiền tệ
                     double serviceCharge = hotel.getCurrencySymbol().equals("₫") ? 50000.0 : 5.0;
                     double total = roomPrice + taxes + serviceCharge;
 
                     String checkInOut = summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime());
-                    String guestInfo = guestCount + " Person (" + bedCount + " Bed)";
+                    String guestInfo = getString(R.string.booking_guest_info_format, guestCount, bedCount);
 
                     Bundle args = new Bundle();
                     args.putInt("num_nights", nights);
@@ -99,7 +96,7 @@ public class BookingRequestFragment extends Fragment {
                     args.putDouble("taxes", taxes);
                     args.putDouble("service_charge", serviceCharge);
                     args.putDouble("total_price", total);
-                    args.putString("check_in_out", checkInOut + " (" + nights + " nights)");
+                    args.putString("check_in_out", checkInOut + getString(R.string.booking_nights_format, nights));
                     args.putString("guest_info", guestInfo);
 
                     BookingConfirmFragment nextFragment = new BookingConfirmFragment();
@@ -184,11 +181,11 @@ public class BookingRequestFragment extends Fragment {
                     tv.setText(String.valueOf(prevDay));
                     tv.setTextColor(Color.parseColor("#E0E0E0"));
                 } else if (dayCounter > daysInMonth) {
-                    tv.setText(String.format(Locale.US, "%02d", nextMonthDayCounter++));
+                    tv.setText(String.format(Locale.getDefault(), "%02d", nextMonthDayCounter++));
                     tv.setTextColor(Color.parseColor("#E0E0E0"));
                 } else {
                     final int day = dayCounter;
-                    tv.setText(String.format(Locale.US, "%02d", day));
+                    tv.setText(String.format(Locale.getDefault(), "%02d", day));
                     tv.setTextColor(Color.BLACK);
                     currentCellDate.set(Calendar.DAY_OF_MONTH, day);
                     
@@ -244,10 +241,10 @@ public class BookingRequestFragment extends Fragment {
             long diff = endDate.getTimeInMillis() - startDate.getTimeInMillis();
             int nights = (int) (diff / (24 * 60 * 60 * 1000));
             if (nights <= 0) nights = 1;
-            tvSummary.setText(summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime()) + " (" + nights + " nights)");
+            tvSummary.setText(summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime()) + getString(R.string.booking_nights_format, nights));
         } else {
             tvCheckOutDate.setText("-- --- ----");
-            tvSummary.setText("Select return date");
+            tvSummary.setText(R.string.booking_select_return);
         }
     }
 

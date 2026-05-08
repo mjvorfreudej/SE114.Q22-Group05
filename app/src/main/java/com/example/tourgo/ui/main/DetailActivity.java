@@ -28,10 +28,8 @@ import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -79,7 +77,11 @@ public class DetailActivity extends AppCompatActivity {
         
         binding.tvDetailName.setText(hotel.getName());
         binding.tvDetailLocation.setText(hotel.getAddress());
-        binding.tvDetailPrice.setText(hotel.getPriceString());
+        
+        // Cập nhật giá tiền đa ngôn ngữ (chỉ thay đổi ký hiệu, không đổi giá trị)
+        String formattedPrice = hotel.formatPrice(hotel.getPricePerNight());
+        binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
+        
         binding.tvDetailDescription.setText(hotel.getDescription());
 
         updateHeartIcon(hotel.isFavorite());
@@ -87,7 +89,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void toggleFavorite() {
         if (!session.isLoggedIn()) {
-            Toast.makeText(this, "Vui lòng đăng nhập để thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.err_login_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -110,7 +112,7 @@ public class DetailActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         hotel.setFavorite(currentState);
                         updateHeartIcon(currentState);
-                        Toast.makeText(DetailActivity.this, "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DetailActivity.this, getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                     });
                 }
             });
@@ -121,7 +123,7 @@ public class DetailActivity extends AppCompatActivity {
                     runOnUiThread(() -> {
                         hotel.setFavorite(currentState);
                         updateHeartIcon(currentState);
-                        Toast.makeText(DetailActivity.this, "Lỗi: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DetailActivity.this, getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                     });
                 }
             });
@@ -129,9 +131,11 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateRatingSummary() {
-        binding.tvHeaderRating.setText(String.format(Locale.US, "★ %.1f (%d Reviews)", hotel.getRating(), hotel.getReviewCount()));
-        binding.tvBigRating.setText(String.format(Locale.US, "%.1f", hotel.getRating()));
-        binding.tvReviewCount.setText(String.format(Locale.US, "%d reviews", hotel.getReviewCount()));
+        binding.tvHeaderRating.setText(String.format(Locale.getDefault(), "★ %.1f (%d %s)", 
+                hotel.getRating(), hotel.getReviewCount(), getString(R.string.reviews_count_label)));
+        binding.tvBigRating.setText(String.format(Locale.getDefault(), "%.1f", hotel.getRating()));
+        binding.tvReviewCount.setText(String.format(Locale.getDefault(), "%d %s", 
+                hotel.getReviewCount(), getString(R.string.reviews_count_label).toLowerCase()));
     }
 
     private void setupFilters() {
@@ -149,7 +153,6 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void filterComments(String type) {
-        // Mock filter logic
         commentAdapter.submitList(new ArrayList<>(allComments));
     }
 

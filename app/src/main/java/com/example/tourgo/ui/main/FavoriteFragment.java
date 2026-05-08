@@ -38,7 +38,7 @@ public class FavoriteFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorite, container, false);
         session = new SessionManager(requireContext());
-        progressBar = view.findViewById(R.id.pbFavorite); // Giả sử có pbFavorite trong layout
+        progressBar = view.findViewById(R.id.pbFavorite);
         
         RecyclerView rv = view.findViewById(R.id.rvFavoriteItem);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -80,7 +80,7 @@ public class FavoriteFragment extends Fragment {
                     adapter.setData(favoriteHotels);
                     
                     if (favoriteHotels.isEmpty()) {
-                        Toast.makeText(getContext(), "Chưa có mục yêu thích nào", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.no_favorites, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -90,7 +90,7 @@ public class FavoriteFragment extends Fragment {
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Lỗi tải danh sách yêu thích", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.err_load_favorites, Toast.LENGTH_SHORT).show();
                 });
             }
         });

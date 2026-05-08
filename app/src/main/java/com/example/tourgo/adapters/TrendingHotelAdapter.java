@@ -58,13 +58,13 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
             holder.imgHotel.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
 
-        holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+        holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
         
         updateHeartIcon(holder.imgFavorite, item.isFavorite());
 
         holder.imgFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), R.string.err_login_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -86,7 +86,7 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
                         holder.imgFavorite.post(() -> {
                             item.setFavorite(false);
                             updateHeartIcon(holder.imgFavorite, false);
-                            Toast.makeText(v.getContext(), "Lỗi yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });
@@ -97,7 +97,7 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
                         holder.imgFavorite.post(() -> {
                             item.setFavorite(true);
                             updateHeartIcon(holder.imgFavorite, true);
-                            Toast.makeText(v.getContext(), "Lỗi xóa yêu thích: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });

@@ -81,15 +81,18 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
 
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getLocation());
+        
+        // Hiển thị giá tiền đa ngôn ngữ cho Tour
         holder.tvPrice.setText(item.getPriceString());
+        
         holder.tvDuration.setText(item.getDuration());
-        holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+        holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
 
         updateHeartIcon(holder.btnFavorite, item.isFavorite());
 
         holder.btnFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), R.string.err_login_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -114,7 +117,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
                         holder.btnFavorite.post(() -> {
                             item.setFavorite(false);
                             updateHeartIcon(holder.btnFavorite, false);
-                            Toast.makeText(v.getContext(), "Lỗi yêu thích Tour: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });
@@ -125,7 +128,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
                         holder.btnFavorite.post(() -> {
                             item.setFavorite(true);
                             updateHeartIcon(holder.btnFavorite, true);
-                            Toast.makeText(v.getContext(), "Lỗi xóa yêu thích Tour: " + msg, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
                     }
                 });

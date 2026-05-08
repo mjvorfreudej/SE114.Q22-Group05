@@ -48,7 +48,8 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
         holder.tvUserName.setText(comment.getUserName());
         holder.tvCommentDate.setText(comment.getDate());
         holder.tvCommentContent.setText(comment.getContent());
-        holder.tvUserRating.setText(String.format(Locale.US, "★ %.1f", comment.getRating()));
+        // Sử dụng Locale mặc định để đồng bộ với định dạng hệ thống
+        holder.tvUserRating.setText(String.format(Locale.getDefault(), "★ %.1f", comment.getRating()));
         
         holder.layoutCommentImages.removeAllViews();
         if (comment.hasImages()) {
