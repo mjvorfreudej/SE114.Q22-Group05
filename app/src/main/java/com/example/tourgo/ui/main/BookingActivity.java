@@ -7,16 +7,22 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.Tour;
 
 public class BookingActivity extends AppCompatActivity {
+    public static final String EXTRA_HOTEL = "hotel_item";
+    public static final String EXTRA_TOUR = "tour_item";
+
     private Hotel hotel;
+    private Tour tour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
 
-        hotel = (Hotel) getIntent().getSerializableExtra("hotel_item");
+        hotel = (Hotel) getIntent().getSerializableExtra(EXTRA_HOTEL);
+        tour = (Tour) getIntent().getSerializableExtra(EXTRA_TOUR);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -48,5 +54,9 @@ public class BookingActivity extends AppCompatActivity {
 
     public Hotel getHotel() {
         return hotel;
+    }
+
+    public Tour getTour() {
+        return tour;
     }
 }

@@ -59,7 +59,7 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:background="@drawable/bg_amenity_card"
-            android:hint="Search Hotel"
+            android:hint="Search Tour"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textSize="14sp"
@@ -78,7 +78,44 @@
             app:tint="#1C1F26" />
     </LinearLayout>
 
+    <!-- Search Results Area (hidden by default, shown when typing) -->
+    <FrameLayout
+        android:id="@+id/layoutSearchResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llSearchBar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSearchResults"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:clipToPadding="false" />
+
+        <ProgressBar
+            android:id="@+id/pbSearchLoading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvNoResults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Không tìm thấy kết quả"
+            android:textColor="#7B818C"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Recent Content (shown by default, hidden when typing) -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/layoutRecentContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
@@ -139,3 +176,4 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

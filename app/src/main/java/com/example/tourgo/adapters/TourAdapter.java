@@ -11,13 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Tour;
 import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.utils.SessionManager;
 
 import java.util.ArrayList;
@@ -26,13 +26,22 @@ import java.util.Locale;
 
 public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder> {
 
+    public interface OnTourClickListener {
+        void onTourClick(Tour tour);
+    }
+
     private final List<Tour> originalList;
     private List<Tour> filteredList;
     private SessionManager session;
+    private OnTourClickListener onTourClickListener;
 
     public TourAdapter(List<Tour> list) {
         this.originalList = list;
         this.filteredList = new ArrayList<>(list);
+    }
+
+    public void setOnTourClickListener(OnTourClickListener listener) {
+        this.onTourClickListener = listener;
     }
 
     public void filter(String query) {
@@ -64,11 +73,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         Tour item = filteredList.get(position);
 
         if (item.getImageUrls() != null && !item.getImageUrls().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getImageUrls().get(0))
-                    .placeholder(R.drawable.hotel_1)
-                    .centerCrop()
-                    .into(holder.imgTour);
+            ImageLoader.loadThumbnail(holder.imgTour, item.getImageUrls().get(0));
         } else {
             holder.imgTour.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
@@ -115,6 +120,12 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
                         updateHeartIcon(holder.btnFavorite, true);
                     }
                 });
+            }
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onTourClickListener != null) {
+                onTourClickListener.onTourClick(item);
             }
         });
     }

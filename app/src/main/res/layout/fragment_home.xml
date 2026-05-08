@@ -191,15 +191,27 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:id="@+id/progressBarHome"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="60dp"
+            android:visibility="visible"
+            android:indeterminateTint="#1E6DEA" />
+
         <!-- BODY -->
         <LinearLayout
+            android:id="@+id/layoutHomeBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingTop="18dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="24dp"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -266,6 +278,51 @@
                 android:layout_height="130dp"
                 android:layout_marginTop="14dp"
                 android:clipToPadding="false"
+                android:overScrollMode="never" />
+
+            <!-- Popular Tours Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Popular Tours"
+                    android:textColor="#1C1F26"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSeeAllPopularTours"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="See all"
+                    android:textColor="#1E6DEA"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBarTours"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:visibility="visible"
+                android:indeterminateTint="#1E6DEA" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPopularTours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:overScrollMode="never" />
 
         </LinearLayout>

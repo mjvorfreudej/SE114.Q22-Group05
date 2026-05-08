@@ -107,6 +107,10 @@
     <string name="err_already_favorited">Đã có trong danh sách yêu thích</string>
     <string name="booking_error">Không thể tạo booking</string>
     
+    <!-- Search -->
+    <string name="search_no_results">Không tìm thấy kết quả</string>
+    <string name="search_timeout">Hết thời gian chờ, vui lòng thử lại</string>
+
     <!--  Nav  -->
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Tìm kiếm</string>
