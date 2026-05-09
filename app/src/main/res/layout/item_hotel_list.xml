@@ -45,8 +45,11 @@
                 android:layout_height="32dp"
                 android:layout_gravity="end|top"
                 android:layout_margin="12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="6dp"
-                android:src="@drawable/ic_favorite_24"
+                android:src="@drawable/ic_heart_filled"
                 app:tint="@android:color/white" />
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>

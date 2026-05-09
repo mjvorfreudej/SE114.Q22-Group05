@@ -104,7 +104,7 @@
                     android:layout_height="36dp"
                     android:padding="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_arrow_back_24"
+                    android:src="@drawable/ic_chevron_left_24"
                     app:tint="@color/black" />
 
                 <LinearLayout
