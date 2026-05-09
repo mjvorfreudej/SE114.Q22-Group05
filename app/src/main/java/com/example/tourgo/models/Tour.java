@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public class Tour implements Serializable {
     private String id;
@@ -41,13 +43,42 @@ public class Tour implements Serializable {
     }
 
     public Tour(int imageResId, String name, String location, String priceString, double rating, String duration) {
+        this.id = UUID.randomUUID().toString();
         this.imageResId = imageResId;
         this.name = name;
         this.location = location;
         this.priceString = priceString;
+        this.price = parsePriceString(priceString);
         this.rating = (float) rating;
         this.duration = duration;
         this.imageUrls = new ArrayList<>();
+    }
+
+    private static double parsePriceString(String s) {
+        if (s == null) return 0;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c) || c == '.') sb.append(c);
+        }
+        if (sb.length() == 0) return 0;
+        try {
+            return Double.parseDouble(sb.toString());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    public String getCurrencySymbol() {
+        return "₫";
+    }
+
+    public String formatPrice(double amount) {
+        double finalAmount = amount;
+        if (amount > 0 && amount < 10000) {
+            finalAmount = amount * 26000;
+        }
+        return String.format(Locale.US, "%,.0f₫", finalAmount);
     }
 
     public static Tour fromJson(JSONObject json) {

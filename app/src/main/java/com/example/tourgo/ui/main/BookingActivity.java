@@ -1,13 +1,30 @@
 package com.example.tourgo.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.Booking;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.models.Tour;
+import com.example.tourgo.remote.BookingService;
+import com.example.tourgo.utils.SessionManager;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class BookingActivity extends AppCompatActivity {
     public static final String EXTRA_HOTEL = "hotel_item";
@@ -15,6 +32,8 @@ public class BookingActivity extends AppCompatActivity {
 
     private Hotel hotel;
     private Tour tour;
+    private View loadingOverlay;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +42,9 @@ public class BookingActivity extends AppCompatActivity {
 
         hotel = (Hotel) getIntent().getSerializableExtra(EXTRA_HOTEL);
         tour = (Tour) getIntent().getSerializableExtra(EXTRA_TOUR);
+
+        loadingOverlay = findViewById(R.id.bookingLoadingOverlay);
+        sessionManager = new SessionManager(this);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -34,7 +56,7 @@ public class BookingActivity extends AppCompatActivity {
     public void showStep(Fragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        
+
         ft.setCustomAnimations(
                 R.anim.slide_in_right,
                 R.anim.slide_out_left,
@@ -58,5 +80,112 @@ public class BookingActivity extends AppCompatActivity {
 
     public Tour getTour() {
         return tour;
+    }
+
+    public void submitBooking(long checkInMillis, long checkOutMillis, int guests, double totalPrice) {
+        if (!validateBookingInputs(checkInMillis, checkOutMillis, guests)) {
+            return;
+        }
+
+        String userId = sessionManager.getUserId();
+        String accessToken = sessionManager.getAccessToken();
+        if (userId == null || accessToken == null) {
+            Toast.makeText(this, R.string.booking_error_not_logged_in, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String hotelId = hotel != null ? hotel.getId() : null;
+        String tourId = tour != null ? tour.getId() : null;
+        if (hotelId == null && tourId == null) {
+            Toast.makeText(this, R.string.booking_error_missing_target, Toast.LENGTH_LONG).show();
+            return;
+        }
+        String bookingType = hotelId != null ? "HOTEL" : "TOUR";
+
+        String checkIn = formatDate(checkInMillis);
+        String checkOut = formatDate(checkOutMillis);
+
+        Booking booking = new Booking(userId, tourId, hotelId, bookingType,
+                checkIn, checkOut, guests, totalPrice);
+        booking.setStatus("PENDING");
+
+        showLoading(true);
+        BookingService.createBooking(booking, accessToken, new DataCallback<Booking>() {
+            @Override
+            public void onSuccess(Booking created) {
+                runOnUiThread(() -> {
+                    showLoading(false);
+                    if (created == null || created.getId() == null) {
+                        Toast.makeText(BookingActivity.this,
+                                getString(R.string.booking_error_create_failed, "NO_ID"),
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    launchPayment(created.getId(), totalPrice);
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                Log.e("BookingError", "Supabase Error: " + rawMessage);
+                runOnUiThread(() -> {
+                    showLoading(false);
+                    Toast.makeText(BookingActivity.this,
+                            getString(R.string.booking_error_create_failed, code.name())
+                                    + "\nDetail: " + rawMessage,
+                            Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private boolean validateBookingInputs(long checkInMillis, long checkOutMillis, int guests) {
+        if (checkInMillis <= 0L || checkOutMillis <= 0L) {
+            Toast.makeText(this, R.string.booking_error_dates_required, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        long todayStart = startOfToday();
+        if (checkInMillis < todayStart) {
+            Toast.makeText(this, R.string.booking_error_checkin_past, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (checkOutMillis <= checkInMillis) {
+            Toast.makeText(this, R.string.booking_error_checkout_after_checkin, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (guests <= 0) {
+            Toast.makeText(this, R.string.booking_error_guests_invalid, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+    private void showLoading(boolean visible) {
+        if (loadingOverlay != null) {
+            loadingOverlay.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void launchPayment(String bookingId, double totalPrice) {
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(PaymentActivity.EXTRA_BOOKING_ID, bookingId);
+        intent.putExtra(PaymentActivity.EXTRA_TOTAL_PRICE, totalPrice);
+        startActivity(intent);
+    }
+
+    private static String formatDate(long millis) {
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        fmt.setTimeZone(TimeZone.getDefault());
+        return fmt.format(new Date(millis));
+    }
+
+    private static long startOfToday() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTimeInMillis();
     }
 }

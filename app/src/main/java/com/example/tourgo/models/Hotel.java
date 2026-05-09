@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class Hotel implements Serializable {
     private String id;
@@ -27,6 +28,7 @@ public class Hotel implements Serializable {
     }
 
     public Hotel(int imageResId, String name, String address, double pricePerNight, double rating, String amenities) {
+        this.id = UUID.randomUUID().toString();
         this.imageResId = imageResId;
         this.name = name;
         this.address = address;

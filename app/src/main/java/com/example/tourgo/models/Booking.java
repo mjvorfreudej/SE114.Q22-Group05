@@ -49,6 +49,7 @@ public class Booking {
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
         try {
+            // id is never written: Supabase generates it server-side
             json.put("user_id", userId);
             if (tourId != null) json.put("tour_id", tourId);
             if (hotelId != null) json.put("hotel_id", hotelId);
