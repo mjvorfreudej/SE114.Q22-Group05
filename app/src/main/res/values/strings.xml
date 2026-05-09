@@ -24,6 +24,8 @@
     <string name="login_forgot_password">Quên mật khẩu?</string>
     <string name="login_no_account">Chưa có tài khoản?</string>
     <string name="login_sign_up">Đăng ký</string>
+    <string name="login_or_with">Hoặc đăng nhập với</string>
+    <string name="register_or_with">Hoặc đăng ký với</string>
 
     <!-- activity_register.xml -->
     <string name="register_create">Tạo tài khoản</string>
@@ -154,6 +156,7 @@
     <string name="booking_view_all">Xem tất cả</string>
     <string name="booking_wallet">Ví điện tử</string>
     <string name="booking_bank">Ngân hàng</string>
+    <string name="booking_card">Thẻ</string>
     <string name="booking_ending_in">Kết thúc bằng %s</string>
     <string name="booking_confirm_payment">Xác nhận thanh toán</string>
 
@@ -164,6 +167,7 @@
     <string name="booking_guest_info_format">%1$d Người (%2$d Giường)</string>
     <string name="booking_add_wallet">+ Thêm ví mới</string>
     <string name="booking_add_bank">+ Thêm ngân hàng mới</string>
+    <string name="booking_add_card">+ Thêm thẻ mới</string>
 
     <string name="booking_success_title">Đặt phòng thành công!</string>
     <string name="booking_stay_confirmed">Chỗ ở của bạn đã được xác nhận</string>

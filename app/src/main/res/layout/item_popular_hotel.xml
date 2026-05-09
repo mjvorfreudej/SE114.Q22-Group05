@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:background="#DDDDDD"
+            android:background="@color/light_gray"
             android:clipToOutline="true" />
 
         <TextView
@@ -52,7 +52,7 @@
         android:layout_marginTop="10dp"
         android:maxLines="1"
         android:text="The Grand Orchid Resort"
-        android:textColor="#1C1F26"
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="From $199 / nights"
-        android:textColor="#7B818C"
+        android:textColor="@color/dark_gray"
         android:textSize="14sp" />
 
 </LinearLayout>

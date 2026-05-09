@@ -22,12 +22,17 @@ import com.example.tourgo.models.Tour;
 
 public class BookingConfirmFragment extends Fragment {
 
-    private LinearLayout btnWallet, btnBank;
-    private ImageView ivWallet, ivBank;
-    private TextView tvWallet, tvBank, tvTotalPrice;
+    private static final int CATEGORY_WALLET = 0;
+    private static final int CATEGORY_BANK = 1;
+    private static final int CATEGORY_CARD = 2;
+
+    private LinearLayout btnWallet, btnBank, btnCard;
+    private ImageView ivWallet, ivBank, ivCard;
+    private TextView tvWallet, tvBank, tvCard, tvTotalPrice;
     private TextView tvNights, tvRoomPrice, tvTaxes, tvServiceCharge;
-    private View layoutPaymentMethods;
+    private View layoutPaymentMethods, layoutCardMethods;
     private TextView tvAddMethod;
+    private RadioButton rbMomo, rbZaloPay, rbPayPal, rbVisa, rbMastercard;
     private double totalPrice = 0.0;
     private Hotel hotel;
     private Tour tour;
@@ -53,7 +58,6 @@ public class BookingConfirmFragment extends Fragment {
             }
         }
 
-        // Ánh xạ các View
         tvNights = view.findViewById(R.id.tvNights);
         tvRoomPrice = view.findViewById(R.id.tvRoomPrice);
         tvTaxes = view.findViewById(R.id.tvTaxes);
@@ -61,16 +65,22 @@ public class BookingConfirmFragment extends Fragment {
         tvTotalPrice = view.findViewById(R.id.tvTotalPrice);
         btnWallet = view.findViewById(R.id.btnWallet);
         btnBank = view.findViewById(R.id.btnBank);
+        btnCard = view.findViewById(R.id.btnCard);
         ivWallet = view.findViewById(R.id.ivWalletIcon);
         tvWallet = view.findViewById(R.id.tvWalletLabel);
         ivBank = view.findViewById(R.id.ivBankIcon);
         tvBank = view.findViewById(R.id.tvBankLabel);
+        ivCard = view.findViewById(R.id.ivCardIcon);
+        tvCard = view.findViewById(R.id.tvCardLabel);
         layoutPaymentMethods = view.findViewById(R.id.layoutPaymentMethods);
+        layoutCardMethods = view.findViewById(R.id.layoutCardMethods);
         tvAddMethod = view.findViewById(R.id.btnAddMethod);
-        RadioButton rbMomo = view.findViewById(R.id.rbMomo);
-        RadioButton rbZaloPay = view.findViewById(R.id.rbZaloPay);
+        rbMomo = view.findViewById(R.id.rbMomo);
+        rbZaloPay = view.findViewById(R.id.rbZaloPay);
+        rbPayPal = view.findViewById(R.id.rbPayPal);
+        rbVisa = view.findViewById(R.id.rbVisa);
+        rbMastercard = view.findViewById(R.id.rbMastercard);
 
-        // NHẬN DỮ LIỆU VÀ HIỂN THỊ
         if (getArguments() != null && (hotel != null || tour != null)) {
             int nights = getArguments().getInt("num_nights", 0);
             double roomPrice = getArguments().getDouble("room_price", 0.0);
@@ -88,25 +98,32 @@ public class BookingConfirmFragment extends Fragment {
             } else {
                 tvNights.setText(getString(R.string.booking_night_plural, nights));
             }
-            
+
             tvRoomPrice.setText(hotel.formatPrice(roomPrice));
             tvTaxes.setText(hotel.formatPrice(taxes));
             tvServiceCharge.setText(hotel.formatPrice(service));
             tvTotalPrice.setText(hotel.formatPrice(totalPrice));
         }
 
-        // THIẾT LẬP CLICK LISTENERS
         view.findViewById(R.id.btnBack).setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
 
-        btnWallet.setOnClickListener(v -> selectPaymentCategory(true));
-        btnBank.setOnClickListener(v -> selectPaymentCategory(false));
+        btnWallet.setOnClickListener(v -> selectPaymentCategory(CATEGORY_WALLET));
+        btnBank.setOnClickListener(v -> selectPaymentCategory(CATEGORY_BANK));
+        btnCard.setOnClickListener(v -> selectPaymentCategory(CATEGORY_CARD));
 
         View.OnClickListener radioClick = v -> {
-            rbMomo.setChecked(v.getId() == R.id.rbMomo);
-            rbZaloPay.setChecked(v.getId() == R.id.rbZaloPay);
+            int id = v.getId();
+            rbMomo.setChecked(id == R.id.rbMomo);
+            rbZaloPay.setChecked(id == R.id.rbZaloPay);
+            rbPayPal.setChecked(id == R.id.rbPayPal);
+            rbVisa.setChecked(id == R.id.rbVisa);
+            rbMastercard.setChecked(id == R.id.rbMastercard);
         };
         rbMomo.setOnClickListener(radioClick);
         rbZaloPay.setOnClickListener(radioClick);
+        rbPayPal.setOnClickListener(radioClick);
+        rbVisa.setOnClickListener(radioClick);
+        rbMastercard.setOnClickListener(radioClick);
 
         view.findViewById(R.id.btnConfirmPayment).setOnClickListener(v -> {
             if (getActivity() instanceof BookingActivity && getArguments() != null) {
@@ -117,7 +134,7 @@ public class BookingConfirmFragment extends Fragment {
             }
         });
 
-        selectPaymentCategory(true);
+        selectPaymentCategory(CATEGORY_WALLET);
     }
 
     private String formatPrice(double amount) {
@@ -126,22 +143,60 @@ public class BookingConfirmFragment extends Fragment {
         return String.format(java.util.Locale.US, "%,.0f₫", amount);
     }
 
-    private void selectPaymentCategory(boolean isWallet) {
-        btnWallet.setBackgroundResource(isWallet ? R.drawable.bg_outline_blue : R.drawable.bg_outline_gray);
-        ivWallet.setImageTintList(ColorStateList.valueOf(isWallet ? COLOR_BLUE : COLOR_BLACK));
-        tvWallet.setTextColor(isWallet ? COLOR_BLUE : COLOR_BLACK);
-        tvWallet.setTypeface(null, isWallet ? Typeface.BOLD : Typeface.NORMAL);
-
-        btnBank.setBackgroundResource(!isWallet ? R.drawable.bg_outline_blue : R.drawable.bg_outline_gray);
-        ivBank.setImageTintList(ColorStateList.valueOf(!isWallet ? COLOR_BLUE : COLOR_BLACK));
-        tvBank.setTextColor(!isWallet ? COLOR_BLUE : COLOR_BLACK);
-        tvBank.setTypeface(null, !isWallet ? Typeface.BOLD : Typeface.NORMAL);
+    private void selectPaymentCategory(int category) {
+        applyTabState(btnWallet, ivWallet, tvWallet, category == CATEGORY_WALLET);
+        applyTabState(btnBank, ivBank, tvBank, category == CATEGORY_BANK);
+        applyTabState(btnCard, ivCard, tvCard, category == CATEGORY_CARD);
 
         if (layoutPaymentMethods != null) {
-            layoutPaymentMethods.setVisibility(isWallet ? View.VISIBLE : View.GONE);
+            layoutPaymentMethods.setVisibility(category == CATEGORY_WALLET ? View.VISIBLE : View.GONE);
+        }
+        if (layoutCardMethods != null) {
+            layoutCardMethods.setVisibility(category == CATEGORY_CARD ? View.VISIBLE : View.GONE);
         }
         if (tvAddMethod != null) {
-            tvAddMethod.setText(isWallet ? getString(R.string.booking_add_wallet) : getString(R.string.booking_add_bank));
+            int labelRes;
+            switch (category) {
+                case CATEGORY_BANK:
+                    labelRes = R.string.booking_add_bank;
+                    break;
+                case CATEGORY_CARD:
+                    labelRes = R.string.booking_add_card;
+                    break;
+                case CATEGORY_WALLET:
+                default:
+                    labelRes = R.string.booking_add_wallet;
+                    break;
+            }
+            tvAddMethod.setText(getString(labelRes));
         }
+
+        clearAllRadios();
+        switch (category) {
+            case CATEGORY_WALLET:
+                rbZaloPay.setChecked(true);
+                break;
+            case CATEGORY_CARD:
+                rbVisa.setChecked(true);
+                break;
+            case CATEGORY_BANK:
+            default:
+                break;
+        }
+    }
+
+    private void applyTabState(LinearLayout tab, ImageView icon, TextView label, boolean active) {
+        tab.setBackgroundResource(active ? R.drawable.bg_outline_blue : R.drawable.bg_outline_gray);
+        icon.setImageTintList(ColorStateList.valueOf(active ? COLOR_BLUE : COLOR_BLACK));
+        label.setTextColor(active ? COLOR_BLUE : COLOR_BLACK);
+        label.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
+    }
+
+    private void clearAllRadios() {
+        rbMomo.setChecked(false);
+        rbZaloPay.setChecked(false);
+        rbPayPal.setChecked(false);
+        rbVisa.setChecked(false);
+        rbMastercard.setChecked(false);
     }
 }

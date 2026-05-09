@@ -6,7 +6,7 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:cardBackgroundColor="#F8F9FA">
+    app:cardBackgroundColor="@color/light_gray">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="User Name"
-                    android:textColor="#1C1F26"
+                    android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -48,7 +48,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2 days ago"
-                    android:textColor="#7B818C"
+                    android:textColor="@color/dark_gray"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -59,7 +59,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:text="★ 5.0"
-                android:textColor="#FFB800"
+                android:textColor="@color/dark_gray"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </RelativeLayout>
@@ -71,7 +71,7 @@
             android:layout_marginTop="12dp"
             android:lineSpacingExtra="2dp"
             android:text="Comment text goes here..."
-            android:textColor="#4B5563"
+            android:textColor="@color/dark_gray"
             android:textSize="14sp" />
 
         <!-- Placeholder for comment images if any -->

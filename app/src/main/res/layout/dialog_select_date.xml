@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_bottom_sheet"
-    android:padding="24dp">
+    android:paddingHorizontal="@dimen/screen_margin_horizontal"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp">
 
     <TextView
         android:id="@+id/tvSelectDate"
