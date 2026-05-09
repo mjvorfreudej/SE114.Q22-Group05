@@ -24,17 +24,21 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class HotelReviewService {
-    public static void getReviewsByHotelId(String hotelId, DataCallback<List<Comment>> callback) {
+    public static void getReviewsByHotelId(
+            String hotelId,
+            String accessToken,
+            DataCallback<List<Comment>> callback
+    ) {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/hotel_reviews"
-                + "?select=id,hotel_id,user_id,review_text,stars,created_at,profiles(name,email,avatar_url)"
+                + "?select=id,hotel_id,user_id,review_text,stars,created_at,users!hotel_reviews_user_id_users_fkey(name,avatar)"
                 + "&hotel_id=eq." + hotelId
                 + "&order=created_at.desc";
 
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
                 .addHeader("Accept", "application/json")
                 .get()
                 .build();
@@ -48,6 +52,10 @@ public class HotelReviewService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body() != null ? response.body().string() : "[]";
+
+                android.util.Log.d("ReviewLoad", "url = " + url);
+                android.util.Log.d("ReviewLoad", "code = " + response.code());
+                android.util.Log.d("ReviewLoad", "body = " + body);
 
                 if (response.isSuccessful()) {
                     try {

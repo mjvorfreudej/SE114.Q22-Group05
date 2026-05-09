@@ -97,13 +97,6 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
 
-                if (id == R.id.action_edit_review) {
-                    if (listener != null) {
-                        listener.onEdit(comment);
-                    }
-                    return true;
-                }
-
                 if (id == R.id.action_delete_review) {
                     if (listener != null) {
                         listener.onDelete(comment);

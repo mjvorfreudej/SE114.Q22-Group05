@@ -105,8 +105,7 @@ public class BookingActivity extends AppCompatActivity {
         String checkIn = formatDate(checkInMillis);
         String checkOut = formatDate(checkOutMillis);
 
-        Booking booking = new Booking(userId, tourId, hotelId, bookingType,
-                checkIn, checkOut, guests, totalPrice);
+        Booking booking = new Booking(userId, tourId, hotelId);
         booking.setStatus("PENDING");
 
         showLoading(true);

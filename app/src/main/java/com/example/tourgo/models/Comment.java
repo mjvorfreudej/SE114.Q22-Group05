@@ -33,14 +33,14 @@ public class Comment implements Serializable {
     }
 
     public static Comment fromHotelReviewJson(JSONObject json) {
-        JSONObject profile = json.optJSONObject("profiles");
+        JSONObject user = json.optJSONObject("users");
 
         String userName = "User";
         String avatarUrl = "";
 
-        if(profile != null) {
-            userName = profile.optString("name", "User");
-            avatarUrl = profile.optString("avatar_url", "");
+        if (user != null) {
+            userName = user.optString("name", "User");
+            avatarUrl = user.optString("avatar", "");
         }
 
         Comment comment = new Comment(

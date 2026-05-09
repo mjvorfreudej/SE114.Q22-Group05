@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +49,7 @@ public class DetailActivity extends AppCompatActivity {
     private Runnable sliderRunnable;
     private CommentAdapter commentAdapter;
     private List<Comment> allComments = new ArrayList<>();
+    private Comment myReview = null;
     private SessionManager session;
 
     @Override
@@ -83,7 +85,7 @@ public class DetailActivity extends AppCompatActivity {
         setupGallery();
         setupComments();
         loadHotelReviews();
-        updateRatingSummary();
+        checkReviewPermission();
         setupReviewForm();
         updateRatingSummary();
         
@@ -102,24 +104,60 @@ public class DetailActivity extends AppCompatActivity {
     private void loadHotelReviews() {
         if (hotel == null || hotel.getId() == null) return;
 
-        HotelReviewService.getReviewsByHotelId(hotel.getId(), new DataCallback<List<Comment>>() {
-            @Override
-            public void onSuccess(List<Comment> data) {
-                runOnUiThread(() -> {
-                    allComments = data != null ? data : new ArrayList<>();
-                    sortCurrentUserReviewFirst(allComments);
-                    commentAdapter.submitList(new ArrayList<>(allComments));
-                });
-            }
+        HotelReviewService.getReviewsByHotelId(
+                hotel.getId(),
+                session.getAccessToken(),
+                new DataCallback<List<Comment>>() {
+                    @Override
+                    public void onSuccess(List<Comment> data) {
+                        runOnUiThread(() -> {
+                            allComments = data != null ? data : new ArrayList<>();
+                            sortCurrentUserReviewFirst(allComments);
 
-            @Override
-            public void onError(ApiErrorCode code, String rawMessage) {
-                runOnUiThread(() -> {
-                    allComments = new ArrayList<>();
-                    commentAdapter.submitList(new ArrayList<>());
-                });
+                            myReview = findMyReview(allComments);
+                            bindReviewForm();
+
+                            commentAdapter.submitList(new ArrayList<>(allComments));
+                        });
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        runOnUiThread(() -> {
+                            allComments = new ArrayList<>();
+                            myReview = null;
+                            commentAdapter.submitList(new ArrayList<>());
+                        });
+                    }
+                }
+        );
+    }
+
+    private Comment findMyReview(List<Comment> comments) {
+        if (comments == null || session == null || session.getUserId() == null) return null;
+
+        String currentUserId = session.getUserId();
+
+        for (Comment comment : comments) {
+            if (currentUserId.equals(comment.getUserId())) {
+                return comment;
             }
-        });
+        }
+
+        return null;
+    }
+
+    private void bindReviewForm() {
+        if (myReview == null) {
+            binding.ratingBarReview.setRating(5);
+            binding.edtReviewText.setText("");
+            binding.btnSubmitReview.setText(R.string.review_submit_button);
+            return;
+        }
+
+        binding.ratingBarReview.setRating(myReview.getRating());
+        binding.edtReviewText.setText(myReview.getContent());
+        binding.btnSubmitReview.setText(R.string.review_update_button);
     }
 
     private void sortCurrentUserReviewFirst(List<Comment> comments) {
@@ -308,26 +346,28 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        String userId = session.getUserId();
-        String token = session.getAccessToken();
+        BookingService.hasBookedHotel(
+                session.getUserId(),
+                hotel.getId(),
+                session.getAccessToken(),
+                new DataCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean hasBooked) {
+                        runOnUiThread(() -> {
+                            binding.layoutWriteReview.setVisibility(hasBooked ? View.VISIBLE : View.GONE);
+                            binding.tvReviewPermissionMessage.setVisibility(hasBooked ? View.GONE : View.VISIBLE);
+                        });
+                    }
 
-        BookingService.hasBookedHotel(userId, hotel.getId(), token, new DataCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean hasBooked) {
-                runOnUiThread(() -> {
-                    binding.layoutWriteReview.setVisibility(hasBooked ? View.VISIBLE : View.GONE);
-                    binding.tvReviewPermissionMessage.setVisibility(hasBooked ? View.GONE : View.VISIBLE);
-                });
-            }
-
-            @Override
-            public void onError(ApiErrorCode code, String rawMessage) {
-                runOnUiThread(() -> {
-                    binding.layoutWriteReview.setVisibility(View.GONE);
-                    binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
-                });
-            }
-        });
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        runOnUiThread(() -> {
+                            binding.layoutWriteReview.setVisibility(View.GONE);
+                            binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
+                        });
+                    }
+                }
+        );
     }
 
     private void submitReview() {
@@ -348,6 +388,34 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.btnSubmitReview.setEnabled(false);
 
+        if (myReview != null && myReview.getId() != null && !myReview.getId().isEmpty()) {
+            HotelReviewService.updateHotelReview(
+                    myReview.getId(),
+                    stars,
+                    reviewText,
+                    session.getAccessToken(),
+                    new DataCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void data) {
+                            runOnUiThread(() -> {
+                                binding.btnSubmitReview.setEnabled(true);
+                                Toast.makeText(DetailActivity.this, R.string.review_update_success, Toast.LENGTH_SHORT).show();
+                                loadHotelReviews();
+                            });
+                        }
+
+                        @Override
+                        public void onError(ApiErrorCode code, String rawMessage) {
+                            runOnUiThread(() -> {
+                                binding.btnSubmitReview.setEnabled(true);
+                                Toast.makeText(DetailActivity.this, R.string.review_update_error, Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+            );
+            return;
+        }
+
         HotelReviewService.createHotelReview(
                 hotel.getId(),
                 session.getUserId(),
@@ -359,15 +427,8 @@ public class DetailActivity extends AppCompatActivity {
                     public void onSuccess(Void data) {
                         runOnUiThread(() -> {
                             binding.btnSubmitReview.setEnabled(true);
-                            binding.edtReviewText.setText("");
-                            binding.ratingBarReview.setRating(5);
-                            binding.layoutWriteReview.setVisibility(View.GONE);
-
-                            Toast.makeText(DetailActivity.this, R.string.review_submit_success,
-                                    Toast.LENGTH_SHORT).show();
-
+                            Toast.makeText(DetailActivity.this, R.string.review_submit_success, Toast.LENGTH_SHORT).show();
                             loadHotelReviews();
-                            checkReviewPermission();
                         });
                     }
 
@@ -387,14 +448,12 @@ public class DetailActivity extends AppCompatActivity {
 
         commentAdapter = new CommentAdapter(currentUserId, new CommentAdapter.ReviewActionListener() {
             @Override
-            public void onEdit(Comment comment) {
-                showEditReviewDialog(comment);
-            }
-
-            @Override
             public void onDelete(Comment comment) {
                 deleteReview(comment);
             }
+
+            @Override
+            public void onEdit(Comment comment) {}
         });
 
         binding.rvComments.setLayoutManager(new LinearLayoutManager(this));
@@ -437,6 +496,11 @@ public class DetailActivity extends AppCompatActivity {
                     );
                 })
                 .show();
+
+        myReview = null;
+        bindReviewForm();
+        loadHotelReviews();
+        checkReviewPermission();
     }
 
     private void updateReview(String reviewId, int stars, String reviewText) {

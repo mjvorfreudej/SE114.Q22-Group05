@@ -1,5 +1,7 @@
 package com.example.tourgo.remote;
 
+import android.util.Log;
+
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Booking;
@@ -70,7 +72,7 @@ public class BookingService {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/bookings"
                 + "?user_id=eq." + userId
-                + "&order=created_at.desc";
+                + "&order=booking_date.desc";
 
         Request request = new Request.Builder()
                 .url(url)
@@ -177,6 +179,10 @@ public class BookingService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String body = response.body() != null ? response.body().string() : "[]";
+
+                Log.d("ReviewCheck", "hasBookedHotel url = " + url);
+                Log.d("ReviewCheck", "bookings response code = " + response.code());
+                Log.d("ReviewCheck", "bookings response body = " + body);
 
                 if (response.isSuccessful()) {
                     try {
