@@ -128,8 +128,9 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
-                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageResource(isFavorite ? R.drawable.ic_heart_fullfilled : R.drawable.ic_heart_filled);
+        int color = ContextCompat.getColor(imgHeart.getContext(),
+                isFavorite ? R.color.red : android.R.color.white);
         imgHeart.setImageTintList(ColorStateList.valueOf(color));
     }
 

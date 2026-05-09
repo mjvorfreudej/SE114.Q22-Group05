@@ -58,7 +58,7 @@
                         android:layout_height="40dp"
                         android:background="@drawable/bg_input_glass"
                         android:padding="10dp"
-                        android:src="@drawable/ic_arrow_back_24"
+                        android:src="@drawable/ic_chevron_left_24"
                         app:tint="@android:color/white" />
 
                     <LinearLayout

@@ -73,6 +73,19 @@
     <string name="profile_about_placeholder">Người yêu du lịch…</string>
     <string name="profile_edit_button">Chỉnh sửa hồ sơ</string>
     <string name="profile_logout">Đăng xuất</string>
+    <string name="profile_account_title">Tài khoản</string>
+    <string name="profile_edit_short">Sửa</string>
+    <string name="profile_my_booking">Đặt phòng của tôi</string>
+    <string name="profile_view_all">Xem tất cả</string>
+    <string name="profile_settings">Cài đặt</string>
+    <string name="profile_personal_information">Thông tin cá nhân</string>
+    <string name="profile_payment_methods">Phương thức thanh toán</string>
+    <string name="profile_notifications">Thông báo</string>
+    <string name="profile_privacy_security">Bảo mật &amp; Riêng tư</string>
+    <string name="profile_language_currency">Ngôn ngữ &amp; Tiền tệ</string>
+    <string name="profile_logout_title">Đăng xuất</string>
+    <string name="profile_logout_confirm">Bạn có chắc muốn đăng xuất?</string>
+    <string name="profile_logout_confirm_btn">Xác nhận</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>
