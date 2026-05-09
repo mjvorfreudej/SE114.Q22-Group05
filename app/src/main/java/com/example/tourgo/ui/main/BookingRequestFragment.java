@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.Tour;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
@@ -73,37 +75,57 @@ public class BookingRequestFragment extends Fragment {
         btnMinusBed.setOnClickListener(v -> { if (bedCount > 1) { bedCount--; updateCounterUI(); } });
 
         view.findViewById(R.id.btnNextStep).setOnClickListener(v -> {
-            if (getActivity() instanceof BookingActivity) {
-                Hotel hotel = ((BookingActivity) getActivity()).getHotel();
-                if (hotel != null && startDate != null && endDate != null) {
-                    long diff = endDate.getTimeInMillis() - startDate.getTimeInMillis();
-                    int nights = (int) (diff / (24 * 60 * 60 * 1000));
-                    if (nights <= 0) nights = 1;
+            if (!(getActivity() instanceof BookingActivity)) return;
+            BookingActivity host = (BookingActivity) getActivity();
+            Hotel hotel = host.getHotel();
+            Tour tour = hotel == null ? host.getTour() : null;
+            if (hotel == null && tour == null) return;
+            if (startDate == null || endDate == null) return;
 
-                    double pricePerNight = hotel.getPricePerNight();
-                    double roomPrice = pricePerNight * nights;
-                    double taxes = roomPrice * 0.1;
-                    
-                    double serviceCharge = hotel.getCurrencySymbol().equals("₫") ? 50000.0 : 5.0;
-                    double total = roomPrice + taxes + serviceCharge;
-
-                    String checkInOut = summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime());
-                    String guestInfo = getString(R.string.booking_guest_info_format, guestCount, bedCount);
-
-                    Bundle args = new Bundle();
-                    args.putInt("num_nights", nights);
-                    args.putDouble("room_price", roomPrice);
-                    args.putDouble("taxes", taxes);
-                    args.putDouble("service_charge", serviceCharge);
-                    args.putDouble("total_price", total);
-                    args.putString("check_in_out", checkInOut + getString(R.string.booking_nights_format, nights));
-                    args.putString("guest_info", guestInfo);
-
-                    BookingConfirmFragment nextFragment = new BookingConfirmFragment();
-                    nextFragment.setArguments(args);
-                    ((BookingActivity) getActivity()).showStep(nextFragment);
-                }
+            if (isBeforeToday(startDate)) {
+                Toast.makeText(requireContext(),
+                        R.string.booking_error_checkin_past,
+                        Toast.LENGTH_SHORT).show();
+                return;
             }
+            if (!endDate.after(startDate)) {
+                Toast.makeText(requireContext(),
+                        R.string.booking_error_checkout_after_checkin,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            long diff = endDate.getTimeInMillis() - startDate.getTimeInMillis();
+            int nights = (int) (diff / (24 * 60 * 60 * 1000));
+            if (nights <= 0) nights = 1;
+
+            double pricePerNight = hotel != null ? hotel.getPricePerNight() : tour.getPrice();
+            if (pricePerNight < 10000) {
+                pricePerNight *= 26000;
+            }
+            double roomPrice = pricePerNight * nights;
+            double taxes = roomPrice * 0.1;
+            double serviceCharge = 50000.0;
+            double total = roomPrice + taxes + serviceCharge;
+
+            String checkInOut = summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime());
+            String guestInfo = guestCount + " Person (" + bedCount + " Bed)";
+
+            Bundle args = new Bundle();
+            args.putInt("num_nights", nights);
+            args.putDouble("room_price", roomPrice);
+            args.putDouble("taxes", taxes);
+            args.putDouble("service_charge", serviceCharge);
+            args.putDouble("total_price", total);
+            args.putString("check_in_out", checkInOut + " (" + nights + " nights)");
+            args.putString("guest_info", guestInfo);
+            args.putLong("check_in_millis", startDate.getTimeInMillis());
+            args.putLong("check_out_millis", endDate.getTimeInMillis());
+            args.putInt("guests", guestCount);
+
+            BookingConfirmFragment nextFragment = new BookingConfirmFragment();
+            nextFragment.setArguments(args);
+            host.showStep(nextFragment);
         });
 
         updateCounterUI();
@@ -188,23 +210,27 @@ public class BookingRequestFragment extends Fragment {
                     tv.setText(String.format(Locale.getDefault(), "%02d", day));
                     tv.setTextColor(Color.BLACK);
                     currentCellDate.set(Calendar.DAY_OF_MONTH, day);
-                    
-                    highlightDate(tv, currentCellDate);
 
-                    tv.setOnClickListener(v -> {
-                        if (startDate != null && endDate == null) {
-                            if (currentCellDate.after(startDate)) {
-                                endDate = (Calendar) currentCellDate.clone();
+                    if (isBeforeToday(currentCellDate)) {
+                        tv.setTextColor(Color.parseColor("#E0E0E0"));
+                    } else {
+                        tv.setTextColor(Color.BLACK);
+                        highlightDate(tv, currentCellDate);
+                        tv.setOnClickListener(v -> {
+                            if (startDate != null && endDate == null) {
+                                if (currentCellDate.after(startDate)) {
+                                    endDate = (Calendar) currentCellDate.clone();
+                                } else {
+                                    startDate = (Calendar) currentCellDate.clone();
+                                    endDate = null;
+                                }
                             } else {
                                 startDate = (Calendar) currentCellDate.clone();
                                 endDate = null;
                             }
-                        } else {
-                            startDate = (Calendar) currentCellDate.clone();
-                            endDate = null;
-                        }
-                        renderCalendar(table, tvMonthYear);
-                    });
+                            renderCalendar(table, tvMonthYear);
+                        });
+                    }
                     dayCounter++;
                 }
                 row.addView(tv);
@@ -230,6 +256,15 @@ public class BookingRequestFragment extends Fragment {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
+    private boolean isBeforeToday(Calendar date) {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        return date.before(today);
     }
 
     private void updateDateUI() {

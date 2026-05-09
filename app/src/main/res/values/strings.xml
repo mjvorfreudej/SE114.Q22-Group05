@@ -111,6 +111,16 @@
     <string name="err_tour_full">Tour đã đầy chỗ</string>
     <string name="err_already_favorited">Đã có trong danh sách yêu thích</string>
     <string name="booking_error">Không thể tạo booking</string>
+    <string name="booking_error_dates_required">Vui lòng chọn ngày nhận và trả phòng</string>
+    <string name="booking_error_checkin_past">Ngày nhận phòng không được ở quá khứ</string>
+    <string name="booking_error_checkout_after_checkin">Ngày trả phòng phải sau ngày nhận phòng</string>
+    <string name="booking_error_guests_invalid">Số khách phải lớn hơn 0</string>
+    <string name="booking_error_not_logged_in">Vui lòng đăng nhập để đặt phòng</string>
+    <string name="booking_error_missing_target">Không xác định được khách sạn hoặc tour</string>
+    <string name="booking_error_create_failed">Không thể tạo booking (%1$s)</string>
+    <string name="payment_title">Thanh toán</string>
+    <string name="payment_booking_id">Mã đặt phòng: %1$s</string>
+    <string name="payment_total">Tổng tiền: %1$s</string>
     
     <!-- Search -->
     <string name="search_no_results">Không tìm thấy kết quả</string>

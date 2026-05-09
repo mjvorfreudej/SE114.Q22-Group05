@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.Tour;
 
 public class BookingConfirmFragment extends Fragment {
 
@@ -29,6 +30,7 @@ public class BookingConfirmFragment extends Fragment {
     private TextView tvAddMethod;
     private double totalPrice = 0.0;
     private Hotel hotel;
+    private Tour tour;
 
     private final int COLOR_BLUE = Color.parseColor("#4285F4");
     private final int COLOR_BLACK = Color.BLACK;
@@ -44,7 +46,11 @@ public class BookingConfirmFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getActivity() instanceof BookingActivity) {
-            hotel = ((BookingActivity) getActivity()).getHotel();
+            BookingActivity host = (BookingActivity) getActivity();
+            hotel = host.getHotel();
+            if (hotel == null) {
+                tour = host.getTour();
+            }
         }
 
         // Ánh xạ các View
@@ -65,13 +71,18 @@ public class BookingConfirmFragment extends Fragment {
         RadioButton rbZaloPay = view.findViewById(R.id.rbZaloPay);
 
         // NHẬN DỮ LIỆU VÀ HIỂN THỊ
-        if (getArguments() != null && hotel != null) {
+        if (getArguments() != null && (hotel != null || tour != null)) {
             int nights = getArguments().getInt("num_nights", 0);
             double roomPrice = getArguments().getDouble("room_price", 0.0);
             double taxes = getArguments().getDouble("taxes", 0.0);
             double service = getArguments().getDouble("service_charge", 0.0);
             totalPrice = getArguments().getDouble("total_price", 0.0);
 
+            tvNights.setText(nights + " Night" + (nights > 1 ? "s" : ""));
+            tvRoomPrice.setText(formatPrice(roomPrice));
+            tvTaxes.setText(formatPrice(taxes));
+            tvServiceCharge.setText(formatPrice(service));
+            tvTotalPrice.setText(formatPrice(totalPrice));
             if (nights == 1) {
                 tvNights.setText(getString(R.string.booking_night_single, nights));
             } else {
@@ -98,22 +109,21 @@ public class BookingConfirmFragment extends Fragment {
         rbZaloPay.setOnClickListener(radioClick);
 
         view.findViewById(R.id.btnConfirmPayment).setOnClickListener(v -> {
-            if (getActivity() instanceof BookingActivity) {
-                BookingSuccessFragment successFragment = new BookingSuccessFragment();
-                Bundle args = new Bundle();
-                args.putDouble("total_price", totalPrice);
-                
-                if (getArguments() != null) {
-                    args.putString("check_in_out", getArguments().getString("check_in_out"));
-                    args.putString("guest_info", getArguments().getString("guest_info"));
-                }
-
-                successFragment.setArguments(args);
-                ((BookingActivity) getActivity()).showStep(successFragment);
+            if (getActivity() instanceof BookingActivity && getArguments() != null) {
+                long checkIn = getArguments().getLong("check_in_millis", 0L);
+                long checkOut = getArguments().getLong("check_out_millis", 0L);
+                int guests = getArguments().getInt("guests", 0);
+                ((BookingActivity) getActivity()).submitBooking(checkIn, checkOut, guests, totalPrice);
             }
         });
 
         selectPaymentCategory(true);
+    }
+
+    private String formatPrice(double amount) {
+        if (hotel != null) return hotel.formatPrice(amount);
+        if (tour != null) return tour.formatPrice(amount);
+        return String.format(java.util.Locale.US, "%,.0f₫", amount);
     }
 
     private void selectPaymentCategory(boolean isWallet) {

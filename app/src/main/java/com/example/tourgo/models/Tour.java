@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class Tour implements Serializable {
     private String id;
@@ -41,6 +42,7 @@ public class Tour implements Serializable {
     }
 
     public Tour(int imageResId, String name, String location, String priceString, double rating, String duration) {
+        this.id = UUID.randomUUID().toString();
         this.imageResId = imageResId;
         this.name = name;
         this.location = location;
