@@ -30,12 +30,14 @@
         android:layout_height="32dp"
         android:layout_margin="12dp"
         android:background="@drawable/bg_circle_white_alpha"
+        android:clickable="true"
+        android:contentDescription="@string/app_name"
+        android:focusable="true"
         android:padding="6dp"
-        android:src="@drawable/ic_favorite_24"
+        android:src="@drawable/ic_heart_filled"
         app:layout_constraintEnd_toEndOf="@id/cardTourImg"
         app:layout_constraintTop_toTopOf="@id/cardTourImg"
-        app:tint="@android:color/white"
-        android:contentDescription="@string/app_name" />
+        app:tint="@android:color/white" />
 
     <TextView
         android:id="@+id/tvTourName"

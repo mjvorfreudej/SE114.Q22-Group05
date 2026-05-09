@@ -143,15 +143,14 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
-                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageResource(isFavorite ? R.drawable.ic_heart_fullfilled : R.drawable.ic_heart_filled);
+        int color = ContextCompat.getColor(imgHeart.getContext(),
+                isFavorite ? R.color.red : android.R.color.white);
         imgHeart.setImageTintList(ColorStateList.valueOf(color));
-        
-        if (isFavorite) {
-            imgHeart.setBackgroundResource(R.drawable.bg_circle_white);
-        } else {
-            imgHeart.setBackgroundResource(R.drawable.bg_circle_white_alpha);
-        }
+
+        imgHeart.setBackgroundResource(isFavorite
+                ? R.drawable.bg_circle_white
+                : R.drawable.bg_circle_white_alpha);
     }
 
     @Override
