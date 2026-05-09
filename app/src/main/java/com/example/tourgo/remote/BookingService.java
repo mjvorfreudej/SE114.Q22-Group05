@@ -150,4 +150,45 @@ public class BookingService {
             callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
     }
+
+    public static void hasBookedHotel(String userId, String hotelId, String accessToken, DataCallback<Boolean> callback) {
+        String url = SupabaseConfig.SUPABASE_URL
+                + "/rest/v1/bookings"
+                + "?select=id"
+                + "&user_id=eq." + userId
+                + "&hotel_id=eq." + hotelId
+                + "&limit=1"
+                + "&status=eq.COMPLETED";
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("apikey", SupabaseConfig.ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Accept", "application/json")
+                .get()
+                .build();
+
+        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String body = response.body() != null ? response.body().string() : "[]";
+
+                if (response.isSuccessful()) {
+                    try {
+                        JSONArray array = new JSONArray(body);
+                        callback.onSuccess(array.length() > 0);
+                    } catch (Exception e) {
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
+                    }
+                } else {
+                    callback.onError(SupabaseConfig.mapHttp(response.code()), body);
+                }
+            }
+        });
+    }
 }

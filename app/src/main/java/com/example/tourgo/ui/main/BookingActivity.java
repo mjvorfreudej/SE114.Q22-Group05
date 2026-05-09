@@ -130,6 +130,7 @@ public class BookingActivity extends AppCompatActivity {
                 Log.e("BookingError", "Supabase Error: " + rawMessage);
                 runOnUiThread(() -> {
                     showLoading(false);
+                    Log.e("BookingError", "Supabase Error: " + rawMessage);
                     Toast.makeText(BookingActivity.this,
                             getString(R.string.booking_error_create_failed, code.name())
                                     + "\nDetail: " + rawMessage,

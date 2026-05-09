@@ -176,6 +176,71 @@
                         android:textStyle="bold" />
                 </RelativeLayout>
 
+                <!-- User Review -->
+                <LinearLayout
+                    android:id="@+id/layoutWriteReview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_card"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/write_review"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <RatingBar
+                        android:id="@+id/ratingBarReview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:numStars="5"
+                        android:rating="5"
+                        android:stepSize="1" />
+
+                    <EditText
+                        android:id="@+id/edtReviewText"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input_field"
+                        android:gravity="top|start"
+                        android:hint="@string/review_hint"
+                        android:inputType="textMultiLine"
+                        android:maxLength="500"
+                        android:padding="12dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray"
+                        android:textSize="14sp" />
+
+                    <Button
+                        android:id="@+id/btnSubmitReview"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_book_button"
+                        android:text="@string/review_submit_button"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvReviewPermissionMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/not_book_yet"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
                 <!-- Rating Summary Breakdown -->
                 <LinearLayout
                     android:layout_width="match_parent"

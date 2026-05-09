@@ -196,4 +196,26 @@
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_favorite">Yêu thích</string>
     <string name="nav_profile">Hồ sơ</string>
+
+    <!-- User Review -->
+    <string name="not_book_yet">Bạn cần đặt phòng khách sạn này trước khi viết đánh giá.</string>
+    <string name="write_review">Viết đáng giá</string>
+    <string name="review_hint">Chia sẻ trải nghiệm của bạn</string>
+    <string name="review_rating">Vui lòng chọn đánh giá</string>
+    <string name="delete_review">Xóa</string>
+    <string name="edit_review">Sửa</string>"
+    <string name="review_submit_button">Gửi đánh giá</string>
+    <string name="review_update_button">Cập nhật đánh giá</string>
+    <string name="review_action_delete">Xóa</string>
+    <string name="review_edit_title">Sửa đánh giá</string>
+    <string name="review_delete_title">Xóa đánh giá</string>
+    <string name="review_delete_message">Bạn có chắc muốn xóa đánh giá này?</string>
+    <string name="review_rating_required">Vui lòng chọn số sao</string>
+    <string name="review_text_required">Vui lòng nhập nội dung đánh giá</string>
+    <string name="review_submit_success">Đã gửi đánh giá</string>
+    <string name="review_submit_error">Không thể gửi đánh giá</string>
+    <string name="review_update_success">Đã cập nhật đánh giá</string>
+    <string name="review_update_error">Không thể cập nhật đánh giá</string>
+    <string name="review_delete_success">Đã xóa đánh giá</string>
+    <string name="review_delete_error">Không thể xóa đánh giá</string>
 </resources>

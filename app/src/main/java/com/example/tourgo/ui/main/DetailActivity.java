@@ -1,15 +1,21 @@
 package com.example.tourgo.ui.main;
 
+import static com.example.tourgo.remote.HotelReviewService.deleteHotelReview;
+
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,7 +31,10 @@ import com.example.tourgo.models.Comment;
 import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.remote.HotelReviewService;
 import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.remote.BookingService;
+import com.example.tourgo.remote.HotelReviewService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +55,7 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        
+
         session = new SessionManager(this);
         hotel = (Hotel) getIntent().getSerializableExtra("hotel_object");
 
@@ -73,6 +82,9 @@ public class DetailActivity extends AppCompatActivity {
     private void setupUI() {
         setupGallery();
         setupComments();
+        loadHotelReviews();
+        updateRatingSummary();
+        setupReviewForm();
         updateRatingSummary();
         
         binding.tvDetailName.setText(hotel.getName());
@@ -85,6 +97,44 @@ public class DetailActivity extends AppCompatActivity {
         binding.tvDetailDescription.setText(hotel.getDescription());
 
         updateHeartIcon(hotel.isFavorite());
+    }
+
+    private void loadHotelReviews() {
+        if (hotel == null || hotel.getId() == null) return;
+
+        HotelReviewService.getReviewsByHotelId(hotel.getId(), new DataCallback<List<Comment>>() {
+            @Override
+            public void onSuccess(List<Comment> data) {
+                runOnUiThread(() -> {
+                    allComments = data != null ? data : new ArrayList<>();
+                    sortCurrentUserReviewFirst(allComments);
+                    commentAdapter.submitList(new ArrayList<>(allComments));
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                runOnUiThread(() -> {
+                    allComments = new ArrayList<>();
+                    commentAdapter.submitList(new ArrayList<>());
+                });
+            }
+        });
+    }
+
+    private void sortCurrentUserReviewFirst(List<Comment> comments) {
+        if (session == null || session.getUserId() == null || comments == null) return;
+
+        String currentUserId = session.getUserId();
+
+        comments.sort((c1, c2) -> {
+            boolean c1IsMine = currentUserId.equals(c1.getUserId());
+            boolean c2IsMine = currentUserId.equals(c2.getUserId());
+
+            if (c1IsMine && !c2IsMine) return -1;
+            if (!c1IsMine && c2IsMine) return 1;
+            return 0;
+        });
     }
 
     private void toggleFavorite() {
@@ -153,7 +203,26 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void filterComments(String type) {
-        commentAdapter.submitList(new ArrayList<>(allComments));
+        List<Comment> filtered = new ArrayList<>();
+
+        for (Comment comment : allComments) {
+            if ("all".equals(type)) {
+                filtered.add(comment);
+            } else if ("photos".equals(type) && comment.hasImages()) {
+                filtered.add(comment);
+            } else {
+                try {
+                    int rating = Integer.parseInt(type);
+                    if ((int) comment.getRating() == rating) {
+                        filtered.add(comment);
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        sortCurrentUserReviewFirst(filtered);
+        commentAdapter.submitList(filtered);
     }
 
     private void setupGallery() {
@@ -204,12 +273,6 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void setupComments() {
-        commentAdapter = new CommentAdapter();
-        binding.rvComments.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvComments.setAdapter(commentAdapter);
-    }
-
     private void updateHeartIcon(boolean isFavorite) {
         int color = isFavorite ? ContextCompat.getColor(this, android.R.color.holo_red_dark) : ContextCompat.getColor(this, android.R.color.white);
         binding.btnFavoriteDetail.setImageTintList(ColorStateList.valueOf(color));
@@ -232,5 +295,212 @@ public class DetailActivity extends AppCompatActivity {
         if (sliderRunnable != null) {
             sliderHandler.postDelayed(sliderRunnable, 3000);
         }
+    }
+
+    private void setupReviewForm() {
+        binding.btnSubmitReview.setOnClickListener(v -> submitReview());
+    }
+
+    private void checkReviewPermission() {
+        if (hotel == null || hotel.getId() == null || !session.isLoggedIn()) {
+            binding.layoutWriteReview.setVisibility(View.GONE);
+            binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        String userId = session.getUserId();
+        String token = session.getAccessToken();
+
+        BookingService.hasBookedHotel(userId, hotel.getId(), token, new DataCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean hasBooked) {
+                runOnUiThread(() -> {
+                    binding.layoutWriteReview.setVisibility(hasBooked ? View.VISIBLE : View.GONE);
+                    binding.tvReviewPermissionMessage.setVisibility(hasBooked ? View.GONE : View.VISIBLE);
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                runOnUiThread(() -> {
+                    binding.layoutWriteReview.setVisibility(View.GONE);
+                    binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
+                });
+            }
+        });
+    }
+
+    private void submitReview() {
+        if (hotel == null || hotel.getId() == null || !session.isLoggedIn()) return;
+
+        int stars = (int) binding.ratingBarReview.getRating();
+        String reviewText = binding.edtReviewText.getText().toString().trim();
+
+        if (stars < 1 || stars > 5) {
+            Toast.makeText(this, R.string.review_rating_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (reviewText.isEmpty()) {
+            Toast.makeText(this, R.string.review_text_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        binding.btnSubmitReview.setEnabled(false);
+
+        HotelReviewService.createHotelReview(
+                hotel.getId(),
+                session.getUserId(),
+                stars,
+                reviewText,
+                session.getAccessToken(),
+                new DataCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        runOnUiThread(() -> {
+                            binding.btnSubmitReview.setEnabled(true);
+                            binding.edtReviewText.setText("");
+                            binding.ratingBarReview.setRating(5);
+                            binding.layoutWriteReview.setVisibility(View.GONE);
+
+                            Toast.makeText(DetailActivity.this, R.string.review_submit_success,
+                                    Toast.LENGTH_SHORT).show();
+
+                            loadHotelReviews();
+                            checkReviewPermission();
+                        });
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        runOnUiThread(() -> {
+                            binding.btnSubmitReview.setEnabled(true);
+                            Toast.makeText(DetailActivity.this, R.string.review_submit_error, Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+        );
+    }
+
+    private void setupComments() {
+        String currentUserId = session != null ? session.getUserId() : null;
+
+        commentAdapter = new CommentAdapter(currentUserId, new CommentAdapter.ReviewActionListener() {
+            @Override
+            public void onEdit(Comment comment) {
+                showEditReviewDialog(comment);
+            }
+
+            @Override
+            public void onDelete(Comment comment) {
+                deleteReview(comment);
+            }
+        });
+
+        binding.rvComments.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvComments.setAdapter(commentAdapter);
+    }
+
+    private void deleteReview(Comment comment) {
+        if (comment == null || comment.getId() == null || comment.getId().isEmpty()) {
+            Toast.makeText(this, R.string.review_delete_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.review_delete_title)
+                .setMessage(R.string.review_delete_message)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.review_action_delete, (dialog, which) -> {
+                    HotelReviewService.deleteHotelReview(
+                            comment.getId(),
+                            session.getAccessToken(),
+                            new DataCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void data) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(DetailActivity.this, R.string.review_delete_success,
+                                                Toast.LENGTH_SHORT).show();
+                                        loadHotelReviews();
+                                        checkReviewPermission();
+                                    });
+                                }
+
+                                @Override
+                                public void onError(ApiErrorCode code, String rawMessage) {
+                                    runOnUiThread(() ->
+                                            Toast.makeText(DetailActivity.this, R.string.review_delete_error,
+                                                    Toast.LENGTH_SHORT).show()
+                                    );
+                                }
+                            }
+                    );
+                })
+                .show();
+    }
+
+    private void updateReview(String reviewId, int stars, String reviewText) {
+        HotelReviewService.updateHotelReview(
+                reviewId,
+                stars,
+                reviewText,
+                session.getAccessToken(),
+                new DataCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(DetailActivity.this, R.string.review_update_success,
+                                    Toast.LENGTH_SHORT).show();
+                            loadHotelReviews();
+                        });
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        runOnUiThread(() ->
+                                Toast.makeText(DetailActivity.this, R.string.review_update_error,
+                                        Toast.LENGTH_SHORT).show()
+                        );
+                    }
+                }
+        );
+    }
+
+    private void showEditReviewDialog(Comment comment) {
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        int padding = (int) (16 * getResources().getDisplayMetrics().density);
+        container.setPadding(padding, padding, padding, 0);
+
+        RatingBar ratingBar = new RatingBar(this);
+        ratingBar.setNumStars(5);
+        ratingBar.setStepSize(1);
+        ratingBar.setRating(comment.getRating());
+
+        EditText edtReview = new EditText(this);
+        edtReview.setMinLines(4);
+        edtReview.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
+        edtReview.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        edtReview.setText(comment.getContent());
+
+        container.addView(ratingBar);
+        container.addView(edtReview);
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.review_edit_title)
+                .setView(container)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.review_update_button, (dialog, which) -> {
+                    int stars = (int) ratingBar.getRating();
+                    String reviewText = edtReview.getText().toString().trim();
+
+                    if (reviewText.isEmpty()) {
+                        Toast.makeText(this, R.string.review_text_required, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    updateReview(comment.getId(), stars, reviewText);
+                })
+                .show();
     }
 }
