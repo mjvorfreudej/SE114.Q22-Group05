@@ -21,7 +21,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Request a Book"
+        android:text="@string/booking_request_title"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -47,7 +47,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Date"
+                android:text="@string/booking_select_date"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
@@ -82,7 +82,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Check In"
+                            android:text="@string/main_check_in"
                             android:textSize="12sp" />
 
                         <TextView
@@ -120,7 +120,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Check Out"
+                            android:text="@string/main_check_out"
                             android:textSize="12sp" />
 
                         <TextView
@@ -138,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Room and Guest"
+                android:text="@string/booking_room_guest"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
@@ -151,7 +151,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="Guest"
+                    android:text="@string/main_guest"
                     android:textColor="@android:color/black" />
 
                 <LinearLayout
@@ -196,7 +196,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="Bed Room"
+                    android:text="@string/booking_bedroom"
                     android:textColor="@android:color/black" />
 
                 <LinearLayout
@@ -235,7 +235,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Special Requirement"
+                android:text="@string/booking_special_req"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
@@ -246,7 +246,7 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_light_gray_rect"
                 android:gravity="top"
-                android:hint="Type your message here..."
+                android:hint="@string/booking_req_hint"
                 android:padding="12dp"
                 android:textSize="14sp" />
 
@@ -275,7 +275,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:backgroundTint="@android:color/black"
-            android:text="Next Step"
+            android:text="@string/booking_next_step"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
             app:cornerRadius="28dp" />

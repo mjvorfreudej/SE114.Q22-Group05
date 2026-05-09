@@ -36,7 +36,6 @@ public class Tour implements Serializable {
 
     private int imageResId;
     private String location;
-    private String priceString;
 
     public Tour() {
         this.imageUrls = new ArrayList<>();
@@ -47,38 +46,22 @@ public class Tour implements Serializable {
         this.imageResId = imageResId;
         this.name = name;
         this.location = location;
-        this.priceString = priceString;
-        this.price = parsePriceString(priceString);
+        // Chú ý: priceString cũ từ fake data sẽ không còn dùng nữa, dùng price double
         this.rating = (float) rating;
         this.duration = duration;
         this.imageUrls = new ArrayList<>();
     }
 
-    private static double parsePriceString(String s) {
-        if (s == null) return 0;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (Character.isDigit(c) || c == '.') sb.append(c);
-        }
-        if (sb.length() == 0) return 0;
-        try {
-            return Double.parseDouble(sb.toString());
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    public String getCurrencySymbol() {
-        return "₫";
-    }
-
     public String formatPrice(double amount) {
-        double finalAmount = amount;
-        if (amount > 0 && amount < 10000) {
-            finalAmount = amount * 26000;
+        if (Locale.getDefault().getLanguage().equals("vi")) {
+            return String.format(Locale.getDefault(), "%,.0f₫", amount);
+        } else {
+            return String.format(Locale.getDefault(), "VND %,.0f", amount);
         }
-        return String.format(Locale.US, "%,.0f₫", finalAmount);
+    }
+
+    public String getPriceString() {
+        return formatPrice(price);
     }
 
     public static Tour fromJson(JSONObject json) {
@@ -111,8 +94,6 @@ public class Tour implements Serializable {
         }
 
         t.location = t.destination;
-        t.priceString = String.format("%,.0f₫", t.price);
-
         return t;
     }
 
@@ -170,5 +151,4 @@ public class Tour implements Serializable {
 
     public int getImageResId() { return imageResId; }
     public String getLocation() { return location != null ? location : destination; }
-    public String getPriceString() { return priceString != null ? priceString : String.format("%,.0f₫", price); }
 }

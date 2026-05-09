@@ -33,15 +33,16 @@ public class SessionManager {
 
     /**
      * Lưu session sau khi login thành công.
-     * Lưu access_token và refresh_token thay vì mật khẩu.
      */
-    public void saveSession(String email, String userId, String accessToken, String refreshToken) {
+    public void saveSession(String email, String userId, String accessToken, String refreshToken, String name, boolean rememberMe) {
         sharedPreferences.edit()
                 .putString("email", email)
                 .putString("user_id", userId)
                 .putString("access_token", accessToken)
                 .putString("refresh_token", refreshToken)
+                .putString("user_name", name)
                 .putBoolean("isLoggedIn", true)
+                .putBoolean("remember_me", rememberMe)
                 .apply();
     }
 
@@ -61,11 +62,35 @@ public class SessionManager {
         return sharedPreferences.getString("refresh_token", null);
     }
 
+    public String getUserName() {
+        return sharedPreferences.getString("user_name", null);
+    }
+
     public boolean isLoggedIn() {
         return sharedPreferences.getBoolean("isLoggedIn", false);
     }
 
+    public boolean isRememberMe() {
+        return sharedPreferences.getBoolean("remember_me", false);
+    }
+
     public void clear() {
         sharedPreferences.edit().clear().apply();
+    }
+
+    /**
+     * Lấy 2 chữ cuối của tên (thường là Họ và Tên ở VN, hoặc Tên chính)
+     */
+    public String getShortName() {
+        String fullName = getUserName();
+        if (fullName == null || fullName.trim().isEmpty()) return "User";
+        
+        String[] parts = fullName.trim().split("\\s+");
+        if (parts.length <= 2) {
+            return fullName;
+        } else {
+            // Lấy 2 từ cuối
+            return parts[parts.length - 2] + " " + parts[parts.length - 1];
+        }
     }
 }

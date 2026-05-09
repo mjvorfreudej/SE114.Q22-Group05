@@ -21,7 +21,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Booking Confirmed"
+        android:text="@string/booking_success_title"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Your Stay is confirmed"
+                android:text="@string/booking_stay_confirmed"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="We've sent a confirmation email to your address. Please check your inbox for more details."
+                android:text="@string/booking_success_msg"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp" />
 
@@ -99,7 +99,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icDate"
-                        android:text="Booking Date"
+                        android:text="@string/booking_date_label"
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icGuest"
-                        android:text="Guest"
+                        android:text="@string/main_guest"
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
@@ -159,7 +159,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_toEndOf="@id/icRoom"
-                        android:text="Room Type"
+                        android:text="@string/booking_room_type"
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
@@ -180,7 +180,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Cost"
+                        android:text="@string/booking_total_cost"
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
@@ -205,7 +205,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Confirmation Number"
+                        android:text="@string/booking_confirm_number"
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
@@ -230,7 +230,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@android:color/black"
-        android:text="View Booking"
+        android:text="@string/booking_view_booking"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
         app:cornerRadius="28dp"
@@ -244,7 +244,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@android:color/white"
-        android:text="Back to Home"
+        android:text="@string/booking_back_home"
         android:textAllCaps="false"
         android:textColor="@android:color/black"
         app:cornerRadius="28dp"

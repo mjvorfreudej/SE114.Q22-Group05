@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -57,6 +58,13 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             updateTabUI(navHome);
             loadFragment(new HomeFragment(), false);
+        } else {
+            // Khôi phục UI của tab sau khi đổi ngôn ngữ/tái tạo activity
+            int selectedId = savedInstanceState.getInt("selected_tab_id", R.id.navHome);
+            View savedTab = findViewById(selectedId);
+            if (savedTab != null) {
+                updateTabUI(savedTab);
+            }
         }
 
         HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
@@ -74,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (currentTab != null) {
+            outState.putInt("selected_tab_id", currentTab.getId());
+        }
     }
 
     private void setupNavigation() {

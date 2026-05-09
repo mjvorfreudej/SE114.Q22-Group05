@@ -39,20 +39,21 @@ public class Hotel implements Serializable {
     }
 
     public String getCurrencySymbol() {
-        return "₫";
+        return Locale.getDefault().getLanguage().equals("vi") ? "₫" : "VND";
     }
 
     public String formatPrice(double amount) {
-        // Nếu giá nhỏ (ví dụ < 10000), coi là USD và đổi sang VND (x25000)
-        double finalAmount = amount;
-        if (amount > 0 && amount < 10000) {
-            finalAmount = amount * 25000;
+        // Sử dụng Locale.getDefault() để tự động định dạng dấu phân cách theo ngôn ngữ
+        if (Locale.getDefault().getLanguage().equals("vi")) {
+            return String.format(Locale.getDefault(), "%,.0f₫", amount);
+        } else {
+            return String.format(Locale.getDefault(), "VND %,.0f", amount);
         }
-        return String.format(Locale.US, "%,.0f₫", finalAmount);
     }
 
     public String getPriceString() {
-        return formatPrice(pricePerNight) + " / đêm";
+        // Phương thức này nên được thay thế bằng cách sử dụng String Resource trong Adapter để hỗ trợ đa ngôn ngữ tốt hơn cho chuỗi " / đêm"
+        return formatPrice(pricePerNight);
     }
 
     public static Hotel fromJson(JSONObject json) {
@@ -67,7 +68,6 @@ public class Hotel implements Serializable {
         h.reviewCount = json.optInt("review_count", 0);
         h.createdAt = json.optString("createdAt", null);
 
-        // Lấy từ trường image_urls (nếu có mảng string trực tiếp)
         JSONArray directImages = json.optJSONArray("image_urls");
         if (directImages != null) {
             for (int i = 0; i < directImages.length(); i++) {
@@ -78,7 +78,6 @@ public class Hotel implements Serializable {
             }
         }
 
-        // Lấy từ table liên kết hotel_images (kết quả của query select=*,hotel_images(*))
         JSONArray joinedImages = json.optJSONArray("hotel_images");
         if (joinedImages != null) {
             for (int i = 0; i < joinedImages.length(); i++) {

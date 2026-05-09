@@ -31,30 +31,44 @@
             app:cardElevation="20dp"
             app:strokeWidth="0dp">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="100dp">
+                android:layout_height="wrap_content">
 
-                <!-- Drag Handle -->
-                <View
-                    android:layout_width="40dp"
-                    android:layout_height="4dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="#E5E7EB" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerHotels"
+                <LinearLayout
+                    android:id="@+id/layoutListContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="false"
-                    android:paddingHorizontal="20dp"
-                    tools:listitem="@layout/item_hotel_list" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:paddingBottom="100dp">
+
+                    <!-- Drag Handle -->
+                    <View
+                        android:layout_width="40dp"
+                        android:layout_height="4dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="#E5E7EB" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerHotels"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:nestedScrollingEnabled="false"
+                        android:paddingHorizontal="20dp"
+                        tools:listitem="@layout/item_hotel_list" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/pbHotelList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="50dp"
+                    android:visibility="gone" />
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
     </androidx.core.widget.NestedScrollView>
 

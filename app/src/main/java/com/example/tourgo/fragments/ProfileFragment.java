@@ -12,10 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
-import com.example.tourgo.data.AppFakeData;
-import com.example.tourgo.models.User;
 import com.example.tourgo.ui.auth.LoginActivity;
+import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.utils.SessionManager;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 
 public class ProfileFragment extends Fragment {
 
@@ -26,7 +26,6 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Use the existing activity_profile.xml layout for this fragment
         return inflater.inflate(R.layout.activity_profile, container, false);
     }
 
@@ -36,21 +35,18 @@ public class ProfileFragment extends Fragment {
 
         session = new SessionManager(requireContext());
 
-        // Find views in the activity_profile layout
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
         btnLogout = view.findViewById(R.id.btnLogout);
 
-        // Populate user data
-        User user = AppFakeData.getUser();
-        if (user != null) {
-            if (tvProfileName != null) tvProfileName.setText(user.getName());
-            if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
-            if (tvProfilePhone != null) tvProfilePhone.setText(user.getPhone());
+        // Đổ dữ liệu từ session (tên 2 chữ)
+        if (session.isLoggedIn()) {
+            if (tvProfileName != null) tvProfileName.setText(session.getShortName());
+            if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
+            // Số điện thoại có thể bổ sung sau khi Supabase có lưu field này
         }
 
-        // Set up logout button
         if (btnLogout != null) {
             btnLogout.setOnClickListener(v -> {
                 session.clear();
@@ -59,5 +55,29 @@ public class ProfileFragment extends Fragment {
                 startActivity(intent);
             });
         }
+
+        setupLanguage(view);
+    }
+
+    private void setupLanguage(View view) {
+        MaterialButtonToggleGroup toggleLanguage = view.findViewById(R.id.toggleLanguage);
+        if (toggleLanguage == null) return;
+
+        String currentLang = LocaleHelper.getCurrentLanguageTag();
+        if ("en".equals(currentLang)) {
+            toggleLanguage.check(R.id.btnLangEn);
+        } else {
+            toggleLanguage.check(R.id.btnLangVi);
+        }
+
+        toggleLanguage.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                String newLang = (checkedId == R.id.btnLangVi) ? "vi" : "en";
+                // Chỉ chuyển đổi nếu ngôn ngữ được chọn khác với ngôn ngữ hiện tại
+                if (!newLang.equals(LocaleHelper.getCurrentLanguageTag())) {
+                    LocaleHelper.setAppLocale(newLang);
+                }
+            }
+        });
     }
 }

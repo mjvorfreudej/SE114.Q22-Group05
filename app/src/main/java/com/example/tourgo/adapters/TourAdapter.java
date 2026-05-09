@@ -1,5 +1,6 @@
 package com.example.tourgo.adapters;
 
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,19 +81,24 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
 
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getLocation());
+        
+        // Hiển thị giá tiền đa ngôn ngữ cho Tour
         holder.tvPrice.setText(item.getPriceString());
+        
         holder.tvDuration.setText(item.getDuration());
-        holder.tvRating.setText(String.format(Locale.US, "★ %.1f", item.getRating()));
+        holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
 
         updateHeartIcon(holder.btnFavorite, item.isFavorite());
 
         holder.btnFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để thực hiện", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), R.string.err_login_required, Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            boolean newState = !item.isFavorite();
+            final boolean oldState = item.isFavorite();
+            final boolean newState = !oldState;
+            
             item.setFavorite(newState);
             updateHeartIcon(holder.btnFavorite, newState);
 
@@ -108,16 +114,22 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
                 FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(false);
-                        updateHeartIcon(holder.btnFavorite, false);
+                        holder.btnFavorite.post(() -> {
+                            item.setFavorite(false);
+                            updateHeartIcon(holder.btnFavorite, false);
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             } else {
                 FavoriteService.removeFavoriteTour(userId, item.getId(), token, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
-                        item.setFavorite(true);
-                        updateHeartIcon(holder.btnFavorite, true);
+                        holder.btnFavorite.post(() -> {
+                            item.setFavorite(true);
+                            updateHeartIcon(holder.btnFavorite, true);
+                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
+                        });
                     }
                 });
             }
@@ -131,11 +143,13 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
+        int color = isFavorite ? ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark) 
+                              : ContextCompat.getColor(imgHeart.getContext(), android.R.color.white);
+        imgHeart.setImageTintList(ColorStateList.valueOf(color));
+        
         if (isFavorite) {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.holo_red_dark));
             imgHeart.setBackgroundResource(R.drawable.bg_circle_white);
         } else {
-            imgHeart.setColorFilter(ContextCompat.getColor(imgHeart.getContext(), android.R.color.white));
             imgHeart.setBackgroundResource(R.drawable.bg_circle_white_alpha);
         }
     }
