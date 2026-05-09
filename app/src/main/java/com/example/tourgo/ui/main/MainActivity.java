@@ -161,12 +161,12 @@ public class MainActivity extends AppCompatActivity {
             
             // Icon
             ImageView icon = (ImageView) layout.getChildAt(0);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_selected_text));
-            
+            icon.setColorFilter(ContextCompat.getColor(this, R.color.black));
+
             // Text
             TextView tv = (TextView) layout.getChildAt(1);
             tv.setVisibility(View.VISIBLE);
-            tv.setTextColor(ContextCompat.getColor(this, R.color.nav_selected_text));
+            tv.setTextColor(ContextCompat.getColor(this, R.color.black));
 
             // Weight adjustment
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
             
             // Icon
             ImageView icon = (ImageView) layout.getChildAt(0);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.nav_unselected));
+            icon.setColorFilter(ContextCompat.getColor(this, R.color.dark_gray));
             
             // Text
             TextView tv = (TextView) layout.getChildAt(1);

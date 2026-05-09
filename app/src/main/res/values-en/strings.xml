@@ -25,6 +25,8 @@
     <string name="login_forgot_password">Forgot password?</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
+    <string name="login_or_with">Or Log In With</string>
+    <string name="register_or_with">Or Sign up With</string>
 
     <!-- activity_register.xml -->
     <string name="register_create">Create Account</string>
@@ -145,6 +147,7 @@
     <string name="booking_view_all">View All</string>
     <string name="booking_wallet">E-Wallet</string>
     <string name="booking_bank">Bank</string>
+    <string name="booking_card">Card</string>
     <string name="booking_ending_in">Ending in %s</string>
     <string name="booking_confirm_payment">Confirm Payment</string>
 
@@ -155,6 +158,7 @@
     <string name="booking_guest_info_format">%1$d Person (%2$d Bed)</string>
     <string name="booking_add_wallet">+ Add New Wallet</string>
     <string name="booking_add_bank">+ Add New Bank</string>
+    <string name="booking_add_card">+ Add New Card</string>
 
     <string name="booking_success_title">Booking Success!</string>
     <string name="booking_stay_confirmed">Your Stay is confirmed</string>

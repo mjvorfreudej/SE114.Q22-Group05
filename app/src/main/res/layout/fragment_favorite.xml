@@ -11,7 +11,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingHorizontal="@dimen/screen_margin_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -19,7 +21,7 @@
             android:text="@string/nav_favorite"
             android:textStyle="bold"
             android:layout_centerInParent="true"
-            android:textColor="#1C1F26"
+            android:textColor="@color/black"
             android:textSize="18sp"/>
 
         <ImageView
@@ -29,7 +31,7 @@
             android:layout_alignParentEnd="true"
             android:padding="8dp"
             android:src="@drawable/ic_more_vert"
-            app:tint="#1C1F26"/>
+            app:tint="@color/black"/>
     </RelativeLayout>
 
     <FrameLayout
@@ -41,8 +43,7 @@
             android:id="@+id/rvFavoriteItem"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingHorizontal="@dimen/screen_margin_horizontal"
             android:paddingTop="8dp"
             android:paddingBottom="16dp"
             android:clipToPadding="false"/>

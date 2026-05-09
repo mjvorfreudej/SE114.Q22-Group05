@@ -3,14 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F4F6"
+    android:background="@color/light_gray"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingHorizontal="@dimen/screen_margin_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +27,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_search_24"
-                android:tint="#7B818C" />
+                android:tint="@color/dark_gray" />
 
             <EditText
                 android:id="@+id/etSearch"
@@ -34,8 +36,8 @@
                 android:layout_marginStart="10dp"
                 android:background="@android:color/transparent"
                 android:hint="Search tours or hotels..."
-                android:textColor="#1C1F26"
-                android:textColorHint="#9CA3AF"
+                android:textColor="@color/black"
+                android:textColorHint="@color/dark_gray"
                 android:imeOptions="actionSearch"
                 android:inputType="text" />
         </LinearLayout>
@@ -46,9 +48,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        app:tabIndicatorColor="#1E6DEA"
-        app:tabSelectedTextColor="#1E6DEA"
-        app:tabTextColor="#7B818C" />
+        app:tabIndicatorColor="@color/light_blue"
+        app:tabSelectedTextColor="@color/light_blue"
+        app:tabTextColor="@color/dark_gray" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

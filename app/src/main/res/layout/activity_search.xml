@@ -4,14 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="@color/white">
 
     <!-- Header -->
     <RelativeLayout
         android:id="@+id/rlSearchHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:paddingHorizontal="@dimen/screen_margin_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -20,7 +22,7 @@
             android:layout_height="40dp"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back_24"
-            app:tint="#1C1F26" />
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/tvSearchTitle"
@@ -28,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/nav_search"
-            android:textColor="#1C1F26"
+            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -39,7 +41,7 @@
             android:layout_alignParentEnd="true"
             android:padding="8dp"
             android:src="@drawable/ic_bell_20"
-            app:tint="#1C1F26" />
+            app:tint="@color/black" />
     </RelativeLayout>
 
     <!-- Search Bar & Filter -->
@@ -48,8 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingHorizontal="@dimen/screen_margin_horizontal"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/rlSearchHeader">
 
@@ -65,17 +66,17 @@
             android:textSize="14sp"
             android:drawableStart="@drawable/ic_search_24"
             android:drawablePadding="12dp"
-            android:drawableTint="#9AA1AF" />
+            android:drawableTint="@color/dark_gray" />
 
         <ImageView
             android:id="@+id/btnFilterSearch"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="@dimen/gutter_space"
             android:background="@drawable/bg_amenity_card"
             android:padding="12dp"
             android:src="@drawable/ic_filter_list"
-            app:tint="#1C1F26" />
+            app:tint="@color/black" />
     </LinearLayout>
 
     <!-- Search Results Area -->
@@ -92,7 +93,9 @@
             android:id="@+id/rvSearchResults"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp"
+            android:paddingHorizontal="@dimen/screen_margin_horizontal"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
             android:clipToPadding="false" />
 
         <ProgressBar
@@ -108,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/search_no_results"
-            android:textColor="#7B818C"
+            android:textColor="@color/dark_gray"
             android:textSize="16sp"
             android:visibility="gone" />
     </FrameLayout>
@@ -126,7 +129,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="@dimen/screen_margin_horizontal"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -135,7 +140,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/search_recent"
-                    android:textColor="#1C1F26"
+                    android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
                 <TextView
@@ -144,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:text="@string/search_clear"
-                    android:textColor="#E53935"
+                    android:textColor="@color/dark_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -160,7 +165,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="@string/search_recent_viewed"
-                android:textColor="#1C1F26"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
