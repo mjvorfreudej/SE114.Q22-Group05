@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.models.Comment;
+import com.example.tourgo.utils.ImageLoader;
 
 import java.util.Locale;
 
@@ -44,7 +45,8 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
                 @Override
                 public boolean areContentsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
                     return oldItem.getContent().equals(newItem.getContent())
-                            && oldItem.getRating() == newItem.getRating();
+                            && oldItem.getRating() == newItem.getRating()
+                            && oldItem.getImageUrls().equals(newItem.getImageUrls());
                 }
             };
 
@@ -71,13 +73,13 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
         holder.layoutCommentImages.removeAllViews();
         if (comment.hasImages()) {
             holder.scrollCommentImages.setVisibility(View.VISIBLE);
-            for (Integer imageRes : comment.getImages()) {
+            for (String imageUrl : comment.getImageUrls()) {
                 ImageView iv = new ImageView(holder.itemView.getContext());
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(160, 160);
                 params.setMargins(0, 0, 12, 0);
                 iv.setLayoutParams(params);
                 iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                iv.setImageResource(imageRes);
+                ImageLoader.loadThumbnail(iv, imageUrl);
                 iv.setClipToOutline(true);
                 iv.setBackgroundResource(R.drawable.bg_amenity_card);
                 holder.layoutCommentImages.addView(iv);

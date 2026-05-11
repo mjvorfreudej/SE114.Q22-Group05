@@ -4,6 +4,7 @@ import static com.example.tourgo.remote.HotelReviewService.deleteHotelReview;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -32,10 +35,10 @@ import com.example.tourgo.models.Comment;
 import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.remote.HotelService;
 import com.example.tourgo.remote.HotelReviewService;
 import com.example.tourgo.utils.SessionManager;
 import com.example.tourgo.remote.BookingService;
-import com.example.tourgo.remote.HotelReviewService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +54,8 @@ public class DetailActivity extends AppCompatActivity {
     private List<Comment> allComments = new ArrayList<>();
     private Comment myReview = null;
     private SessionManager session;
+    private ActivityResultLauncher<Intent> pickImagesLauncher;
+    private final List<Uri> selectedImageUris = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,7 @@ public class DetailActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         hotel = (Hotel) getIntent().getSerializableExtra("hotel_object");
+        setupImagePicker();
 
         if (hotel != null) {
             setupUI();
@@ -88,6 +94,7 @@ public class DetailActivity extends AppCompatActivity {
         checkReviewPermission();
         setupReviewForm();
         updateRatingSummary();
+        refreshHotelSummary();
         
         binding.tvDetailName.setText(hotel.getName());
         binding.tvDetailLocation.setText(hotel.getAddress());
@@ -219,11 +226,37 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateRatingSummary() {
-        binding.tvHeaderRating.setText(String.format(Locale.getDefault(), "★ %.1f (%d %s)", 
-                hotel.getRating(), hotel.getReviewCount(), getString(R.string.reviews_count_label)));
-        binding.tvBigRating.setText(String.format(Locale.getDefault(), "%.1f", hotel.getRating()));
-        binding.tvReviewCount.setText(String.format(Locale.getDefault(), "%d %s", 
-                hotel.getReviewCount(), getString(R.string.reviews_count_label).toLowerCase()));
+        if (hotel == null) return;
+        updateRatingSummary(hotel.getRating(), hotel.getReviewCount());
+    }
+
+    private void updateRatingSummary(float rating, int reviewCount) {
+        binding.tvHeaderRating.setText(String.format(Locale.getDefault(), "★ %.1f (%d %s)",
+                rating, reviewCount, getString(R.string.reviews_count_label)));
+        binding.tvBigRating.setText(String.format(Locale.getDefault(), "%.1f", rating));
+        binding.tvReviewCount.setText(String.format(Locale.getDefault(), "%d %s",
+                reviewCount, getString(R.string.reviews_count_label).toLowerCase()));
+    }
+
+    private void refreshHotelSummary() {
+        if (hotel == null || hotel.getId() == null) return;
+
+        HotelService.getHotelDetail(hotel.getId(), new DataCallback<Hotel>() {
+            @Override
+            public void onSuccess(Hotel freshHotel) {
+                runOnUiThread(() -> {
+                    if (freshHotel == null) return;
+                    freshHotel.setFavorite(hotel.isFavorite());
+                    hotel = freshHotel;
+                    updateRatingSummary();
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                Log.e("DetailActivity", "Can not refresh hotel summary: " + rawMessage);
+            }
+        });
     }
 
     private void setupFilters() {
@@ -336,7 +369,47 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setupReviewForm() {
+        binding.btnPickReviewImages.setOnClickListener(v -> openImagePicker());
         binding.btnSubmitReview.setOnClickListener(v -> submitReview());
+    }
+
+    private void setupImagePicker() {
+        pickImagesLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+
+                    Intent data = result.getData();
+                    if (data.getClipData() != null) {
+                        int count = data.getClipData().getItemCount();
+                        for (int i = 0; i < count; i++) {
+                            selectedImageUris.add(data.getClipData().getItemAt(i).getUri());
+                        }
+                    } else if (data.getData() != null) {
+                        selectedImageUris.add(data.getData());
+                    }
+
+                    updateSelectedImagesText();
+                }
+        );
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        pickImagesLauncher.launch(Intent.createChooser(intent, getString(R.string.review_pick_images_title)));
+    }
+
+    private void updateSelectedImagesText() {
+        int count = selectedImageUris.size();
+        if (count == 0) {
+            binding.tvSelectedReviewImages.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.tvSelectedReviewImages.setVisibility(View.VISIBLE);
+        binding.tvSelectedReviewImages.setText(getString(R.string.review_selected_images_count, count));
     }
 
     private void checkReviewPermission() {
@@ -397,11 +470,7 @@ public class DetailActivity extends AppCompatActivity {
                     new DataCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
-                            runOnUiThread(() -> {
-                                binding.btnSubmitReview.setEnabled(true);
-                                Toast.makeText(DetailActivity.this, R.string.review_update_success, Toast.LENGTH_SHORT).show();
-                                loadHotelReviews();
-                            });
+                            uploadSelectedReviewImages(myReview.getId(), R.string.review_update_success);
                         }
 
                         @Override
@@ -422,14 +491,10 @@ public class DetailActivity extends AppCompatActivity {
                 stars,
                 reviewText,
                 session.getAccessToken(),
-                new DataCallback<Void>() {
+                new DataCallback<String>() {
                     @Override
-                    public void onSuccess(Void data) {
-                        runOnUiThread(() -> {
-                            binding.btnSubmitReview.setEnabled(true);
-                            Toast.makeText(DetailActivity.this, R.string.review_submit_success, Toast.LENGTH_SHORT).show();
-                            loadHotelReviews();
-                        });
+                    public void onSuccess(String reviewId) {
+                        uploadSelectedReviewImages(reviewId, R.string.review_submit_success);
                     }
 
                     @Override
@@ -441,6 +506,76 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    private void uploadSelectedReviewImages(String reviewId, int successMessageRes) {
+        if (selectedImageUris.isEmpty()) {
+            runOnUiThread(() -> completeReviewSave(successMessageRes));
+            return;
+        }
+
+        final int total = selectedImageUris.size();
+        final int[] completed = {0};
+        final boolean[] hasError = {false};
+        List<Uri> imagesToUpload = new ArrayList<>(selectedImageUris);
+
+        for (Uri imageUri : imagesToUpload) {
+            HotelReviewService.uploadReviewImage(
+                    this,
+                    imageUri,
+                    reviewId,
+                    session.getAccessToken(),
+                    new DataCallback<String>() {
+                        @Override
+                        public void onSuccess(String imageUrl) {
+                            HotelReviewService.insertReviewImage(
+                                    reviewId,
+                                    imageUrl,
+                                    session.getAccessToken(),
+                                    new DataCallback<Void>() {
+                                        @Override
+                                        public void onSuccess(Void data) {
+                                            markImageUploadDone(completed, hasError, total, successMessageRes);
+                                        }
+
+                                        @Override
+                                        public void onError(ApiErrorCode code, String rawMessage) {
+                                            hasError[0] = true;
+                                            markImageUploadDone(completed, hasError, total, successMessageRes);
+                                        }
+                                    }
+                            );
+                        }
+
+                        @Override
+                        public void onError(ApiErrorCode code, String rawMessage) {
+                            hasError[0] = true;
+                            markImageUploadDone(completed, hasError, total, successMessageRes);
+                        }
+                    }
+            );
+        }
+    }
+
+    private void markImageUploadDone(int[] completed, boolean[] hasError, int total, int successMessageRes) {
+        synchronized (completed) {
+            completed[0]++;
+            if (completed[0] < total) return;
+        }
+
+        runOnUiThread(() -> {
+            int messageRes = hasError[0] ? R.string.review_image_upload_partial_error : successMessageRes;
+            completeReviewSave(messageRes);
+        });
+    }
+
+    private void completeReviewSave(int messageRes) {
+        binding.btnSubmitReview.setEnabled(true);
+        selectedImageUris.clear();
+        updateSelectedImagesText();
+        Toast.makeText(DetailActivity.this, messageRes, Toast.LENGTH_SHORT).show();
+        loadHotelReviews();
+        refreshHotelSummary();
     }
 
     private void setupComments() {
@@ -481,6 +616,7 @@ public class DetailActivity extends AppCompatActivity {
                                         Toast.makeText(DetailActivity.this, R.string.review_delete_success,
                                                 Toast.LENGTH_SHORT).show();
                                         loadHotelReviews();
+                                        refreshHotelSummary();
                                         checkReviewPermission();
                                     });
                                 }
@@ -496,11 +632,6 @@ public class DetailActivity extends AppCompatActivity {
                     );
                 })
                 .show();
-
-        myReview = null;
-        bindReviewForm();
-        loadHotelReviews();
-        checkReviewPermission();
     }
 
     private void updateReview(String reviewId, int stars, String reviewText) {
@@ -516,6 +647,7 @@ public class DetailActivity extends AppCompatActivity {
                             Toast.makeText(DetailActivity.this, R.string.review_update_success,
                                     Toast.LENGTH_SHORT).show();
                             loadHotelReviews();
+                            refreshHotelSummary();
                         });
                     }
 

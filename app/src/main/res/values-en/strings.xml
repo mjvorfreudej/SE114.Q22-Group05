@@ -236,4 +236,9 @@
     <string name="review_delete_success">Review deleted</string>
     <string name="review_delete_error">Can not delete review</string>
 
+    <string name="review_pick_images">Add photos</string>
+    <string name="review_pick_images_title">Choose review photos</string>
+    <string name="review_selected_images_count">%d photos selected</string>
+    <string name="review_image_upload_partial_error">Review saved, but some photos could not be uploaded</string>
+
 </resources>
