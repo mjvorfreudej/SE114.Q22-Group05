@@ -1,5 +1,7 @@
 package com.example.tourgo.models;
 
+import android.content.Context;
+import com.example.tourgo.utils.SessionManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,22 +48,29 @@ public class Tour implements Serializable {
         this.imageResId = imageResId;
         this.name = name;
         this.location = location;
-        // Chú ý: priceString cũ từ fake data sẽ không còn dùng nữa, dùng price double
         this.rating = (float) rating;
         this.duration = duration;
         this.imageUrls = new ArrayList<>();
     }
 
-    public String formatPrice(double amount) {
-        if (Locale.getDefault().getLanguage().equals("vi")) {
+    public String formatPrice(Context context, double amount) {
+        SessionManager session = new SessionManager(context);
+        String currency = session.getCurrency(); // "VND" hoặc "USD"
+        
+        if ("VND".equals(currency)) {
             return String.format(Locale.getDefault(), "%,.0f₫", amount);
         } else {
-            return String.format(Locale.getDefault(), "VND %,.0f", amount);
+            return String.format(Locale.getDefault(), "$ %,.0f", amount);
         }
     }
 
+    public String getPriceString(Context context) {
+        return formatPrice(context, price);
+    }
+
+    // Fallback for cases without context
     public String getPriceString() {
-        return formatPrice(price);
+        return String.format(Locale.getDefault(), "%,.0f₫", price);
     }
 
     public static Tour fromJson(JSONObject json) {

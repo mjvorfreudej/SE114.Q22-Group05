@@ -3,10 +3,13 @@
     <string name="app_name">TourGo</string>
 
     <string name="profile_language">Language</string>
+    <string name="profile_currency">Currency</string>
     <string name="lang_vi">Vietnamese</string>
     <string name="lang_en">English</string>
     <string name="lang_vi_short">VI</string>
     <string name="lang_en_short">EN</string>
+    <string name="curr_vnd">VND</string>
+    <string name="curr_usd">USD</string>
     <string name="lang_system">System default</string>
     <string name="action_cancel">Cancel</string>
 
@@ -127,6 +130,16 @@
     <string name="err_tour_full">Tour is fully booked</string>
     <string name="err_already_favorited">Already in favorites</string>
     <string name="booking_error">Can not create booking</string>
+    <string name="booking_error_dates_required">Please select check-in and check-out dates</string>
+    <string name="booking_error_checkin_past">Check-in date cannot be in the past</string>
+    <string name="booking_error_checkout_after_checkin">Check-out date must be after check-in date</string>
+    <string name="booking_error_guests_invalid">Number of guests must be greater than 0</string>
+    <string name="booking_error_not_logged_in">Please login to book a room</string>
+    <string name="booking_error_missing_target">Could not identify hotel or tour</string>
+    <string name="booking_error_create_failed">Could not create booking (%1$s)</string>
+    <string name="payment_title">Payment</string>
+    <string name="payment_booking_id">Booking ID: %1$s</string>
+    <string name="payment_total">Total: %1$s</string>
 
     <!-- Search -->
     <string name="search_no_results">No results found</string>

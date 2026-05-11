@@ -2,10 +2,13 @@
     <string name="app_name">TourGo</string>
 
     <string name="profile_language">Ngôn ngữ</string>
+    <string name="profile_currency">Tiền tệ</string>
     <string name="lang_vi">Tiếng Việt</string>
     <string name="lang_en">Tiếng Anh</string>
     <string name="lang_vi_short">VI</string>
     <string name="lang_en_short">EN</string>
+    <string name="curr_vnd">VND</string>
+    <string name="curr_usd">USD</string>
     <string name="lang_system">Theo hệ thống</string>
     <string name="action_cancel">Hủy</string>
 
@@ -74,17 +77,17 @@
     <string name="profile_edit_button">Chỉnh sửa hồ sơ</string>
     <string name="profile_logout">Đăng xuất</string>
     <string name="profile_account_title">Tài khoản</string>
-    <string name="profile_edit_short">Sửa</string>
-    <string name="profile_my_booking">Đặt phòng của tôi</string>
+    <string name="profile_edit_short">Chỉnh sửa</string>
+    <string name="profile_my_booking">Đơn đặt của tôi</string>
     <string name="profile_view_all">Xem tất cả</string>
     <string name="profile_settings">Cài đặt</string>
     <string name="profile_personal_information">Thông tin cá nhân</string>
     <string name="profile_payment_methods">Phương thức thanh toán</string>
     <string name="profile_notifications">Thông báo</string>
-    <string name="profile_privacy_security">Bảo mật &amp; Riêng tư</string>
+    <string name="profile_privacy_security">Quyền riêng tư &amp; Bảo mật</string>
     <string name="profile_language_currency">Ngôn ngữ &amp; Tiền tệ</string>
     <string name="profile_logout_title">Đăng xuất</string>
-    <string name="profile_logout_confirm">Bạn có chắc muốn đăng xuất?</string>
+    <string name="profile_logout_confirm">Bạn có chắc chắn muốn đăng xuất?</string>
     <string name="profile_logout_confirm_btn">Xác nhận</string>
 
     <!-- dialog_edit_profile.xml -->
@@ -157,7 +160,7 @@
     <string name="booking_room_guest">Phòng và Khách</string>
     <string name="booking_bedroom">Phòng ngủ</string>
     <string name="booking_special_req">Yêu cầu đặc biệt</string>
-    <string name="booking_req_hint">Nhập tin nhắn của bạn ở đây...</string>
+    <string name="booking_req_hint">Nhập tin nhắn của bạn ở đây…</string>
     <string name="booking_next_step">Tiếp theo</string>
 
     <string name="booking_confirm_title">Xác nhận đặt phòng</string>
@@ -208,5 +211,5 @@
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_favorite">Yêu thích</string>
-    <string name="nav_profile">Hồ sơ</string>
+    <string name="nav_profile">Cá nhân</string>
 </resources>

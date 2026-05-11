@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.models.Tour;
+import com.example.tourgo.utils.SessionManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ public class BookingRequestFragment extends Fragment {
     private Calendar startDate;
     private Calendar endDate;
     private Calendar calendarDisplay; 
+    private SessionManager session;
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
     private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
@@ -50,6 +52,7 @@ public class BookingRequestFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        session = new SessionManager(requireContext());
         startDate = Calendar.getInstance();
         endDate = Calendar.getInstance();
         endDate.add(Calendar.DAY_OF_MONTH, 2);
@@ -83,15 +86,11 @@ public class BookingRequestFragment extends Fragment {
             if (startDate == null || endDate == null) return;
 
             if (isBeforeToday(startDate)) {
-                Toast.makeText(requireContext(),
-                        R.string.booking_error_checkin_past,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.booking_error_checkin_past, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (!endDate.after(startDate)) {
-                Toast.makeText(requireContext(),
-                        R.string.booking_error_checkout_after_checkin,
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.booking_error_checkout_after_checkin, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -100,16 +99,15 @@ public class BookingRequestFragment extends Fragment {
             if (nights <= 0) nights = 1;
 
             double pricePerNight = hotel != null ? hotel.getPricePerNight() : tour.getPrice();
-            if (pricePerNight < 10000) {
-                pricePerNight *= 26000;
-            }
             double roomPrice = pricePerNight * nights;
             double taxes = roomPrice * 0.1;
+            
+            // Giữ nguyên giá trị phí dịch vụ (không quy đổi tỷ giá)
             double serviceCharge = 50000.0;
             double total = roomPrice + taxes + serviceCharge;
 
             String checkInOut = summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime());
-            String guestInfo = guestCount + " Person (" + bedCount + " Bed)";
+            String guestInfo = getString(R.string.booking_guest_info_format, guestCount, bedCount);
 
             Bundle args = new Bundle();
             args.putInt("num_nights", nights);
@@ -117,7 +115,7 @@ public class BookingRequestFragment extends Fragment {
             args.putDouble("taxes", taxes);
             args.putDouble("service_charge", serviceCharge);
             args.putDouble("total_price", total);
-            args.putString("check_in_out", checkInOut + " (" + nights + " nights)");
+            args.putString("check_in_out", checkInOut + getString(R.string.booking_nights_format, nights));
             args.putString("guest_info", guestInfo);
             args.putLong("check_in_millis", startDate.getTimeInMillis());
             args.putLong("check_out_millis", endDate.getTimeInMillis());

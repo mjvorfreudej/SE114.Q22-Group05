@@ -17,8 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.models.Hotel;
-
-import java.util.Locale;
+import com.example.tourgo.models.Tour;
 
 public class BookingSuccessFragment extends Fragment {
 
@@ -41,8 +40,10 @@ public class BookingSuccessFragment extends Fragment {
         Button btnBackHome = view.findViewById(R.id.btnBackHome);
 
         Hotel hotel = null;
+        Tour tour = null;
         if (getActivity() instanceof BookingActivity) {
             hotel = ((BookingActivity) getActivity()).getHotel();
+            tour = ((BookingActivity) getActivity()).getTour();
         }
 
         if (hotel != null) {
@@ -55,6 +56,14 @@ public class BookingSuccessFragment extends Fragment {
             } else {
                 ivHotel.setImageResource(hotel.getImageResId() != 0 ? hotel.getImageResId() : R.drawable.hotel_1);
             }
+        } else if (tour != null) {
+             if (tour.getImageUrls() != null && !tour.getImageUrls().isEmpty()) {
+                Glide.with(this)
+                        .load(tour.getImageUrls().get(0))
+                        .placeholder(R.drawable.hotel_1)
+                        .centerCrop()
+                        .into(ivHotel);
+            }
         }
 
         // Nhận và hiển thị dữ liệu từ arguments
@@ -64,14 +73,9 @@ public class BookingSuccessFragment extends Fragment {
             String guestInfo = getArguments().getString("guest_info", "");
 
             if (hotel != null) {
-                tvTotalCost.setText(hotel.formatPrice(total));
-            } else {
-                // Mặc định format nếu không có hotel object (phòng hờ)
-                if (Locale.getDefault().getLanguage().equals("vi")) {
-                    tvTotalCost.setText(String.format(Locale.getDefault(), "%,.0f₫", total));
-                } else {
-                    tvTotalCost.setText(String.format(Locale.getDefault(), "VND %,.0f", total));
-                }
+                tvTotalCost.setText(hotel.formatPrice(requireContext(), total));
+            } else if (tour != null) {
+                tvTotalCost.setText(tour.formatPrice(requireContext(), total));
             }
             
             tvBookingDate.setText(bookingDate);

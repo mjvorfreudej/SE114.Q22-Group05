@@ -88,21 +88,16 @@ public class BookingConfirmFragment extends Fragment {
             double service = getArguments().getDouble("service_charge", 0.0);
             totalPrice = getArguments().getDouble("total_price", 0.0);
 
-            tvNights.setText(nights + " Night" + (nights > 1 ? "s" : ""));
-            tvRoomPrice.setText(formatPrice(roomPrice));
-            tvTaxes.setText(formatPrice(taxes));
-            tvServiceCharge.setText(formatPrice(service));
-            tvTotalPrice.setText(formatPrice(totalPrice));
             if (nights == 1) {
                 tvNights.setText(getString(R.string.booking_night_single, nights));
             } else {
                 tvNights.setText(getString(R.string.booking_night_plural, nights));
             }
 
-            tvRoomPrice.setText(hotel.formatPrice(roomPrice));
-            tvTaxes.setText(hotel.formatPrice(taxes));
-            tvServiceCharge.setText(hotel.formatPrice(service));
-            tvTotalPrice.setText(hotel.formatPrice(totalPrice));
+            tvRoomPrice.setText(formatPrice(roomPrice));
+            tvTaxes.setText(formatPrice(taxes));
+            tvServiceCharge.setText(formatPrice(service));
+            tvTotalPrice.setText(formatPrice(totalPrice));
         }
 
         view.findViewById(R.id.btnBack).setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
@@ -138,9 +133,9 @@ public class BookingConfirmFragment extends Fragment {
     }
 
     private String formatPrice(double amount) {
-        if (hotel != null) return hotel.formatPrice(amount);
-        if (tour != null) return tour.formatPrice(amount);
-        return String.format(java.util.Locale.US, "%,.0f₫", amount);
+        if (hotel != null) return hotel.formatPrice(requireContext(), amount);
+        if (tour != null) return tour.formatPrice(requireContext(), amount);
+        return String.format(java.util.Locale.getDefault(), "%,.0f₫", amount);
     }
 
     private void selectPaymentCategory(int category) {
