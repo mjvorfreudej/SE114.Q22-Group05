@@ -160,7 +160,7 @@
     <string name="booking_room_guest">Phòng và Khách</string>
     <string name="booking_bedroom">Phòng ngủ</string>
     <string name="booking_special_req">Yêu cầu đặc biệt</string>
-    <string name="booking_req_hint">Nhập tin nhắn của bạn ở đây...</string>
+    <string name="booking_req_hint">Nhập tin nhắn của bạn ở đây…</string>
     <string name="booking_next_step">Tiếp theo</string>
 
     <string name="booking_confirm_title">Xác nhận đặt phòng</string>
