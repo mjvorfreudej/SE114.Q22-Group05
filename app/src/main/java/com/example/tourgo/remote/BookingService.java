@@ -1,5 +1,7 @@
 package com.example.tourgo.remote;
 
+import android.util.Log;
+
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Booking;
@@ -70,7 +72,7 @@ public class BookingService {
         String url = SupabaseConfig.SUPABASE_URL
                 + "/rest/v1/bookings"
                 + "?user_id=eq." + userId
-                + "&order=created_at.desc";
+                + "&order=booking_date.desc";
 
         Request request = new Request.Builder()
                 .url(url)
@@ -149,5 +151,50 @@ public class BookingService {
         } catch (Exception e) {
             callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
+    }
+
+    public static void hasBookedHotel(String userId, String hotelId, String accessToken, DataCallback<Boolean> callback) {
+        String url = SupabaseConfig.SUPABASE_URL
+                + "/rest/v1/bookings"
+                + "?select=id"
+                + "&user_id=eq." + userId
+                + "&hotel_id=eq." + hotelId
+                + "&limit=1"
+                + "&status=eq.COMPLETED";
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("apikey", SupabaseConfig.ANON_KEY)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("Accept", "application/json")
+                .get()
+                .build();
+
+        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String body = response.body() != null ? response.body().string() : "[]";
+
+                Log.d("ReviewCheck", "hasBookedHotel url = " + url);
+                Log.d("ReviewCheck", "bookings response code = " + response.code());
+                Log.d("ReviewCheck", "bookings response body = " + body);
+
+                if (response.isSuccessful()) {
+                    try {
+                        JSONArray array = new JSONArray(body);
+                        callback.onSuccess(array.length() > 0);
+                    } catch (Exception e) {
+                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
+                    }
+                } else {
+                    callback.onError(SupabaseConfig.mapHttp(response.code()), body);
+                }
+            }
+        });
     }
 }

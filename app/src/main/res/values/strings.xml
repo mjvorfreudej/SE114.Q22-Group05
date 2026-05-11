@@ -212,4 +212,31 @@
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_favorite">Yêu thích</string>
     <string name="nav_profile">Cá nhân</string>
+
+
+    <!-- User Review -->
+    <string name="not_book_yet">Cần đặt khách sạn này trước khi viết đánh giá.</string>
+    <string name="write_review">Viết đánh giá</string>
+    <string name="review_hint">Chia sẻ trải nghiệm của bạn</string>
+    <string name="review_rating">Vui lòng chọn xếp hạng</string>
+    <string name="delete_review">Xóa</string>
+    <string name="review_submit_button">Gửi đánh giá</string>
+    <string name="review_update_button">Cập nhật đánh giá</string>
+    <string name="review_edit_title">Sửa đánh giá</string>
+    <string name="review_delete_title">Xóa đánh giá</string>
+    <string name="review_delete_message">Bạn có chắc chắn muốn xóa đánh giá này?</string>
+    <string name="review_rating_required">Vui lòng chọn xếp hạng</string>
+    <string name="review_text_required">Vui lòng nhập đánh giá</string>
+    <string name="review_submit_success">Đánh giá đã được gửi</string>
+    <string name="review_submit_error">Không thể gửi đánh giá</string>
+    <string name="review_update_success">Đánh giá đã được cập nhật</string>
+    <string name="review_update_error">Không thể cập nhật đánh giá</string>
+    <string name="review_delete_success">Đánh giá đã được xóa</string>
+    <string name="review_delete_error">Không thể xóa đánh giá</string>
+
+    <string name="review_pick_images">Thêm ảnh</string>
+    <string name="review_pick_images_title">Chọn ảnh đánh giá</string>
+    <string name="review_selected_images_count">Đã chọn %d ảnh</string>
+    <string name="review_image_upload_partial_error">Đánh giá đã được gửi, nhưng có ảnh chưa tải lên được</string>
+
 </resources>
