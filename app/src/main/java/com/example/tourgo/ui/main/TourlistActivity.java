@@ -1,79 +1,75 @@
 package com.example.tourgo.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tourgo.R;
-import com.example.tourgo.adapters.TourAdapter;
-import com.example.tourgo.data.TourRepository;
-import com.example.tourgo.interfaces.ApiErrorCode;
-import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.utils.SessionManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.tourgo.adapters.SearchPagerAdapter;
+import com.example.tourgo.fragments.HotelListFragment;
+import com.example.tourgo.fragments.TourListFragment;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class TourlistActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerTours;
-    private TourAdapter adapter;
-    private ProgressBar progressBar;
-    private SessionManager session;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
+    private EditText etSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tour_list);
 
-        session = new SessionManager(this);
-        progressBar = findViewById(R.id.pbTourList);
-
-        recyclerTours = findViewById(R.id.recyclerTours);
-        recyclerTours.setLayoutManager(new LinearLayoutManager(this));
-        
-        adapter = new TourAdapter(new ArrayList<>());
-        adapter.setOnTourClickListener(tour -> {
-            Intent intent = new Intent(this, BookingActivity.class);
-            intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
-            startActivity(intent);
-        });
-        recyclerTours.setAdapter(adapter);
-
-        loadTours();
+        initViews();
+        setupViewPager();
+        setupSearch();
     }
 
-    private void loadTours() {
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
+    private void initViews() {
+        viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        etSearch = findViewById(R.id.etSearch);
+    }
 
-        String userId = session.getUserId();
-        String token = session.getAccessToken();
+    private void setupViewPager() {
+        SearchPagerAdapter pagerAdapter = new SearchPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
 
-        TourRepository.getInstance().loadTours(userId, token, new DataCallback<List<Tour>>() {
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            tab.setText(position == 0 ? "Tours" : "Hotels");
+        }).attach();
+    }
+
+    private void setupSearch() {
+        if (etSearch == null) return;
+        etSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onSuccess(List<Tour> data) {
-                runOnUiThread(() -> {
-                    if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    if (data != null) {
-                        adapter.setData(data);
-                    }
-                });
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterCurrentFragment(s.toString());
             }
 
             @Override
-            public void onError(ApiErrorCode code, String msg) {
-                runOnUiThread(() -> {
-                    if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    Toast.makeText(TourlistActivity.this, R.string.err_network, Toast.LENGTH_SHORT).show();
-                });
-            }
+            public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void filterCurrentFragment(String query) {
+        // ViewPager2 uses "f" + position as the internal tag for fragments
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + viewPager.getCurrentItem());
+        if (currentFragment instanceof TourListFragment) {
+            ((TourListFragment) currentFragment).filter(query);
+        } else if (currentFragment instanceof HotelListFragment) {
+            ((HotelListFragment) currentFragment).filter(query);
+        }
     }
 }
