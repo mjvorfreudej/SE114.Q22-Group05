@@ -605,7 +605,7 @@ public class DetailActivity extends AppCompatActivity {
                 .setTitle(R.string.review_delete_title)
                 .setMessage(R.string.review_delete_message)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.review_action_delete, (dialog, which) -> {
+                .setPositiveButton(R.string.delete_review, (dialog, which) -> {
                     HotelReviewService.deleteHotelReview(
                             comment.getId(),
                             session.getAccessToken(),

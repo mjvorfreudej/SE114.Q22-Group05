@@ -220,10 +220,8 @@
     <string name="review_hint">Chia sẻ trải nghiệm của bạn</string>
     <string name="review_rating">Vui lòng chọn xếp hạng</string>
     <string name="delete_review">Xóa</string>
-    <string name="edit_review">Sửa</string>
     <string name="review_submit_button">Gửi đánh giá</string>
     <string name="review_update_button">Cập nhật đánh giá</string>
-    <string name="review_action_delete">Xóa</string>
     <string name="review_edit_title">Sửa đánh giá</string>
     <string name="review_delete_title">Xóa đánh giá</string>
     <string name="review_delete_message">Bạn có chắc chắn muốn xóa đánh giá này?</string>
