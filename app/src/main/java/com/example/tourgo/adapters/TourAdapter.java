@@ -82,8 +82,8 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getLocation());
         
-        // Hiển thị giá tiền đa ngôn ngữ cho Tour
-        holder.tvPrice.setText(item.getPriceString());
+        // Hiển thị giá tiền dựa trên cài đặt tiền tệ trong Session
+        holder.tvPrice.setText(item.getPriceString(holder.itemView.getContext()));
         
         holder.tvDuration.setText(item.getDuration());
         holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));

@@ -227,7 +227,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvSeeAllTours"
+                    android:id="@+id/tvSeeAllHotels"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_see_all"
@@ -261,7 +261,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvSeeAllHotels"
+                    android:id="@+id/tvSeeAllTrending"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_see_all"
@@ -273,7 +273,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTrendingHotels"
                 android:layout_width="match_parent"
-                android:layout_height="130dp"
+                android:layout_height="180dp"
                 android:layout_marginTop="14dp"
                 android:clipToPadding="false"
                 android:overScrollMode="never" />
@@ -296,7 +296,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvSeeAllPopularTours"
+                    android:id="@+id/tvSeeAllTours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/main_see_all"

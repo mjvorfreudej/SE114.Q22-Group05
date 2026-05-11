@@ -74,6 +74,15 @@ public class SessionManager {
         return sharedPreferences.getBoolean("remember_me", false);
     }
 
+    public void setCurrency(String currency) {
+        sharedPreferences.edit().putString("currency", currency).apply();
+    }
+
+    public String getCurrency() {
+        // Mặc định là VND nếu chưa chọn
+        return sharedPreferences.getString("currency", "VND");
+    }
+
     public void clear() {
         sharedPreferences.edit().clear().apply();
     }
