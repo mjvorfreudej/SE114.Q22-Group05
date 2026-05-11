@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +34,7 @@ import java.util.List;
 public class ProfileFragment extends Fragment {
 
     private TextView tvProfileName, tvProfileEmail;
+    private ImageView ivProfileAvatar;
     private SessionManager session;
 
     @Nullable
@@ -48,6 +51,7 @@ public class ProfileFragment extends Fragment {
 
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
+        ivProfileAvatar = view.findViewById(R.id.ivProfileAvatar);
 
         if (session.isLoggedIn()) {
             if (tvProfileName != null) tvProfileName.setText(session.getShortName());
@@ -55,28 +59,107 @@ public class ProfileFragment extends Fragment {
         }
 
         View btnBack = view.findViewById(R.id.btnProfileBack);
-        if (btnBack != null) btnBack.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+        if (btnBack != null) btnBack.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
 
         setupBookings(view);
-        setupLogout(view);
-        setupLanguage(view);
+        setupSettings(view);
     }
 
     private void setupBookings(View root) {
         RecyclerView rv = root.findViewById(R.id.rvMyBookings);
         if (rv == null) return;
         rv.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false));
+        
+        // Mocking data based on currency
+        String currency = session.getCurrency();
+        String price1 = "VND".equals(currency) ? "2.500.000đ" : "$100";
+        String price2 = "VND".equals(currency) ? "1.800.000đ" : "$75";
+
         List<MyBookingAdapter.Item> items = new ArrayList<>(Arrays.asList(
                 new MyBookingAdapter.Item("The Grand Orchid Resort", "13 Aug - 15 Aug", R.drawable.hotel_1),
                 new MyBookingAdapter.Item("Hilton Bandung", "20 Sep - 22 Sep", R.drawable.hotel_2)
         ));
+        // Note: MyBookingAdapter.Item doesn't currently support prices, but we refresh the list anyway.
+        // If the adapter supported it, we would pass price1 and price2 here.
         rv.setAdapter(new MyBookingAdapter(items));
     }
 
-    private void setupLogout(View root) {
+    private void setupSettings(View root) {
+        // Edit Profile
+        View btnEdit = root.findViewById(R.id.btnProfileEdit);
+        if (btnEdit != null) btnEdit.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Edit Profile", Toast.LENGTH_SHORT).show();
+        });
+
+        // Language Selection
+        MaterialButtonToggleGroup toggleLanguage = root.findViewById(R.id.toggleLanguage);
+        if (toggleLanguage != null) {
+            String currentLang = LocaleHelper.getCurrentLanguageTag();
+            if ("vi".equals(currentLang)) {
+                toggleLanguage.check(R.id.btnLangVi);
+            } else {
+                toggleLanguage.check(R.id.btnLangEn);
+            }
+
+            toggleLanguage.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                if (isChecked) {
+                    String lang = (checkedId == R.id.btnLangVi) ? "vi" : "en";
+                    if (!lang.equals(LocaleHelper.getCurrentLanguageTag())) {
+                        LocaleHelper.setAppLocale(lang);
+                        // Activity will recreate automatically
+                    }
+                }
+            });
+        }
+
+        // Currency Selection
+        MaterialButtonToggleGroup toggleCurrency = root.findViewById(R.id.toggleCurrency);
+        if (toggleCurrency != null) {
+            String currentCurr = session.getCurrency();
+            if ("VND".equals(currentCurr)) {
+                toggleCurrency.check(R.id.btnCurrVnd);
+            } else {
+                toggleCurrency.check(R.id.btnCurrUsd);
+            }
+
+            toggleCurrency.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                if (isChecked) {
+                    String currency = (checkedId == R.id.btnCurrVnd) ? "VND" : "USD";
+                    if (!currency.equals(session.getCurrency())) {
+                        session.setCurrency(currency);
+                        setupBookings(root); // Reload bookings with new currency
+                        Toast.makeText(getContext(), "Currency changed to: " + currency, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+        // Settings Rows
+        View rowPersonalInfo = root.findViewById(R.id.rowPersonalInfo);
+        if (rowPersonalInfo != null) rowPersonalInfo.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Personal Information", Toast.LENGTH_SHORT).show();
+        });
+
+        View rowPayment = root.findViewById(R.id.rowPaymentMethods);
+        if (rowPayment != null) rowPayment.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Payment Methods", Toast.LENGTH_SHORT).show();
+        });
+
+        View rowNotifications = root.findViewById(R.id.rowNotifications);
+        if (rowNotifications != null) rowNotifications.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Notifications", Toast.LENGTH_SHORT).show();
+        });
+
+        View rowPrivacy = root.findViewById(R.id.rowPrivacy);
+        if (rowPrivacy != null) rowPrivacy.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Privacy & Security", Toast.LENGTH_SHORT).show();
+        });
+
+        // Logout
         View btnLogout = root.findViewById(R.id.btnLogout);
-        if (btnLogout == null) return;
-        btnLogout.setOnClickListener(v -> showLogoutDialog());
+        if (btnLogout != null) btnLogout.setOnClickListener(v -> showLogoutDialog());
     }
 
     private void showLogoutDialog() {
@@ -98,26 +181,5 @@ public class ProfileFragment extends Fragment {
             startActivity(intent);
         });
         dialog.show();
-    }
-
-    private void setupLanguage(View view) {
-        MaterialButtonToggleGroup toggleLanguage = view.findViewById(R.id.toggleLanguage);
-        if (toggleLanguage == null) return;
-
-        String currentLang = LocaleHelper.getCurrentLanguageTag();
-        if ("en".equals(currentLang)) {
-            toggleLanguage.check(R.id.btnLangEn);
-        } else {
-            toggleLanguage.check(R.id.btnLangVi);
-        }
-
-        toggleLanguage.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                String newLang = (checkedId == R.id.btnLangVi) ? "vi" : "en";
-                if (!newLang.equals(LocaleHelper.getCurrentLanguageTag())) {
-                    LocaleHelper.setAppLocale(newLang);
-                }
-            }
-        });
     }
 }

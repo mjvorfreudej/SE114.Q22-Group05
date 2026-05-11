@@ -58,7 +58,12 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
             holder.imgHotel.setImageResource(item.getImageResId() != 0 ? item.getImageResId() : R.drawable.hotel_1);
         }
 
+        holder.tvName.setText(item.getName());
         holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
+        
+        // Hiển thị giá tiền dựa trên tiền tệ đã chọn
+        String formattedPrice = item.formatPrice(holder.itemView.getContext(), item.getPricePerNight());
+        holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.price_per_night_format, formattedPrice));
         
         updateHeartIcon(holder.imgFavorite, item.isFavorite());
 
@@ -136,13 +141,15 @@ public class TrendingHotelAdapter extends RecyclerView.Adapter<TrendingHotelAdap
 
     static class TrendingViewHolder extends RecyclerView.ViewHolder {
         ImageView imgHotel, imgFavorite;
-        TextView tvRating;
+        TextView tvRating, tvName, tvPrice;
 
         public TrendingViewHolder(@NonNull View itemView) {
             super(itemView);
             imgHotel = itemView.findViewById(R.id.imgTrendingHotel);
             imgFavorite = itemView.findViewById(R.id.imgTrendingFavorite);
             tvRating = itemView.findViewById(R.id.tvTrendingRating);
+            tvName = itemView.findViewById(R.id.tvTrendingName);
+            tvPrice = itemView.findViewById(R.id.tvTrendingPrice);
         }
     }
 }

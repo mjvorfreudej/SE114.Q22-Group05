@@ -78,8 +78,8 @@ public class DetailActivity extends AppCompatActivity {
         binding.tvDetailName.setText(hotel.getName());
         binding.tvDetailLocation.setText(hotel.getAddress());
         
-        // Cập nhật giá tiền đa ngôn ngữ (chỉ thay đổi ký hiệu, không đổi giá trị)
-        String formattedPrice = hotel.formatPrice(hotel.getPricePerNight());
+        // SỬA TẠI ĐÂY: Truyền 'this' để định dạng đúng VND/USD theo cài đặt Profile
+        String formattedPrice = hotel.formatPrice(this, hotel.getPricePerNight());
         binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
         
         binding.tvDetailDescription.setText(hotel.getDescription());

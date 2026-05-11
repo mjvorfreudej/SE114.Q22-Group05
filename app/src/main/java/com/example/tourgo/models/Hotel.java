@@ -1,5 +1,7 @@
 package com.example.tourgo.models;
 
+import android.content.Context;
+import com.example.tourgo.utils.SessionManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,22 +40,26 @@ public class Hotel implements Serializable {
         this.imageUrls = new ArrayList<>();
     }
 
-    public String getCurrencySymbol() {
-        return Locale.getDefault().getLanguage().equals("vi") ? "₫" : "VND";
-    }
-
-    public String formatPrice(double amount) {
-        // Sử dụng Locale.getDefault() để tự động định dạng dấu phân cách theo ngôn ngữ
-        if (Locale.getDefault().getLanguage().equals("vi")) {
-            return String.format(Locale.getDefault(), "%,.0f₫", amount);
+    public String formatPrice(Context context, double amount) {
+        SessionManager session = new SessionManager(context);
+        String currency = session.getCurrency();
+        
+        // Sử dụng định dạng số theo Locale hiện tại (ngôn ngữ hệ thống)
+        if ("USD".equals(currency)) {
+            // Định dạng: $ 1,234,567
+            return String.format(Locale.getDefault(), "$ %,.0f", amount);
         } else {
-            return String.format(Locale.getDefault(), "VND %,.0f", amount);
+            // Định dạng: 1.234.567₫ (Mặc định VND)
+            return String.format(Locale.getDefault(), "%,.0f₫", amount);
         }
     }
 
-    public String getPriceString() {
-        // Phương thức này nên được thay thế bằng cách sử dụng String Resource trong Adapter để hỗ trợ đa ngôn ngữ tốt hơn cho chuỗi " / đêm"
-        return formatPrice(pricePerNight);
+    public String getPriceString(Context context) {
+        return formatPrice(context, pricePerNight);
+    }
+
+    public String formatPrice(double amount) {
+        return String.format(Locale.getDefault(), "%,.0f₫", amount);
     }
 
     public static Hotel fromJson(JSONObject json) {
@@ -72,9 +78,7 @@ public class Hotel implements Serializable {
         if (directImages != null) {
             for (int i = 0; i < directImages.length(); i++) {
                 String url = directImages.optString(i);
-                if (!url.isEmpty()) {
-                    h.imageUrls.add(url);
-                }
+                if (!url.isEmpty()) h.imageUrls.add(url);
             }
         }
 
@@ -84,13 +88,10 @@ public class Hotel implements Serializable {
                 JSONObject imgObj = joinedImages.optJSONObject(i);
                 if (imgObj != null) {
                     String url = imgObj.optString("url", imgObj.optString("image_url", ""));
-                    if (!url.isEmpty() && !h.imageUrls.contains(url)) {
-                        h.imageUrls.add(url);
-                    }
+                    if (!url.isEmpty() && !h.imageUrls.contains(url)) h.imageUrls.add(url);
                 }
             }
         }
-
         return h;
     }
 
@@ -99,9 +100,7 @@ public class Hotel implements Serializable {
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
                 JSONObject obj = array.optJSONObject(i);
-                if (obj != null) {
-                    list.add(fromJson(obj));
-                }
+                if (obj != null) list.add(fromJson(obj));
             }
         }
         return list;
@@ -110,24 +109,13 @@ public class Hotel implements Serializable {
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }
     public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
     public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public double getPricePerNight() { return pricePerNight; }
-    public void setPricePerNight(double pricePerNight) { this.pricePerNight = pricePerNight; }
     public List<String> getImageUrls() { return imageUrls; }
-    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
-    public String getAmenities() { return amenities; }
-    public void setAmenities(String amenities) { this.amenities = amenities; }
     public float getRating() { return rating; }
-    public void setRating(float rating) { this.rating = rating; }
     public int getReviewCount() { return reviewCount; }
-    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     public int getImageResId() { return imageResId; }
 }

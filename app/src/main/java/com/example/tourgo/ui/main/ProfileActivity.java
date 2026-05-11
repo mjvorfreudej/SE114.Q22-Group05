@@ -51,6 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
         setupBookings();
         setupLogout();
         setupLanguage();
+        setupCurrency();
     }
 
     private void setupBookings() {
@@ -96,6 +97,7 @@ public class ProfileActivity extends AppCompatActivity {
         MaterialButtonToggleGroup toggleLanguage = findViewById(R.id.toggleLanguage);
         if (toggleLanguage == null) return;
 
+        // Mặc định là VN nếu chưa được thiết lập (hoặc là "vi")
         String currentLang = LocaleHelper.getCurrentLanguageTag();
         if ("en".equals(currentLang)) {
             toggleLanguage.check(R.id.btnLangEn);
@@ -109,6 +111,26 @@ public class ProfileActivity extends AppCompatActivity {
                 if (!newLang.equals(LocaleHelper.getCurrentLanguageTag())) {
                     LocaleHelper.setAppLocale(newLang);
                 }
+            }
+        });
+    }
+
+    private void setupCurrency() {
+        MaterialButtonToggleGroup toggleCurrency = findViewById(R.id.toggleCurrency);
+        if (toggleCurrency == null) return;
+
+        // Mặc định là VND (đã được xử lý trong session.getCurrency())
+        String currentCurrency = session.getCurrency();
+        if ("USD".equalsIgnoreCase(currentCurrency)) {
+            toggleCurrency.check(R.id.btnCurrUsd);
+        } else {
+            toggleCurrency.check(R.id.btnCurrVnd);
+        }
+
+        toggleCurrency.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                String newCurrency = (checkedId == R.id.btnCurrVnd) ? "VND" : "USD";
+                session.setCurrency(newCurrency);
             }
         });
     }

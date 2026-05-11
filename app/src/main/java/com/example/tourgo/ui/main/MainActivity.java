@@ -123,9 +123,10 @@ public class MainActivity extends AppCompatActivity {
         loadFragment(new SearchFragment(), true);
     }
 
-    public void switchToHotelList(String destination, String date, String guest) {
+    public void switchToHotelList(String title, String destination, String date, String guest) {
         HotelListFragment fragment = new HotelListFragment();
         Bundle args = new Bundle();
+        args.putString("title", title);
         args.putString("destination", destination);
         args.putString("date", date);
         args.putString("guest", guest);

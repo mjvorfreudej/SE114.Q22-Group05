@@ -56,13 +56,41 @@ public class HomeFragment extends Fragment {
         loadData();
         loadTours();
 
+        setupClickListeners();
+    }
+
+    private void setupClickListeners() {
         binding.btnFind.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToSearch();
+                String dest = binding.tvSearchDestination.getText().toString();
+                String date = binding.tvCheckInOut.getText().toString();
+                String guest = binding.tvGuest.getText().toString();
+                
+                // Chuyển sang HotelListFragment với tiêu đề tìm kiếm
+                ((MainActivity) getActivity()).switchToHotelList("Search Results", dest, date, guest);
             }
         });
         
         binding.layoutSearchDestination.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToSearch();
+            }
+        });
+
+        // Chuyển sang xem tất cả các mục tương ứng
+        binding.tvSeeAllHotels.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToHotelList("Most Popular", "", "", "");
+            }
+        });
+
+        binding.tvSeeAllTrending.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).switchToHotelList("Trending Hotels", "", "", "");
+            }
+        });
+
+        binding.tvSeeAllTours.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).switchToSearch();
             }

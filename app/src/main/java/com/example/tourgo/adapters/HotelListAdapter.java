@@ -1,5 +1,6 @@
 package com.example.tourgo.adapters;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Favorite;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.remote.FavoriteService;
+import com.example.tourgo.ui.main.DetailActivity;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.utils.SessionManager;
 
@@ -67,8 +69,8 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         holder.tvName.setText(item.getName());
         holder.tvLocation.setText(item.getAddress());
         
-        // Cập nhật hiển thị giá tiền đa ngôn ngữ
-        String formattedPrice = item.formatPrice(item.getPricePerNight());
+        // Hiển thị giá tiền dựa trên cài đặt tiền tệ trong Session
+        String formattedPrice = item.formatPrice(holder.itemView.getContext(), item.getPricePerNight());
         holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.price_per_night_format, formattedPrice));
 
         holder.tvDescription.setText(item.getDescription());
@@ -81,6 +83,13 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
         }
 
         updateHeartIcon(holder.btnFavorite, item.isFavorite());
+
+        // Sự kiện click vào item để xem chi tiết
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DetailActivity.class);
+            intent.putExtra("hotel_object", item);
+            v.getContext().startActivity(intent);
+        });
 
         holder.btnFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
@@ -128,9 +137,8 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
     }
 
     private void updateHeartIcon(ImageView imgHeart, boolean isFavorite) {
-        imgHeart.setImageResource(isFavorite ? R.drawable.ic_heart_fullfilled : R.drawable.ic_heart_filled);
         int color = ContextCompat.getColor(imgHeart.getContext(),
-                isFavorite ? R.color.red : android.R.color.white);
+                isFavorite ? android.R.color.holo_red_dark : android.R.color.white);
         imgHeart.setImageTintList(ColorStateList.valueOf(color));
     }
 
