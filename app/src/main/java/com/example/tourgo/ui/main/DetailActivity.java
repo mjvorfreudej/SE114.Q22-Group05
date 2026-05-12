@@ -345,7 +345,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateHeartIcon(boolean isFavorite) {
-        int color = isFavorite ? ContextCompat.getColor(this, android.R.color.holo_red_dark) : ContextCompat.getColor(this, android.R.color.white);
+        binding.btnFavoriteDetail.setImageResource(isFavorite ? R.drawable.ic_heart_fullfilled : R.drawable.ic_heart_outline_18);
+        int color = ContextCompat.getColor(this, isFavorite ? R.color.red : android.R.color.white);
         binding.btnFavoriteDetail.setImageTintList(ColorStateList.valueOf(color));
     }
 
