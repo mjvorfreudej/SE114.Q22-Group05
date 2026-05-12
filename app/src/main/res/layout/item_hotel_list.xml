@@ -49,7 +49,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="6dp"
-                android:src="@drawable/ic_heart_filled"
+                android:src="@drawable/ic_heart_outline_18"
                 app:tint="@android:color/white" />
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>

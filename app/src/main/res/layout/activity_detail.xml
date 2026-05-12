@@ -83,7 +83,7 @@
                             android:layout_marginStart="@dimen/gutter_space"
                             android:background="@drawable/bg_input_glass"
                             android:padding="10dp"
-                            android:src="@drawable/ic_heart_filled"
+                            android:src="@drawable/ic_heart_outline_18"
                             app:tint="@android:color/white" />
                     </LinearLayout>
                 </RelativeLayout>
