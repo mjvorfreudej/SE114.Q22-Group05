@@ -45,7 +45,7 @@
             android:layout_height="match_parent"
             android:paddingHorizontal="@dimen/screen_margin_horizontal"
             android:paddingTop="8dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="120dp"
             android:clipToPadding="false"/>
 
         <ProgressBar

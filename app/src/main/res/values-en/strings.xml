@@ -67,6 +67,32 @@
     <string name="main_trending_hotels">Trending Hotels</string>
     <string name="main_nav_home">Home</string>
 
+    <!-- Home Screen Redesign -->
+    <string name="home_title">Explore the World</string>
+    <string name="home_guest_name">Guest</string>
+    <string name="home_category_hotel">Hotel</string>
+    <string name="home_category_tour">Tour</string>
+    <string name="home_special_deals">Special Deals</string>
+    <string name="home_offers">Offers</string>
+    <string name="home_how_to_book">Travel Guides</string>
+    <string name="home_deal_percent">30%</string>
+    <string name="home_deal_off">OFF</string>
+    <string name="home_deal_title">Happy Hour</string>
+    <string name="home_deal_desc">Enjoy every moment of your journey.</string>
+    <string name="home_book_now">Booking now</string>
+    <string name="home_guide_hotel_title">How to book a hotel</string>
+    <string name="home_guide_hotel_desc">Step-by-step tips to find the right stay.</string>
+    <string name="home_guide_tour_title">How to book a tour</string>
+    <string name="home_guide_tour_desc">Pick the perfect itinerary at the best price.</string>
+    <string name="home_watch_now">Watch now</string>
+    <string name="home_offer_flight">Flight</string>
+    <string name="home_offer_hotel">Hotel</string>
+    <string name="home_offer_tour">Tour</string>
+    <string name="home_offer_all">All</string>
+    <string name="home_trending_tours">Trending Tours</string>
+    <string name="home_screen_hotel_title">Hotels</string>
+    <string name="home_screen_tour_title">Tours</string>
+
     <!-- activity_profile.xml -->
     <string name="profile_name_placeholder">User</string>
     <string name="profile_email_placeholder">email@example.com</string>
@@ -201,6 +227,14 @@
     <string name="detail_reviews_label">Reviews</string>
     <string name="detail_staying_price_label">Staying Price</string>
     <string name="detail_book_now_button">Book Now</string>
+    <string name="detail_amenities_label">Amenities</string>
+    <string name="detail_location_label">Location</string>
+    <string name="detail_view_all">View All</string>
+    <string name="amenity_wifi">Free Wifi</string>
+    <string name="amenity_parking">Parking Area</string>
+    <string name="amenity_pool">Shared pool</string>
+    <string name="amenity_workplace">Workplace</string>
+    <string name="amenity_tour_desk">Tour Desk</string>
     <string name="filter_all">All</string>
     <string name="filter_with_photos">With Photos</string>
 

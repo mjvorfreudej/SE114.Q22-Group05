@@ -24,6 +24,8 @@ public class Hotel implements Serializable {
     private String createdAt;
     private boolean isFavorite;
     private int imageResId;
+    private double latitude;
+    private double longitude;
 
     public Hotel() {
         this.imageUrls = new ArrayList<>();
@@ -73,6 +75,8 @@ public class Hotel implements Serializable {
         h.rating = (float) json.optDouble("rating", 0);
         h.reviewCount = json.optInt("review_count", 0);
         h.createdAt = json.optString("createdAt", null);
+        h.latitude = json.optDouble("latitude", 0);
+        h.longitude = json.optDouble("longitude", 0);
 
         JSONArray directImages = json.optJSONArray("image_urls");
         if (directImages != null) {
@@ -118,4 +122,9 @@ public class Hotel implements Serializable {
     public float getRating() { return rating; }
     public int getReviewCount() { return reviewCount; }
     public int getImageResId() { return imageResId; }
+    public double getLatitude() { return latitude; }
+    public double getLongitude() { return longitude; }
+    public boolean hasCoordinates() {
+        return !(latitude == 0 && longitude == 0);
+    }
 }
