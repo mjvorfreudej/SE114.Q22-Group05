@@ -14,6 +14,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
@@ -51,6 +54,8 @@ public class BookingRequestFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        applyTopInset(view);
 
         session = new SessionManager(requireContext());
         startDate = Calendar.getInstance();
@@ -128,6 +133,16 @@ public class BookingRequestFragment extends Fragment {
 
         updateCounterUI();
         updateDateUI();
+    }
+
+    private void applyTopInset(View root) {
+        final int basePaddingTop = root.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), basePaddingTop + bars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
     }
 
     private void showDateSelectionDialog() {

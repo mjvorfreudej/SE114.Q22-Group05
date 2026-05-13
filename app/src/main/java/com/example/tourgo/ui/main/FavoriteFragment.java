@@ -56,6 +56,16 @@ public class FavoriteFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         applyTopInset(view);
+        View btnBack = view.findViewById(R.id.btnFavoriteBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).switchToHome();
+                } else if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+            });
+        }
         loadFavorites();
     }
 

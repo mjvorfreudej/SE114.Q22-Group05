@@ -438,21 +438,23 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layoutBottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingHorizontal="@dimen/screen_margin_horizontal"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -476,7 +478,7 @@
             android:id="@+id/btnBookNow"
             android:layout_width="160dp"
             android:layout_height="56dp"
-            android:layout_alignParentEnd="true"
+            android:layout_marginStart="12dp"
             android:background="@drawable/bg_book_button"
             android:text="@string/detail_book_now_button"
             android:textAllCaps="false"
@@ -484,6 +486,6 @@
             android:textSize="16sp"
             android:textStyle="bold"
             app:backgroundTint="@null" />
-    </RelativeLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
