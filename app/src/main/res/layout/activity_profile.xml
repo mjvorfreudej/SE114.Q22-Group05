@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="16dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="120dp">
 
             <!-- User Info Section -->
             <RelativeLayout
