@@ -16,12 +16,22 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.RegisterRequest;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuthData;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
 import com.example.tourgo.utils.ApiErrorMapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
     private ActivityRegisterBinding binding;
@@ -57,48 +67,45 @@ public class RegisterActivity extends AppCompatActivity {
 
             setLoading(true);
 
-            SupabaseClient.register(email, password, name, new ApiCallback() {
-                @Override
-                public void onSuccess(String responseData) {
-                    runOnUiThread(() -> {
-                        setLoading(false);
-                        try {
-                            JSONObject json = new JSONObject(responseData);
-                            JSONArray identities = json.optJSONArray("identities");
-                            
-                            if (identities != null && identities.length() == 0) {
-                                binding.tilRegisterEmail.setError(getString(R.string.err_email_registered));
-                                binding.etRegisterEmail.requestFocus();
-                                return;
-                            }
+            RegisterRequest request = new RegisterRequest(name, email, password);
+            RetrofitClient.getInstance(this)
+                    .getAuthApi()
+                    .register(request)
+                    .enqueue(new Callback<ApiResponse<AuthData>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<AuthData>> call, Response<ApiResponse<AuthData>> response) {
+                            runOnUiThread(() -> {
+                                setLoading(false);
 
-                            Toast.makeText(RegisterActivity.this, getString(R.string.msg_register_success), Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
-                        } catch (Exception e) {
-                            Toast.makeText(RegisterActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
-                            finish();
+                                if (response.isSuccessful() && response.body() != null) {
+                                    ApiResponse<AuthData> apiResponse = response.body();
+
+                                    if (apiResponse.getSuccess() != null && apiResponse.getSuccess()
+                                            && apiResponse.getData() != null) {
+
+                                        Toast.makeText(RegisterActivity.this, getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                    } else {
+                                        ApiError error = ErrorHandler.parseError(response);
+                                        ErrorHandler.showError(RegisterActivity.this, error);
+                                    }
+                                } else {
+                                    ApiError error = ErrorHandler.parseError(response);
+                                    ErrorHandler.showError(RegisterActivity.this, error);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<AuthData>> call, Throwable t) {
+                            runOnUiThread(() -> {
+                                setLoading(false);
+                                ApiError error = ErrorHandler.parseError(t);
+                                ErrorHandler.showError(RegisterActivity.this, error);
+                            });
                         }
                     });
-                }
 
-                @Override
-                public void onError(ApiErrorCode code, String raw) {
-                    runOnUiThread(() -> {
-                        setLoading(false);
-                        if (code == ApiErrorCode.EMAIL_ALREADY_REGISTERED) {
-                            binding.tilRegisterEmail.setError(getString(R.string.err_email_registered));
-                            binding.etRegisterEmail.requestFocus();
-                        } else {
-                            Toast.makeText(RegisterActivity.this,
-                                    ApiErrorMapper.messageOf(RegisterActivity.this, code),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
         });
     }
 
