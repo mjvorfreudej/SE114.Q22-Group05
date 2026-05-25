@@ -12,7 +12,7 @@ import com.example.tourgo.TourGoApp;
 import com.example.tourgo.interfaces.ApiCallback;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.ui.auth.LoginActivity;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 
 import org.json.JSONObject;
 
@@ -57,35 +57,6 @@ public class SupabaseClient {
                 public void onResponse(Call call, Response response) throws IOException {
                     String resBody = response.body() != null ? response.body().string() : "";
                     if (response.isSuccessful()) {
-                        callback.onSuccess(resBody);
-                    } else {
-                        handleError(resBody, callback);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
-        }
-    }
-
-    public static void login(String email, String password, ApiCallback callback) {
-        String url = SUPABASE_URL + "/auth/v1/token?grant_type=password";
-        try {
-            JSONObject jsonBody = new JSONObject();
-            jsonBody.put("email", email);
-            jsonBody.put("password", password);
-            RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
-            Request request = buildAuthRequest(url, body);
-            SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    handleError(e.getMessage(), callback);
-                }
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String resBody = response.body() != null ? response.body().string() : "";
-                    if (response.isSuccessful()) {
-                        loggedOut.set(false);
                         callback.onSuccess(resBody);
                     } else {
                         handleError(resBody, callback);

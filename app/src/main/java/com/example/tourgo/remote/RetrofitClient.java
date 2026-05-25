@@ -1,0 +1,91 @@
+package com.example.tourgo.remote;
+
+import android.content.Context;
+
+import com.example.tourgo.BuildConfig;
+import com.example.tourgo.data.local.SessionManager;
+import com.example.tourgo.remote.api.AuthApi;
+import com.example.tourgo.remote.api.BookingApi;
+import com.example.tourgo.remote.api.CommentApi;
+import com.example.tourgo.remote.api.FavoriteApi;
+import com.example.tourgo.remote.api.HotelApi;
+import com.example.tourgo.remote.api.TourApi;
+import com.example.tourgo.remote.api.UserApi;
+import com.example.tourgo.remote.interceptor.AuthInterceptor;
+
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class RetrofitClient {
+    private static final String BASE_URL = "https://tourgo-api-service.onrender.com/";
+    // GitHub link: https://github.com/trungnha-uit/TourGo_API_Service
+
+    private static RetrofitClient instance;
+
+    private Retrofit retrofit;
+    private SessionManager sessionManager;
+
+    private RetrofitClient(Context context) {
+        sessionManager = new SessionManager(context);
+
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(
+                BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE
+        );
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(new AuthInterceptor(sessionManager))
+                .addInterceptor(loggingInterceptor)
+                .build();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+    }
+
+    public static synchronized RetrofitClient getInstance(Context context) {
+        if (instance == null) {
+            instance = new RetrofitClient(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    public AuthApi getAuthApi() {
+        return retrofit.create(AuthApi.class);
+    }
+
+    public TourApi getTourApi() {
+        return retrofit.create(TourApi.class);
+    }
+
+    public HotelApi getHotelApi() {
+        return retrofit.create(HotelApi.class);
+    }
+
+    public BookingApi getBookingApi() {
+        return retrofit.create(BookingApi.class);
+    }
+
+    public FavoriteApi getFavoriteApi() {
+        return retrofit.create(FavoriteApi.class);
+    }
+
+    public CommentApi getCommentApi() {
+        return retrofit.create(CommentApi.class);
+    }
+
+    public UserApi getUserApi() {
+        return retrofit.create(UserApi.class);
+    }
+
+
+}

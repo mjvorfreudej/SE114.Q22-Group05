@@ -119,9 +119,10 @@
     <string name="msg_register_success">Account created!</string>
     <string name="msg_reset_success">Password updated!</string>
     <string name="msg_recovery_sent">Recovery email sent!\nPlease check your inbox.</string>
+    <string name="msg_login_fail">Login failed</string>
 
     <!--  Error Code  -->
-    <string name="err_unauthorized">Session expired, please sign in again</string>
+    <string name="err_unauthorized">Invalid email or password</string>
     <string name="err_forbidden">You don\'t have permission to do that</string>
     <string name="err_not_found">Not found</string>
     <string name="err_server">Server error, please try again</string>
@@ -238,5 +239,9 @@
     <string name="review_pick_images_title">Choose review photos</string>
     <string name="review_selected_images_count">%d photos selected</string>
     <string name="review_image_upload_partial_error">Review saved, but some photos could not be uploaded</string>
+
+    <!--  API Error  -->
+    <string name="err_no_internet">No internet connection</string>
+    <string name="err_timeout">Connection timeout</string>
 
 </resources>

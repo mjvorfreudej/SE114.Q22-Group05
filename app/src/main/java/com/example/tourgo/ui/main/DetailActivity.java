@@ -1,7 +1,5 @@
 package com.example.tourgo.ui.main;
 
-import static com.example.tourgo.remote.HotelReviewService.deleteHotelReview;
-
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -31,13 +29,13 @@ import com.example.tourgo.adapters.GalleryAdapter;
 import com.example.tourgo.databinding.ActivityDetailBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Comment;
-import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.response.Comment;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.remote.HotelService;
 import com.example.tourgo.remote.HotelReviewService;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.BookingService;
 
 import java.util.ArrayList;

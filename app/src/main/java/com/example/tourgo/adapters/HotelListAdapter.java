@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.ui.main.DetailActivity;
 import com.example.tourgo.utils.ImageLoader;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;

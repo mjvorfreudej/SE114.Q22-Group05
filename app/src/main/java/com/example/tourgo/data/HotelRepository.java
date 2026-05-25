@@ -5,8 +5,8 @@ import android.os.Looper;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.remote.HotelService;
 

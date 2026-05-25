@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.Comment;
+import com.example.tourgo.models.response.Comment;
 import com.example.tourgo.utils.ImageLoader;
 
 import java.util.Locale;

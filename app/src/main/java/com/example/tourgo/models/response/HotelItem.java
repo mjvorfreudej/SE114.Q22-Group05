@@ -1,4 +1,4 @@
-package com.example.tourgo.models;
+package com.example.tourgo.models.response;
 
 import java.io.Serializable;
 import java.util.ArrayList;

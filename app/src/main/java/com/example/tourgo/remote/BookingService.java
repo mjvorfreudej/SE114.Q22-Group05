@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Booking;
+import com.example.tourgo.models.response.Booking;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

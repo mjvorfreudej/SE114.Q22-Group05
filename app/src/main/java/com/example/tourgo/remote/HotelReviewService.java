@@ -7,7 +7,7 @@ import android.net.Uri;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Comment;
+import com.example.tourgo.models.response.Comment;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -17,8 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.models.Tour;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
 
 public class BookingConfirmFragment extends Fragment {
 

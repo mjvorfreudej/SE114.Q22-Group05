@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.response.Hotel;
 
 import org.json.JSONArray;
 

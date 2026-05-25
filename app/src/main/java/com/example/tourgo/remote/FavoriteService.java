@@ -2,7 +2,7 @@ package com.example.tourgo.remote;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Favorite;
+import com.example.tourgo.models.response.Favorite;
 
 import org.json.JSONArray;
 

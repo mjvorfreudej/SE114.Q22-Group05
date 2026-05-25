@@ -17,9 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;

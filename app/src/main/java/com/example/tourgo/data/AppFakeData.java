@@ -1,9 +1,9 @@
 package com.example.tourgo.data;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.models.User;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.models.response.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +33,15 @@ public class AppFakeData {
         return list;
     }
 
-    public static User getUser() {
-        return new User(
-                "Harry Bender",
-                "harrybender@gmail.com",
-                "+84 912 345 678",
-                "Harry Bender",
-                null,
-                "USER"
-        );
-    }
+//    public static User getUser() {
+//        return new User(
+//                "Harry Bender",
+//                "harrybender@gmail.com",
+//                "+84 912 345 678",
+//                "Harry Bender",
+//                "USER"
+//        );
+//    }
 
     public static List<Hotel> getPopularHotelItems() {
         List<Hotel> list = new ArrayList<>();

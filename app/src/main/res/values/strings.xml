@@ -118,9 +118,10 @@
     <string name="msg_register_success">Đăng ký thành công!</string>
     <string name="msg_reset_success">Đổi mật khẩu thành công!</string>
     <string name="msg_recovery_sent">Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.</string>
+    <string name="msg_login_fail">Đăng nhập thất bại</string>
 
     <!--  Error Code  -->
-    <string name="err_unauthorized">Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại</string>
+    <string name="err_unauthorized">Sai email hoặc mật khẩu</string>
     <string name="err_forbidden">Bạn không có quyền thực hiện thao tác này</string>
     <string name="err_not_found">Không tìm thấy dữ liệu</string>
     <string name="err_server">Lỗi máy chủ, vui lòng thử lại</string>
@@ -238,5 +239,9 @@
     <string name="review_pick_images_title">Chọn ảnh đánh giá</string>
     <string name="review_selected_images_count">Đã chọn %d ảnh</string>
     <string name="review_image_upload_partial_error">Đánh giá đã được gửi, nhưng có ảnh chưa tải lên được</string>
+
+    <!--  Error message  -->
+    <string name="err_no_internet">Không có kết nối mạng</string>
+    <string name="err_timeout">Hết thời gian kết nối</string>
 
 </resources>

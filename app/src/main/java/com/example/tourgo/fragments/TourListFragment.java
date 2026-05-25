@@ -18,8 +18,8 @@ import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.data.TourRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.data.local.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;

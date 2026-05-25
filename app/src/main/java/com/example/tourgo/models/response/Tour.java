@@ -1,7 +1,7 @@
-package com.example.tourgo.models;
+package com.example.tourgo.models.response;
 
 import android.content.Context;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

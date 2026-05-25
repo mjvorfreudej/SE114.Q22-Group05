@@ -14,15 +14,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
-import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.LoginRequest;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuthData;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.main.MainActivity;
-import com.example.tourgo.utils.ApiErrorMapper;
-import com.example.tourgo.utils.SessionManager;
-import com.example.tourgo.remote.SupabaseClient;
+import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.databinding.ActivityLoginBinding;
-import com.example.tourgo.interfaces.ApiCallback;
 
 import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -72,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         binding.btnLogin.setOnClickListener(v -> {
             Editable emailEditable = binding.etLoginEmail.getText();
             Editable passEditable = binding.etLoginPassword.getText();
-            
+
             String email = emailEditable != null ? emailEditable.toString().trim() : "";
             String password = passEditable != null ? passEditable.toString() : "";
 
@@ -88,54 +94,68 @@ public class LoginActivity extends AppCompatActivity {
             binding.btnLogin.setVisibility(android.view.View.INVISIBLE);
             binding.pbLoginLoading.setVisibility(android.view.View.VISIBLE);
 
-            SupabaseClient.login(email, password, new ApiCallback() {
-                @Override
-                public void onSuccess(String responseData) {
-                    runOnUiThread(() -> {
-                        binding.btnLogin.setVisibility(android.view.View.VISIBLE);
-                        binding.pbLoginLoading.setVisibility(android.view.View.GONE);
+            LoginRequest request = new LoginRequest(email, password);
+            RetrofitClient.getInstance(this)
+                    .getAuthApi()
+                    .login(request)
+                    .enqueue(new Callback<ApiResponse<AuthData>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<AuthData>> call, Response<ApiResponse<AuthData>> response) {
+                            runOnUiThread(() -> {
+                                binding.btnLogin.setVisibility(android.view.View.VISIBLE);
+                                binding.pbLoginLoading.setVisibility(View.GONE);
 
-                        try {
-                            JSONObject json = new JSONObject(responseData);
-                            String accessToken = json.getString("access_token");
-                            String refreshToken = json.getString("refresh_token");
-                            JSONObject user = json.getJSONObject("user");
-                            String userId = user.getString("id");
-                            String userEmail = user.getString("email");
-                            
-                            // Lấy tên từ metadata (kiểm tra cả user_metadata và raw_user_meta_data)
-                            String userName = "";
-                            if (user.has("user_metadata")) {
-                                userName = user.getJSONObject("user_metadata").optString("name", "");
-                            }
-                            if (userName.isEmpty() && user.has("raw_user_meta_data")) {
-                                userName = user.getJSONObject("raw_user_meta_data").optString("name", "");
-                            }
+                                if (response.isSuccessful() && response.body() != null) {
+                                    ApiResponse<AuthData> apiResponse = response.body();
 
-                            session.saveSession(userEmail, userId, accessToken, refreshToken, userName, binding.cbLoginRemember.isChecked());
+                                    if (apiResponse.getSuccess() != null && apiResponse.getSuccess()
+                                            && apiResponse.getData() != null) {
 
-                            Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } catch (Exception e) {
-                            Toast.makeText(LoginActivity.this, "Lỗi xử lý phản hồi: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                        AuthData authData = apiResponse.getData();
+
+                                        session.saveSession(
+                                                authData.getSession().getAccess_token(),
+                                                authData.getSession().getRefresh_token(),
+                                                authData.getSession().getExpires_at()
+                                        );
+
+                                        session.saveUserInfo(
+                                                authData.getUser().getId(),
+                                                authData.getUser().getEmail(),
+                                                authData.getUser().getName()
+                                        );
+
+                                        session.setRememberMe(binding.cbLoginRemember.isChecked());
+
+                                        Toast.makeText(LoginActivity.this,
+                                                getString(R.string.msg_login_success),
+                                                Toast.LENGTH_SHORT).show();
+
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                        finish();
+
+                                    } else {
+                                        ApiError error = ErrorHandler.parseError(response);
+                                        ErrorHandler.showError(LoginActivity.this, error, binding.tilLoginPassword);
+                                    }
+                                } else {
+                                    ApiError error = ErrorHandler.parseError(response);
+                                    ErrorHandler.showError(LoginActivity.this, error, binding.tilLoginPassword);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<AuthData>> call, Throwable t) {
+                            runOnUiThread(() -> {
+                                binding.btnLogin.setVisibility(View.VISIBLE);
+                                binding.pbLoginLoading.setVisibility(View.GONE);
+
+                                ApiError error = ErrorHandler.parseError(t);
+                                ErrorHandler.showError(LoginActivity.this, error);
+                            });
                         }
                     });
-                }
-
-                @Override
-                public void onError(ApiErrorCode code, String raw) {
-                    runOnUiThread(() -> {
-                        binding.btnLogin.setVisibility(View.VISIBLE);
-                        binding.pbLoginLoading.setVisibility(View.GONE);
-                        if (code == ApiErrorCode.INVALID_CREDENTIALS) {
-                            binding.tilLoginPassword.setError(getString(R.string.err_invalid_credentials));
-                        } else {
-                            Toast.makeText(LoginActivity.this, ApiErrorMapper.messageOf(LoginActivity.this, code), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
         });
     }
 

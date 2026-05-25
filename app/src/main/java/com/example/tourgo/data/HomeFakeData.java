@@ -1,7 +1,7 @@
 package com.example.tourgo.data;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.HotelItem;
+import com.example.tourgo.models.response.HotelItem;
 
 import java.util.ArrayList;
 import java.util.List;
