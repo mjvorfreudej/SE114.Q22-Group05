@@ -1,5 +1,8 @@
-package com.example.tourgo.data;
+package com.example.tourgo.data.repository;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -26,17 +29,13 @@ public class HotelRepository {
         return instance;
     }
 
-    public List<Hotel> getCachedHotels() {
-        return cachedHotels;
-    }
-
     // Hàm load cũ để không làm hỏng code hiện tại
-    public void loadHotels(DataCallback<List<Hotel>> callback) {
+    public void loadHotels(Context context, DataCallback<List<Hotel>> callback) {
         if (cachedHotels != null) {
             callback.onSuccess(cachedHotels);
             return;
         }
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
+        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 cachedHotels = data;
@@ -49,8 +48,13 @@ public class HotelRepository {
         });
     }
 
-    public void loadHotels(String userId, String token, DataCallback<List<Hotel>> callback) {
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
+    public void loadHotels(Context context, String userId, String token, DataCallback<List<Hotel>> callback) {
+        if (cachedHotels != null) {
+            callback.onSuccess(cachedHotels);
+            return;
+        }
+
+        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> hotels) {
                 cachedHotels = hotels;

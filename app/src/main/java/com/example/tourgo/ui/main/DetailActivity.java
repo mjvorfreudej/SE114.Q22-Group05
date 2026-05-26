@@ -239,7 +239,7 @@ public class DetailActivity extends AppCompatActivity {
     private void refreshHotelSummary() {
         if (hotel == null || hotel.getId() == null) return;
 
-        HotelService.getHotelDetail(hotel.getId(), new DataCallback<Hotel>() {
+        HotelService.getHotelDetail(this, hotel.getId(), new DataCallback<Hotel>() {
             @Override
             public void onSuccess(Hotel freshHotel) {
                 runOnUiThread(() -> {

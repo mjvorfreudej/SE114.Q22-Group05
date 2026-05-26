@@ -2,8 +2,7 @@ package com.example.tourgo.models.response;
 
 import android.content.Context;
 import com.example.tourgo.data.local.SessionManager;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,14 +15,24 @@ public class Tour implements Serializable {
     private String name;
     private String description;
     private double price;
-    private List<String> imageUrls;
+
+    @SerializedName("tour_images")
+    private List<TourImage> tourImages;
+
     private String destination;
     private String region;
     private String duration;
     private String status;
+
+    @SerializedName("owner_id")
     private String ownerId;
+
     private float rating;
+
+    @SerializedName("review_count")
     private int reviewCount;
+
+    @SerializedName("created_at")
     private String createdAt;
 
     private boolean isFavorite;
@@ -39,8 +48,22 @@ public class Tour implements Serializable {
     private int imageResId;
     private String location;
 
+    // Inner class for tour_images array items
+    public static class TourImage implements Serializable {
+        private String id;
+
+        @SerializedName("tour_id")
+        private String tourId;
+
+        @SerializedName("image_url")
+        private String imageUrl;
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+    }
+
     public Tour() {
-        this.imageUrls = new ArrayList<>();
     }
 
     public Tour(int imageResId, String name, String location, String priceString, double rating, String duration) {
@@ -50,7 +73,6 @@ public class Tour implements Serializable {
         this.location = location;
         this.rating = (float) rating;
         this.duration = duration;
-        this.imageUrls = new ArrayList<>();
     }
 
     public String formatPrice(Context context, double amount) {
@@ -73,52 +95,6 @@ public class Tour implements Serializable {
         return String.format(Locale.getDefault(), "%,.0f₫", price);
     }
 
-    public static Tour fromJson(JSONObject json) {
-        Tour t = new Tour();
-        t.id = json.optString("id", null);
-        t.name = json.optString("name", "");
-        t.description = json.optString("description", "");
-        t.price = json.optDouble("price", 0);
-        t.destination = json.optString("destination", "");
-        t.region = json.optString("region", "");
-        t.duration = json.optString("duration", "");
-        t.status = json.optString("status", "APPROVED");
-        t.ownerId = json.optString("owner_id", null);
-        t.rating = (float) json.optDouble("rating", 0);
-        t.reviewCount = json.optInt("review_count", 0);
-        t.createdAt = json.optString("created_at", null);
-
-        t.imageUrls = new ArrayList<>();
-        JSONArray images = json.optJSONArray("tour_images");
-        if (images != null) {
-            for (int i = 0; i < images.length(); i++) {
-                JSONObject img = images.optJSONObject(i);
-                if (img != null) {
-                    String url = img.optString("image_url", "");
-                    if (!url.isEmpty()) {
-                        t.imageUrls.add(url);
-                    }
-                }
-            }
-        }
-
-        t.location = t.destination;
-        return t;
-    }
-
-    public static List<Tour> fromJsonArray(JSONArray array) {
-        List<Tour> list = new ArrayList<>();
-        if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.optJSONObject(i);
-                if (obj != null) {
-                    list.add(Tour.fromJson(obj));
-                }
-            }
-        }
-        return list;
-    }
-
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -131,8 +107,28 @@ public class Tour implements Serializable {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
-    public List<String> getImageUrls() { return imageUrls; }
-    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
+    public List<String> getImageUrls() {
+        List<String> urls = new ArrayList<>();
+        if (tourImages != null) {
+            for (TourImage img : tourImages) {
+                if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
+                    urls.add(img.getImageUrl());
+                }
+            }
+        }
+        return urls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.tourImages = new ArrayList<>();
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                TourImage img = new TourImage();
+                img.imageUrl = url;
+                this.tourImages.add(img);
+            }
+        }
+    }
 
     public String getDestination() { return destination; }
     public void setDestination(String destination) { this.destination = destination; }

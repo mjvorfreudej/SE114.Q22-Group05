@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tourgo.R;
-import com.example.tourgo.data.HotelRepository;
+import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.fragments.HotelListFragment;
 import com.example.tourgo.fragments.ProfileFragment;
 import com.example.tourgo.interfaces.ApiErrorCode;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
+        HotelRepository.getInstance().loadHotels(this, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (session.isLoggedIn()) {

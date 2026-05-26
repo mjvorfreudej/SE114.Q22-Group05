@@ -27,11 +27,12 @@ public class TourRepository {
         return instance;
     }
 
-    public List<Tour> getCachedTours() {
-        return cachedTours;
-    }
-
     public void loadTours(Context context, String userId, String token, DataCallback<List<Tour>> callback) {
+        if (cachedTours != null) {
+            callback.onSuccess(cachedTours);
+            return;
+        }
+
         TourService.getTours(context, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> tours) {

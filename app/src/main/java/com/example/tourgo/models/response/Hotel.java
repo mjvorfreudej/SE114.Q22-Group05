@@ -2,6 +2,8 @@ package com.example.tourgo.models.response;
 
 import android.content.Context;
 import com.example.tourgo.data.local.SessionManager;
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,17 +18,32 @@ public class Hotel implements Serializable {
     private String name;
     private String address;
     private String description;
+    @SerializedName("price_per_night")
     private double pricePerNight;
-    private List<String> imageUrls;
     private String amenities;
     private float rating;
+    @SerializedName("review_count")
     private int reviewCount;
+    @SerializedName("created_at")
     private String createdAt;
     private boolean isFavorite;
     private int imageResId;
+    @SerializedName("hotel_images")
+    private List<HotelImage> hotelImages;
+
+    public static class HotelImage implements Serializable {
+        private String id;
+        @SerializedName("hotel_id")
+        private String hotelId;
+        @SerializedName("image_url")
+        private String imageUrl;
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+    }
 
     public Hotel() {
-        this.imageUrls = new ArrayList<>();
     }
 
     public Hotel(int imageResId, String name, String address, double pricePerNight, double rating, String amenities) {
@@ -37,7 +54,6 @@ public class Hotel implements Serializable {
         this.pricePerNight = pricePerNight;
         this.rating = (float) rating;
         this.amenities = amenities;
-        this.imageUrls = new ArrayList<>();
     }
 
     public String formatPrice(Context context, double amount) {
@@ -62,48 +78,27 @@ public class Hotel implements Serializable {
         return String.format(Locale.getDefault(), "%,.0f₫", amount);
     }
 
-    public static Hotel fromJson(JSONObject json) {
-        Hotel h = new Hotel();
-        h.id = json.optString("id", null);
-        h.name = json.optString("name", "");
-        h.address = json.optString("address", "");
-        h.description = json.optString("description", "");
-        h.pricePerNight = json.optDouble("price_per_night", 0);
-        h.amenities = json.optString("amenities", "");
-        h.rating = (float) json.optDouble("rating", 0);
-        h.reviewCount = json.optInt("review_count", 0);
-        h.createdAt = json.optString("createdAt", null);
-
-        JSONArray directImages = json.optJSONArray("image_urls");
-        if (directImages != null) {
-            for (int i = 0; i < directImages.length(); i++) {
-                String url = directImages.optString(i);
-                if (!url.isEmpty()) h.imageUrls.add(url);
-            }
-        }
-
-        JSONArray joinedImages = json.optJSONArray("hotel_images");
-        if (joinedImages != null) {
-            for (int i = 0; i < joinedImages.length(); i++) {
-                JSONObject imgObj = joinedImages.optJSONObject(i);
-                if (imgObj != null) {
-                    String url = imgObj.optString("url", imgObj.optString("image_url", ""));
-                    if (!url.isEmpty() && !h.imageUrls.contains(url)) h.imageUrls.add(url);
+    public List<String> getImageUrls() {
+        List<String> urls = new ArrayList<>();
+        if (hotelImages != null) {
+            for (HotelImage img : hotelImages) {
+                if (img.getImageUrl() != null && !img.getImageUrl().isEmpty()) {
+                    urls.add(img.getImageUrl());
                 }
             }
         }
-        return h;
+        return urls;
     }
 
-    public static List<Hotel> fromJsonArray(JSONArray array) {
-        List<Hotel> list = new ArrayList<>();
-        if (array != null) {
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.optJSONObject(i);
-                if (obj != null) list.add(fromJson(obj));
+    public void setImageUrls(List<String> imageUrls) {
+        this.hotelImages = new ArrayList<>();
+        if (imageUrls != null) {
+            for (String url : imageUrls) {
+                HotelImage img = new HotelImage();
+                img.imageUrl = url;
+                this.hotelImages.add(img);
             }
         }
-        return list;
     }
 
     public boolean isFavorite() { return isFavorite; }
@@ -114,7 +109,6 @@ public class Hotel implements Serializable {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public double getPricePerNight() { return pricePerNight; }
-    public List<String> getImageUrls() { return imageUrls; }
     public float getRating() { return rating; }
     public int getReviewCount() { return reviewCount; }
     public int getImageResId() { return imageResId; }

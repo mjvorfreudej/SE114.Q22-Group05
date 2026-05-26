@@ -2,10 +2,14 @@ package com.example.tourgo.remote;
 
 import static com.example.tourgo.remote.SupabaseConfig.mapHttp;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Hotel;
 
 import org.json.JSONArray;
@@ -13,141 +17,138 @@ import org.json.JSONArray;
 import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HotelService {
 
-    public static void getHotels(DataCallback<List<Hotel>> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/hotels"
-                + "?select=*,hotel_images(*)"
-                + "&order=rating.desc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e("API_ERROR", "Network error: " + e.getMessage());
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-
-                Log.d("API_RESPONSE", "Code: " + response.code());
-                Log.d("API_RESPONSE", "Body: " + body);
-
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        List<Hotel> hotels = Hotel.fromJsonArray(array);
-                        callback.onSuccess(hotels);
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
-                    }
-                } else {
-                    callback.onError(mapHttp(response.code()), body);
-                }
-            }
-        });
-    }
-
-
-    public static void getHotelDetail(String hotelId, DataCallback<Hotel> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/hotels"
-                + "?id=eq." + hotelId
-                + "&select=*,hotel_images(*)";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e("API_ERROR", "Network error: " + e.getMessage());
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-
-                Log.d("API_RESPONSE", "Code: " + response.code());
-                Log.d("API_RESPONSE", "Body: " + body);
-
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        if (array.length() > 0) {
-                            Hotel hotel = Hotel.fromJson(array.getJSONObject(0));
-                            callback.onSuccess(hotel);
+    public static void getHotels(Context context, DataCallback<List<Hotel>> callback) {
+        RetrofitClient.getInstance(context)
+                .getHotelApi()
+                .getHotels()
+                .enqueue(new Callback<ApiResponse<List<Hotel>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Hotel>>> call, Response<ApiResponse<List<Hotel>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Hotel>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
                         } else {
-                            callback.onError(ApiErrorCode.NOT_FOUND, body);
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
                         }
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN,e.getMessage());
                     }
-                } else {
-                    callback.onError(mapHttp(response.code()), body);
-                }
-            }
-        });
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Hotel>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
     }
 
 
-    public static void searchHotels(String keyword, DataCallback<List<Hotel>> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/hotels"
-                + "?name=ilike.*" + keyword + "*"
-                + "&select=*,hotel_images(*)"
-                + "&order=rating.desc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        List<Hotel> hotels = Hotel.fromJsonArray(array);
-                        callback.onSuccess(hotels);
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
+    public static void getHotelDetail(Context context, String hotelId, DataCallback<Hotel> callback) {
+        RetrofitClient.getInstance(context)
+                .getHotelApi()
+                .getHotelById(hotelId)
+                .enqueue(new Callback<ApiResponse<Hotel>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Hotel>> call, Response<ApiResponse<Hotel>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Hotel> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
                     }
-                } else {
-                    callback.onError(mapHttp(response.code()), body);
-                }
-            }
-        });
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Hotel>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+
+    /**
+     * Search hotels by keyword
+     * API: GET /api/hotels/search?q={keyword}
+     */
+    public static void searchHotels(Context context, String keyword, DataCallback<List<Hotel>> callback) {
+        RetrofitClient.getInstance(context)
+                .getHotelApi()
+                .searchHotels(keyword, null, null, null, null, "rating", "desc")
+                .enqueue(new Callback<ApiResponse<List<Hotel>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Hotel>>> call, Response<ApiResponse<List<Hotel>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Hotel>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Hotel>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Search hotels with advanced filters
+     * API: GET /api/hotels/search with multiple query parameters
+     */
+    public static void searchHotelsAdvanced(Context context, String query, String city,
+                                           Double minPrice, Double maxPrice, Double minRating,
+                                           String sortBy, String order, DataCallback<List<Hotel>> callback) {
+        RetrofitClient.getInstance(context)
+                .getHotelApi()
+                .searchHotels(query, city, minPrice, maxPrice, minRating, sortBy, order)
+                .enqueue(new Callback<ApiResponse<List<Hotel>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Hotel>>> call, Response<ApiResponse<List<Hotel>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Hotel>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Hotel>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
     }
 }
