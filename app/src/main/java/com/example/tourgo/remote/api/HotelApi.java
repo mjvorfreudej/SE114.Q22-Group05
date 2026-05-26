@@ -17,16 +17,6 @@ public interface HotelApi {
     @GET("api/hotels/{id}")
     Call<ApiResponse<Hotel>> getHotelById(@Path("id") String id);
 
-    /**
-     * Search/filter hotels with multiple criteria
-     * @param query Search keyword for hotel name (optional)
-     * @param city Filter by city (optional)
-     * @param minPrice Minimum price per night filter (optional)
-     * @param maxPrice Maximum price per night filter (optional)
-     * @param minRating Minimum rating filter (optional)
-     * @param sortBy Sort field: price_per_night, rating, name (optional)
-     * @param order Sort order: asc, desc (optional)
-     */
     @GET("api/hotels/search")
     Call<ApiResponse<List<Hotel>>> searchHotels(
             @Query("q") String query,

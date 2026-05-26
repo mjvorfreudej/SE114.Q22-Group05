@@ -1,23 +1,16 @@
-package com.example.tourgo.remote;
-
-import static com.example.tourgo.remote.SupabaseConfig.mapHttp;
+package com.example.tourgo.remote.service;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.remote.RetrofitClient;
 
-import org.json.JSONArray;
-
-import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

@@ -24,8 +24,8 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.data.local.SessionManager;
-import com.example.tourgo.remote.HotelService;
-import com.example.tourgo.remote.TourService;
+import com.example.tourgo.remote.service.HotelService;
+import com.example.tourgo.remote.service.TourService;
 
 import java.util.ArrayList;
 import java.util.List;

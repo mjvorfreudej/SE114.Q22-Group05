@@ -18,7 +18,7 @@ import com.example.tourgo.databinding.ActivitySearchBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Tour;
-import com.example.tourgo.remote.TourService;
+import com.example.tourgo.remote.service.TourService;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,5 @@
 package com.example.tourgo.data.repository;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,7 +9,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.HotelService;
+import com.example.tourgo.remote.service.HotelService;
 
 import java.util.HashSet;
 import java.util.List;

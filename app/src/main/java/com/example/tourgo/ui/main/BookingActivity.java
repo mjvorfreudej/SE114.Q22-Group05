@@ -17,7 +17,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Booking;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
-import com.example.tourgo.remote.BookingService;
+import com.example.tourgo.remote.service.BookingService;
 import com.example.tourgo.data.local.SessionManager;
 
 import java.text.SimpleDateFormat;
@@ -106,10 +106,9 @@ public class BookingActivity extends AppCompatActivity {
         String checkOut = formatDate(checkOutMillis);
 
         Booking booking = new Booking(userId, tourId, hotelId);
-        booking.setStatus("PENDING");
 
         showLoading(true);
-        BookingService.createBooking(booking, accessToken, new DataCallback<Booking>() {
+        BookingService.createBooking(this, booking, new DataCallback<Booking>() {
             @Override
             public void onSuccess(Booking created) {
                 runOnUiThread(() -> {

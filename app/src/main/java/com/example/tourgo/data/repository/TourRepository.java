@@ -9,7 +9,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.TourService;
+import com.example.tourgo.remote.service.TourService;
 
 import java.util.HashSet;
 import java.util.List;

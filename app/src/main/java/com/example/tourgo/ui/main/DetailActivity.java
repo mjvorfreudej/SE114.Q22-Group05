@@ -33,10 +33,10 @@ import com.example.tourgo.models.response.Comment;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.HotelService;
+import com.example.tourgo.remote.service.HotelService;
 import com.example.tourgo.remote.HotelReviewService;
 import com.example.tourgo.data.local.SessionManager;
-import com.example.tourgo.remote.BookingService;
+import com.example.tourgo.remote.service.BookingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -418,9 +418,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         BookingService.hasBookedHotel(
-                session.getUserId(),
+                this,
                 hotel.getId(),
-                session.getAccessToken(),
                 new DataCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean hasBooked) {
