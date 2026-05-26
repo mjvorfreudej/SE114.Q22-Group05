@@ -1,187 +1,155 @@
 package com.example.tourgo.remote;
 
+import android.content.Context;
+
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Tour;
 
-import org.json.JSONArray;
-
-import java.io.IOException;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+/**
+ * TourService - Migrated to use Retrofit with Custom API
+ * Replaces direct Supabase PostgREST calls with REST API endpoints
+ */
 public class TourService {
 
-
-    public static void getTours(DataCallback<List<Tour>> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/tours"
-                + "?status=eq.APPROVED"
-                + "&select=*,tour_images(*)"
-                + "&order=created_at.desc"
-                + "&tour_images.order=display_order.asc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        List<Tour> tours = Tour.fromJsonArray(array);
-                        callback.onSuccess(tours);
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
-                    }
-                } else {
-                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
-                }
-            }
-        });
-    }
-
-
-    public static void getToursByRegion(String region, DataCallback<List<Tour>> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/tours"
-                + "?status=eq.APPROVED"
-                + "&region=eq." + region
-                + "&select=*,tour_images(*)"
-                + "&order=rating.desc"
-                + "&tour_images.order=display_order.asc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        List<Tour> tours = Tour.fromJsonArray(array);
-                        callback.onSuccess(tours);
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
-                    }
-                } else {
-                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
-                }
-            }
-        });
-    }
-
-
-    public static void getTourDetail(String tourId, DataCallback<Tour> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/tours"
-                + "?id=eq." + tourId
-                + "&select=*,tour_images(*)"
-                + "&tour_images.order=display_order.asc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        if (array.length() > 0) {
-                            Tour tour = Tour.fromJson(array.getJSONObject(0));
-                            callback.onSuccess(tour);
+    /**
+     * Get all approved tours with images
+     * API: GET /api/tours
+     */
+    public static void getTours(Context context, DataCallback<List<Tour>> callback) {
+        RetrofitClient.getInstance(context)
+                .getTourApi()
+                .getTours()
+                .enqueue(new Callback<ApiResponse<List<Tour>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Tour>>> call, Response<ApiResponse<List<Tour>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Tour>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
                         } else {
-                            callback.onError(ApiErrorCode.NOT_FOUND, body);
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
                         }
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
                     }
-                } else {
-                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
-                }
-            }
-        });
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Tour>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
     }
 
-
-    public static void searchTours(String keyword, DataCallback<List<Tour>> callback) {
-        String url = SupabaseConfig.SUPABASE_URL
-                + "/rest/v1/tours"
-                + "?status=eq.APPROVED"
-                + "&name=ilike.*" + keyword + "*"
-                + "&select=*,tour_images(*)"
-                + "&order=rating.desc"
-                + "&tour_images.order=display_order.asc";
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-
-        SupabaseConfig.client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError(ApiErrorCode.NETWORK, e.getMessage());
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    try {
-                        JSONArray array = new JSONArray(body);
-                        List<Tour> tours = Tour.fromJsonArray(array);
-                        callback.onSuccess(tours);
-                    } catch (Exception e) {
-                        callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
+    /**
+     * Get tours filtered by region
+     * API: GET /api/tours/search?region={region}
+     */
+    public static void getToursByRegion(Context context, String region, DataCallback<List<Tour>> callback) {
+        RetrofitClient.getInstance(context)
+                .getTourApi()
+                .searchTours(null, region, null, null, null, "rating", "desc")
+                .enqueue(new Callback<ApiResponse<List<Tour>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Tour>>> call, Response<ApiResponse<List<Tour>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Tour>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
                     }
-                } else {
-                    callback.onError(ApiErrorCode.SERVER_ERROR, body);
-                }
-            }
-        });
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Tour>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Get tour details by ID
+     * API: GET /api/tours/{id}
+     */
+    public static void getTourDetail(Context context, String tourId, DataCallback<Tour> callback) {
+        RetrofitClient.getInstance(context)
+                .getTourApi()
+                .getTourById(tourId)
+                .enqueue(new Callback<ApiResponse<Tour>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Tour>> call, Response<ApiResponse<Tour>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Tour> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Tour>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    /**
+     * Search tours by keyword
+     * API: GET /api/tours/search?q={keyword}
+     */
+    public static void searchTours(Context context, String keyword, DataCallback<List<Tour>> callback) {
+        RetrofitClient.getInstance(context)
+                .getTourApi()
+                .searchTours(keyword, null, null, null, null, "rating", "desc")
+                .enqueue(new Callback<ApiResponse<List<Tour>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<Tour>>> call, Response<ApiResponse<List<Tour>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<Tour>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<Tour>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
     }
 }

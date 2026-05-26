@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.TourAdapter;
-import com.example.tourgo.data.TourRepository;
+import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Tour;
@@ -55,7 +55,7 @@ public class TourListFragment extends Fragment {
         String userId = session.getUserId();
         String token = session.getAccessToken();
 
-        TourRepository.getInstance().loadTours(userId, token, new DataCallback<List<Tour>>() {
+        TourRepository.getInstance().loadTours(requireContext(), userId, token, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 if (getActivity() == null) return;

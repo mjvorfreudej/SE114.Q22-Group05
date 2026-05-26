@@ -1,5 +1,6 @@
-package com.example.tourgo.data;
+package com.example.tourgo.data.repository;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -30,8 +31,8 @@ public class TourRepository {
         return cachedTours;
     }
 
-    public void loadTours(String userId, String token, DataCallback<List<Tour>> callback) {
-        TourService.getTours(new DataCallback<List<Tour>>() {
+    public void loadTours(Context context, String userId, String token, DataCallback<List<Tour>> callback) {
+        TourService.getTours(context, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> tours) {
                 cachedTours = tours;

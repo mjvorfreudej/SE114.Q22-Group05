@@ -122,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
         };
         handler.postDelayed(timeoutRunnable, SEARCH_TIMEOUT_MS);
 
-        TourService.searchTours(query, new DataCallback<List<Tour>>() {
+        TourService.searchTours(this, query, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 runOnUiThread(() -> {

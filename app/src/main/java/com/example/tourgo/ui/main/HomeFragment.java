@@ -17,7 +17,7 @@ import com.example.tourgo.adapters.PopularHotelAdapter;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.adapters.TrendingHotelAdapter;
 import com.example.tourgo.data.HotelRepository;
-import com.example.tourgo.data.TourRepository;
+import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.databinding.FragmentHomeBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -168,7 +168,7 @@ public class HomeFragment extends Fragment {
         String userId = session.getUserId();
         String token = session.getAccessToken();
         
-        TourRepository.getInstance().loadTours(userId, token, new DataCallback<List<Tour>>() {
+        TourRepository.getInstance().loadTours(requireContext(), userId, token, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 if (binding == null || getActivity() == null) return;
