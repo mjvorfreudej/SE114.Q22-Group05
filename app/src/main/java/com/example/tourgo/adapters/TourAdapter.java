@@ -13,11 +13,11 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
+import com.example.tourgo.data.repository.FavoriteRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Tour;
-import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
 
@@ -111,7 +111,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
 
             if (newState) {
                 Favorite favorite = new Favorite(userId, item.getId(), null);
-                FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
+                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
                         holder.btnFavorite.post(() -> {
@@ -122,16 +122,19 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
                     }
                 });
             } else {
-                FavoriteService.removeFavoriteTour(userId, item.getId(), token, new DataCallback<Void>() {
-                    @Override public void onSuccess(Void data) {}
-                    @Override public void onError(ApiErrorCode code, String msg) {
-                        holder.btnFavorite.post(() -> {
-                            item.setFavorite(true);
-                            updateHeartIcon(holder.btnFavorite, true);
-                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                });
+                String favoriteId = FavoriteRepository.getInstance().findFavoriteIdByTourId(item.getId());
+                if (favoriteId != null) {
+                    FavoriteRepository.getInstance().removeFavorite(v.getContext(), favoriteId, new DataCallback<Void>() {
+                        @Override public void onSuccess(Void data) {}
+                        @Override public void onError(ApiErrorCode code, String msg) {
+                            holder.btnFavorite.post(() -> {
+                                item.setFavorite(true);
+                                updateHeartIcon(holder.btnFavorite, true);
+                                Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                }
             }
         });
 

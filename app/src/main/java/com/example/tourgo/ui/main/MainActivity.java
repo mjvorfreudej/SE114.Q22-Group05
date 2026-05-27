@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (session.isLoggedIn()) {
-                    HotelRepository.getInstance().syncFavorites(session.getUserId(), session.getAccessToken());
+                    HotelRepository.getInstance().syncFavorites(MainActivity.this, session.getUserId(), session.getAccessToken());
                 }
             }
 

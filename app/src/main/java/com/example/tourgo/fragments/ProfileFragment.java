@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.MyBookingAdapter;
+import com.example.tourgo.data.repository.FavoriteRepository;
+import com.example.tourgo.data.repository.HotelRepository;
+import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -207,8 +210,11 @@ public class ProfileFragment extends Fragment {
             dialog.dismiss();
             session.clear();
 
-            // Clear UserRepository cache khi logout
+            // Clear all repository caches khi logout
             UserRepository.getInstance().clearCache();
+            FavoriteRepository.getInstance().clearCache();
+            HotelRepository.getInstance().clearCache();
+            TourRepository.getInstance().clearCache();
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

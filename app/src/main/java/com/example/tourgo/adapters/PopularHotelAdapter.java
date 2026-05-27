@@ -14,11 +14,11 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
+import com.example.tourgo.data.repository.FavoriteRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Hotel;
-import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.ui.main.DetailActivity;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
@@ -86,7 +86,7 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
 
             if (newState) {
                 Favorite favorite = new Favorite(userId, null, item.getId());
-                FavoriteService.addFavorite(favorite, token, new DataCallback<Void>() {
+                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
                         holder.imgHeart.post(() -> {
@@ -97,16 +97,19 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
                     }
                 });
             } else {
-                FavoriteService.removeFavoriteHotel(userId, item.getId(), token, new DataCallback<Void>() {
-                    @Override public void onSuccess(Void data) {}
-                    @Override public void onError(ApiErrorCode code, String msg) {
-                        holder.imgHeart.post(() -> {
-                            item.setFavorite(true);
-                            updateHeartIcon(holder.imgHeart, true);
-                            Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                });
+                String favoriteId = FavoriteRepository.getInstance().findFavoriteIdByHotelId(item.getId());
+                if (favoriteId != null) {
+                    FavoriteRepository.getInstance().removeFavorite(v.getContext(), favoriteId, new DataCallback<Void>() {
+                        @Override public void onSuccess(Void data) {}
+                        @Override public void onError(ApiErrorCode code, String msg) {
+                            holder.imgHeart.post(() -> {
+                                item.setFavorite(true);
+                                updateHeartIcon(holder.imgHeart, true);
+                                Toast.makeText(v.getContext(), v.getContext().getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                }
             }
         });
 

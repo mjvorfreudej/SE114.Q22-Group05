@@ -8,7 +8,6 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Tour;
-import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.remote.service.TourService;
 
 import java.util.HashSet;
@@ -71,7 +70,7 @@ public class TourRepository {
             return;
         }
 
-        FavoriteService.getMyFavorites(userId, token, new DataCallback<List<Favorite>>() {
+        FavoriteRepository.getInstance().loadFavorites(null, false, new DataCallback<List<Favorite>>() {
             @Override
             public void onSuccess(List<Favorite> favorites) {
                 Set<String> favTourIds = new HashSet<>();
