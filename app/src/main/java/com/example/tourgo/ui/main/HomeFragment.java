@@ -18,11 +18,13 @@ import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.adapters.TrendingHotelAdapter;
 import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.data.repository.TourRepository;
+import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.databinding.FragmentHomeBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.models.response.User;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
 
@@ -99,8 +101,19 @@ public class HomeFragment extends Fragment {
 
     private void updateGreeting() {
         if (binding == null || session == null) return;
+
         if (session.isLoggedIn()) {
-            binding.tvGreeting.setText(getString(R.string.main_greeting, session.getShortName()));
+            // Lấy user từ UserRepository (cache)
+            User cachedUser = UserRepository.getInstance().getCachedUser();
+
+            if (cachedUser != null && cachedUser.getName() != null) {
+                // Dùng tên từ UserRepository nếu có
+                String firstName = cachedUser.getName().split(" ")[0];
+                binding.tvGreeting.setText(getString(R.string.main_greeting, firstName));
+            } else {
+                // Fallback về SessionManager nếu chưa có cache
+                binding.tvGreeting.setText(getString(R.string.main_greeting, session.getShortName()));
+            }
         } else {
             binding.tvGreeting.setText(R.string.main_greeting_default);
         }

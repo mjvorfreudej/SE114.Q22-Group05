@@ -14,11 +14,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
+import com.example.tourgo.data.repository.UserRepository;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
 import com.example.tourgo.models.request.LoginRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
+import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.data.local.SessionManager;
@@ -127,12 +131,29 @@ public class LoginActivity extends AppCompatActivity {
 
                                         session.setRememberMe(binding.cbLoginRemember.isChecked());
 
-                                        Toast.makeText(LoginActivity.this,
-                                                getString(R.string.msg_login_success),
-                                                Toast.LENGTH_SHORT).show();
+                                        // Gọi UserService để lấy thông tin đầy đủ và cache vào UserRepository
+                                        UserRepository.getInstance().getCurrentUser(LoginActivity.this, true, new DataCallback<User>() {
+                                            @Override
+                                            public void onSuccess(User user) {
+                                                Toast.makeText(LoginActivity.this,
+                                                        getString(R.string.msg_login_success),
+                                                        Toast.LENGTH_SHORT).show();
 
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                        finish();
+                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                finish();
+                                            }
+
+                                            @Override
+                                            public void onError(ApiErrorCode code, String message) {
+                                                // Nếu lỗi khi lấy user info, vẫn cho login nhưng không có cache
+                                                Toast.makeText(LoginActivity.this,
+                                                        getString(R.string.msg_login_success),
+                                                        Toast.LENGTH_SHORT).show();
+
+                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                                finish();
+                                            }
+                                        });
 
                                     } else {
                                         ApiError error = ErrorHandler.parseError(response);

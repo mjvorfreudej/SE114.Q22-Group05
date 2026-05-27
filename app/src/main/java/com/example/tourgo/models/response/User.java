@@ -1,15 +1,31 @@
 package com.example.tourgo.models.response;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+    @SerializedName("id")
     private String id;
+
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("phone")
     private String phone;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("avatar")
     private String avatar;
-    private String role; // "USER" or "ADMIN"
+
+    @SerializedName("role")
+    private String role;
+
+    @SerializedName("create_at")
+    private String createdAt;
 
     public String getId() {
         return id;
@@ -33,5 +49,9 @@ public class User {
 
     public String getRole() {
         return role;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
     }
 }
