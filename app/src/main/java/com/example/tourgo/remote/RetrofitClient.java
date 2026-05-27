@@ -37,11 +37,26 @@ public class RetrofitClient {
                 BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE
         );
 
+        OkHttpClient refreshClient = new OkHttpClient.Builder()
+                .connectTimeout(90, TimeUnit.SECONDS)
+                .readTimeout(90, TimeUnit.SECONDS)
+                .writeTimeout(90, TimeUnit.SECONDS)
+                .addInterceptor(loggingInterceptor)
+                .build();
+
+        Retrofit refreshRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(refreshClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        AuthApi authApiForRefresh = refreshRetrofit.create(AuthApi.class);
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(90, TimeUnit.SECONDS)
                 .readTimeout(90, TimeUnit.SECONDS)
                 .writeTimeout(90, TimeUnit.SECONDS)
-                .addInterceptor(new AuthInterceptor(sessionManager))
+                .addInterceptor(new AuthInterceptor(sessionManager, authApiForRefresh))
                 .addInterceptor(loggingInterceptor)
                 .build();
 
