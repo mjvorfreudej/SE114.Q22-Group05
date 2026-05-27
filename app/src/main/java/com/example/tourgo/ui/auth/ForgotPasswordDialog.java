@@ -30,8 +30,6 @@ import com.example.tourgo.models.request.ResetPasswordRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
 import com.example.tourgo.remote.RetrofitClient;
-import com.example.tourgo.remote.SupabaseClient;
-import com.example.tourgo.utils.ApiErrorMapper;
 import com.google.android.material.textfield.TextInputLayout;
 
 import retrofit2.Call;
@@ -139,33 +137,6 @@ public class ForgotPasswordDialog extends DialogFragment {
                         });
                     }
                 });
-
-
-        SupabaseClient.resetPassword(email, new ApiCallback() {
-            @Override
-            public void onSuccess(String responseData) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    showSuccess();
-                });
-            }
-
-            @Override
-            public void onError(ApiErrorCode code, String raw) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    if (code == ApiErrorCode.NETWORK) {
-                        Toast.makeText(requireContext(),
-                                R.string.err_network, Toast.LENGTH_SHORT).show();
-                    } else {
-                        tilEmail.setError(
-                                ApiErrorMapper.messageOf(requireContext(), code));
-                    }
-                });
-            }
-        });
     }
 
     private void setLoading(boolean loading) {

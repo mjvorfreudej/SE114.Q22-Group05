@@ -22,12 +22,7 @@ import com.example.tourgo.models.request.RegisterRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
 import com.example.tourgo.remote.RetrofitClient;
-import com.example.tourgo.remote.SupabaseClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
-import com.example.tourgo.utils.ApiErrorMapper;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -4,6 +4,7 @@ import com.example.tourgo.models.request.LoginRequest;
 import com.example.tourgo.models.request.RefreshTokenRequest;
 import com.example.tourgo.models.request.RegisterRequest;
 import com.example.tourgo.models.request.ResetPasswordRequest;
+import com.example.tourgo.models.request.UpdatePasswordRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
 
@@ -23,6 +24,9 @@ public interface AuthApi {
 
     @POST("api/auth/refresh-token")
     Call<ApiResponse<AuthData>> refreshToken(@Body RefreshTokenRequest request);
+
+    @POST("api/auth/update-password")
+    Call<ApiResponse<Void>> updatePassword(@Body UpdatePasswordRequest request);
 
     @POST("api/auth/logout")
     Call<ApiResponse<Void>> logout();

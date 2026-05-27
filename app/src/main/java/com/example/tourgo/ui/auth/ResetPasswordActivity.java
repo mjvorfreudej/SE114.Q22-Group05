@@ -15,11 +15,16 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
-import com.example.tourgo.interfaces.ApiErrorCode;
-import com.example.tourgo.remote.SupabaseClient;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.UpdatePasswordRequest;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.databinding.ActivityResetPasswordBinding;
-import com.example.tourgo.interfaces.ApiCallback;
-import com.example.tourgo.utils.ApiErrorMapper;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
@@ -108,41 +113,39 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
     private void submitNewPassword(String newPassword) {
         setLoading(true);
+        RetrofitClient.getInstance(this)
+                .getAuthApi()
+                .updatePassword(new UpdatePasswordRequest(newPassword))
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<?> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
+                                runOnUiThread(() -> {
+                                    setLoading(false);
+                                    Toast.makeText(ResetPasswordActivity.this, R.string.msg_reset_success, Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                    finish();
+                                });
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                ErrorHandler.showError(ResetPasswordActivity.this, error);
+                            }
+                        }
+                    }
 
-        SupabaseClient.updatePassword(accessToken, newPassword, new ApiCallback() {
-            @Override
-            public void onSuccess(String responseData) {
-                runOnUiThread(() -> {
-                    setLoading(false);
-                    Toast.makeText(ResetPasswordActivity.this, R.string.msg_reset_success, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(ResetPasswordActivity.this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                });
-            }
-
-            @Override
-            public void onError(ApiErrorCode code, String raw) {
-                runOnUiThread(() -> {
-                    setLoading(false);
-                    switch (code) {
-                        case NETWORK:
-                            Toast.makeText(ResetPasswordActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
-                            break;
-                        case PASSWORD_SAME_AS_OLD:
-                            binding.tilResetPassword.setError(getString(R.string.err_password_same_as_old));
-                            binding.etResetPassword.requestFocus();
-                            break;
-                        case INVALID_TOKEN:
-                            Toast.makeText(ResetPasswordActivity.this, R.string.err_invalid_token, Toast.LENGTH_LONG).show();
-                            break;
-                        default:
-                            Toast.makeText(ResetPasswordActivity.this, ApiErrorMapper.messageOf(ResetPasswordActivity.this, code), Toast.LENGTH_LONG).show();
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        runOnUiThread(() -> {
+                            setLoading(false);
+                            ApiError error = ErrorHandler.parseError(t);
+                            ErrorHandler.showError(ResetPasswordActivity.this, error);
+                        });
                     }
                 });
-            }
-        });
     }
 
     private void setLoading(boolean loading) {

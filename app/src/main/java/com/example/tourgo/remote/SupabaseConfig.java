@@ -29,73 +29,9 @@ public class SupabaseConfig {
             .authenticator(new TokenAuthenticator())
             .build();
 
-    public static void executeRequest(Request request, ApiCallback callback) {
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                callback.onError("Lỗi kết nối: " + e.getMessage());
-            }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String resBody = response.body() != null ? response.body().string() : "";
-                if (response.isSuccessful()) {
-                    callback.onSuccess(resBody);
-                } else {
-                    callback.onError(resBody);
-                }
-            }
-        });
-    }
 
-    public static void handleHttpError(int httpCode, String resBody, ApiCallback cb) {
-        if (httpCode == 401) {
-            cb.onError(ApiErrorCode.UNAUTHORIZED, resBody);
-            return;
-        }
-        if (httpCode == 403) {
-            cb.onError(ApiErrorCode.FORBIDDEN, resBody);
-            return;
-        }
-        if (httpCode == 404) {
-            cb.onError(ApiErrorCode.NOT_FOUND, resBody);
-            return;
-        }
-        if (httpCode == 429) {
-            cb.onError(ApiErrorCode.RATE_LIMIT, resBody);
-            return;
-        }
-        if (httpCode >= 500) {
-            cb.onError(ApiErrorCode.SERVER_ERROR, resBody);
-            return;
-        }
-        cb.onError(ApiErrorCode.UNKNOWN, resBody);
-    }
 
-    public static Request buildGet(String url) {
-        return new Request.Builder()
-                .url(url)
-                .addHeader("apikey", SupabaseConfig.ANON_KEY)
-                .addHeader("Authorization", "Bearer " + SupabaseConfig.ANON_KEY)
-                .addHeader("Accept", "application/json")
-                .get()
-                .build();
-    }
-
-    public static ApiErrorCode mapHttp(int code) {
-        if (code == 401) return ApiErrorCode.UNAUTHORIZED;
-        if (code == 403) return ApiErrorCode.FORBIDDEN;
-        if (code == 404) return ApiErrorCode.NOT_FOUND;
-        if (code == 429) return ApiErrorCode.RATE_LIMIT;
-        if (code >= 500) return ApiErrorCode.SERVER_ERROR;
-        return ApiErrorCode.UNKNOWN;
-    }
-
-    /**
-     * Sniffs successful-looking responses for PostgREST's PGRST303 (JWT expired) marker
-     * and rewrites them to 401 so the {@link TokenAuthenticator} can take over.
-     * PostgREST normally pairs PGRST303 with 401 already, but this acts as a safety net.
-     */
     private static class Pgrst303Interceptor implements Interceptor {
         @Override
         public Response intercept(Chain chain) throws IOException {
@@ -120,11 +56,7 @@ public class SupabaseConfig {
         }
     }
 
-    /**
-     * Invoked by OkHttp on any 401. Tries to mint a new access token via
-     * {@link SupabaseClient#refreshToken(String)}, then re-sends the original request
-     * with the rotated Authorization header. Auth-domain calls and refresh-loops are skipped.
-     */
+
     private static class TokenAuthenticator implements Authenticator {
         @Nullable
         @Override
