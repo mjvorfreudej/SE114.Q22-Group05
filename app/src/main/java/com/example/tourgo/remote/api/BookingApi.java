@@ -2,6 +2,7 @@ package com.example.tourgo.remote.api;
 
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Booking;
+import com.example.tourgo.models.response.BookingCheckResponse;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface BookingApi {
     Call<ApiResponse<Booking>> getBookingById(@Path("bookingId") String bookingId);
 
     @GET("api/bookings/check")
-    Call<ApiResponse<Boolean>> hasBookedHotel(@Query("hotelId") String hotelId);
+    Call<ApiResponse<BookingCheckResponse>> hasBookedHotel(@Query("hotelId") String hotelId);
 
     @PATCH("api/bookings/{bookingId}/cancel")
     Call<ApiResponse<Void>> cancelBooking(@Path("bookingId") String bookingId);

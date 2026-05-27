@@ -7,6 +7,7 @@ import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Booking;
+import com.example.tourgo.models.response.BookingCheckResponse;
 import com.example.tourgo.remote.RetrofitClient;
 
 import java.util.List;
@@ -111,13 +112,13 @@ public class BookingService {
         RetrofitClient.getInstance(context)
                 .getBookingApi()
                 .hasBookedHotel(hotelId)
-                .enqueue(new Callback<ApiResponse<Boolean>>() {
+                .enqueue(new Callback<ApiResponse<BookingCheckResponse>>() {
                     @Override
-                    public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
+                    public void onResponse(Call<ApiResponse<BookingCheckResponse>> call, Response<ApiResponse<BookingCheckResponse>> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            ApiResponse<Boolean> apiResponse = response.body();
+                            ApiResponse<BookingCheckResponse> apiResponse = response.body();
                             if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
-                                callback.onSuccess(apiResponse.getData());
+                                callback.onSuccess(apiResponse.getData().getHasBooked());
                             } else {
                                 ApiError error = ErrorHandler.parseError(response);
                                 callback.onError(error.getCode(), error.getMessage());
@@ -129,7 +130,7 @@ public class BookingService {
                     }
 
                     @Override
-                    public void onFailure(Call<ApiResponse<Boolean>> call, Throwable t) {
+                    public void onFailure(Call<ApiResponse<BookingCheckResponse>> call, Throwable t) {
                         ApiError error = ErrorHandler.parseError(t);
                         callback.onError(error.getCode(), error.getMessage());
                     }

@@ -13,7 +13,7 @@ public class HotelItem implements Serializable {
     private boolean favorite;
     private String location;
     private String description;
-    private List<Comment> comments;
+    private List<Review> reviews;
 
     public HotelItem(int imageResId, String name, String price, double rating, boolean favorite) {
         this(imageResId, name, price, rating, favorite, "", "");
@@ -29,7 +29,7 @@ public class HotelItem implements Serializable {
         this.description = description;
         this.galleryImages = new ArrayList<>();
         this.galleryImages.add(imageResId);
-        this.comments = new ArrayList<>();
+        this.reviews = new ArrayList<>();
     }
 
     public int getImageResId() {
@@ -80,11 +80,11 @@ public class HotelItem implements Serializable {
         this.description = description;
     }
 
-    public List<Comment> getComments() {
-        return comments;
+    public List<Review> getComments() {
+        return reviews;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    public void setComments(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

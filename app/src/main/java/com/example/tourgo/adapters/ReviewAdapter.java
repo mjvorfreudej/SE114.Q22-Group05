@@ -14,43 +14,43 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
-import com.example.tourgo.models.response.Comment;
+import com.example.tourgo.models.response.Review;
 import com.example.tourgo.utils.ImageLoader;
 
 import java.util.Locale;
 
-public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentViewHolder> {
+public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentViewHolder> {
 
     public interface ReviewActionListener {
-        void onEdit(Comment comment);
-        void onDelete(Comment comment);
+        void onEdit(Review review);
+        void onDelete(Review review);
     }
 
     private String currentUserId;
     private ReviewActionListener listener;
 
-    public CommentAdapter(String currentUserId, ReviewActionListener listener) {
+    public ReviewAdapter(String currentUserId, ReviewActionListener listener) {
         super(DIFF_CALLBACK);
         this.currentUserId = currentUserId;
         this.listener = listener;
     }
 
-    private static final DiffUtil.ItemCallback<Comment> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<Comment>() {
+    private static final DiffUtil.ItemCallback<Review> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<Review>() {
                 @Override
-                public boolean areItemsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
+                public boolean areItemsTheSame(@NonNull Review oldItem, @NonNull Review newItem) {
                     return oldItem.getId().equals(newItem.getId());
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull Comment oldItem, @NonNull Comment newItem) {
+                public boolean areContentsTheSame(@NonNull Review oldItem, @NonNull Review newItem) {
                     return oldItem.getContent().equals(newItem.getContent())
                             && oldItem.getRating() == newItem.getRating()
                             && oldItem.getImageUrls().equals(newItem.getImageUrls());
                 }
             };
 
-    public CommentAdapter() {
+    public ReviewAdapter() {
         super(DIFF_CALLBACK);
     }
 
@@ -63,17 +63,17 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
-        Comment comment = getItem(position);
-        holder.tvUserName.setText(comment.getUserName());
-        holder.tvCommentDate.setText(comment.getDate());
-        holder.tvCommentContent.setText(comment.getContent());
+        Review review = getItem(position);
+        holder.tvUserName.setText(review.getUserName());
+        holder.tvCommentDate.setText(review.getDate());
+        holder.tvCommentContent.setText(review.getContent());
         // Sử dụng Locale mặc định để đồng bộ với định dạng hệ thống
-        holder.tvUserRating.setText(String.format(Locale.getDefault(), "★ %.1f", comment.getRating()));
+        holder.tvUserRating.setText(String.format(Locale.getDefault(), "★ %.1f", review.getRating()));
         
         holder.layoutCommentImages.removeAllViews();
-        if (comment.hasImages()) {
+        if (review.hasImages()) {
             holder.scrollCommentImages.setVisibility(View.VISIBLE);
-            for (String imageUrl : comment.getImageUrls()) {
+            for (String imageUrl : review.getImageUrls()) {
                 ImageView iv = new ImageView(holder.itemView.getContext());
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(160, 160);
                 params.setMargins(0, 0, 12, 0);
@@ -88,7 +88,7 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
             holder.scrollCommentImages.setVisibility(View.GONE);
         }
 
-        boolean isOwner = currentUserId != null && currentUserId.equals(comment.getUserId());
+        boolean isOwner = currentUserId != null && currentUserId.equals(review.getUserId());
 
         holder.btnReviewMenu.setVisibility(isOwner ? View.VISIBLE : View.GONE);
 
@@ -101,7 +101,7 @@ public class CommentAdapter extends ListAdapter<Comment, CommentAdapter.CommentV
 
                 if (id == R.id.action_delete_review) {
                     if (listener != null) {
-                        listener.onDelete(comment);
+                        listener.onDelete(review);
                     }
                     return true;
                 }

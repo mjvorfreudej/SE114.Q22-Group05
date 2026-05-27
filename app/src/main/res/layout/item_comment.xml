@@ -93,7 +93,7 @@
             android:textColor="@color/dark_gray"
             android:textSize="14sp" />
 
-        <!-- Placeholder for comment images if any -->
+        <!-- Placeholder for review images if any -->
         <HorizontalScrollView
             android:id="@+id/scrollCommentImages"
             android:layout_width="match_parent"

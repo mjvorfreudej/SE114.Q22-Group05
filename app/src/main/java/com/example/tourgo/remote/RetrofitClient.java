@@ -6,7 +6,7 @@ import com.example.tourgo.BuildConfig;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.api.AuthApi;
 import com.example.tourgo.remote.api.BookingApi;
-import com.example.tourgo.remote.api.CommentApi;
+import com.example.tourgo.remote.api.ReviewApi;
 import com.example.tourgo.remote.api.FavoriteApi;
 import com.example.tourgo.remote.api.HotelApi;
 import com.example.tourgo.remote.api.TourApi;
@@ -79,13 +79,11 @@ public class RetrofitClient {
         return retrofit.create(FavoriteApi.class);
     }
 
-    public CommentApi getCommentApi() {
-        return retrofit.create(CommentApi.class);
+    public ReviewApi getReviewApi() {
+        return retrofit.create(ReviewApi.class);
     }
 
     public UserApi getUserApi() {
         return retrofit.create(UserApi.class);
     }
-
-
 }
