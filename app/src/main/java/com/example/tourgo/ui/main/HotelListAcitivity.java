@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.HotelListAdapter;
-import com.example.tourgo.data.HotelRepository;
+import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Hotel;
+import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.utils.ImageLoader;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class HotelListAcitivity extends AppCompatActivity {
         String userId = session.getUserId();
         String token = session.getAccessToken();
 
-        HotelRepository.getInstance().loadHotels(userId, token, new DataCallback<List<Hotel>>() {
+        HotelRepository.getInstance().loadHotels(this, userId, token, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 runOnUiThread(() -> {

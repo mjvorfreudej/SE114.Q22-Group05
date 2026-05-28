@@ -1,4 +1,4 @@
-package com.example.tourgo.models;
+package com.example.tourgo.models.response;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Comment implements Serializable {
+public class Review implements Serializable {
     private String userName;
     private String userAvatar;
     private String content;
@@ -19,11 +19,11 @@ public class Comment implements Serializable {
     private String userId;
     private List<String> imageUrls;
 
-    public Comment(String userName, String userAvatar, String content, float rating, String date) {
+    public Review(String userName, String userAvatar, String content, float rating, String date) {
         this(userName, userAvatar, content, rating, date, new ArrayList<>());
     }
 
-    public Comment(String userName, String userAvatar, String content, float rating, String date, List<String> imageUrls) {
+    public Review(String userName, String userAvatar, String content, float rating, String date, List<String> imageUrls) {
         this.userName = userName;
         this.userAvatar = userAvatar;
         this.content = content;
@@ -32,7 +32,7 @@ public class Comment implements Serializable {
         this.imageUrls = imageUrls;
     }
 
-    public static Comment fromHotelReviewJson(JSONObject json) {
+    public static Review fromHotelReviewJson(JSONObject json) {
         JSONObject user = json.optJSONObject("users");
 
         String userName = "User";
@@ -43,7 +43,7 @@ public class Comment implements Serializable {
             avatarUrl = user.optString("avatar", "");
         }
 
-        Comment comment = new Comment(
+        Review review = new Review(
                 userName,
                 avatarUrl,
                 json.optString("review_text", ""),
@@ -52,12 +52,12 @@ public class Comment implements Serializable {
                 new ArrayList<>()
         );
 
-        comment.id = json.optString("id", "");
-        comment.hotelId = json.optString("hotel_id", "");
-        comment.userId = json.optString("user_id", "");
-        comment.imageUrls = parseImageUrls(json.optJSONArray("hotel_review_images"));
+        review.id = json.optString("id", "");
+        review.hotelId = json.optString("hotel_id", "");
+        review.userId = json.optString("user_id", "");
+        review.imageUrls = parseImageUrls(json.optJSONArray("hotel_review_images"));
 
-        return comment;
+        return review;
     }
 
     private static List<String> parseImageUrls(JSONArray array) {
@@ -75,19 +75,19 @@ public class Comment implements Serializable {
         return urls;
     }
 
-    public static List<Comment> fromHotelReviewJsonArray(JSONArray array) {
-        List<Comment> comments = new ArrayList<>();
+    public static List<Review> fromHotelReviewJsonArray(JSONArray array) {
+        List<Review> reviews = new ArrayList<>();
 
-        if (array == null) return comments;
+        if (array == null) return reviews;
 
         for (int i = 0; i < array.length(); i++) {
             JSONObject obj = array.optJSONObject(i);
             if (obj != null) {
-                comments.add(fromHotelReviewJson(obj));
+                reviews.add(fromHotelReviewJson(obj));
             }
         }
 
-        return comments;
+        return reviews;
     }
 
     public String getUserName() {
@@ -132,5 +132,17 @@ public class Comment implements Serializable {
 
     public String getUserId() {
         return userId;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public void setHotelId(String hotelId) {
+        this.hotelId = hotelId;
     }
 }

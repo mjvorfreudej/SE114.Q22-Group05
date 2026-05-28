@@ -19,13 +19,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tourgo.R;
-import com.example.tourgo.data.HotelRepository;
+import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.fragments.HotelListFragment;
 import com.example.tourgo.fragments.ProfileFragment;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.data.local.SessionManager;
 
 import java.util.List;
 
@@ -75,11 +75,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        HotelRepository.getInstance().loadHotels(new DataCallback<List<Hotel>>() {
+        HotelRepository.getInstance().loadHotels(this, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (session.isLoggedIn()) {
-                    HotelRepository.getInstance().syncFavorites(session.getUserId(), session.getAccessToken());
+                    HotelRepository.getInstance().syncFavorites(MainActivity.this, session.getUserId(), session.getAccessToken());
                 }
             }
 

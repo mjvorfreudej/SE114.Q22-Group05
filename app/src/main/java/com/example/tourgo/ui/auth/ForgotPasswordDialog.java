@@ -24,9 +24,17 @@ import androidx.fragment.app.DialogFragment;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.ApiCallback;
-import com.example.tourgo.remote.SupabaseClient;
-import com.example.tourgo.utils.ApiErrorMapper;
+import com.example.tourgo.models.error.ApiError;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.ResetPasswordRequest;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuthData;
+import com.example.tourgo.remote.RetrofitClient;
 import com.google.android.material.textfield.TextInputLayout;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ForgotPasswordDialog extends DialogFragment {
 
@@ -96,31 +104,39 @@ public class ForgotPasswordDialog extends DialogFragment {
 
     private void sendRecoveryEmail(String email) {
         setLoading(true);
-        SupabaseClient.resetPassword(email, new ApiCallback() {
-            @Override
-            public void onSuccess(String responseData) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    showSuccess();
-                });
-            }
+        ResetPasswordRequest request = new ResetPasswordRequest(email);
+        RetrofitClient.getInstance(requireContext())
+                .getAuthApi()
+                .resetPasswrod(request)
+                .enqueue(new Callback<ApiResponse<AuthData>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<AuthData>> call, Response<ApiResponse<AuthData>> response) {
+                        requireActivity().runOnUiThread(() -> {
+                            setLoading(false);
+                            if (response.isSuccessful() && response.body() != null){
+                                ApiResponse<?> apiResponse = response.body();
+                                if (apiResponse.getSuccess() != null && apiResponse.getSuccess()){
+                                    showSuccess();
+                                } else {
+                                    ApiError error = ErrorHandler.parseError(response);
+                                    ErrorHandler.showError(requireContext(), error, tilEmail);
+                                }
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                ErrorHandler.showError(requireContext(), error, tilEmail);
+                            }
+                        });
+                    }
 
-            @Override
-            public void onError(ApiErrorCode code, String raw) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    if (code == ApiErrorCode.NETWORK) {
-                        Toast.makeText(requireContext(),
-                                R.string.err_network, Toast.LENGTH_SHORT).show();
-                    } else {
-                        tilEmail.setError(
-                                ApiErrorMapper.messageOf(requireContext(), code));
+                    @Override
+                    public void onFailure(Call<ApiResponse<AuthData>> call, Throwable t) {
+                        requireActivity().runOnUiThread(() -> {
+                            setLoading(false);
+                            ApiError error = ErrorHandler.parseError(t);
+                            ErrorHandler.showError(requireContext(), error, tilEmail);
+                        });
                     }
                 });
-            }
-        });
     }
 
     private void setLoading(boolean loading) {

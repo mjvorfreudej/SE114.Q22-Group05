@@ -1,12 +1,18 @@
-package com.example.tourgo.models;
+package com.example.tourgo.models.response;
+
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
 
 public class Favorite {
     private String id;
+    @SerializedName("user_id")
     private String userId;
+    @SerializedName("tour_id")
     private String tourId;
+    @SerializedName("hotel_id")
     private String hotelId;
+    @SerializedName("created_at")
     private String createdAt;
 
     public Favorite() {}
@@ -16,29 +22,6 @@ public class Favorite {
         this.tourId = tourId;
         this.hotelId = hotelId;
     }
-
-    public static Favorite fromJson(JSONObject json) {
-        Favorite f = new Favorite();
-        f.id = json.optString("id", null);
-        f.userId = json.optString("user_id", null);
-        f.tourId = json.optString("tour_id", null);
-        f.hotelId = json.optString("hotel_id", null);
-        f.createdAt = json.optString("created_at", null);
-        return f;
-    }
-
-    public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("user_id", userId);
-            if (tourId != null) json.put("tour_id", tourId);
-            if (hotelId != null) json.put("hotel_id", hotelId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return json;
-    }
-
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

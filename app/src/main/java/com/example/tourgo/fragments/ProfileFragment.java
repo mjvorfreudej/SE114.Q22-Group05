@@ -24,9 +24,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.MyBookingAdapter;
+import com.example.tourgo.data.repository.FavoriteRepository;
+import com.example.tourgo.data.repository.HotelRepository;
+import com.example.tourgo.data.repository.TourRepository;
+import com.example.tourgo.data.repository.UserRepository;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.User;
+import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -58,10 +66,8 @@ public class ProfileFragment extends Fragment {
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         ivProfileAvatar = view.findViewById(R.id.ivProfileAvatar);
 
-        if (session.isLoggedIn()) {
-            if (tvProfileName != null) tvProfileName.setText(session.getShortName());
-            if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
-        }
+        // Load user profile from server
+        loadUserProfile();
 
         View btnBack = view.findViewById(R.id.btnProfileBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> {
@@ -70,6 +76,33 @@ public class ProfileFragment extends Fragment {
 
         setupBookings(view);
         setupSettings(view);
+    }
+
+    private void loadUserProfile() {
+        if (!session.isLoggedIn()) {
+            return;
+        }
+
+        // Dùng UserRepository để lấy user từ cache hoặc API
+        UserRepository.getInstance().getCurrentUser(requireContext(), false, new DataCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                if (user != null) {
+                    if (tvProfileName != null) tvProfileName.setText(user.getName());
+                    if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
+
+                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName());
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String message) {
+                if (tvProfileName != null) tvProfileName.setText(session.getShortName());
+                if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
+
+                Toast.makeText(requireContext(), "Failed to load profile: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void applyTopInset(View root) {
@@ -191,6 +224,13 @@ public class ProfileFragment extends Fragment {
         if (confirm != null) confirm.setOnClickListener(v -> {
             dialog.dismiss();
             session.clear();
+
+            // Clear all repository caches khi logout
+            UserRepository.getInstance().clearCache();
+            FavoriteRepository.getInstance().clearCache();
+            HotelRepository.getInstance().clearCache();
+            TourRepository.getInstance().clearCache();
+
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

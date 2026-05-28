@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,9 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.MyBookingAdapter;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.User;
+import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -40,10 +45,8 @@ public class ProfileActivity extends AppCompatActivity {
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
 
-        if (session.isLoggedIn()) {
-            if (tvProfileName != null) tvProfileName.setText(session.getShortName());
-            if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
-        }
+        // Load user profile from server
+        loadUserProfile();
 
         View btnBack = findViewById(R.id.btnProfileBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
@@ -52,6 +55,32 @@ public class ProfileActivity extends AppCompatActivity {
         setupLogout();
         setupLanguage();
         setupCurrency();
+    }
+
+    private void loadUserProfile() {
+        if (!session.isLoggedIn()) {
+            return;
+        }
+
+        UserService.getCurrentUser(this, new DataCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                if (user != null) {
+                    if (tvProfileName != null) tvProfileName.setText(user.getName());
+                    if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
+
+                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName());
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String message) {
+                if (tvProfileName != null) tvProfileName.setText(session.getShortName());
+                if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
+
+                Toast.makeText(ProfileActivity.this, "Failed to load profile: " + message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupBookings() {

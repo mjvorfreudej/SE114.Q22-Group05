@@ -1,14 +1,14 @@
-package com.example.tourgo.data;
+package com.example.tourgo.data.repository;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.HotelService;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.remote.service.HotelService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,17 +26,13 @@ public class HotelRepository {
         return instance;
     }
 
-    public List<Hotel> getCachedHotels() {
-        return cachedHotels;
-    }
-
     // Hàm load cũ để không làm hỏng code hiện tại
-    public void loadHotels(DataCallback<List<Hotel>> callback) {
+    public void loadHotels(Context context, DataCallback<List<Hotel>> callback) {
         if (cachedHotels != null) {
             callback.onSuccess(cachedHotels);
             return;
         }
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
+        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 cachedHotels = data;
@@ -49,13 +45,18 @@ public class HotelRepository {
         });
     }
 
-    public void loadHotels(String userId, String token, DataCallback<List<Hotel>> callback) {
-        HotelService.getHotels(new DataCallback<List<Hotel>>() {
+    public void loadHotels(Context context, String userId, String token, DataCallback<List<Hotel>> callback) {
+        if (cachedHotels != null) {
+            callback.onSuccess(cachedHotels);
+            return;
+        }
+
+        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> hotels) {
                 cachedHotels = hotels;
                 if (userId != null && token != null) {
-                    syncFavorites(userId, token, new DataCallback<Void>() {
+                    syncFavorites(context, userId, token, new DataCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
                             mainHandler.post(() -> callback.onSuccess(cachedHotels));
@@ -77,17 +78,17 @@ public class HotelRepository {
         });
     }
 
-    public void syncFavorites(String userId, String token) {
-        syncFavorites(userId, token, null);
+    public void syncFavorites(Context context, String userId, String token) {
+        syncFavorites(context, userId, token, null);
     }
 
-    public void syncFavorites(String userId, String token, DataCallback<Void> callback) {
+    public void syncFavorites(Context context, String userId, String token, DataCallback<Void> callback) {
         if (userId == null || token == null || cachedHotels == null) {
             if (callback != null) callback.onSuccess(null);
             return;
         }
 
-        FavoriteService.getMyFavorites(userId, token, new DataCallback<List<Favorite>>() {
+        FavoriteRepository.getInstance().loadFavorites(context, false, new DataCallback<List<Favorite>>() {
             @Override
             public void onSuccess(List<Favorite> favorites) {
                 Set<String> favHotelIds = new HashSet<>();

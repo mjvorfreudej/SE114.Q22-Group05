@@ -17,8 +17,8 @@ import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.databinding.ActivitySearchBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.remote.TourService;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.remote.service.TourService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class SearchActivity extends AppCompatActivity {
         };
         handler.postDelayed(timeoutRunnable, SEARCH_TIMEOUT_MS);
 
-        TourService.searchTours(query, new DataCallback<List<Tour>>() {
+        TourService.searchTours(this, query, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 runOnUiThread(() -> {

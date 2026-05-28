@@ -18,15 +18,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.PopularHotelAdapter;
 import com.example.tourgo.adapters.TourAdapter;
-import com.example.tourgo.data.HotelRepository;
-import com.example.tourgo.data.TourRepository;
+import com.example.tourgo.adapters.TrendingHotelAdapter;
+import com.example.tourgo.data.repository.HotelRepository;
+import com.example.tourgo.data.repository.TourRepository;
+import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.databinding.FragmentHomeBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Hotel;
-import com.example.tourgo.models.Tour;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.models.response.User;
 import com.example.tourgo.utils.ImageLoader;
-import com.example.tourgo.utils.SessionManager;
+import com.example.tourgo.data.local.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,8 +81,19 @@ public class HomeFragment extends Fragment {
 
     private void updateUserName() {
         if (binding == null || session == null) return;
+
         if (session.isLoggedIn()) {
-            binding.tvHomeUserName.setText(session.getShortName());
+            // Lấy user từ UserRepository (cache)
+            User cachedUser = UserRepository.getInstance().getCachedUser();
+
+            if (cachedUser != null && cachedUser.getName() != null) {
+                // Dùng tên từ UserRepository nếu có
+                String firstName = cachedUser.getName().split(" ")[0];
+                binding.tvHomeUserName.setText(firstName);
+            } else {
+                // Fallback về SessionManager nếu chưa có cache
+                binding.tvHomeUserName.setText(session.getShortName());
+            }
         } else {
             binding.tvHomeUserName.setText(R.string.home_guest_name);
         }
@@ -144,7 +158,7 @@ public class HomeFragment extends Fragment {
         String userId = session.getUserId();
         String token = session.getAccessToken();
 
-        HotelRepository.getInstance().loadHotels(userId, token, new DataCallback<List<Hotel>>() {
+        HotelRepository.getInstance().loadHotels(getContext(), userId, token, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (binding == null || getActivity() == null) return;
@@ -170,7 +184,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        TourRepository.getInstance().loadTours(userId, token, new DataCallback<List<Tour>>() {
+        TourRepository.getInstance().loadTours(requireContext(), userId, token, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 if (binding == null || getActivity() == null) return;

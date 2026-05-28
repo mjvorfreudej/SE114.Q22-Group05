@@ -1,12 +1,18 @@
-package com.example.tourgo.models;
+package com.example.tourgo.models.response;
+
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
 
 public class Booking {
     private String id;
+    @SerializedName("user_id")
     private String userId;
+    @SerializedName("tour_id")
     private String tourId;
+    @SerializedName("hotel_id")
     private String hotelId;
+    @SerializedName("booking_date")
     private String bookingDate;
     private String status;
 

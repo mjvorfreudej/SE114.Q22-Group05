@@ -1,14 +1,14 @@
-package com.example.tourgo.data;
+package com.example.tourgo.data.repository;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.Favorite;
-import com.example.tourgo.models.Tour;
-import com.example.tourgo.remote.FavoriteService;
-import com.example.tourgo.remote.TourService;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.remote.service.TourService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,12 +26,13 @@ public class TourRepository {
         return instance;
     }
 
-    public List<Tour> getCachedTours() {
-        return cachedTours;
-    }
+    public void loadTours(Context context, String userId, String token, DataCallback<List<Tour>> callback) {
+        if (cachedTours != null) {
+            callback.onSuccess(cachedTours);
+            return;
+        }
 
-    public void loadTours(String userId, String token, DataCallback<List<Tour>> callback) {
-        TourService.getTours(new DataCallback<List<Tour>>() {
+        TourService.getTours(context, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> tours) {
                 cachedTours = tours;
@@ -69,7 +70,7 @@ public class TourRepository {
             return;
         }
 
-        FavoriteService.getMyFavorites(userId, token, new DataCallback<List<Favorite>>() {
+        FavoriteRepository.getInstance().loadFavorites(null, false, new DataCallback<List<Favorite>>() {
             @Override
             public void onSuccess(List<Favorite> favorites) {
                 Set<String> favTourIds = new HashSet<>();
