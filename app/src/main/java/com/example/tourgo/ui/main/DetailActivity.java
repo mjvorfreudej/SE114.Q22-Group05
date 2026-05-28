@@ -2,26 +2,43 @@ package com.example.tourgo.ui.main;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.ReviewAdapter;
@@ -38,6 +55,7 @@ import com.example.tourgo.remote.service.ReviewService;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.BookingService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -58,8 +76,11 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        applyStatusBarInset();
 
         session = new SessionManager(this);
         hotel = (Hotel) getIntent().getSerializableExtra("hotel_object");
@@ -73,7 +94,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
-        
+
         binding.btnFavoriteDetail.setOnClickListener(v -> toggleFavorite());
 
         binding.btnBookNow.setOnClickListener(v -> {
@@ -85,25 +106,112 @@ public class DetailActivity extends AppCompatActivity {
         setupFilters();
     }
 
+    private void applyStatusBarInset() {
+        View actions = binding.layoutHeaderActions;
+        final int actionsBaseTop = actions.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(actions, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), actionsBaseTop + bars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
+
+        View bottomBar = binding.layoutBottomBar;
+        final int bottomBaseBottom = bottomBar.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), bottomBaseBottom + bars.bottom);
+            return insets;
+        });
+
+        ViewCompat.requestApplyInsets(actions);
+        ViewCompat.requestApplyInsets(bottomBar);
+    }
+
     private void setupUI() {
         setupGallery();
         setupComments();
         loadHotelReviews();
         checkReviewPermission();
         setupReviewForm();
+        setupAmenities();
+        setupMap();
         updateRatingSummary();
         refreshHotelSummary();
-        
+
         binding.tvDetailName.setText(hotel.getName());
         binding.tvDetailLocation.setText(hotel.getAddress());
-        
+
         // SỬA TẠI ĐÂY: Truyền 'this' để định dạng đúng VND/USD theo cài đặt Profile
         String formattedPrice = hotel.formatPrice(this, hotel.getPricePerNight());
         binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
-        
+
         binding.tvDetailDescription.setText(hotel.getDescription());
 
         updateHeartIcon(hotel.isFavorite());
+    }
+
+    private void setupAmenities() {
+        LinearLayout container = binding.layoutAmenities;
+        container.removeAllViews();
+
+        int[][] items = new int[][] {
+                {R.drawable.ic_wifi, R.string.amenity_wifi},
+                {R.drawable.ic_garage, R.string.amenity_parking},
+                {R.drawable.ic_pool, R.string.amenity_pool},
+                {R.drawable.ic_workplace, R.string.amenity_workplace},
+                {R.drawable.ic_tour, R.string.amenity_tour_desk}
+        };
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (int[] item : items) {
+            View row = inflater.inflate(R.layout.item_amenity, container, false);
+            ImageView icon = row.findViewById(R.id.imgAmenity);
+            TextView label = row.findViewById(R.id.tvAmenityLabel);
+            icon.setImageResource(item[0]);
+            label.setText(item[1]);
+            container.addView(row);
+        }
+    }
+
+    private void setupMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentById(R.id.mapFragment);
+        if (mapFragment == null) return;
+
+        mapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(@NonNull GoogleMap googleMap) {
+                googleMap.getUiSettings().setMapToolbarEnabled(false);
+                googleMap.getUiSettings().setZoomControlsEnabled(false);
+
+                LatLng target = resolveHotelLatLng();
+                String title = hotel != null && !TextUtils.isEmpty(hotel.getName()) ? hotel.getName() : "Location";
+                googleMap.addMarker(new MarkerOptions().position(target).title(title));
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 14f));
+            }
+        });
+    }
+
+    private LatLng resolveHotelLatLng() {
+        if (hotel != null && hotel.hasCoordinates()) {
+            return new LatLng(hotel.getLatitude(), hotel.getLongitude());
+        }
+
+        if (hotel != null && !TextUtils.isEmpty(hotel.getAddress()) && Geocoder.isPresent()) {
+            try {
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                List<Address> matches = geocoder.getFromLocationName(hotel.getAddress(), 1);
+                if (matches != null && !matches.isEmpty()) {
+                    Address a = matches.get(0);
+                    return new LatLng(a.getLatitude(), a.getLongitude());
+                }
+            } catch (IOException e) {
+                Log.w("DetailActivity", "Geocoder failed: " + e.getMessage());
+            }
+        }
+
+        // Fallback: Hanoi city center
+        return new LatLng(21.0285, 105.8542);
     }
 
     private void loadHotelReviews() {
@@ -346,7 +454,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void updateHeartIcon(boolean isFavorite) {
-        int color = isFavorite ? ContextCompat.getColor(this, android.R.color.holo_red_dark) : ContextCompat.getColor(this, android.R.color.white);
+        binding.btnFavoriteDetail.setImageResource(isFavorite ? R.drawable.ic_heart_fullfilled : R.drawable.ic_heart_outline_18);
+        int color = ContextCompat.getColor(this, isFavorite ? R.color.red : android.R.color.white);
         binding.btnFavoriteDetail.setImageTintList(ColorStateList.valueOf(color));
     }
 

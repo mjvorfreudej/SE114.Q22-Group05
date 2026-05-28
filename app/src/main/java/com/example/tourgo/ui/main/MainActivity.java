@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,9 +48,16 @@ public class MainActivity extends AppCompatActivity {
         navHotels = findViewById(R.id.navHotels);
         navProfile = findViewById(R.id.navProfile);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutNavMain), (v, insets) -> {
+        // Edge-to-edge: floating nav uses bottom margin so it stays above the
+        // gesture/nav bar. Fragments can draw behind the status bar at the top.
+        View bottomNav = findViewById(R.id.bottomNavContainer);
+        ViewGroup.MarginLayoutParams navLp = (ViewGroup.MarginLayoutParams) bottomNav.getLayoutParams();
+        final int baseNavBottomMargin = navLp.bottomMargin;
+        ViewCompat.setOnApplyWindowInsetsListener(bottomNav, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            lp.bottomMargin = baseNavBottomMargin + systemBars.bottom;
+            v.setLayoutParams(lp);
             return insets;
         });
 
@@ -132,6 +140,19 @@ public class MainActivity extends AppCompatActivity {
         args.putString("guest", guest);
         fragment.setArguments(args);
         loadFragment(fragment, true);
+    }
+
+    public void switchToHotelScreen() {
+        loadFragment(new HotelScreenFragment(), true);
+    }
+
+    public void switchToTourScreen() {
+        loadFragment(new TourScreenFragment(), true);
+    }
+
+    public void switchToHome() {
+        updateTabUI(navHome);
+        loadFragment(new HomeFragment(), true);
     }
 
     private void loadFragment(Fragment fragment, boolean animate) {

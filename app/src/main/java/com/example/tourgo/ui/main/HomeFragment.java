@@ -9,6 +9,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -33,11 +36,18 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    private static final int OFFERS_LIMIT = 8;
+
     private FragmentHomeBinding binding;
-    private PopularHotelAdapter popularAdapter;
-    private TrendingHotelAdapter trendingAdapter;
-    private TourAdapter tourAdapter;
+    private PopularHotelAdapter offersHotelAdapter;
+    private TourAdapter offersTourAdapter;
     private SessionManager session;
+
+    private List<Hotel> cachedHotels = new ArrayList<>();
+    private List<Tour> cachedTours = new ArrayList<>();
+
+    private enum OfferFilter { ALL, HOTEL, TOUR }
+    private OfferFilter currentFilter = OfferFilter.ALL;
 
     @Nullable
     @Override
@@ -51,55 +61,25 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        updateGreeting();
-
-        setupRecyclerViews();
-        showLoading(true);
-        loadData();
-        loadTours();
-
+        applyStatusBarInset();
+        updateUserName();
         setupClickListeners();
+        loadOffers();
     }
 
-    private void setupClickListeners() {
-        binding.btnFind.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                String dest = binding.tvSearchDestination.getText().toString();
-                String date = binding.tvCheckInOut.getText().toString();
-                String guest = binding.tvGuest.getText().toString();
-                
-                // Chuyển sang HotelListFragment với tiêu đề tìm kiếm
-                ((MainActivity) getActivity()).switchToHotelList("Search Results", dest, date, guest);
-            }
+    private void applyStatusBarInset() {
+        if (binding == null) return;
+        View header = binding.homeHeader;
+        int basePaddingTop = header.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), basePaddingTop + bars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
         });
-        
-        binding.layoutSearchDestination.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToSearch();
-            }
-        });
-
-        // Chuyển sang xem tất cả các mục tương ứng
-        binding.tvSeeAllHotels.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToHotelList("Most Popular", "", "", "");
-            }
-        });
-
-        binding.tvSeeAllTrending.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToHotelList("Trending Hotels", "", "", "");
-            }
-        });
-
-        binding.tvSeeAllTours.setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).switchToSearch();
-            }
-        });
+        ViewCompat.requestApplyInsets(header);
     }
 
-    private void updateGreeting() {
+    private void updateUserName() {
         if (binding == null || session == null) return;
 
         if (session.isLoggedIn()) {
@@ -115,96 +95,157 @@ public class HomeFragment extends Fragment {
                 binding.tvGreeting.setText(getString(R.string.main_greeting, session.getShortName()));
             }
         } else {
-            binding.tvGreeting.setText(R.string.main_greeting_default);
+            binding.tvHomeUserName.setText(R.string.home_guest_name);
         }
     }
 
-    private void setupRecyclerViews() {
-        popularAdapter = new PopularHotelAdapter(new ArrayList<>());
-        binding.rvPopularHotels.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvPopularHotels.setAdapter(popularAdapter);
+    private void setupClickListeners() {
+        binding.categoryHotel.setOnClickListener(v -> openHotelScreen());
+        binding.categoryTour.setOnClickListener(v -> openTourScreen());
 
-        trendingAdapter = new TrendingHotelAdapter(new ArrayList<>());
-        binding.rvTrendingHotels.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.rvTrendingHotels.setAdapter(trendingAdapter);
+        binding.cardSpecialDeal.setOnClickListener(v -> openHotelScreen());
+        binding.btnDealBookNow.setOnClickListener(v -> openHotelScreen());
 
-        tourAdapter = new TourAdapter(new ArrayList<>());
-        tourAdapter.setOnTourClickListener(tour -> {
-            Intent intent = new Intent(getContext(), BookingActivity.class);
-            intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
-            startActivity(intent);
+        binding.cardGuideHotel.setOnClickListener(v -> openHotelScreen());
+        binding.cardGuideTour.setOnClickListener(v -> openTourScreen());
+
+        binding.tvOffersSeeAll.setOnClickListener(v -> {
+            if (currentFilter == OfferFilter.TOUR) {
+                openTourScreen();
+            } else {
+                openHotelScreen();
+            }
         });
-        binding.rvPopularTours.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.rvPopularTours.setAdapter(tourAdapter);
+
+        binding.chipOfferAll.setOnClickListener(v -> setFilter(OfferFilter.ALL));
+        binding.chipOfferHotel.setOnClickListener(v -> setFilter(OfferFilter.HOTEL));
+        binding.chipOfferTour.setOnClickListener(v -> setFilter(OfferFilter.TOUR));
     }
 
-    private void showLoading(boolean show) {
+    private void openHotelScreen() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).switchToHotelScreen();
+        }
+    }
+
+    private void openTourScreen() {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).switchToTourScreen();
+        }
+    }
+
+    private void setFilter(OfferFilter filter) {
+        currentFilter = filter;
+        applyChipStyles();
+        refreshOffersList();
+    }
+
+    private void applyChipStyles() {
+        styleChip(binding.chipOfferAll, currentFilter == OfferFilter.ALL);
+        styleChip(binding.chipOfferHotel, currentFilter == OfferFilter.HOTEL);
+        styleChip(binding.chipOfferTour, currentFilter == OfferFilter.TOUR);
+    }
+
+    private void styleChip(android.widget.TextView chip, boolean selected) {
+        chip.setBackgroundResource(selected ? R.drawable.bg_action_gradient : R.drawable.bg_offer_chip);
+        chip.setTextColor(getResources().getColor(selected ? R.color.white : R.color.dark_gray, null));
+    }
+
+    private void loadOffers() {
         if (binding == null) return;
-        binding.progressBarHome.setVisibility(show ? View.VISIBLE : View.GONE);
-        binding.layoutHomeBody.setVisibility(show ? View.GONE : View.VISIBLE);
-    }
+        binding.progressBarHome.setVisibility(View.VISIBLE);
 
-    private void loadData() {
         String userId = session.getUserId();
         String token = session.getAccessToken();
 
         HotelRepository.getInstance().loadHotels(getContext(), userId, token, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
-                if (binding == null) return;
-                showLoading(false);
-                if (data != null && !data.isEmpty()) {
-                    popularAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
-                    if (data.size() > 5) {
-                        trendingAdapter.setData(data.subList(5, Math.min(data.size(), 10)));
-                    } else {
-                        trendingAdapter.setData(new ArrayList<>(data));
+                if (binding == null || getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (data != null) {
+                        cachedHotels = data;
+                        preloadHotelImages(data);
                     }
-                    preloadImages(data);
-                }
+                    refreshOffersList();
+                    maybeHideProgress();
+                });
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
-                if (binding == null) return;
-                showLoading(false);
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_SHORT).show();
-                }
+                if (binding == null || getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    maybeHideProgress();
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
-    }
 
-    private void loadTours() {
-        binding.progressBarTours.setVisibility(View.VISIBLE);
-        
-        String userId = session.getUserId();
-        String token = session.getAccessToken();
-        
         TourRepository.getInstance().loadTours(requireContext(), userId, token, new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> data) {
                 if (binding == null || getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
-                    binding.progressBarTours.setVisibility(View.GONE);
-                    if (data != null && !data.isEmpty()) {
-                        tourAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
+                    if (data != null) {
+                        cachedTours = data;
                         preloadTourImages(data);
                     }
+                    refreshOffersList();
+                    maybeHideProgress();
                 });
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
                 if (binding == null || getActivity() == null) return;
-                getActivity().runOnUiThread(() -> {
-                    binding.progressBarTours.setVisibility(View.GONE);
-                });
+                getActivity().runOnUiThread(this::handleError);
+            }
+
+            private void handleError() {
+                maybeHideProgress();
             }
         });
     }
 
-    private void preloadImages(List<Hotel> hotels) {
+    private void maybeHideProgress() {
+        if (binding == null) return;
+        binding.progressBarHome.setVisibility(View.GONE);
+    }
+
+    private void refreshOffersList() {
+        if (binding == null) return;
+
+        if (currentFilter == OfferFilter.TOUR) {
+            if (offersTourAdapter == null) {
+                offersTourAdapter = new TourAdapter(new ArrayList<>());
+                offersTourAdapter.setOnTourClickListener(tour -> {
+                    Intent intent = new Intent(getContext(), BookingActivity.class);
+                    intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
+                    startActivity(intent);
+                });
+            }
+            binding.rvHomeOffers.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+            binding.rvHomeOffers.setAdapter(offersTourAdapter);
+            offersTourAdapter.setData(limit(cachedTours, OFFERS_LIMIT));
+        } else {
+            if (offersHotelAdapter == null) {
+                offersHotelAdapter = new PopularHotelAdapter(new ArrayList<>());
+            }
+            binding.rvHomeOffers.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+            binding.rvHomeOffers.setAdapter(offersHotelAdapter);
+            offersHotelAdapter.setData(limit(cachedHotels, OFFERS_LIMIT));
+        }
+    }
+
+    private <T> List<T> limit(List<T> source, int max) {
+        if (source == null) return new ArrayList<>();
+        return source.size() > max ? source.subList(0, max) : source;
+    }
+
+    private void preloadHotelImages(List<Hotel> hotels) {
         List<String> urls = new ArrayList<>();
         for (Hotel hotel : hotels) {
             if (hotel.getImageUrls() != null && !hotel.getImageUrls().isEmpty()) {
@@ -227,10 +268,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateGreeting();
-        if (popularAdapter != null) popularAdapter.notifyDataSetChanged();
-        if (trendingAdapter != null) trendingAdapter.notifyDataSetChanged();
-        if (tourAdapter != null) tourAdapter.notifyDataSetChanged();
+        updateUserName();
+        applyChipStyles();
+        if (offersHotelAdapter != null) offersHotelAdapter.notifyDataSetChanged();
+        if (offersTourAdapter != null) offersTourAdapter.notifyDataSetChanged();
     }
 
     @Override

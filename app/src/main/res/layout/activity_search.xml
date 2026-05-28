@@ -131,7 +131,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="@dimen/screen_margin_horizontal"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:paddingBottom="120dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"

@@ -30,6 +30,8 @@ public class Hotel implements Serializable {
     private int imageResId;
     @SerializedName("hotel_images")
     private List<HotelImage> hotelImages;
+    private double latitude;
+    private double longitude;
 
     public static class HotelImage implements Serializable {
         private String id;
@@ -112,4 +114,9 @@ public class Hotel implements Serializable {
     public float getRating() { return rating; }
     public int getReviewCount() { return reviewCount; }
     public int getImageResId() { return imageResId; }
+    public double getLatitude() { return latitude; }
+    public double getLongitude() { return longitude; }
+    public boolean hasCoordinates() {
+        return !(latitude == 0 && longitude == 0);
+    }
 }
