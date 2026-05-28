@@ -89,10 +89,10 @@ public class HomeFragment extends Fragment {
             if (cachedUser != null && cachedUser.getName() != null) {
                 // Dùng tên từ UserRepository nếu có
                 String firstName = cachedUser.getName().split(" ")[0];
-                binding.tvGreeting.setText(getString(R.string.main_greeting, firstName));
+                binding.tvHomeUserName.setText(firstName);
             } else {
                 // Fallback về SessionManager nếu chưa có cache
-                binding.tvGreeting.setText(getString(R.string.main_greeting, session.getShortName()));
+                binding.tvHomeUserName.setText(session.getShortName());
             }
         } else {
             binding.tvHomeUserName.setText(R.string.home_guest_name);

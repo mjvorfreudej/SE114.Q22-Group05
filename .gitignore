@@ -14,6 +14,7 @@ Thumbs.db
 
 /captures
 .externalNativeBuild
+.claude/
 # Android Studio generated files and folders
 captures/
 .externalNativeBuild/
