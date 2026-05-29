@@ -131,5 +131,13 @@
                 android:textColor="@color/adm_gray_500"
                 android:textSize="12.5sp" />
         </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/admBizProgress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/adm_blue_500"
+            android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

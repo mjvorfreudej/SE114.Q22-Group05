@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminAccount;
+import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.admin.AdminMockData.AdminUser;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
@@ -29,15 +34,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Admin › Users directory — status tabs, user rows, profile detail sheet w/ suspend/reactivate. */
+/** Admin › Users directory — fetched from the backend; suspend/activate via the API. */
 public class AdminUsersFragment extends Fragment {
 
-    private final List<AdminUser> all = AdminMockData.users();
+    // Users are loaded live from the server, never from mock data.
+    private final List<AdminUser> all = new ArrayList<>();
     private String filter = "all";
     private String query = "";
 
     private AdminUserAdapter adapter;
     private LinearLayout tabs;
+    private ProgressBar progress;
+    private TextView empty, title;
 
     @Nullable
     @Override
@@ -50,9 +58,11 @@ public class AdminUsersFragment extends Fragment {
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
-        ((TextView) v.findViewById(R.id.admUsersTitle)).setText(getString(R.string.adm_users_title, "12,438"));
-
+        title = v.findViewById(R.id.admUsersTitle);
         tabs = v.findViewById(R.id.admTopTabs);
+        progress = v.findViewById(R.id.admUsersProgress);
+        empty = v.findViewById(R.id.admUsersEmpty);
+
         RecyclerView rv = v.findViewById(R.id.admUsersList);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new AdminUserAdapter(this::openUser);
@@ -69,18 +79,53 @@ public class AdminUsersFragment extends Fragment {
         });
 
         refresh();
+        loadUsers();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUsers();
+    }
+
+    private void loadUsers() {
+        setLoading(true);
+        AdminService.getUsers(requireContext(), new DataCallback<List<AdminAccount>>() {
+            @Override
+            public void onSuccess(List<AdminAccount> data) {
+                if (!isAdded()) return;
+                setLoading(false);
+                all.clear();
+                if (data != null) {
+                    for (AdminAccount dto : data) all.add(AdminUser.fromServer(dto));
+                }
+                refresh();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                setLoading(false);
+                all.clear();
+                refresh();
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private int count(String status) {
         int n = 0;
-        for (AdminUser u : all) if (u.status.equals(status)) n++;
+        for (AdminUser u : all) if (u.status != null && u.status.equals(status)) n++;
         return n;
     }
 
     private void refresh() {
+        title.setText(getString(R.string.adm_users_title, String.valueOf(all.size())));
+
         List<AdminTabBar.Tab> tabList = new ArrayList<>();
-        tabList.add(new AdminTabBar.Tab("all", getString(R.string.adm_tab_all), 12438));
-        tabList.add(new AdminTabBar.Tab("active", getString(R.string.adm_tab_active), AdminTabBar.NO_COUNT));
+        tabList.add(new AdminTabBar.Tab("all", getString(R.string.adm_tab_all), all.size()));
+        tabList.add(new AdminTabBar.Tab("active", getString(R.string.adm_tab_active), count("active")));
         tabList.add(new AdminTabBar.Tab("flagged", getString(R.string.adm_tab_flagged), count("flagged")));
         tabList.add(new AdminTabBar.Tab("suspended", getString(R.string.adm_tab_suspended), count("suspended")));
         AdminTabBar.build(tabs, tabList, filter, id -> {
@@ -94,13 +139,22 @@ public class AdminUsersFragment extends Fragment {
         String q = query.trim().toLowerCase(Locale.getDefault());
         List<AdminUser> visible = new ArrayList<>();
         for (AdminUser u : all) {
-            boolean statusOk = filter.equals("all") || u.status.equals(filter);
+            boolean statusOk = filter.equals("all") || (u.status != null && u.status.equals(filter));
             boolean queryOk = q.isEmpty()
                     || u.name.toLowerCase(Locale.getDefault()).contains(q)
                     || u.email.toLowerCase(Locale.getDefault()).contains(q);
             if (statusOk && queryOk) visible.add(u);
         }
         adapter.setItems(visible);
+        if (empty != null) {
+            boolean showEmpty = visible.isEmpty() && progress.getVisibility() != View.VISIBLE;
+            empty.setVisibility(showEmpty ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void setLoading(boolean loading) {
+        if (progress != null) progress.setVisibility(loading ? View.VISIBLE : View.GONE);
+        if (loading && empty != null) empty.setVisibility(View.GONE);
     }
 
     private void openUser(AdminUser u) {
@@ -139,7 +193,7 @@ public class AdminUsersFragment extends Fragment {
             ((ImageView) sheet.findViewById(R.id.admNavReportsIcon)).setImageTintList(ColorStateList.valueOf(red));
         }
 
-        boolean suspended = u.status.equals("suspended");
+        boolean suspended = "suspended".equals(u.status);
         MaterialButton suspendBtn = sheet.findViewById(R.id.admBtnSuspend);
         if (suspended) {
             suspendBtn.setText(R.string.adm_reactivate);
@@ -166,12 +220,37 @@ public class AdminUsersFragment extends Fragment {
                 getString(suspend ? R.string.adm_user_suspend_msg : R.string.adm_user_reactivate_msg, u.name),
                 getString(suspend ? R.string.adm_suspend : R.string.adm_reactivate),
                 suspend,
-                () -> {
-                    u.status = suspend ? "suspended" : "active";
-                    Toast.makeText(requireContext(),
-                            getString(suspend ? R.string.adm_toast_user_suspended : R.string.adm_toast_user_reactivated, u.name),
-                            Toast.LENGTH_SHORT).show();
-                    refresh();
-                });
+                () -> performToggle(u, suspend));
+    }
+
+    /** Call the backend to suspend/activate, then update the row's status indicator. */
+    private void performToggle(AdminUser u, boolean suspend) {
+        DataCallback<Void> cb = new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                if (!isAdded()) return;
+                u.status = suspend ? "suspended" : "active";
+                Toast.makeText(requireContext(),
+                        getString(suspend ? R.string.adm_toast_user_suspended : R.string.adm_toast_user_reactivated, u.name),
+                        Toast.LENGTH_SHORT).show();
+                refresh();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if (u.serverId == null) {
+            // No backend id (shouldn't happen for server data) — update locally.
+            cb.onSuccess(null);
+        } else if (suspend) {
+            AdminService.suspendUser(requireContext(), u.serverId, cb);
+        } else {
+            AdminService.activateUser(requireContext(), u.serverId, cb);
+        }
     }
 }

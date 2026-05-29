@@ -426,4 +426,44 @@
     <string name="adm_logout">Log out</string>
     <string name="adm_toast_logged_out">Logged out</string>
 
+    <!-- Create Tour -->
+    <string name="create_tour_title">Create new tour</string>
+    <string name="create_tour_subtitle">Submit your tour for review</string>
+    <string name="create_tour_section_info">Tour information</string>
+    <string name="create_tour_name_hint">Tour title</string>
+    <string name="create_tour_desc_hint">Description</string>
+    <string name="create_tour_price_hint">Price (VND)</string>
+    <string name="create_tour_destination_hint">Destination</string>
+    <string name="create_tour_duration_hint">Duration (e.g. 2 days 1 night)</string>
+    <string name="create_tour_section_image">Cover image</string>
+    <string name="create_tour_pick_image">Tap to select a cover image</string>
+    <string name="create_tour_change_image">Change image</string>
+    <string name="create_tour_confirm">Confirm</string>
+    <string name="create_tour_err_name">Please enter a title</string>
+    <string name="create_tour_err_desc">Please enter a description</string>
+    <string name="create_tour_err_price">Price must be greater than 0</string>
+    <string name="create_tour_err_destination">Please enter a destination</string>
+    <string name="create_tour_err_image">Please select a cover image</string>
+    <string name="create_tour_uploading">Uploading image…</string>
+    <string name="create_tour_saving">Saving tour…</string>
+    <string name="create_tour_success">Tour submitted, pending review</string>
+    <string name="create_tour_view_pending">View pending list</string>
+
+    <!-- Pending tours -->
+    <string name="pending_tour_title">Pending tours</string>
+    <string name="pending_tour_empty">No tours are pending review yet</string>
+    <string name="pending_tour_badge">Pending</string>
+
+    <!-- Booking history -->
+    <string name="booking_history_title">Booking history</string>
+    <string name="booking_history_filter_paid">Paid</string>
+    <string name="booking_history_filter_completed">Completed</string>
+    <string name="booking_history_empty">No bookings found</string>
+
+    <!-- Admin moderation (businesses & users) -->
+    <string name="adm_status_pending">Pending</string>
+    <string name="adm_menu_approve">Approve</string>
+    <string name="adm_toast_biz_approved">%s approved</string>
+    <string name="adm_users_empty">No users found</string>
+
 </resources>

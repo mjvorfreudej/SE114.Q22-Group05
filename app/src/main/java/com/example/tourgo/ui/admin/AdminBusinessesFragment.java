@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,22 +19,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.BusinessAccount;
+import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.admin.AdminMockData.BizAccount;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** Admin › Active Businesses directory — search, status tabs, kebab actions w/ confirm. */
+/** Admin › Pending businesses — fetched from the backend; approve via the API. */
 public class AdminBusinessesFragment extends Fragment {
 
-    private final List<BizAccount> all = AdminMockData.businesses();
-    private String filter = "all";
+    // Pending businesses are loaded live from the server, never from mock data.
+    private final List<BizAccount> all = new ArrayList<>();
     private String query = "";
 
     private BusinessAdapter adapter;
     private LinearLayout tabs, empty;
     private RecyclerView rv;
+    private ProgressBar progress;
+    private TextView title;
 
     @Nullable
     @Override
@@ -46,11 +53,11 @@ public class AdminBusinessesFragment extends Fragment {
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
-        ((TextView) v.findViewById(R.id.admBizTitle)).setText(getString(R.string.adm_biz_title, all.size()));
-
+        title = v.findViewById(R.id.admBizTitle);
         rv = v.findViewById(R.id.admBizList);
         empty = v.findViewById(R.id.admBizEmpty);
         tabs = v.findViewById(R.id.admTopTabs);
+        progress = v.findViewById(R.id.admBizProgress);
 
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new BusinessAdapter(this::onAction);
@@ -66,58 +73,99 @@ public class AdminBusinessesFragment extends Fragment {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        refresh();
+        buildTabs();
+        loadBusinesses();
     }
 
-    private int countActive() {
-        int n = 0;
-        for (BizAccount b : all) if (!b.suspended) n++;
-        return n;
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadBusinesses();
     }
 
-    private void refresh() {
-        List<AdminTabBar.Tab> tabList = new ArrayList<>();
-        tabList.add(new AdminTabBar.Tab("all", getString(R.string.adm_tab_all), all.size()));
-        tabList.add(new AdminTabBar.Tab("active", getString(R.string.adm_tab_active), countActive()));
-        tabList.add(new AdminTabBar.Tab("suspended", getString(R.string.adm_tab_suspended), all.size() - countActive()));
-        AdminTabBar.build(tabs, tabList, filter, id -> {
-            filter = id;
-            applyFilter();
+    private void loadBusinesses() {
+        setLoading(true);
+        AdminService.getPendingBusinesses(requireContext(), new DataCallback<List<BusinessAccount>>() {
+            @Override
+            public void onSuccess(List<BusinessAccount> data) {
+                if (!isAdded()) return;
+                setLoading(false);
+                all.clear();
+                if (data != null) {
+                    for (BusinessAccount dto : data) all.add(BizAccount.fromServer(dto));
+                }
+                buildTabs();
+                applyFilter();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                setLoading(false);
+                all.clear();
+                buildTabs();
+                applyFilter();
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
         });
-        applyFilter();
+    }
+
+    private void buildTabs() {
+        title.setText(getString(R.string.adm_biz_title, all.size()));
+        List<AdminTabBar.Tab> tabList = new ArrayList<>();
+        tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_status_pending), all.size()));
+        AdminTabBar.build(tabs, tabList, "pending", id -> applyFilter());
     }
 
     private void applyFilter() {
         String q = query.trim().toLowerCase(Locale.getDefault());
         List<BizAccount> visible = new ArrayList<>();
         for (BizAccount b : all) {
-            boolean statusOk = filter.equals("all")
-                    || (filter.equals("active") && !b.suspended)
-                    || (filter.equals("suspended") && b.suspended);
             boolean queryOk = q.isEmpty()
                     || b.name.toLowerCase(Locale.getDefault()).contains(q)
                     || b.owner.toLowerCase(Locale.getDefault()).contains(q);
-            if (statusOk && queryOk) visible.add(b);
+            if (queryOk) visible.add(b);
         }
         adapter.setItems(visible);
-        boolean isEmpty = visible.isEmpty();
+        boolean isEmpty = visible.isEmpty() && progress.getVisibility() != View.VISIBLE;
         empty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
-        rv.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        rv.setVisibility(visible.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    private void setLoading(boolean loading) {
+        progress.setVisibility(loading ? View.VISIBLE : View.GONE);
+        if (loading) {
+            empty.setVisibility(View.GONE);
+            rv.setVisibility(View.GONE);
+        }
     }
 
     private void onAction(BizAccount biz, String action) {
-        boolean suspend = BusinessAdapter.ACTION_SUSPEND.equals(action);
-        AdminUi.confirm(requireContext(),
-                getString(suspend ? R.string.adm_biz_suspend_title : R.string.adm_biz_reactivate_title),
-                getString(suspend ? R.string.adm_biz_suspend_msg : R.string.adm_biz_reactivate_msg, biz.name),
-                getString(suspend ? R.string.adm_suspend : R.string.adm_reactivate),
-                suspend,
-                () -> {
-                    biz.suspended = suspend;
-                    Toast.makeText(requireContext(),
-                            getString(suspend ? R.string.adm_toast_biz_suspended : R.string.adm_toast_biz_reactivated, biz.name),
-                            Toast.LENGTH_SHORT).show();
-                    refresh();
-                });
+        if (BusinessAdapter.ACTION_APPROVE.equals(action)) {
+            approve(biz);
+        }
+    }
+
+    private void approve(BizAccount biz) {
+        if (biz.serverId == null) return;
+        AdminService.approveBusiness(requireContext(), biz.serverId, new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        getString(R.string.adm_toast_biz_approved, biz.name), Toast.LENGTH_SHORT).show();
+                all.remove(biz);
+                buildTabs();
+                applyFilter();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

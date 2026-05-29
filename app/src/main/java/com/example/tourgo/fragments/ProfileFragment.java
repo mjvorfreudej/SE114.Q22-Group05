@@ -34,6 +34,7 @@ import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
+import com.example.tourgo.ui.main.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -117,22 +118,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupBookings(View root) {
-        RecyclerView rv = root.findViewById(R.id.rvMyBookings);
-        if (rv == null) return;
-        rv.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false));
-        
-        // Mocking data based on currency
-        String currency = session.getCurrency();
-        String price1 = "VND".equals(currency) ? "2.500.000đ" : "$100";
-        String price2 = "VND".equals(currency) ? "1.800.000đ" : "$75";
-
-        List<MyBookingAdapter.Item> items = new ArrayList<>(Arrays.asList(
-                new MyBookingAdapter.Item("The Grand Orchid Resort", "13 Aug - 15 Aug", R.drawable.hotel_1),
-                new MyBookingAdapter.Item("Hilton Bandung", "20 Sep - 22 Sep", R.drawable.hotel_2)
-        ));
-        // Note: MyBookingAdapter.Item doesn't currently support prices, but we refresh the list anyway.
-        // If the adapter supported it, we would pass price1 and price2 here.
-        rv.setAdapter(new MyBookingAdapter(items));
+        // Real booking history from the bookings table, with PAID/COMPLETED tabs.
+        new BookingHistorySection(requireContext()).bind(root);
     }
 
     private void setupSettings(View root) {

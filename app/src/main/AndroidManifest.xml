@@ -84,6 +84,10 @@
         <activity
             android:name=".ui.main.PaymentActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.main.CreateTourActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

@@ -112,4 +112,13 @@ public class HotelRepository {
     public void clearCache() {
         cachedHotels = null;
     }
+
+    /** Look up a cached hotel by id, or {@code null} if not loaded/found. */
+    public Hotel findHotelById(String hotelId) {
+        if (hotelId == null || cachedHotels == null) return null;
+        for (Hotel h : cachedHotels) {
+            if (hotelId.equals(h.getId())) return h;
+        }
+        return null;
+    }
 }

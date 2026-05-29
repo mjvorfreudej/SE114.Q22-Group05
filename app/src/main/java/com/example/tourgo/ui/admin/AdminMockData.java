@@ -1,6 +1,8 @@
 package com.example.tourgo.ui.admin;
 
 import com.example.tourgo.R;
+import com.example.tourgo.models.response.AdminAccount;
+import com.example.tourgo.models.response.BusinessAccount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,12 +26,45 @@ public final class AdminMockData {
         public final int price, photoRes;
         public final List<String[]> history; // {at, note}
 
+        // Populated when the listing comes from the backend (real pending tour);
+        // null/0 for the legacy mock entries.
+        public final String serverId;   // backend tour id, used by the approve API
+        public final String imageUrl;   // network cover image (else use photoRes)
+        public final String priceText;  // preformatted price (else "$" + price)
+
         public PendingListing(int id, String business, String name, String cat, String city,
                               String date, int price, int photoRes, String status, String desc,
                               List<String[]> history) {
             this.id = id; this.business = business; this.name = name; this.cat = cat;
             this.city = city; this.date = date; this.price = price; this.photoRes = photoRes;
             this.status = status; this.desc = desc; this.history = history;
+            this.serverId = null; this.imageUrl = null; this.priceText = null;
+        }
+
+        private PendingListing(String serverId, String name, String city, String date,
+                               String priceText, String imageUrl, String desc) {
+            this.id = 0; this.business = ""; this.name = name; this.cat = "tour";
+            this.city = city; this.date = date; this.price = 0; this.photoRes = R.drawable.hotel_1;
+            this.status = "pending"; this.desc = desc; this.history = new ArrayList<>();
+            this.serverId = serverId; this.imageUrl = imageUrl; this.priceText = priceText;
+        }
+
+        /** Map a backend tour into the moderation display model. */
+        public static PendingListing fromTour(android.content.Context ctx,
+                                              com.example.tourgo.models.response.Tour tour) {
+            List<String> imgs = tour.getImageUrls();
+            String img = (imgs != null && !imgs.isEmpty()) ? imgs.get(0) : null;
+            String city = tour.getLocation() != null ? tour.getLocation() : "";
+            String created = tour.getCreatedAt();
+            String date = (created != null && created.length() >= 10) ? created.substring(0, 10) : "";
+            return new PendingListing(
+                    tour.getId(),
+                    tour.getName(),
+                    city,
+                    date,
+                    tour.getPriceString(ctx),
+                    img,
+                    tour.getDescription() != null ? tour.getDescription() : "");
         }
     }
 
@@ -49,51 +84,75 @@ public final class AdminMockData {
     // ── Business directory ───────────────────────────────────────────────────
     public static class BizAccount {
         public final int id;
+        public final String serverId;      // backend id (null for legacy mock rows)
         public final String name, owner, joined;
         public final int listings, bookings;
         public boolean suspended;
+        public String status;              // "pending" | "active" | "suspended"
 
         public BizAccount(int id, String name, String owner, int listings, int bookings,
                           boolean suspended, String joined) {
-            this.id = id; this.name = name; this.owner = owner; this.listings = listings;
-            this.bookings = bookings; this.suspended = suspended; this.joined = joined;
+            this.id = id; this.serverId = null; this.name = name; this.owner = owner;
+            this.listings = listings; this.bookings = bookings; this.suspended = suspended;
+            this.joined = joined; this.status = suspended ? "suspended" : "active";
+        }
+
+        private BizAccount(String serverId, String name, String owner, int listings, int bookings,
+                           String status, String joined) {
+            this.id = 0; this.serverId = serverId;
+            this.name = name != null ? name : "";
+            this.owner = owner != null ? owner : "";
+            this.listings = listings; this.bookings = bookings;
+            this.status = status != null ? status : "pending";
+            this.suspended = "suspended".equals(this.status);
+            this.joined = joined != null ? joined : "";
+        }
+
+        /** Map a backend business account into the directory display model. */
+        public static BizAccount fromServer(BusinessAccount dto) {
+            return new BizAccount(dto.getId(), dto.getName(), dto.getOwner(),
+                    dto.getListings(), dto.getBookings(), dto.getStatus(), dateOnly(dto.getCreatedAt()));
         }
     }
 
     // ── Users directory ──────────────────────────────────────────────────────
     public static class AdminUser {
         public final int id;
+        public final String serverId;      // backend id (null for legacy mock rows)
         public final String name, email, joined, tier, loc;
         public final int bookings, reported;
         public String status; // active | flagged | suspended
 
         public AdminUser(int id, String name, String email, String joined, String status,
                          int bookings, int reported, String tier, String loc) {
-            this.id = id; this.name = name; this.email = email; this.joined = joined;
-            this.status = status; this.bookings = bookings; this.reported = reported;
-            this.tier = tier; this.loc = loc;
+            this.id = id; this.serverId = null; this.name = name; this.email = email;
+            this.joined = joined; this.status = status; this.bookings = bookings;
+            this.reported = reported; this.tier = tier; this.loc = loc;
+        }
+
+        private AdminUser(String serverId, String name, String email, String joined, String status,
+                          int bookings, int reported, String tier, String loc) {
+            this.id = 0; this.serverId = serverId;
+            this.name = name != null ? name : "";
+            this.email = email != null ? email : "";
+            this.joined = joined != null ? joined : "";
+            this.status = status != null ? status : "active";
+            this.bookings = bookings; this.reported = reported;
+            this.tier = tier != null ? tier : "—";
+            this.loc = loc != null ? loc : "—";
+        }
+
+        /** Map a backend user account into the users-directory display model. */
+        public static AdminUser fromServer(AdminAccount dto) {
+            return new AdminUser(dto.getId(), dto.getName(), dto.getEmail(), dateOnly(dto.getCreatedAt()),
+                    dto.getStatus(), dto.getBookings(), dto.getReported(), dto.getTier(), dto.getLocation());
         }
     }
 
-    private static List<String[]> history(String... pairs) {
-        List<String[]> out = new ArrayList<>();
-        for (int i = 0; i + 1 < pairs.length; i += 2) out.add(new String[]{pairs[i], pairs[i + 1]});
-        return out;
-    }
-
-    public static List<PendingListing> pendingListings() {
-        return new ArrayList<>(Arrays.asList(
-                new PendingListing(1, "Orchid Hospitality", "The Grand Orchid Resort", "hotel", "Bangkok, TH", "Aug 17", 199, R.drawable.hotel_1, "pending",
-                        "A boutique riverside hotel with handcrafted suites, rooftop pool and concierge service.", history()),
-                new PendingListing(2, "Riverbend Tours Co.", "Cherry Blossom Walk", "tour", "Kyoto, JP", "Aug 17", 78, R.drawable.hotel_2, "pending",
-                        "A guided 3-hour walk through Kyoto's most beautiful blossom alleys.", history("Aug 16", "Revision: clarified meeting point.")),
-                new PendingListing(3, "Skyline Marina", "Sunset Yacht Charter", "tour", "Singapore", "Aug 16", 320, R.drawable.hotel_3, "revision",
-                        "Private yacht charter at sunset, 4-hour cruise with light dinner.", history("Aug 14", "Rejected: missing safety certificates.")),
-                new PendingListing(4, "Cedar Cove LLC", "Cedar Cove Seaside Stay", "hotel", "Lisbon, PT", "Aug 15", 142, R.drawable.hotel_3, "pending",
-                        "Bright seaside apartments with private balconies overlooking the Tagus.", history()),
-                new PendingListing(5, "Dune & Desert Adv.", "Sunset Dune Adventure", "tour", "Dubai, AE", "Aug 14", 245, R.drawable.hotel_4, "pending",
-                        "Half-day desert safari with sandboarding, camel ride and BBQ dinner.", history())
-        ));
+    /** Trim an ISO timestamp down to its date portion (yyyy-MM-dd) for display. */
+    static String dateOnly(String iso) {
+        if (iso == null) return "";
+        return iso.length() >= 10 ? iso.substring(0, 10) : iso;
     }
 
     public static List<UserReport> userReports() {
@@ -117,25 +176,4 @@ public final class AdminMockData {
         ));
     }
 
-    public static List<BizAccount> businesses() {
-        return new ArrayList<>(Arrays.asList(
-                new BizAccount(1, "Orchid Hospitality", "Maya Chen", 4, 286, false, "Jun 2024"),
-                new BizAccount(2, "Riverbend Tours Co.", "Kenji Tanaka", 2, 124, false, "Mar 2024"),
-                new BizAccount(3, "Cedar Cove LLC", "Inês Costa", 6, 412, false, "Jan 2024"),
-                new BizAccount(4, "Skyline Marina", "Wei Zhang", 7, 198, true, "Nov 2023"),
-                new BizAccount(5, "Dune & Desert Adv.", "Layla Hassan", 3, 88, false, "Aug 2023"),
-                new BizAccount(6, "Sandbar Cliff Resorts", "James Park", 9, 624, false, "May 2023")
-        ));
-    }
-
-    public static List<AdminUser> users() {
-        return new ArrayList<>(Arrays.asList(
-                new AdminUser(1, "Amelia Robinson", "amelia.r@gmail.com", "Mar 2025", "active", 14, 0, "Silver", "London, UK"),
-                new AdminUser(2, "Liam Kowalski", "liam.k@outlook.com", "Apr 2025", "active", 8, 0, "Bronze", "Warsaw, PL"),
-                new AdminUser(3, "guest_jay_88", "jay.88@protonmail.com", "Jun 2025", "flagged", 3, 4, "Bronze", "Unknown"),
-                new AdminUser(4, "Sara Mendes", "sara.m@gmail.com", "Jan 2024", "active", 32, 0, "Gold", "Lisbon, PT"),
-                new AdminUser(5, "travel_deals_99", "deals99@temp-mail.org", "Aug 2025", "suspended", 0, 7, "Bronze", "Unknown"),
-                new AdminUser(6, "Ben Tanaka", "ben.t@me.com", "May 2025", "active", 6, 1, "Bronze", "Osaka, JP")
-        ));
-    }
 }

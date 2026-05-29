@@ -29,6 +29,7 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
 
     public static final String ACTION_SUSPEND = "suspend";
     public static final String ACTION_REACTIVATE = "reactivate";
+    public static final String ACTION_APPROVE = "approve";
 
     private final List<BizAccount> items = new ArrayList<>();
     private final Listener listener;
@@ -54,7 +55,9 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
     public void onBindViewHolder(@NonNull VH h, int position) {
         BizAccount b = items.get(position);
         Context ctx = h.itemView.getContext();
-        boolean suspended = b.suspended;
+        String state = stateOf(b);
+        boolean pending = "pending".equals(state);
+        boolean suspended = "suspended".equals(state);
 
         h.itemView.setAlpha(suspended ? 0.85f : 1f);
         h.name.setText(b.name);
@@ -62,33 +65,63 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
         h.listings.setText(String.valueOf(b.listings));
         h.bookings.setText(String.valueOf(b.bookings));
 
-        int wrapColor = ContextCompat.getColor(ctx, suspended ? R.color.adm_red_100 : R.color.adm_blue_50);
-        int iconColor = ContextCompat.getColor(ctx, suspended ? R.color.adm_red_700 : R.color.adm_blue_500);
-        h.iconWrap.setBackgroundTintList(ColorStateList.valueOf(wrapColor));
-        h.icon.setImageTintList(ColorStateList.valueOf(iconColor));
-
-        int chipBg = ContextCompat.getColor(ctx, suspended ? R.color.adm_red_100 : R.color.adm_green_100);
-        int chipFg = ContextCompat.getColor(ctx, suspended ? R.color.adm_red_700 : R.color.adm_green_700);
-        int dot = ContextCompat.getColor(ctx, suspended ? R.color.adm_red_500 : R.color.adm_green_500);
-        h.statusChip.setBackgroundTintList(ColorStateList.valueOf(chipBg));
-        h.statusDot.setBackgroundTintList(ColorStateList.valueOf(dot));
-        h.statusLabel.setTextColor(chipFg);
-        h.statusLabel.setText(suspended ? R.string.adm_status_suspended : R.string.adm_status_active);
+        int wrapColor, iconColor, chipBg, chipFg, dot, label;
+        if (pending) {
+            wrapColor = R.color.adm_amber_100; iconColor = R.color.adm_amber_700;
+            chipBg = R.color.adm_amber_100; chipFg = R.color.adm_amber_700; dot = R.color.adm_amber_500;
+            label = R.string.adm_status_pending;
+        } else if (suspended) {
+            wrapColor = R.color.adm_red_100; iconColor = R.color.adm_red_700;
+            chipBg = R.color.adm_red_100; chipFg = R.color.adm_red_700; dot = R.color.adm_red_500;
+            label = R.string.adm_status_suspended;
+        } else {
+            wrapColor = R.color.adm_blue_50; iconColor = R.color.adm_blue_500;
+            chipBg = R.color.adm_green_100; chipFg = R.color.adm_green_700; dot = R.color.adm_green_500;
+            label = R.string.adm_status_active;
+        }
+        h.iconWrap.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, wrapColor)));
+        h.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, iconColor)));
+        h.statusChip.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, chipBg)));
+        h.statusDot.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, dot)));
+        h.statusLabel.setTextColor(ContextCompat.getColor(ctx, chipFg));
+        h.statusLabel.setText(label);
 
         h.more.setOnClickListener(v -> showMenu(v, b));
     }
 
+    /** Resolve the display state, preferring the explicit status over the legacy flag. */
+    private static String stateOf(BizAccount b) {
+        if (b.status != null && !b.status.isEmpty()) return b.status;
+        return b.suspended ? "suspended" : "active";
+    }
+
     private void showMenu(View anchor, BizAccount b) {
         Context ctx = anchor.getContext();
+        String state = stateOf(b);
+
+        // Primary action depends on the account state: pending → approve,
+        // active → suspend, suspended → reactivate.
+        final String actionLabel;
+        final String action;
+        if ("pending".equals(state)) {
+            actionLabel = ctx.getString(R.string.adm_menu_approve);
+            action = ACTION_APPROVE;
+        } else if ("suspended".equals(state)) {
+            actionLabel = ctx.getString(R.string.adm_reactivate);
+            action = ACTION_REACTIVATE;
+        } else {
+            actionLabel = ctx.getString(R.string.adm_suspend);
+            action = ACTION_SUSPEND;
+        }
+
         PopupMenu menu = new PopupMenu(ctx, anchor);
         menu.getMenu().add(ctx.getString(R.string.adm_menu_view_profile));
         menu.getMenu().add(ctx.getString(R.string.adm_menu_view_listings));
         menu.getMenu().add(ctx.getString(R.string.adm_menu_view_reports));
-        String actionLabel = b.suspended ? ctx.getString(R.string.adm_reactivate) : ctx.getString(R.string.adm_suspend);
         menu.getMenu().add(actionLabel);
         menu.setOnMenuItemClickListener(item -> {
             if (item.getTitle() != null && item.getTitle().toString().equals(actionLabel)) {
-                if (listener != null) listener.onAction(b, b.suspended ? ACTION_REACTIVATE : ACTION_SUSPEND);
+                if (listener != null) listener.onAction(b, action);
             } else {
                 Toast.makeText(ctx, item.getTitle(), Toast.LENGTH_SHORT).show();
             }

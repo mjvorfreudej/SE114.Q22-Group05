@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
+import com.example.tourgo.utils.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,11 +49,16 @@ public class PendingListingAdapter extends RecyclerView.Adapter<PendingListingAd
         PendingListing it = items.get(position);
         Context ctx = h.itemView.getContext();
 
-        h.photo.setImageResource(it.photoRes);
+        if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
+            ImageLoader.loadThumbnail(h.photo, it.imageUrl);
+        } else {
+            h.photo.setImageResource(it.photoRes);
+        }
         AdminUi.catChip(ctx, h.cat, h.catDot, h.catLabel, it.cat);
         h.revision.setVisibility("revision".equals(it.status) ? View.VISIBLE : View.GONE);
         h.name.setText(it.name);
-        h.sub.setText(it.business + " · " + it.city);
+        boolean hasBusiness = it.business != null && !it.business.isEmpty();
+        h.sub.setText(hasBusiness ? it.business + " · " + it.city : it.city);
         h.submitted.setText(ctx.getString(R.string.adm_submitted, it.date));
 
         h.itemView.setOnClickListener(v -> {

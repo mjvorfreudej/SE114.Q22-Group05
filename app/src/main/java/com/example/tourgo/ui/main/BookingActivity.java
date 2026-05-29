@@ -125,10 +125,10 @@ public class BookingActivity extends AppCompatActivity {
 
             @Override
             public void onError(ApiErrorCode code, String rawMessage) {
-                Log.e("BookingError", "Supabase Error: " + rawMessage);
+                Log.e("BookingError", "API Error: " + rawMessage);
                 runOnUiThread(() -> {
                     showLoading(false);
-                    Log.e("BookingError", "Supabase Error: " + rawMessage);
+                    Log.e("BookingError", "API Error: " + rawMessage);
                     Toast.makeText(BookingActivity.this,
                             getString(R.string.booking_error_create_failed, code.name())
                                     + "\nDetail: " + rawMessage,
