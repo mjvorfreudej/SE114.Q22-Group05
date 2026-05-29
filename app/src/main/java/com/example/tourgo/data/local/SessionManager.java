@@ -6,8 +6,21 @@ import android.content.SharedPreferences;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
+import java.util.Locale;
+
 public class SessionManager {
     private static final String PREF_NAME = "TourGoSession";
+
+    // ── Admin access control (Email suffix + Predefined whitelist) ────────────
+    /** Any account whose email ends with this domain is treated as an admin. */
+    private static final String ADMIN_EMAIL_DOMAIN = "@tourgo.com";
+    /** Extra admin accounts that don't use the company domain. Edit as needed.
+     *  Whitelisted users register normally with their own password; their admin
+     *  role is verified solely by their email at login. */
+    private static final String[] ADMIN_EMAIL_WHITELIST = {
+            "lamquyen290391@gmail.com",
+            "hinduck3206@gmail.com",
+    };
 
     // Auth keys
     private static final String KEY_ACCESS_TOKEN = "access_token";
@@ -106,6 +119,25 @@ public class SessionManager {
 
     public boolean isLoggedIn() {
         return getAccessToken() != null && !isTokenExpired();
+    }
+
+    /**
+     * Returns true when the logged-in user is an admin, based on the
+     * "email suffix + predefined whitelist" strategy:
+     *  - email ends with {@link #ADMIN_EMAIL_DOMAIN} (e.g. admin@tourgo.com), OR
+     *  - email is listed in {@link #ADMIN_EMAIL_WHITELIST}.
+     * Returns false when no email is stored.
+     */
+    public boolean isAdmin() {
+        String email = getEmail();
+        if (email == null) return false;
+        email = email.trim().toLowerCase(Locale.ROOT);
+        if (email.isEmpty()) return false;
+        if (email.endsWith(ADMIN_EMAIL_DOMAIN)) return true;
+        for (String admin : ADMIN_EMAIL_WHITELIST) {
+            if (admin != null && email.equals(admin.trim().toLowerCase(Locale.ROOT))) return true;
+        }
+        return false;
     }
 
     public boolean isRememberMe() {

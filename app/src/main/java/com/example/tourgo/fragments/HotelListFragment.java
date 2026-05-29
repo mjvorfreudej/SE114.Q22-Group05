@@ -10,9 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,40 +55,29 @@ public class HotelListFragment extends Fragment {
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
                 if (getActivity() != null) {
-                    getActivity().onBackPressed();
+                    requireActivity().getOnBackPressedDispatcher().onBackPressed();
                 }
             });
         }
 
-        applyTopInset(view.findViewById(R.id.llHotelListHeader));
-
         return view;
-    }
-
-    private void applyTopInset(View header) {
-        if (header == null) return;
-        final int basePaddingTop = header.getPaddingTop();
-        ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
-            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), basePaddingTop + bars.top, v.getPaddingRight(), v.getPaddingBottom());
-            return insets;
-        });
-        ViewCompat.requestApplyInsets(header);
     }
 
     private void setupHeader() {
         Bundle args = getArguments();
         if (args != null) {
-            String title = args.getString("title", "Hotels");
+            String title = args.getString("title", "");
             String dest = args.getString("destination", "");
             String date = args.getString("date", "");
             String guest = args.getString("guest", "");
 
             if (tvLocationHeader != null) {
                 if (!dest.isEmpty()) {
-                    tvLocationHeader.setText("Hotels in " + dest);
-                } else {
+                    tvLocationHeader.setText(getString(R.string.hotel_in_location, dest));
+                } else if (!title.isEmpty()) {
                     tvLocationHeader.setText(title);
+                } else {
+                    tvLocationHeader.setText(R.string.hotel_list_default_title);
                 }
             }
 
@@ -129,19 +115,19 @@ public class HotelListFragment extends Fragment {
                         Bundle args = getArguments();
                         String title = args != null ? args.getString("title", "") : "";
                         
-                        List<Hotel> filteredData = new ArrayList<>();
+                        List<Hotel> filteredData;
                         if ("Most Popular".equals(title)) {
                             // Giả sử lấy 5 cái đầu làm Popular
-                            filteredData = data.size() > 5 ? data.subList(0, 5) : data;
+                            filteredData = new ArrayList<>(data.size() > 5 ? data.subList(0, 5) : data);
                         } else if ("Trending Hotels".equals(title)) {
                             // Giả sử lấy từ 5-10 làm Trending
                             if (data.size() > 5) {
-                                filteredData = data.subList(5, Math.min(data.size(), 10));
+                                filteredData = new ArrayList<>(data.subList(5, Math.min(data.size(), 10)));
                             } else {
-                                filteredData = data;
+                                filteredData = new ArrayList<>(data);
                             }
                         } else {
-                            filteredData = data;
+                            filteredData = new ArrayList<>(data);
                         }
                         adapter.setData(filteredData);
                     }

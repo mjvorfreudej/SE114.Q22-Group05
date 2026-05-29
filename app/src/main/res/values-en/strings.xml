@@ -116,6 +116,8 @@
     <string name="profile_logout_title">Logout</string>
     <string name="profile_logout_confirm">Are you sure want to logout?</string>
     <string name="profile_logout_confirm_btn">Confirm</string>
+    <string name="profile_admin_console">Admin Console</string>
+    <string name="profile_admin_console_sub">Manage the marketplace</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Edit profile</string>
@@ -239,6 +241,10 @@
     <string name="filter_all">All</string>
     <string name="filter_with_photos">With Photos</string>
 
+    <!-- Hotel List -->
+    <string name="hotel_in_location">Hotels in %s</string>
+    <string name="hotel_list_default_title">Hotels</string>
+
     <!-- Hotel/Tour -->
     <string name="price_per_night_format">%s / night</string>
     <string name="reviews_count_label">Reviews</string>
@@ -277,5 +283,147 @@
     <!--  API Error  -->
     <string name="err_no_internet">No internet connection</string>
     <string name="err_timeout">Connection timeout</string>
+
+    <!-- ===================== Admin Console ===================== -->
+    <!-- Bottom nav -->
+    <string name="adm_nav_home">Home</string>
+    <string name="adm_nav_moderate">Moderate</string>
+    <string name="adm_nav_business">Business</string>
+    <string name="adm_nav_users">Users</string>
+    <string name="adm_nav_profile">Profile</string>
+
+    <!-- Common -->
+    <string name="adm_badge">ADMIN</string>
+    <string name="adm_console">Admin Console</string>
+    <string name="adm_view">View</string>
+    <string name="adm_see_all">See all</string>
+
+    <!-- Home -->
+    <string name="adm_overview">Overview</string>
+    <string name="adm_home_date">Saturday, August 18</string>
+    <string name="adm_home_glance">Marketplace at a glance</string>
+    <string name="adm_stat_users">Total Users</string>
+    <string name="adm_stat_biz">Businesses</string>
+    <string name="adm_stat_listings">Total Listings</string>
+    <string name="adm_stat_pending">Pending Approvals</string>
+    <string name="adm_stat_reports">Reports Waiting</string>
+    <string name="adm_stat_flagged">Flagged Users</string>
+    <string name="adm_alert_title">%d items need your review</string>
+    <string name="adm_alert_sub">%1$d pending listings · %2$d active reports</string>
+    <string name="adm_open">Open</string>
+    <string name="adm_quick_actions">Quick Actions</string>
+    <string name="adm_qa_review_listings">Review pending listings</string>
+    <string name="adm_qa_review_listings_sub">%d awaiting moderation</string>
+    <string name="adm_qa_review_reports">Review reports</string>
+    <string name="adm_qa_review_reports_sub">%d toxic/spam reports</string>
+    <string name="adm_qa_browse_users">Browse users</string>
+    <string name="adm_qa_browse_users_sub">%s accounts</string>
+    <string name="adm_recent_activity">Recent Activity</string>
+
+    <!-- Moderation -->
+    <string name="adm_mod_eyebrow">Moderation</string>
+    <string name="adm_mod_title">Review queue</string>
+    <string name="adm_tab_pending_listings">Pending Listings</string>
+    <string name="adm_tab_user_reports">User Reports</string>
+    <string name="adm_submitted">Submitted %s</string>
+    <string name="adm_revision">REVISION</string>
+    <string name="adm_review_listing">Review listing</string>
+    <string name="adm_review_report">Review report</string>
+    <string name="adm_awaiting_review">Awaiting review</string>
+    <string name="adm_description">Description</string>
+    <string name="adm_verified_business">Verified business · %d active listings</string>
+    <string name="adm_admin_notes">Admin notes (internal)</string>
+    <string name="adm_admin_notes_hint">Notes about this review… (visible to admins only)</string>
+    <string name="adm_status_history">Status history</string>
+    <string name="adm_request_revision">Request revision</string>
+    <string name="adm_reject">Reject</string>
+    <string name="adm_approve_publish">Approve &amp; publish</string>
+    <string name="adm_reject_listing_title">Reject this listing?</string>
+    <string name="adm_reject_listing_msg">The business will be notified with your admin notes. They can re-submit after edits.</string>
+    <string name="adm_request_revision_title">Request revision?</string>
+    <string name="adm_request_revision_msg">The business will receive your notes and can re-submit when ready.</string>
+    <string name="adm_send_request">Send request</string>
+    <string name="adm_original_content">Original content</string>
+    <string name="adm_reporter_reasoning">Reporter reasoning</string>
+    <string name="adm_contact_both">Contact both parties</string>
+    <string name="adm_dismiss">Dismiss</string>
+    <string name="adm_approve_report">Approve report</string>
+    <string name="adm_reported_by">Reported by %1$s · %2$s ago</string>
+    <string name="adm_toast_listing_approved">Listing approved · published</string>
+    <string name="adm_toast_listing_rejected">Listing rejected · business notified</string>
+    <string name="adm_toast_revision_requested">Revision requested · business notified</string>
+    <string name="adm_toast_report_approved">Report approved · user banned &amp; comment removed</string>
+    <string name="adm_toast_report_dismissed">Report dismissed · no action taken</string>
+    <string name="adm_toast_contacted">Message sent to both parties</string>
+    <string name="adm_by_prefix">by </string>
+    <string name="adm_on_prefix">on </string>
+
+    <!-- Businesses -->
+    <string name="adm_biz_eyebrow">Active Businesses</string>
+    <string name="adm_biz_title">Directory · %d</string>
+    <string name="adm_biz_search_hint">Search by name, owner…</string>
+    <string name="adm_tab_all">All</string>
+    <string name="adm_tab_active">Active</string>
+    <string name="adm_tab_suspended">Suspended</string>
+    <string name="adm_biz_empty_title">No businesses found</string>
+    <string name="adm_biz_empty_msg">Try a different filter or search term.</string>
+    <string name="adm_listings_label">Listings</string>
+    <string name="adm_bookings_label">Bookings</string>
+    <string name="adm_status_active">Active</string>
+    <string name="adm_status_suspended">Suspended</string>
+    <string name="adm_joined">Joined %s</string>
+    <string name="adm_menu_view_profile">View profile</string>
+    <string name="adm_menu_view_listings">View listings</string>
+    <string name="adm_menu_view_reports">View reports</string>
+    <string name="adm_suspend">Suspend</string>
+    <string name="adm_reactivate">Reactivate</string>
+    <string name="adm_biz_suspend_title">Suspend business?</string>
+    <string name="adm_biz_suspend_msg">%s will lose access until reactivated. Their published listings will be hidden from travelers.</string>
+    <string name="adm_biz_reactivate_title">Reactivate business?</string>
+    <string name="adm_biz_reactivate_msg">%s will regain access and their listings will become visible to travelers again.</string>
+    <string name="adm_toast_biz_suspended">%s suspended</string>
+    <string name="adm_toast_biz_reactivated">%s reactivated</string>
+
+    <!-- Users -->
+    <string name="adm_users_eyebrow">Users</string>
+    <string name="adm_users_title">Profiles · %s</string>
+    <string name="adm_users_search_hint">Search users…</string>
+    <string name="adm_tab_flagged">Flagged</string>
+    <string name="adm_user_profile">User profile</string>
+    <string name="adm_status_flagged">Flagged</string>
+    <string name="adm_bookings_count">%d bookings</string>
+    <string name="adm_tier">Tier</string>
+    <string name="adm_reports_label">Reports</string>
+    <string name="adm_booking_history">Booking history</string>
+    <string name="adm_n_stays">%d stays</string>
+    <string name="adm_reviews_left">Reviews left</string>
+    <string name="adm_reviews_count">%d reviews</string>
+    <string name="adm_reports_against">Reports against user</string>
+    <string name="adm_n_open">%d open</string>
+    <string name="adm_none">None</string>
+    <string name="adm_contact">Contact</string>
+    <string name="adm_user_suspend_title">Suspend user?</string>
+    <string name="adm_user_suspend_msg">%s will lose access to bookings, reviews and the marketplace until reactivated.</string>
+    <string name="adm_user_reactivate_title">Reactivate user?</string>
+    <string name="adm_user_reactivate_msg">%s will regain access to TourGo.</string>
+    <string name="adm_toast_user_suspended">%s suspended</string>
+    <string name="adm_toast_user_reactivated">%s reactivated</string>
+
+    <!-- Profile -->
+    <string name="adm_account">Account</string>
+    <string name="adm_admin_settings">Admin Settings</string>
+    <string name="adm_sec_moderation">Moderation</string>
+    <string name="adm_mod_policy">Moderation policy</string>
+    <string name="adm_admin_team">Admin team &amp; roles</string>
+    <string name="adm_admin_team_count">4 admins</string>
+    <string name="adm_audit_log">Audit log</string>
+    <string name="adm_sec_preferences">Preferences</string>
+    <string name="adm_notifications">Notifications</string>
+    <string name="adm_language">Language</string>
+    <string name="adm_language_value">English</string>
+    <string name="adm_password_2fa">Password &amp; 2FA</string>
+    <string name="adm_help_center">Help center</string>
+    <string name="adm_logout">Log out</string>
+    <string name="adm_toast_logged_out">Logged out</string>
 
 </resources>

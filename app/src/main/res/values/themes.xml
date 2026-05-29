@@ -70,4 +70,57 @@
         <item name="android:layout_height">20dp</item>
         <item name="tint">@color/dark_gray</item>
     </style>
+
+    <!-- Admin Console — detail-sheet nav row (icon · label · trailing · chevron) -->
+    <style name="AdmDetailNavRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:background">@drawable/bg_adm_rounded_10</item>
+        <item name="android:backgroundTint">@color/adm_gray_50</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingVertical">11dp</item>
+    </style>
+
+    <style name="AdmDetailNavLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AdmDetailNavTrailing">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="AdmDetailNavChevron">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_marginStart">6dp</item>
+        <item name="android:contentDescription">@null</item>
+        <item name="tint">@color/adm_gray_400</item>
+    </style>
+
+    <!-- Admin Console — uppercase section label above grouped rows -->
+    <style name="AdmSectionLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
 </resources>
