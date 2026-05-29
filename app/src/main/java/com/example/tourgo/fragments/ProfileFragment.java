@@ -32,6 +32,7 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.service.UserService;
+import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
@@ -135,6 +136,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupSettings(View root) {
+        // Admin Console — visible only to admins (email suffix / whitelist via SessionManager)
+        View rowAdmin = root.findViewById(R.id.rowAdminConsole);
+        if (rowAdmin != null) {
+            rowAdmin.setVisibility(session.isAdmin() ? View.VISIBLE : View.GONE);
+            rowAdmin.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), AdminActivity.class)));
+        }
+
         // Edit Profile
         View btnEdit = root.findViewById(R.id.btnProfileEdit);
         if (btnEdit != null) btnEdit.setOnClickListener(v -> {

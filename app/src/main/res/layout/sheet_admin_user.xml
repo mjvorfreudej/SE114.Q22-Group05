@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_adm_sheet"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_adm_pill"
+        android:backgroundTint="@color/adm_gray_200" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="@string/adm_user_profile"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/admUserSheetClose"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_gray_100"
+            android:contentDescription="@null"
+            android:padding="7dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/adm_gray_700" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="18dp">
+
+        <!-- Identity -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="14dp">
+
+            <TextView
+                android:id="@+id/admUserSheetAvatar"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/admUserSheetName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/admUserSheetEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:textColor="@color/adm_gray_500"
+                    android:textSize="11.5sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="11dp"
+                        android:layout_height="11dp"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_location_20"
+                        app:tint="@color/adm_gray_400" />
+
+                    <TextView
+                        android:id="@+id/admUserSheetLoc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/adm_gray_400"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/adm_gray_100" />
+
+        <!-- Stats -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_adm_rounded_10"
+                android:backgroundTint="@color/adm_gray_50"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/admStatBookingsV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/adm_bookings_label"
+                    android:textColor="@color/adm_gray_500"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_adm_rounded_10"
+                android:backgroundTint="@color/adm_gray_50"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/admStatTierV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/adm_tier"
+                    android:textColor="@color/adm_gray_500"
+                    android:textSize="10sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/admStatReportsBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_adm_rounded_10"
+                android:backgroundTint="@color/adm_gray_50"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/admStatReportsV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/adm_reports_label"
+                    android:textColor="@color/adm_gray_500"
+                    android:textSize="10sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Nav rows -->
+        <LinearLayout
+            android:id="@+id/admNavBooking"
+            style="@style/AdmDetailNavRow">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_calendar"
+                app:tint="@color/adm_gray_700" />
+
+            <TextView
+                style="@style/AdmDetailNavLabel"
+                android:text="@string/adm_booking_history" />
+
+            <TextView
+                android:id="@+id/admNavBookingTrailing"
+                style="@style/AdmDetailNavTrailing" />
+
+            <ImageView
+                style="@style/AdmDetailNavChevron"
+                android:src="@drawable/ic_chevron_right_24" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/admNavReviews"
+            style="@style/AdmDetailNavRow">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_message_circle"
+                app:tint="@color/adm_gray_700" />
+
+            <TextView
+                style="@style/AdmDetailNavLabel"
+                android:text="@string/adm_reviews_left" />
+
+            <TextView
+                android:id="@+id/admNavReviewsTrailing"
+                style="@style/AdmDetailNavTrailing" />
+
+            <ImageView
+                style="@style/AdmDetailNavChevron"
+                android:src="@drawable/ic_chevron_right_24" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/admNavReports"
+            style="@style/AdmDetailNavRow">
+
+            <ImageView
+                android:id="@+id/admNavReportsIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_flag"
+                app:tint="@color/adm_gray_700" />
+
+            <TextView
+                android:id="@+id/admNavReportsLabel"
+                style="@style/AdmDetailNavLabel"
+                android:text="@string/adm_reports_against" />
+
+            <TextView
+                android:id="@+id/admNavReportsTrailing"
+                style="@style/AdmDetailNavTrailing" />
+
+            <ImageView
+                style="@style/AdmDetailNavChevron"
+                android:src="@drawable/ic_chevron_right_24" />
+        </LinearLayout>
+
+        <!-- Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/admBtnContact"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/adm_contact"
+                android:textAllCaps="false"
+                android:textColor="@color/adm_gray_900"
+                app:cornerRadius="999dp"
+                app:icon="@drawable/ic_mail"
+                app:iconGravity="textStart"
+                app:iconSize="14dp"
+                app:iconTint="@color/adm_gray_900"
+                app:strokeColor="@color/adm_gray_300" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/admBtnSuspend"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/adm_red_500"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/adm_suspend"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                app:cornerRadius="999dp"
+                app:icon="@drawable/ic_ban"
+                app:iconGravity="textStart"
+                app:iconSize="14dp"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

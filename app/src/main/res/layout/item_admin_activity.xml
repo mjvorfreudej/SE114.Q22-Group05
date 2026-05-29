@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="10dp">
+
+        <FrameLayout
+            android:id="@+id/admActivityIconWrap"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_purple_100">
+
+            <ImageView
+                android:id="@+id/admActivityIcon"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_building"
+                app:tint="@color/adm_purple_500" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/admActivityTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/admActivityMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/admActivityWhen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/adm_gray_400"
+            android:textSize="10.5sp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/admActivityDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/adm_gray_100" />
+</LinearLayout>

@@ -24,6 +24,7 @@ import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
+import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.databinding.ActivityLoginBinding;
@@ -45,13 +46,6 @@ public class LoginActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        // Auto-login if "Remember Me" was checked previously
-        if (session.isLoggedIn() && session.isRememberMe()) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
-            return;
-        }
-
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
@@ -61,6 +55,16 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+
+        // Auto-login: if a remembered session exists, route to the correct home
+        // (admins -> AdminActivity, travelers -> MainActivity). Deferred with
+        // post() so the Activity finishes initialising before finish() runs —
+        // calling finish() during onCreate() crashes on API 35+ with
+        // "Activity client record must not be null ... TopResumedActivityChangeItem".
+        if (session.isLoggedIn() && session.isRememberMe()) {
+            binding.getRoot().post(this::goToHome);
+            return;
+        }
 
         if (session.getEmail() != null) {
             binding.etLoginEmail.setText(session.getEmail());
@@ -139,8 +143,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         getString(R.string.msg_login_success),
                                                         Toast.LENGTH_SHORT).show();
 
-                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                finish();
+                                                goToHome();
                                             }
 
                                             @Override
@@ -150,8 +153,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         getString(R.string.msg_login_success),
                                                         Toast.LENGTH_SHORT).show();
 
-                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                                finish();
+                                                goToHome();
                                             }
                                         });
 
@@ -178,6 +180,18 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
         });
+    }
+
+    /**
+     * Routes the user after a successful login / auto-login: admins land on the
+     * Admin Console, everyone else on the standard Traveler home.
+     */
+    private void goToHome() {
+        Class<?> destination = session.isAdmin() ? AdminActivity.class : MainActivity.class;
+        Intent intent = new Intent(LoginActivity.this, destination);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void validateEmail() {

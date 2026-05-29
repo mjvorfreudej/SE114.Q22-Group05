@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <ImageView
+                android:id="@+id/admPlPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/hotel_1" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/admPlCat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_adm_pill"
+                    android:backgroundTint="@color/adm_amber_100"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp">
+
+                    <View
+                        android:id="@+id/admPlCatDot"
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/bg_adm_circle"
+                        android:backgroundTint="@color/adm_amber_500" />
+
+                    <TextView
+                        android:id="@+id/admPlCatLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/adm_orange_ink"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/admPlRevision"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_adm_pill"
+                    android:backgroundTint="@color/adm_amber_100"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp"
+                    android:text="@string/adm_revision"
+                    android:textColor="@color/adm_amber_700"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/admPlName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/admPlSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/adm_gray_500"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/admPlSubmitted"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginStart="6dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/adm_gray_400" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

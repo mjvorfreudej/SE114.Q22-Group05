@@ -115,6 +115,8 @@
     <string name="profile_logout_title">Đăng xuất</string>
     <string name="profile_logout_confirm">Bạn có chắc chắn muốn đăng xuất?</string>
     <string name="profile_logout_confirm_btn">Xác nhận</string>
+    <string name="profile_admin_console">Bảng quản trị</string>
+    <string name="profile_admin_console_sub">Quản lý nền tảng &amp; kiểm duyệt</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>
@@ -238,6 +240,10 @@
     <string name="filter_all">Tất cả</string>
     <string name="filter_with_photos">Có ảnh</string>
 
+    <!-- Hotel List -->
+    <string name="hotel_in_location">Khách sạn tại %s</string>
+    <string name="hotel_list_default_title">Khách sạn</string>
+
     <!-- Hotel/Tour -->
     <string name="price_per_night_format">%s / đêm</string>
     <string name="reviews_count_label">Đánh giá</string>
@@ -277,5 +283,147 @@
     <!--  Error message  -->
     <string name="err_no_internet">Không có kết nối mạng</string>
     <string name="err_timeout">Hết thời gian kết nối</string>
+
+    <!-- ===================== Admin Console ===================== -->
+    <!-- Bottom nav -->
+    <string name="adm_nav_home">Trang chủ</string>
+    <string name="adm_nav_moderate">Kiểm duyệt</string>
+    <string name="adm_nav_business">Doanh nghiệp</string>
+    <string name="adm_nav_users">Người dùng</string>
+    <string name="adm_nav_profile">Cá nhân</string>
+
+    <!-- Common -->
+    <string name="adm_badge">ADMIN</string>
+    <string name="adm_console">Bảng quản trị</string>
+    <string name="adm_view">Xem</string>
+    <string name="adm_see_all">Xem tất cả</string>
+
+    <!-- Home -->
+    <string name="adm_overview">Tổng quan</string>
+    <string name="adm_home_date">Thứ Bảy, 18 Tháng 8</string>
+    <string name="adm_home_glance">Toàn cảnh thị trường</string>
+    <string name="adm_stat_users">Tổng người dùng</string>
+    <string name="adm_stat_biz">Doanh nghiệp</string>
+    <string name="adm_stat_listings">Tổng tin đăng</string>
+    <string name="adm_stat_pending">Chờ phê duyệt</string>
+    <string name="adm_stat_reports">Báo cáo chờ xử lý</string>
+    <string name="adm_stat_flagged">Người dùng bị gắn cờ</string>
+    <string name="adm_alert_title">%d mục cần bạn duyệt</string>
+    <string name="adm_alert_sub">%1$d tin chờ duyệt · %2$d báo cáo đang mở</string>
+    <string name="adm_open">Mở</string>
+    <string name="adm_quick_actions">Thao tác nhanh</string>
+    <string name="adm_qa_review_listings">Duyệt tin đăng chờ</string>
+    <string name="adm_qa_review_listings_sub">%d đang chờ kiểm duyệt</string>
+    <string name="adm_qa_review_reports">Xem báo cáo</string>
+    <string name="adm_qa_review_reports_sub">%d báo cáo spam/độc hại</string>
+    <string name="adm_qa_browse_users">Xem người dùng</string>
+    <string name="adm_qa_browse_users_sub">%s tài khoản</string>
+    <string name="adm_recent_activity">Hoạt động gần đây</string>
+
+    <!-- Moderation -->
+    <string name="adm_mod_eyebrow">Kiểm duyệt</string>
+    <string name="adm_mod_title">Hàng đợi duyệt</string>
+    <string name="adm_tab_pending_listings">Tin chờ duyệt</string>
+    <string name="adm_tab_user_reports">Báo cáo người dùng</string>
+    <string name="adm_submitted">Đã gửi %s</string>
+    <string name="adm_revision">SỬA LẠI</string>
+    <string name="adm_review_listing">Duyệt tin đăng</string>
+    <string name="adm_review_report">Duyệt báo cáo</string>
+    <string name="adm_awaiting_review">Đang chờ duyệt</string>
+    <string name="adm_description">Mô tả</string>
+    <string name="adm_verified_business">Doanh nghiệp đã xác minh · %d tin đang đăng</string>
+    <string name="adm_admin_notes">Ghi chú nội bộ (admin)</string>
+    <string name="adm_admin_notes_hint">Ghi chú về lần duyệt này… (chỉ admin thấy)</string>
+    <string name="adm_status_history">Lịch sử trạng thái</string>
+    <string name="adm_request_revision">Yêu cầu chỉnh sửa</string>
+    <string name="adm_reject">Từ chối</string>
+    <string name="adm_approve_publish">Duyệt &amp; đăng</string>
+    <string name="adm_reject_listing_title">Từ chối tin đăng này?</string>
+    <string name="adm_reject_listing_msg">Doanh nghiệp sẽ nhận được thông báo kèm ghi chú của bạn. Họ có thể gửi lại sau khi chỉnh sửa.</string>
+    <string name="adm_request_revision_title">Yêu cầu chỉnh sửa?</string>
+    <string name="adm_request_revision_msg">Doanh nghiệp sẽ nhận ghi chú của bạn và có thể gửi lại khi sẵn sàng.</string>
+    <string name="adm_send_request">Gửi yêu cầu</string>
+    <string name="adm_original_content">Nội dung gốc</string>
+    <string name="adm_reporter_reasoning">Lý do của người báo cáo</string>
+    <string name="adm_contact_both">Liên hệ cả hai bên</string>
+    <string name="adm_dismiss">Bỏ qua</string>
+    <string name="adm_approve_report">Chấp nhận báo cáo</string>
+    <string name="adm_reported_by">Báo cáo bởi %1$s · %2$s trước</string>
+    <string name="adm_toast_listing_approved">Đã duyệt tin · đã đăng</string>
+    <string name="adm_toast_listing_rejected">Đã từ chối tin · đã báo doanh nghiệp</string>
+    <string name="adm_toast_revision_requested">Đã yêu cầu chỉnh sửa · đã báo doanh nghiệp</string>
+    <string name="adm_toast_report_approved">Đã duyệt báo cáo · đã khóa người dùng &amp; gỡ bình luận</string>
+    <string name="adm_toast_report_dismissed">Đã bỏ qua báo cáo · không xử lý</string>
+    <string name="adm_toast_contacted">Đã gửi tin nhắn cho cả hai bên</string>
+    <string name="adm_by_prefix">bởi </string>
+    <string name="adm_on_prefix">về </string>
+
+    <!-- Businesses -->
+    <string name="adm_biz_eyebrow">Doanh nghiệp đang hoạt động</string>
+    <string name="adm_biz_title">Danh bạ · %d</string>
+    <string name="adm_biz_search_hint">Tìm theo tên, chủ sở hữu…</string>
+    <string name="adm_tab_all">Tất cả</string>
+    <string name="adm_tab_active">Hoạt động</string>
+    <string name="adm_tab_suspended">Tạm khóa</string>
+    <string name="adm_biz_empty_title">Không tìm thấy doanh nghiệp</string>
+    <string name="adm_biz_empty_msg">Thử bộ lọc hoặc từ khóa khác.</string>
+    <string name="adm_listings_label">Tin đăng</string>
+    <string name="adm_bookings_label">Lượt đặt</string>
+    <string name="adm_status_active">Hoạt động</string>
+    <string name="adm_status_suspended">Tạm khóa</string>
+    <string name="adm_joined">Tham gia %s</string>
+    <string name="adm_menu_view_profile">Xem hồ sơ</string>
+    <string name="adm_menu_view_listings">Xem tin đăng</string>
+    <string name="adm_menu_view_reports">Xem báo cáo</string>
+    <string name="adm_suspend">Tạm khóa</string>
+    <string name="adm_reactivate">Mở lại</string>
+    <string name="adm_biz_suspend_title">Tạm khóa doanh nghiệp?</string>
+    <string name="adm_biz_suspend_msg">%s sẽ mất quyền truy cập đến khi được mở lại. Các tin đã đăng sẽ bị ẩn khỏi du khách.</string>
+    <string name="adm_biz_reactivate_title">Mở lại doanh nghiệp?</string>
+    <string name="adm_biz_reactivate_msg">%s sẽ được khôi phục quyền truy cập và các tin đăng sẽ hiển thị lại với du khách.</string>
+    <string name="adm_toast_biz_suspended">Đã tạm khóa %s</string>
+    <string name="adm_toast_biz_reactivated">Đã mở lại %s</string>
+
+    <!-- Users -->
+    <string name="adm_users_eyebrow">Người dùng</string>
+    <string name="adm_users_title">Hồ sơ · %s</string>
+    <string name="adm_users_search_hint">Tìm người dùng…</string>
+    <string name="adm_tab_flagged">Bị gắn cờ</string>
+    <string name="adm_user_profile">Hồ sơ người dùng</string>
+    <string name="adm_status_flagged">Bị gắn cờ</string>
+    <string name="adm_bookings_count">%d lượt đặt</string>
+    <string name="adm_tier">Hạng</string>
+    <string name="adm_reports_label">Báo cáo</string>
+    <string name="adm_booking_history">Lịch sử đặt chỗ</string>
+    <string name="adm_n_stays">%d lần lưu trú</string>
+    <string name="adm_reviews_left">Đánh giá đã viết</string>
+    <string name="adm_reviews_count">%d đánh giá</string>
+    <string name="adm_reports_against">Báo cáo về người dùng</string>
+    <string name="adm_n_open">%d đang mở</string>
+    <string name="adm_none">Không có</string>
+    <string name="adm_contact">Liên hệ</string>
+    <string name="adm_user_suspend_title">Tạm khóa người dùng?</string>
+    <string name="adm_user_suspend_msg">%s sẽ mất quyền truy cập đặt chỗ, đánh giá và thị trường đến khi được mở lại.</string>
+    <string name="adm_user_reactivate_title">Mở lại người dùng?</string>
+    <string name="adm_user_reactivate_msg">%s sẽ được khôi phục quyền truy cập TourGo.</string>
+    <string name="adm_toast_user_suspended">Đã tạm khóa %s</string>
+    <string name="adm_toast_user_reactivated">Đã mở lại %s</string>
+
+    <!-- Profile -->
+    <string name="adm_account">Tài khoản</string>
+    <string name="adm_admin_settings">Cài đặt Admin</string>
+    <string name="adm_sec_moderation">Kiểm duyệt</string>
+    <string name="adm_mod_policy">Chính sách kiểm duyệt</string>
+    <string name="adm_admin_team">Đội ngũ admin &amp; vai trò</string>
+    <string name="adm_admin_team_count">4 admin</string>
+    <string name="adm_audit_log">Nhật ký kiểm toán</string>
+    <string name="adm_sec_preferences">Tùy chọn</string>
+    <string name="adm_notifications">Thông báo</string>
+    <string name="adm_language">Ngôn ngữ</string>
+    <string name="adm_language_value">Tiếng Anh</string>
+    <string name="adm_password_2fa">Mật khẩu &amp; 2FA</string>
+    <string name="adm_help_center">Trung tâm trợ giúp</string>
+    <string name="adm_logout">Đăng xuất</string>
+    <string name="adm_toast_logged_out">Đã đăng xuất</string>
 
 </resources>

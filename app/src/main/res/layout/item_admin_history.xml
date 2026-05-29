@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:background="@drawable/bg_adm_rounded_10"
+    android:backgroundTint="@color/adm_gray_50"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ImageView
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_history"
+        app:tint="@color/adm_gray_500" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/admHistoryAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="11.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/admHistoryNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/adm_gray_700"
+            android:textSize="11.5sp" />
+    </LinearLayout>
+</LinearLayout>

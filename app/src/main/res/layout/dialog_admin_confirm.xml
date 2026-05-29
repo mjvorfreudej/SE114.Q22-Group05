@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_adm_rounded_16"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <FrameLayout
+        android:id="@+id/admIconWrap"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_adm_circle"
+        android:backgroundTint="@color/adm_blue_50">
+
+        <ImageView
+            android:id="@+id/admIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_help_circle"
+            app:tint="@color/adm_blue_500" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/admTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textColor="@color/adm_gray_900"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/admMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/admCancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/action_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/adm_gray_900"
+            app:cornerRadius="999dp"
+            app:strokeColor="@color/adm_gray_300" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/admConfirm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/adm_gray_900"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:cornerRadius="999dp" />
+    </LinearLayout>
+</LinearLayout>

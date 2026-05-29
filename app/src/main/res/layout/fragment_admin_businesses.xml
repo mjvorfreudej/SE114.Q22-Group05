@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_gray_100"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adm_biz_eyebrow"
+            android:textColor="@color/adm_gray_400"
+            android:textSize="10.5sp" />
+
+        <TextView
+            android:id="@+id/admBizTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_adm_pill"
+            android:backgroundTint="@color/adm_gray_100"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp">
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_search_24"
+                app:tint="@color/adm_gray_400" />
+
+            <EditText
+                android:id="@+id/admBizSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="@string/adm_biz_search_hint"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@color/adm_gray_900"
+                android:textColorHint="@color/adm_gray_400"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/admTopTabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/admBizList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="24dp" />
+
+        <LinearLayout
+            android:id="@+id/admBizEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_adm_rounded_16"
+                android:backgroundTint="@color/adm_gray_100">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_building"
+                    app:tint="@color/adm_gray_400" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/adm_biz_empty_title"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/adm_biz_empty_msg"
+                android:textColor="@color/adm_gray_500"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>
