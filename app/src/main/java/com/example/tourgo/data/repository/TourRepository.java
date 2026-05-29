@@ -94,4 +94,13 @@ public class TourRepository {
     public void clearCache() {
         cachedTours = null;
     }
+
+    /** Look up a cached tour by id, or {@code null} if not loaded/found. */
+    public Tour findTourById(String tourId) {
+        if (tourId == null || cachedTours == null) return null;
+        for (Tour t : cachedTours) {
+            if (tourId.equals(t.getId())) return t;
+        }
+        return null;
+    }
 }

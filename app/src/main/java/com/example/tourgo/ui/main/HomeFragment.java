@@ -120,6 +120,9 @@ public class HomeFragment extends Fragment {
         binding.chipOfferAll.setOnClickListener(v -> setFilter(OfferFilter.ALL));
         binding.chipOfferHotel.setOnClickListener(v -> setFilter(OfferFilter.HOTEL));
         binding.chipOfferTour.setOnClickListener(v -> setFilter(OfferFilter.TOUR));
+
+        binding.fabAddTour.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), CreateTourActivity.class)));
     }
 
     private void openHotelScreen() {
@@ -190,8 +193,9 @@ public class HomeFragment extends Fragment {
                 if (binding == null || getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     if (data != null) {
-                        cachedTours = data;
-                        preloadTourImages(data);
+                        // Home only surfaces published tours; pending/rejected ones stay hidden.
+                        cachedTours = filterApproved(data);
+                        preloadTourImages(cachedTours);
                     }
                     refreshOffersList();
                     maybeHideProgress();
@@ -238,6 +242,20 @@ public class HomeFragment extends Fragment {
             binding.rvHomeOffers.setAdapter(offersHotelAdapter);
             offersHotelAdapter.setData(limit(cachedHotels, OFFERS_LIMIT));
         }
+    }
+
+    private List<Tour> filterApproved(List<Tour> source) {
+        List<Tour> approved = new ArrayList<>();
+        if (source == null) return approved;
+        for (Tour tour : source) {
+            String status = tour.getStatus();
+            // Treat a missing status as approved so older records without the
+            // column still appear; only PENDING/rejected tours are filtered out.
+            if (status == null || "APPROVED".equalsIgnoreCase(status)) {
+                approved.add(tour);
+            }
+        }
+        return approved;
     }
 
     private <T> List<T> limit(List<T> source, int max) {

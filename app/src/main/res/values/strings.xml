@@ -426,4 +426,44 @@
     <string name="adm_logout">Đăng xuất</string>
     <string name="adm_toast_logged_out">Đã đăng xuất</string>
 
+    <!-- Create Tour -->
+    <string name="create_tour_title">Tạo tour mới</string>
+    <string name="create_tour_subtitle">Gửi tour của bạn để được duyệt</string>
+    <string name="create_tour_section_info">Thông tin tour</string>
+    <string name="create_tour_name_hint">Tiêu đề tour</string>
+    <string name="create_tour_desc_hint">Mô tả</string>
+    <string name="create_tour_price_hint">Giá (VND)</string>
+    <string name="create_tour_destination_hint">Điểm đến</string>
+    <string name="create_tour_duration_hint">Thời lượng (vd: 2 ngày 1 đêm)</string>
+    <string name="create_tour_section_image">Ảnh bìa</string>
+    <string name="create_tour_pick_image">Chạm để chọn ảnh bìa</string>
+    <string name="create_tour_change_image">Đổi ảnh</string>
+    <string name="create_tour_confirm">Xác nhận</string>
+    <string name="create_tour_err_name">Vui lòng nhập tiêu đề</string>
+    <string name="create_tour_err_desc">Vui lòng nhập mô tả</string>
+    <string name="create_tour_err_price">Giá phải lớn hơn 0</string>
+    <string name="create_tour_err_destination">Vui lòng nhập điểm đến</string>
+    <string name="create_tour_err_image">Vui lòng chọn ảnh bìa</string>
+    <string name="create_tour_uploading">Đang tải ảnh lên…</string>
+    <string name="create_tour_saving">Đang lưu tour…</string>
+    <string name="create_tour_success">Đã gửi tour, đang chờ duyệt</string>
+    <string name="create_tour_view_pending">Xem danh sách chờ</string>
+
+    <!-- Pending tours -->
+    <string name="pending_tour_title">Tour đang chờ duyệt</string>
+    <string name="pending_tour_empty">Chưa có tour nào đang chờ duyệt</string>
+    <string name="pending_tour_badge">Đang chờ</string>
+
+    <!-- Booking history -->
+    <string name="booking_history_title">Lịch sử đặt tour</string>
+    <string name="booking_history_filter_paid">Đã thanh toán</string>
+    <string name="booking_history_filter_completed">Hoàn thành</string>
+    <string name="booking_history_empty">Không có đơn đặt nào</string>
+
+    <!-- Admin moderation (businesses & users) -->
+    <string name="adm_status_pending">Đang chờ</string>
+    <string name="adm_menu_approve">Duyệt</string>
+    <string name="adm_toast_biz_approved">Đã duyệt %s</string>
+    <string name="adm_users_empty">Không có người dùng</string>
+
 </resources>

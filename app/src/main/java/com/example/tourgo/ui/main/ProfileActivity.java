@@ -84,14 +84,8 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupBookings() {
-        RecyclerView rv = findViewById(R.id.rvMyBookings);
-        if (rv == null) return;
-        rv.setLayoutManager(new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false));
-        List<MyBookingAdapter.Item> items = new ArrayList<>(Arrays.asList(
-                new MyBookingAdapter.Item("The Grand Orchid Resort", "13 Aug - 15 Aug", R.drawable.hotel_1),
-                new MyBookingAdapter.Item("Hilton Bandung", "20 Sep - 22 Sep", R.drawable.hotel_2)
-        ));
-        rv.setAdapter(new MyBookingAdapter(items));
+        // Real booking history from the bookings table, with PAID/COMPLETED tabs.
+        new BookingHistorySection(this).bind(findViewById(android.R.id.content));
     }
 
     private void setupLogout() {

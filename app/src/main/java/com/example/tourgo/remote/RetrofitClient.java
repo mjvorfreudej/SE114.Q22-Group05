@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.tourgo.BuildConfig;
 import com.example.tourgo.data.local.SessionManager;
+import com.example.tourgo.remote.api.AdminApi;
 import com.example.tourgo.remote.api.AuthApi;
 import com.example.tourgo.remote.api.BookingApi;
 import com.example.tourgo.remote.api.ReviewApi;
@@ -100,5 +101,9 @@ public class RetrofitClient {
 
     public UserApi getUserApi() {
         return retrofit.create(UserApi.class);
+    }
+
+    public AdminApi getAdminApi() {
+        return retrofit.create(AdminApi.class);
     }
 }
