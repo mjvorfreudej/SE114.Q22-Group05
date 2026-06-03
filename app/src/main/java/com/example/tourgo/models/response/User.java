@@ -27,6 +27,9 @@ public class User {
     @SerializedName("create_at")
     private String createdAt;
 
+    @SerializedName("status")
+    private String status;
+
     public String getId() {
         return id;
     }
@@ -53,5 +56,9 @@ public class User {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }
