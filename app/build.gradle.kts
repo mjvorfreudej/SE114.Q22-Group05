@@ -58,6 +58,11 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.play.services.maps)
+    implementation(libs.swiperefreshlayout)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.gson)
 
     implementation("androidx.security:security-crypto:1.1.0")
 

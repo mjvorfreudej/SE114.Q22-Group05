@@ -1,5 +1,7 @@
 package com.example.tourgo.data;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -10,6 +12,7 @@ import com.example.tourgo.models.Tour;
 import com.example.tourgo.remote.FavoriteService;
 import com.example.tourgo.remote.TourService;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -92,5 +95,132 @@ public class TourRepository {
 
     public void clearCache() {
         cachedTours = null;
+    }
+
+    public void createTourWithImages(
+            Context context,
+            Tour tour,
+            List<Uri> imageUris,
+            String accessToken,
+            DataCallback<Void> callback
+    ) {
+        TourService.createTour(tour, accessToken, new DataCallback<String>() {
+            @Override
+            public void onSuccess(String tourId) {
+                if (imageUris == null || imageUris.isEmpty()) {
+                    clearCache();
+                    mainHandler.post(() -> callback.onSuccess(null));
+                    return;
+                }
+
+                uploadImagesSequentially(
+                        context,
+                        tourId,
+                        imageUris,
+                        0,
+                        accessToken,
+                        callback
+                );
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                mainHandler.post(() -> callback.onError(code, rawMessage));
+            }
+        });
+    }
+
+    private void uploadImagesSequentially(
+            Context context,
+            String tourId,
+            List<Uri> imageUris,
+            int index,
+            String accessToken,
+            DataCallback<Void> callback
+    ) {
+        if (index >= imageUris.size()) {
+            clearCache();
+            mainHandler.post(() -> callback.onSuccess(null));
+            return;
+        }
+
+        TourService.uploadTourImage(
+                context,
+                imageUris.get(index),
+                tourId,
+                index,
+                accessToken,
+                new DataCallback<String>() {
+                    @Override
+                    public void onSuccess(String imageUrl) {
+                        TourService.insertTourImage(
+                                tourId,
+                                imageUrl,
+                                index,
+                                accessToken,
+                                new DataCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void data) {
+                                        uploadImagesSequentially(
+                                                context,
+                                                tourId,
+                                                imageUris,
+                                                index + 1,
+                                                accessToken,
+                                                callback
+                                        );
+                                    }
+
+                                    @Override
+                                    public void onError(ApiErrorCode code, String rawMessage) {
+                                        mainHandler.post(() -> callback.onError(code, rawMessage));
+                                    }
+                                }
+                        );
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        mainHandler.post(() -> callback.onError(code, rawMessage));
+                    }
+                }
+        );
+    }
+
+    public void loadMyTours(
+            String ownerId,
+            String accessToken,
+            DataCallback<List<Tour>> callback
+    ) {
+        TourService.getMyTours(ownerId, accessToken, new DataCallback<List<Tour>>() {
+            @Override
+            public void onSuccess(List<Tour> data) {
+                mainHandler.post(() -> callback.onSuccess(data));
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                mainHandler.post(() -> callback.onError(code, rawMessage));
+            }
+        });
+    }
+
+    public void deleteTour(
+            String tourId,
+            String accessToken,
+            DataCallback<Void> callback
+    ) {
+        TourService.deleteTour(tourId, accessToken, new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                clearCache();
+                mainHandler.post(() -> callback.onSuccess(null));
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                mainHandler.post(() -> callback.onError(code, rawMessage));
+            }
+        });
     }
 }

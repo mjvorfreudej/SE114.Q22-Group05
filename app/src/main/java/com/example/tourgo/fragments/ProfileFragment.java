@@ -157,6 +157,20 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Privacy & Security", Toast.LENGTH_SHORT).show();
         });
 
+        // Pending Tours
+        View rowPending = root.findViewById(R.id.rowPendingTours);
+        if (rowPending != null) rowPending.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), com.example.tourgo.ui.main.PendingTourActivity.class);
+            startActivity(intent);
+        });
+
+        // Create Tour
+        View rowCreateTour = root.findViewById(R.id.rowCreateTour);
+        if (rowCreateTour != null) rowCreateTour.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), com.example.tourgo.ui.main.CreateTourActivity.class);
+            startActivity(intent);
+        });
+
         // Logout
         View btnLogout = root.findViewById(R.id.btnLogout);
         if (btnLogout != null) btnLogout.setOnClickListener(v -> showLogoutDialog());

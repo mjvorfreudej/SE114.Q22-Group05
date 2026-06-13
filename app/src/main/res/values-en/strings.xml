@@ -239,4 +239,28 @@
     <string name="review_selected_images_count">%d photos selected</string>
     <string name="review_image_upload_partial_error">Review saved, but some photos could not be uploaded</string>
 
+    <!-- Create Tour -->
+    <string name="create_tour_title_label">Tour Title</string>
+    <string name="create_tour_title_hint">Enter tour title</string>
+    <string name="create_tour_desc_label">Description</string>
+    <string name="create_tour_desc_hint">Enter tour description</string>
+    <string name="create_tour_price_label">Price (VND)</string>
+    <string name="create_tour_price_hint">0</string>
+    <string name="create_tour_image_label">Image</string>
+    <string name="create_tour_select_image">Select Image</string>
+    <string name="create_tour_button">Create Tour</string>
+    <string name="create_tour_success">Tour created successfully!</string>
+    <string name="create_tour_error">Please fill in all information</string>
+    <string name="create_tour_invalid_price">Tour price must be greater than 0</string>
+    <string name="create_tour_header_title">Create New Tour</string>
+    <string name="create_tour_section_basic">Basic Information</string>
+    <string name="create_tour_duration_label">Duration</string>
+    <string name="create_tour_duration_hint">e.g., 3 days 2 nights</string>
+    <string name="create_tour_destination_label">Destination</string>
+    <string name="create_tour_image_support">Supports JPG, PNG (Max 5MB)</string>
+
+    <!-- Create Listing -->
+    <string name="create_listing_description_title">Create your description</string>
+    <string name="create_listing_description_hint">Share what makes your place special.</string>
+
 </resources>

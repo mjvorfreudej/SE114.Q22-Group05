@@ -34,13 +34,14 @@ public class SessionManager {
     /**
      * Lưu session sau khi login thành công.
      */
-    public void saveSession(String email, String userId, String accessToken, String refreshToken, String name, boolean rememberMe) {
+    public void saveSession(String email, String userId, String accessToken, String refreshToken, String name, String role, boolean rememberMe) {
         sharedPreferences.edit()
                 .putString("email", email)
                 .putString("user_id", userId)
                 .putString("access_token", accessToken)
                 .putString("refresh_token", refreshToken)
                 .putString("user_name", name)
+                .putString("user_role", role)
                 .putBoolean("isLoggedIn", true)
                 .putBoolean("remember_me", rememberMe)
                 .apply();
@@ -64,6 +65,14 @@ public class SessionManager {
 
     public String getUserName() {
         return sharedPreferences.getString("user_name", null);
+    }
+
+    public String getUserRole() {
+        return sharedPreferences.getString("user_role", "USER");
+    }
+
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(getUserRole());
     }
 
     public boolean isLoggedIn() {

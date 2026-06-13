@@ -1,5 +1,6 @@
 package com.example.tourgo.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.Hotel;
 import com.example.tourgo.utils.SessionManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     View currentTab;
 
     LinearLayout navHome, navTours, navHotels, navProfile;
+    FloatingActionButton fabAdd;
     SessionManager session;
 
     @Override
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         navTours = findViewById(R.id.navTours);
         navHotels = findViewById(R.id.navHotels);
         navProfile = findViewById(R.id.navProfile);
+        fabAdd = findViewById(R.id.fabAdd);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutNavMain), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -54,7 +58,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupNavigation();
-        
+
+        fabAdd.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CreateTourActivity.class);
+            startActivity(intent);
+        });
+
         if (savedInstanceState == null) {
             updateTabUI(navHome);
             loadFragment(new HomeFragment(), false);
@@ -118,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void switchToHome() {
+        updateTabUI(navHome);
+        loadFragment(new HomeFragment(), true);
+    }
+
     public void switchToSearch() {
         updateTabUI(navTours);
         loadFragment(new SearchFragment(), true);
@@ -148,6 +162,15 @@ public class MainActivity extends AppCompatActivity {
         }
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentTab != navHome) {
+            switchToHome();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void updateTabUI(View newTab) {

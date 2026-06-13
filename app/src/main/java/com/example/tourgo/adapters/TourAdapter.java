@@ -35,10 +35,15 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
     private List<Tour> filteredList;
     private SessionManager session;
     private OnTourClickListener onTourClickListener;
+    private boolean isPendingList = false;
 
     public TourAdapter(List<Tour> list) {
         this.originalList = list;
         this.filteredList = new ArrayList<>(list);
+    }
+
+    public void setPendingList(boolean pendingList) {
+        isPendingList = pendingList;
     }
 
     public void setOnTourClickListener(OnTourClickListener listener) {
@@ -88,7 +93,17 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
         holder.tvDuration.setText(item.getDuration());
         holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
 
-        updateHeartIcon(holder.btnFavorite, item.isFavorite());
+        if (isPendingList) {
+            holder.btnFavorite.setVisibility(View.GONE);
+            holder.tvRating.setVisibility(View.GONE);
+            holder.tvStatus.setVisibility(View.VISIBLE);
+            holder.tvStatus.setText(item.getStatus());
+        } else {
+            holder.btnFavorite.setVisibility(View.VISIBLE);
+            holder.tvRating.setVisibility(View.VISIBLE);
+            holder.tvStatus.setVisibility(View.GONE);
+            updateHeartIcon(holder.btnFavorite, item.isFavorite());
+        }
 
         holder.btnFavorite.setOnClickListener(v -> {
             if (!session.isLoggedIn()) {
@@ -160,7 +175,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
 
     static class TourViewHolder extends RecyclerView.ViewHolder {
         ImageView imgTour, btnFavorite;
-        TextView tvName, tvLocation, tvPrice, tvRating, tvDuration;
+        TextView tvName, tvLocation, tvPrice, tvRating, tvDuration, tvStatus;
 
         public TourViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -171,6 +186,7 @@ public class TourAdapter extends RecyclerView.Adapter<TourAdapter.TourViewHolder
             tvPrice = itemView.findViewById(R.id.tvTourPrice);
             tvRating = itemView.findViewById(R.id.tvTourRating);
             tvDuration = itemView.findViewById(R.id.tvTourDuration);
+            tvStatus = itemView.findViewById(R.id.tvTourStatus);
         }
     }
 

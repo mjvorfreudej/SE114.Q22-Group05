@@ -239,4 +239,47 @@
     <string name="review_selected_images_count">Đã chọn %d ảnh</string>
     <string name="review_image_upload_partial_error">Đánh giá đã được gửi, nhưng có ảnh chưa tải lên được</string>
 
+    <!-- Create Tour -->
+    <string name="create_tour_title_label">Tiêu đề tour</string>
+    <string name="create_tour_title_hint">Nhập tiêu đề tour</string>
+    <string name="create_tour_desc_label">Mô tả</string>
+    <string name="create_tour_desc_hint">Nhập mô tả tour</string>
+    <string name="create_tour_price_label">Giá (VND)</string>
+    <string name="create_tour_price_hint">0</string>
+    <string name="create_tour_image_label">Hình ảnh</string>
+    <string name="create_tour_select_image">Chọn hình ảnh</string>
+    <string name="create_tour_button">Tạo Tour</string>
+    <string name="create_tour_success">Tạo tour thành công!</string>
+    <string name="create_tour_error">Vui lòng điền đầy đủ thông tin</string>
+    <string name="create_tour_invalid_price">Giá tour phải lớn hơn 0</string>
+    <string name="create_tour_header_title">Tạo tour mới</string>
+    <string name="create_tour_section_basic">Thông tin cơ bản</string>
+    <string name="create_tour_duration_label">Thời gian</string>
+    <string name="create_tour_duration_hint">VD: 3 ngày 2 đêm</string>
+    <string name="create_tour_destination_label">Điểm đến</string>
+    <string name="create_tour_region_label">Vùng miền</string>
+    <string name="create_tour_image_support">Hỗ trợ JPG, PNG (Tối đa 5MB)</string>
+
+    <string name="profile_pending_tours">Tour đang chờ duyệt</string>
+    <string name="pending_tours_title">Tour đang chờ duyệt</string>
+    <string name="pending_tours_empty">Chưa có tour nào đang chờ duyệt</string>
+    <string name="pending_tours_error_prefix">Lỗi: %s</string>
+    <string name="pending_tours_status_pending">ĐANG CHỜ DUYỆT</string>
+    <string name="pending_tours_toast_info">Tour này đang trong quá trình kiểm duyệt</string>
+    <string name="pending_tours_loading">Đang tải...</string>
+    <string name="region_picker_title">Chọn vùng miền</string>
+    <string name="duration_picker_title">Chọn thời gian</string>
+    <string name="custom_duration_title">Nhập thời gian</string>
+    <string name="custom_duration_hint">VD: 7 ngày 6 đêm</string>
+    <string name="create_tour_loading">Đang tạo tour...</string>
+    <string name="create_tour_uploading_image">Đang tải ảnh lên...</string>
+    <string name="create_tour_success_pending">Gửi yêu cầu thành công! Tour của bạn đang chờ phê duyệt.</string>
+    <string name="create_tour_error_prefix">Lỗi tạo tour: %s</string>
+    <string name="create_tour_image_upload_error_prefix">Tải ảnh thất bại: %s</string>
+    <string name="create_tour_image_link_error_prefix">Lỗi lưu ảnh: %s</string>
+
+    <!-- Create Listing -->
+    <string name="create_listing_description_title">Tạo mô tả của bạn</string>
+    <string name="create_listing_description_hint">Chia sẻ những điều làm cho chỗ ở của bạn trở nên đặc biệt.</string>
+
 </resources>

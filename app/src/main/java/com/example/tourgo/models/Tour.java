@@ -21,10 +21,14 @@ public class Tour implements Serializable {
     private String region;
     private String duration;
     private String status;
-    private String ownerId;
+    private String businessesId;
     private float rating;
     private int reviewCount;
     private String createdAt;
+
+    private double latitude;
+    private double longitude;
+    private int capacity;
 
     private boolean isFavorite;
 
@@ -83,10 +87,13 @@ public class Tour implements Serializable {
         t.region = json.optString("region", "");
         t.duration = json.optString("duration", "");
         t.status = json.optString("status", "APPROVED");
-        t.ownerId = json.optString("owner_id", null);
+        t.businessesId = json.optString("businesses_id", null);
         t.rating = (float) json.optDouble("rating", 0);
         t.reviewCount = json.optInt("review_count", 0);
         t.createdAt = json.optString("created_at", null);
+        t.latitude = json.optDouble("latitude", 0);
+        t.longitude = json.optDouble("longitude", 0);
+        t.capacity = json.optInt("capacity", 0);
 
         t.imageUrls = new ArrayList<>();
         JSONArray images = json.optJSONArray("tour_images");
@@ -146,8 +153,8 @@ public class Tour implements Serializable {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getOwnerId() { return ownerId; }
-    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
+    public String getBusinessesId() { return businessesId; }
+    public void setBusinessesId(String businessesId) { this.businessesId = businessesId; }
 
     public float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }
@@ -157,6 +164,15 @@ public class Tour implements Serializable {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 
     public int getImageResId() { return imageResId; }
     public String getLocation() { return location != null ? location : destination; }

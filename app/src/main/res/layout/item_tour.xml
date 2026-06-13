@@ -112,4 +112,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tvTourPrice" />
 
+    <TextView
+        android:id="@+id/tvTourStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_status_pending"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="PENDING"
+        android:textColor="#F59E0B"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/tvTourPrice"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvTourPrice" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

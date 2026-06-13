@@ -52,6 +52,33 @@ public class ProfileActivity extends AppCompatActivity {
         setupLogout();
         setupLanguage();
         setupCurrency();
+        setupPendingTours();
+        setupCreateTour();
+    }
+
+    private void setupCreateTour() {
+        View rowCreateTour = findViewById(R.id.rowCreateTour);
+        if (rowCreateTour != null) {
+            rowCreateTour.setOnClickListener(v -> {
+                Intent intent = new Intent(this, CreateTourActivity.class);
+                startActivity(intent);
+            });
+        }
+    }
+
+    private void setupPendingTours() {
+        View rowPending = findViewById(R.id.rowPendingTours);
+        if (rowPending != null) {
+            if (session.isAdmin()) {
+                rowPending.setVisibility(View.VISIBLE);
+                rowPending.setOnClickListener(v -> {
+                    Intent intent = new Intent(this, PendingTourActivity.class);
+                    startActivity(intent);
+                });
+            } else {
+                rowPending.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void setupBookings() {

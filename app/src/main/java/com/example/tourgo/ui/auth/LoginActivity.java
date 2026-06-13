@@ -35,13 +35,6 @@ public class LoginActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
 
-        // Auto-login if "Remember Me" was checked previously
-        if (session.isLoggedIn() && session.isRememberMe()) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
-            return;
-        }
-
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         EdgeToEdge.enable(this);
@@ -105,14 +98,21 @@ public class LoginActivity extends AppCompatActivity {
                             
                             // Lấy tên từ metadata (kiểm tra cả user_metadata và raw_user_meta_data)
                             String userName = "";
+                            String userRole = "USER";
                             if (user.has("user_metadata")) {
-                                userName = user.getJSONObject("user_metadata").optString("name", "");
+                                JSONObject meta = user.getJSONObject("user_metadata");
+                                userName = meta.optString("name", "");
+                                userRole = meta.optString("role", "USER");
                             }
                             if (userName.isEmpty() && user.has("raw_user_meta_data")) {
-                                userName = user.getJSONObject("raw_user_meta_data").optString("name", "");
+                                JSONObject rawMeta = user.getJSONObject("raw_user_meta_data");
+                                userName = rawMeta.optString("name", "");
+                                if (userRole.equals("USER")) {
+                                    userRole = rawMeta.optString("role", "USER");
+                                }
                             }
 
-                            session.saveSession(userEmail, userId, accessToken, refreshToken, userName, binding.cbLoginRemember.isChecked());
+                            session.saveSession(userEmail, userId, accessToken, refreshToken, userName, userRole, binding.cbLoginRemember.isChecked());
 
                             Toast.makeText(LoginActivity.this, getString(R.string.msg_login_success), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));

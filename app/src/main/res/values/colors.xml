@@ -7,4 +7,19 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#101828</color>
     <color name="red">#FF4B4B</color>
+    <color name="blue">#2E90FA</color>
+    <color name="blue_light">#EFF8FF</color>
+    <color name="orange">#F79009</color>
+    <color name="orange_light">#FFFAEB</color>
+    <color name="cyan">#06AED4</color>
+    <color name="cyan_light">#ECFDFF</color>
+    <color name="green">#12B76A</color>
+
+    <!-- Status Colors -->
+    <color name="status_pending">#F59E0B</color>
+    <color name="status_pending_bg">#FFF7ED</color>
+    <color name="status_approved">#12B76A</color>
+    <color name="status_approved_bg">#F0FDF4</color>
+    <color name="status_rejected">#F04438</color>
+    <color name="status_rejected_bg">#FEF3F2</color>
 </resources>

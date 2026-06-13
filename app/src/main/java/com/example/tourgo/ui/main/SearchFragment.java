@@ -43,7 +43,7 @@ public class SearchFragment extends Fragment {
         
         binding.btnBackSearch.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).onBackPressed();
+                ((MainActivity) getActivity()).switchToHome();
             }
         });
         
