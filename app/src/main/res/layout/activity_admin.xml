@@ -15,20 +15,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Floating "liquid glass" pill navigation -->
+    <!-- Floating Bottom Navigation (matches the user app's pill style) -->
     <LinearLayout
         android:id="@+id/admBottomNav"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_adm_bottom_nav"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/bg_bottom_nav"
         android:elevation="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="6dp"
-        android:paddingVertical="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -37,19 +38,19 @@
         <LinearLayout
             android:id="@+id/admTabHome"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/admIconHome"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:contentDescription="@string/adm_nav_home"
                 android:src="@drawable/ic_home_24"
                 app:tint="@color/adm_gray_400" />
@@ -58,33 +59,28 @@
                 android:id="@+id/admLabelHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/adm_nav_home"
-                android:textColor="@color/adm_gray_400"
-                android:textSize="10sp" />
-
-            <View
-                android:id="@+id/admIndHome"
-                android:layout_width="16dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/bg_adm_pill"
-                android:backgroundTint="@color/adm_gray_900"
-                android:visibility="invisible" />
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Moderate (with badge) -->
         <LinearLayout
             android:id="@+id/admTabModerate"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -92,8 +88,8 @@
 
                 <ImageView
                     android:id="@+id/admIconModerate"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:contentDescription="@string/adm_nav_moderate"
                     android:src="@drawable/ic_gavel"
                     app:tint="@color/adm_gray_400" />
@@ -107,6 +103,7 @@
                     android:layout_marginBottom="8dp"
                     android:background="@drawable/bg_adm_pill"
                     android:backgroundTint="@color/adm_red_500"
+                    android:gravity="center"
                     android:minWidth="16dp"
                     android:paddingHorizontal="4dp"
                     android:paddingVertical="1dp"
@@ -114,7 +111,6 @@
                     android:textColor="@color/white"
                     android:textSize="8sp"
                     android:textStyle="bold"
-                    android:gravity="center"
                     tools:ignore="HardcodedText" />
             </FrameLayout>
 
@@ -122,38 +118,33 @@
                 android:id="@+id/admLabelModerate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/adm_nav_moderate"
-                android:textColor="@color/adm_gray_400"
-                android:textSize="10sp" />
-
-            <View
-                android:id="@+id/admIndModerate"
-                android:layout_width="16dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/bg_adm_pill"
-                android:backgroundTint="@color/adm_gray_900"
-                android:visibility="invisible" />
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Business -->
         <LinearLayout
             android:id="@+id/admTabBusiness"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/admIconBusiness"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:contentDescription="@string/adm_nav_business"
                 android:src="@drawable/ic_building"
                 app:tint="@color/adm_gray_400" />
@@ -162,38 +153,33 @@
                 android:id="@+id/admLabelBusiness"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/adm_nav_business"
-                android:textColor="@color/adm_gray_400"
-                android:textSize="10sp" />
-
-            <View
-                android:id="@+id/admIndBusiness"
-                android:layout_width="16dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/bg_adm_pill"
-                android:backgroundTint="@color/adm_gray_900"
-                android:visibility="invisible" />
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Users -->
         <LinearLayout
             android:id="@+id/admTabUsers"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/admIconUsers"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:contentDescription="@string/adm_nav_users"
                 android:src="@drawable/ic_users"
                 app:tint="@color/adm_gray_400" />
@@ -202,38 +188,33 @@
                 android:id="@+id/admLabelUsers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/adm_nav_users"
-                android:textColor="@color/adm_gray_400"
-                android:textSize="10sp" />
-
-            <View
-                android:id="@+id/admIndUsers"
-                android:layout_width="16dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/bg_adm_pill"
-                android:backgroundTint="@color/adm_gray_900"
-                android:visibility="invisible" />
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Profile -->
         <LinearLayout
             android:id="@+id/admTabProfile"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="4dp">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:id="@+id/admIconProfile"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:contentDescription="@string/adm_nav_profile"
                 android:src="@drawable/ic_person_24"
                 app:tint="@color/adm_gray_400" />
@@ -242,19 +223,14 @@
                 android:id="@+id/admLabelProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/adm_nav_profile"
-                android:textColor="@color/adm_gray_400"
-                android:textSize="10sp" />
-
-            <View
-                android:id="@+id/admIndProfile"
-                android:layout_width="16dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
-                android:background="@drawable/bg_adm_pill"
-                android:backgroundTint="@color/adm_gray_900"
-                android:visibility="invisible" />
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
