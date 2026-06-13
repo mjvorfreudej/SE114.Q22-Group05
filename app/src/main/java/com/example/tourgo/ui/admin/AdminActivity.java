@@ -2,6 +2,7 @@ package com.example.tourgo.ui.admin;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,13 +71,17 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     private void applyInsets() {
-        // Bottom nav sits above the gesture bar; content draws under the status bar (fragments
-        // pad their own white headers).
+        // Floating nav: lift the whole pill above the gesture/nav bar via bottom margin
+        // (mirrors MainActivity). Content draws under the status bar (fragments pad their
+        // own white headers).
         View nav = findViewById(R.id.admBottomNav);
-        final int baseBottom = nav.getPaddingBottom();
+        ViewGroup.MarginLayoutParams navLp = (ViewGroup.MarginLayoutParams) nav.getLayoutParams();
+        final int baseNavBottomMargin = navLp.bottomMargin;
         ViewCompat.setOnApplyWindowInsetsListener(nav, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), baseBottom + bars.bottom);
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+            lp.bottomMargin = baseNavBottomMargin + bars.bottom;
+            v.setLayoutParams(lp);
             return insets;
         });
         View container = findViewById(R.id.adm_fragment_container);
