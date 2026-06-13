@@ -55,4 +55,7 @@ public interface TourApi {
     /** Admin: approve a pending tour (server flips status to "APPROVED"). */
     @PUT("api/tours/{id}/approve")
     Call<ApiResponse<Tour>> approveTour(@Path("id") String tourId);
+
+    @PUT("api/tours/{id}/reject")
+    Call<ApiResponse<Void>> rejectTour(@Path("id") String tourId);
 }

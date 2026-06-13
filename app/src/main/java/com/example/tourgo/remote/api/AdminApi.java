@@ -27,6 +27,14 @@ public interface AdminApi {
     @PUT("api/admin/businesses/{id}/approve")
     Call<ApiResponse<Void>> approveBusiness(@Path("id") String businessId);
 
+    /** Suspend a pending business. */
+    @PUT("api/admin/businesses/{id}/suspend")
+    Call<ApiResponse<Void>> suspendBusiness(@Path("id") String businessId);
+
+    /** Reject a pending business. */
+    @PUT("api/admin/businesses/{id}/reject")
+    Call<ApiResponse<Void>> rejectBusiness(@Path("id") String businessId);
+
     // ── Users ────────────────────────────────────────────────────────────────
 
     /** Fetch all user accounts. */
