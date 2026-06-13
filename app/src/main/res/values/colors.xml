@@ -26,6 +26,8 @@
     <color name="adm_gray_200">#EAECF0</color>
     <color name="adm_gray_100">#F2F4F7</color>
     <color name="adm_gray_50">#F9FAFB</color>
+    <!-- App canvas behind cards: a slightly darker cool-gray so white cards pop -->
+    <color name="adm_canvas">#E6EAF1</color>
 
     <!-- Semantic / status -->
     <color name="adm_green_500">#12B76A</color>

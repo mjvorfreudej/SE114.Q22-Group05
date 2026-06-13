@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/adm_gray_100"
+    android:background="@color/adm_canvas"
     android:orientation="vertical">
 
     <!-- Header -->
@@ -121,6 +121,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingTop="12dp"
@@ -226,6 +228,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:clipChildren="false"
                 android:orientation="horizontal">
 
                 <include
@@ -248,6 +251,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:clipChildren="false"
                 android:orientation="horizontal">
 
                 <include
@@ -270,6 +274,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:clipChildren="false"
                 android:orientation="horizontal">
 
                 <include
@@ -303,19 +308,22 @@
                 android:id="@+id/admActListings"
                 layout="@layout/item_admin_action"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <include
                 android:id="@+id/admActReports"
                 layout="@layout/item_admin_action"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <include
                 android:id="@+id/admActUsers"
                 layout="@layout/item_admin_action"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp" />
 
             <!-- Recent Activity -->
             <RelativeLayout
@@ -350,8 +358,9 @@
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="4dp"
+                app:strokeColor="@color/adm_gray_300"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:id="@+id/admActivityList"

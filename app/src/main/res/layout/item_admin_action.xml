@@ -1,75 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/bg_adm_rounded_12"
+    android:layout_marginBottom="12dp"
     android:clickable="true"
     android:focusable="true"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="12dp">
-
-    <FrameLayout
-        android:id="@+id/admActIconWrap"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/bg_adm_rounded_10"
-        android:backgroundTint="@color/adm_amber_100">
-
-        <ImageView
-            android:id="@+id/admActIcon"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="center"
-            android:contentDescription="@null"
-            android:src="@drawable/ic_gavel"
-            app:tint="@color/adm_amber_500" />
-    </FrameLayout>
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeColor="@color/adm_gray_300"
+    app:strokeWidth="1dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <FrameLayout
+            android:id="@+id/admActIconWrap"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_adm_rounded_10"
+            android:backgroundTint="@color/adm_amber_100">
+
+            <ImageView
+                android:id="@+id/admActIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_gavel"
+                app:tint="@color/adm_amber_500" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/admActTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/admActSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/admActTitle"
+            android:id="@+id/admActBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/adm_gray_900"
-            android:textSize="13sp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_adm_pill"
+            android:backgroundTint="@color/adm_red_500"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/admActSub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textColor="@color/adm_gray_400"
-            android:textSize="11sp" />
+        <ImageView
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/adm_gray_400" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/admActBadge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="6dp"
-        android:background="@drawable/bg_adm_pill"
-        android:backgroundTint="@color/adm_red_500"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
-        android:textColor="@color/white"
-        android:textSize="11sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
-
-    <ImageView
-        android:layout_width="14dp"
-        android:layout_height="14dp"
-        android:contentDescription="@null"
-        android:src="@drawable/ic_chevron_right_24"
-        app:tint="@color/adm_gray_400" />
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>
