@@ -6,8 +6,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,10 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.databinding.ActivitySearchBinding;
+import com.example.tourgo.databinding.LayoutFilterBottomSheetBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.remote.service.TourService;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +40,15 @@ public class SearchActivity extends AppCompatActivity {
     private Runnable debounceRunnable;
     private Runnable timeoutRunnable;
 
-    // Incremented on every new search; used to discard stale callbacks.
     private int currentSearchVersion = 0;
+    
+    // Filter State
+    private int selectedPropertyTypeId = -1;
+    private int selectedQuickPriceId = -1;
+    private String minPrice = "";
+    private String maxPrice = "";
+    private final List<Integer> selectedAmenityIds = new ArrayList<>();
+    private int selectedRatingId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,78 +56,151 @@ public class SearchActivity extends AppCompatActivity {
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setupRecyclerView();
+        initViews();
         setupSearchInput();
-        setupRecentSearches();
-
-        binding.btnBackSearch.setOnClickListener(v -> finish());
+        setupRecentContent();
     }
 
-    // -------------------------------------------------------------------------
-    // Setup
-    // -------------------------------------------------------------------------
-
-    private void setupRecyclerView() {
+    private void initViews() {
         searchAdapter = new TourAdapter(new ArrayList<>());
-        searchAdapter.setOnTourClickListener(tour -> {
-            Intent intent = new Intent(this, BookingActivity.class);
-            intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
-            startActivity(intent);
-        });
+        searchAdapter.setOnTourClickListener(this::navigateToDetail);
         binding.rvSearchResults.setLayoutManager(new LinearLayoutManager(this));
         binding.rvSearchResults.setAdapter(searchAdapter);
+
+        binding.btnBackSearch.setOnClickListener(v -> finish());
+        
+        binding.btnFilterSearch.setOnClickListener(v -> {
+            showFilterBottomSheet();
+        });
+    }
+
+    private void navigateToDetail(Tour tour) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("hotel_object", tour); 
+        startActivity(intent);
+    }
+
+    private void showFilterBottomSheet() {
+        try {
+            BottomSheetDialog dialog = new BottomSheetDialog(this);
+            LayoutFilterBottomSheetBinding sheet = LayoutFilterBottomSheetBinding.inflate(getLayoutInflater());
+            dialog.setContentView(sheet.getRoot());
+
+            View bottomSheetInternal = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheetInternal != null) {
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+            }
+
+            restoreFilterState(sheet);
+
+            // Xử lý khi chọn các mốc giá nhanh
+            sheet.cgQuickPrice.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (checkedIds.isEmpty()) return;
+                int id = checkedIds.get(0);
+                selectedQuickPriceId = id;
+                if (id == R.id.chipPriceUnder500) {
+                    sheet.etMinPrice.setText("0");
+                    sheet.etMaxPrice.setText("500000");
+                } else if (id == R.id.chipPrice500to2M) {
+                    sheet.etMinPrice.setText("500000");
+                    sheet.etMaxPrice.setText("2000000");
+                } else if (id == R.id.chipPrice2Mto5M) {
+                    sheet.etMinPrice.setText("2000000");
+                    sheet.etMaxPrice.setText("5000000");
+                } else if (id == R.id.chipPriceOver5M) {
+                    sheet.etMinPrice.setText("5000000");
+                    sheet.etMaxPrice.setText("");
+                }
+            });
+
+            // Khi người dùng tự nhập -> bỏ chọn mốc giá nhanh
+            TextWatcher manualPriceWatcher = new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (sheet.etMinPrice.hasFocus() || sheet.etMaxPrice.hasFocus()) {
+                        sheet.cgQuickPrice.clearCheck();
+                        selectedQuickPriceId = -1;
+                    }
+                }
+            };
+            sheet.etMinPrice.addTextChangedListener(manualPriceWatcher);
+            sheet.etMaxPrice.addTextChangedListener(manualPriceWatcher);
+
+            sheet.btnCloseFilter.setOnClickListener(v -> dialog.dismiss());
+            sheet.btnCancelFilter.setOnClickListener(v -> {
+                resetFilters();
+                dialog.dismiss();
+                triggerSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            sheet.btnApplyFilter.setOnClickListener(v -> {
+                saveFilterState(sheet);
+                dialog.dismiss();
+                triggerSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            dialog.show();
+        } catch (Exception e) {
+            Log.e("SearchActivity", "Error showing BottomSheet", e);
+            Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void restoreFilterState(LayoutFilterBottomSheetBinding sheet) {
+        if (selectedPropertyTypeId != -1) sheet.cgPropertyType.check(selectedPropertyTypeId);
+        if (selectedQuickPriceId != -1) sheet.cgQuickPrice.check(selectedQuickPriceId);
+        sheet.etMinPrice.setText(minPrice);
+        sheet.etMaxPrice.setText(maxPrice);
+        for (int id : selectedAmenityIds) sheet.cgAmenities.check(id);
+        if (selectedRatingId != -1) sheet.cgRating.check(selectedRatingId);
+    }
+
+    private void saveFilterState(LayoutFilterBottomSheetBinding sheet) {
+        selectedPropertyTypeId = sheet.cgPropertyType.getCheckedChipId();
+        selectedQuickPriceId = sheet.cgQuickPrice.getCheckedChipId();
+        minPrice = sheet.etMinPrice.getText().toString();
+        maxPrice = sheet.etMaxPrice.getText().toString();
+        selectedRatingId = sheet.cgRating.getCheckedChipId();
+        selectedAmenityIds.clear();
+        selectedAmenityIds.addAll(sheet.cgAmenities.getCheckedChipIds());
+    }
+
+    private void resetFilters() {
+        selectedPropertyTypeId = -1;
+        selectedQuickPriceId = -1;
+        minPrice = "";
+        maxPrice = "";
+        selectedAmenityIds.clear();
+        selectedRatingId = -1;
     }
 
     private void setupSearchInput() {
         binding.etSearchQuery.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
-
-                // Cancel any pending debounce and timeout immediately.
                 cancelPendingCallbacks();
-
                 if (query.isEmpty()) {
-                    // Invalidate any in-flight search so its callback is silently dropped.
                     currentSearchVersion++;
                     showRecentContent();
                     return;
                 }
-
-                // Immediately hide recent content and show the spinner — the UI
-                // responds to the keystroke even before the debounce fires.
                 showSearchMode();
-
                 debounceRunnable = () -> triggerSearch(query);
                 handler.postDelayed(debounceRunnable, DEBOUNCE_DELAY_MS);
             }
         });
     }
 
-    private void setupRecentSearches() {
-        String[] recent = {"Phuket", "Pattaya City", "Surat Thani"};
-        for (String city : recent) {
-            TextView tv = new TextView(this);
-            tv.setText(city);
-            tv.setPadding(0, 16, 0, 16);
-            tv.setTextColor(getResources().getColor(R.color.black));
-            binding.llRecentSearches.addView(tv);
-        }
-        binding.btnClearRecent.setOnClickListener(v -> binding.llRecentSearches.removeAllViews());
-    }
-
-    // -------------------------------------------------------------------------
-    // Search logic
-    // -------------------------------------------------------------------------
-
     private void triggerSearch(String query) {
+        if (query.isEmpty()) return;
         final int version = ++currentSearchVersion;
-
-        // 5-second hard timeout — hides the spinner and shows an error message
-        // if the network call hasn't resolved by then.
         timeoutRunnable = () -> {
             if (version != currentSearchVersion) return;
             showNoResults(getString(R.string.search_timeout));
@@ -127,12 +212,8 @@ public class SearchActivity extends AppCompatActivity {
             public void onSuccess(List<Tour> data) {
                 runOnUiThread(() -> {
                     cancelTimeoutCallback();
-
-                    // Stale response — a newer search has already been issued.
                     if (version != currentSearchVersion) return;
-
                     binding.pbSearchLoading.setVisibility(View.GONE);
-
                     if (data != null && !data.isEmpty()) {
                         binding.rvSearchResults.setVisibility(View.VISIBLE);
                         binding.tvNoResults.setVisibility(View.GONE);
@@ -142,24 +223,30 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 });
             }
-
             @Override
-            public void onError(ApiErrorCode code, String rawMessage) {
+            public void onError(ApiErrorCode code, String msg) {
                 runOnUiThread(() -> {
                     cancelTimeoutCallback();
-
-                    // Stale error — discard silently.
                     if (version != currentSearchVersion) return;
-
                     showNoResults(getString(R.string.search_no_results));
                 });
             }
         });
     }
 
-    // -------------------------------------------------------------------------
-    // UI state helpers
-    // -------------------------------------------------------------------------
+    private void setupRecentContent() {
+        String[] recent = {"Hà Nội", "Hạ Long", "Đà Nẵng", "Phú Quốc"};
+        binding.llRecentSearches.removeAllViews();
+        for (String city : recent) {
+            TextView tv = new TextView(this);
+            tv.setText(city);
+            tv.setPadding(0, 16, 0, 16);
+            tv.setTextColor(getColor(R.color.black));
+            tv.setOnClickListener(v -> binding.etSearchQuery.setText(city));
+            binding.llRecentSearches.addView(tv);
+        }
+        binding.btnClearRecent.setOnClickListener(v -> binding.llRecentSearches.removeAllViews());
+    }
 
     private void showSearchMode() {
         binding.layoutRecentContent.setVisibility(View.GONE);
@@ -182,23 +269,13 @@ public class SearchActivity extends AppCompatActivity {
         binding.tvNoResults.setVisibility(View.VISIBLE);
     }
 
-    // -------------------------------------------------------------------------
-    // Handler cleanup
-    // -------------------------------------------------------------------------
-
     private void cancelPendingCallbacks() {
-        if (debounceRunnable != null) {
-            handler.removeCallbacks(debounceRunnable);
-            debounceRunnable = null;
-        }
+        if (debounceRunnable != null) handler.removeCallbacks(debounceRunnable);
         cancelTimeoutCallback();
     }
 
     private void cancelTimeoutCallback() {
-        if (timeoutRunnable != null) {
-            handler.removeCallbacks(timeoutRunnable);
-            timeoutRunnable = null;
-        }
+        if (timeoutRunnable != null) handler.removeCallbacks(timeoutRunnable);
     }
 
     @Override

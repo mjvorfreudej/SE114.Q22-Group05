@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import com.example.tourgo.adapters.PopularHotelAdapter;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.databinding.ActivitySearchBinding;
+import com.example.tourgo.databinding.LayoutFilterBottomSheetBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
@@ -29,6 +31,8 @@ import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.HotelService;
 import com.example.tourgo.remote.service.TourService;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +46,15 @@ public class SearchFragment extends Fragment {
     private SessionManager session;
     private Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-    private static final int SEARCH_DELAY_MS = 500; // Debounce delay
+    private static final int SEARCH_DELAY_MS = 500; 
+
+    // Filter State
+    private int selectedPropertyTypeId = -1;
+    private int selectedQuickPriceId = -1;
+    private String minPriceValue = "";
+    private String maxPriceValue = "";
+    private final List<Integer> selectedAmenityIds = new ArrayList<>();
+    private int selectedRatingId = -1;
 
     @Nullable
     @Override
@@ -60,8 +72,12 @@ public class SearchFragment extends Fragment {
 
         binding.btnBackSearch.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).onBackPressed();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
+        });
+
+        binding.btnFilterSearch.setOnClickListener(v -> {
+            showFilterBottomSheet();
         });
         
         setupRecentSearches();
@@ -88,19 +104,15 @@ public class SearchFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
-
-                // Cancel previous search request
                 if (searchRunnable != null) {
                     searchHandler.removeCallbacks(searchRunnable);
                 }
 
                 if (query.isEmpty()) {
-                    // Show recent searches and recent viewed
                     showRecentContent();
                     return;
                 }
 
-                // Debounce search - wait 500ms after user stops typing
                 searchRunnable = () -> performSearch(query);
                 searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
             }
@@ -118,19 +130,99 @@ public class SearchFragment extends Fragment {
 
     private void performSearch(String query) {
         if (binding == null) return;
-
-        // Hide recent content, show search results area
         binding.layoutRecentContent.setVisibility(View.GONE);
         binding.layoutSearchResults.setVisibility(View.VISIBLE);
         binding.tvNoResults.setVisibility(View.GONE);
-
-        // Show loading state
         showLoading(true);
-
-        // Search both hotels and tours
         searchHotels(query);
         searchTours(query);
     }
+
+    // --- Filter Logic ---
+
+    private void showFilterBottomSheet() {
+        try {
+            BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+            LayoutFilterBottomSheetBinding sheet = LayoutFilterBottomSheetBinding.inflate(getLayoutInflater());
+            dialog.setContentView(sheet.getRoot());
+
+            View bottomSheetInternal = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheetInternal != null) {
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+            }
+
+            restoreFilterState(sheet);
+
+            // Handle Quick Price selection
+            sheet.cgQuickPrice.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (checkedIds.isEmpty()) return;
+                int id = checkedIds.get(0);
+                if (id == R.id.chipPriceUnder500) {
+                    sheet.etMinPrice.setText("0");
+                    sheet.etMaxPrice.setText("500000");
+                } else if (id == R.id.chipPrice500to2M) {
+                    sheet.etMinPrice.setText("500000");
+                    sheet.etMaxPrice.setText("2000000");
+                } else if (id == R.id.chipPrice2Mto5M) {
+                    sheet.etMinPrice.setText("2000000");
+                    sheet.etMaxPrice.setText("5000000");
+                } else if (id == R.id.chipPriceOver5M) {
+                    sheet.etMinPrice.setText("5000000");
+                    sheet.etMaxPrice.setText("");
+                }
+            });
+
+            sheet.btnCloseFilter.setOnClickListener(v -> dialog.dismiss());
+            sheet.btnCancelFilter.setOnClickListener(v -> {
+                resetFilters();
+                dialog.dismiss();
+                performSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            sheet.btnApplyFilter.setOnClickListener(v -> {
+                saveFilterState(sheet);
+                dialog.dismiss();
+                performSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            dialog.show();
+        } catch (Exception e) {
+            Log.e("SearchFragment", "Error showing BottomSheet", e);
+            Toast.makeText(requireContext(), "Lỗi giao diện: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void restoreFilterState(LayoutFilterBottomSheetBinding sheet) {
+        if (selectedPropertyTypeId != -1) sheet.cgPropertyType.check(selectedPropertyTypeId);
+        if (selectedQuickPriceId != -1) sheet.cgQuickPrice.check(selectedQuickPriceId);
+        sheet.etMinPrice.setText(minPriceValue);
+        sheet.etMaxPrice.setText(maxPriceValue);
+        for (int id : selectedAmenityIds) sheet.cgAmenities.check(id);
+        if (selectedRatingId != -1) sheet.cgRating.check(selectedRatingId);
+    }
+
+    private void saveFilterState(LayoutFilterBottomSheetBinding sheet) {
+        selectedPropertyTypeId = sheet.cgPropertyType.getCheckedChipId();
+        selectedQuickPriceId = sheet.cgQuickPrice.getCheckedChipId();
+        minPriceValue = sheet.etMinPrice.getText().toString();
+        maxPriceValue = sheet.etMaxPrice.getText().toString();
+        selectedRatingId = sheet.cgRating.getCheckedChipId();
+        selectedAmenityIds.clear();
+        selectedAmenityIds.addAll(sheet.cgAmenities.getCheckedChipIds());
+    }
+
+    private void resetFilters() {
+        selectedPropertyTypeId = -1;
+        selectedQuickPriceId = -1;
+        minPriceValue = "";
+        maxPriceValue = "";
+        selectedAmenityIds.clear();
+        selectedRatingId = -1;
+    }
+
+    // --- API Calls ---
 
     private void searchHotels(String query) {
         HotelService.searchHotels(requireContext(), query, new DataCallback<List<Hotel>>() {
@@ -152,9 +244,6 @@ public class SearchFragment extends Fragment {
                 if (binding == null) return;
                 requireActivity().runOnUiThread(() -> {
                     showLoading(false);
-                    Toast.makeText(requireContext(),
-                        getString(R.string.err_prefix, msg),
-                        Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -180,9 +269,6 @@ public class SearchFragment extends Fragment {
                 if (binding == null) return;
                 requireActivity().runOnUiThread(() -> {
                     showLoading(false);
-                    Toast.makeText(requireContext(),
-                        getString(R.string.err_prefix, msg),
-                        Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -190,7 +276,6 @@ public class SearchFragment extends Fragment {
 
     private void displayHotelResults(List<Hotel> hotels) {
         if (binding == null) return;
-
         if (searchHotelAdapter == null) {
             searchHotelAdapter = new PopularHotelAdapter(hotels);
             binding.rvSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -198,14 +283,12 @@ public class SearchFragment extends Fragment {
         } else {
             searchHotelAdapter.setData(hotels);
         }
-
         binding.rvSearchResults.setVisibility(View.VISIBLE);
         binding.tvNoResults.setVisibility(View.GONE);
     }
 
     private void displayTourResults(List<Tour> tours) {
         if (binding == null) return;
-
         if (searchTourAdapter == null) {
             searchTourAdapter = new TourAdapter(tours);
             binding.rvSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -213,7 +296,6 @@ public class SearchFragment extends Fragment {
         } else {
             searchTourAdapter.setData(tours);
         }
-
         binding.rvSearchResults.setVisibility(View.VISIBLE);
         binding.tvNoResults.setVisibility(View.GONE);
     }
@@ -262,24 +344,19 @@ public class SearchFragment extends Fragment {
     private void loadRecentHotels() {
         String userId = session.getUserId();
         String token = session.getAccessToken();
-
-        // Sử dụng dữ liệu thật từ Repository thay vì AppFakeData
         HotelRepository.getInstance().loadHotels(getContext(), userId, token, new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (binding == null) return;
-                getActivity().runOnUiThread(() -> {
+                requireActivity().runOnUiThread(() -> {
                     if (data != null && !data.isEmpty()) {
-                        // Lấy 5 khách sạn đầu tiên làm "Vừa xem"
                         recentViewedAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
                     }
                 });
             }
 
             @Override
-            public void onError(ApiErrorCode code, String msg) {
-                // Xử lý lỗi nếu cần
-            }
+            public void onError(ApiErrorCode code, String msg) {}
         });
     }
 
@@ -292,7 +369,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Clean up handler callbacks
         if (searchHandler != null && searchRunnable != null) {
             searchHandler.removeCallbacks(searchRunnable);
         }
