@@ -46,7 +46,8 @@ public class AddListingActivity extends AppCompatActivity {
     private String kind = "hotel";
     private boolean agreed = false;
 
-    private LinearLayout stepperRow, stepperLabels, content;
+    private LinearLayout stepperRow, stepperLabels;
+    private FrameLayout content;
     private TextView stepLabel;
     private MaterialButton backBtn, nextBtn;
 
