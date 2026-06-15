@@ -47,8 +47,8 @@ public class TourScreenFragment extends Fragment {
 
         tourAdapter = new TourAdapter(new ArrayList<>());
         tourAdapter.setOnTourClickListener(tour -> {
-            Intent intent = new Intent(getContext(), BookingActivity.class);
-            intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
+            Intent intent = new Intent(getContext(), DetailActivity.class);
+            intent.putExtra("hotel_object", tour);
             startActivity(intent);
         });
         rvTours.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -28,7 +28,20 @@ public class TourRepository {
 
     public void loadTours(Context context, String userId, String token, DataCallback<List<Tour>> callback) {
         if (cachedTours != null) {
-            callback.onSuccess(cachedTours);
+            if (userId != null && token != null) {
+                syncFavorites(context, userId, token, new DataCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        mainHandler.post(() -> callback.onSuccess(cachedTours));
+                    }
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) {
+                        mainHandler.post(() -> callback.onSuccess(cachedTours));
+                    }
+                });
+            } else {
+                callback.onSuccess(cachedTours);
+            }
             return;
         }
 
@@ -37,7 +50,7 @@ public class TourRepository {
             public void onSuccess(List<Tour> tours) {
                 cachedTours = tours;
                 if (userId != null && token != null) {
-                    syncFavorites(userId, token, new DataCallback<Void>() {
+                    syncFavorites(context, userId, token, new DataCallback<Void>() {
                         @Override
                         public void onSuccess(Void data) {
                             mainHandler.post(() -> callback.onSuccess(cachedTours));
@@ -60,17 +73,17 @@ public class TourRepository {
         });
     }
 
-    public void syncFavorites(String userId, String token) {
-        syncFavorites(userId, token, null);
+    public void syncFavorites(Context context, String userId, String token) {
+        syncFavorites(context, userId, token, null);
     }
 
-    public void syncFavorites(String userId, String token, DataCallback<Void> callback) {
+    public void syncFavorites(Context context, String userId, String token, DataCallback<Void> callback) {
         if (userId == null || token == null || cachedTours == null) {
             if (callback != null) callback.onSuccess(null);
             return;
         }
 
-        FavoriteRepository.getInstance().loadFavorites(null, false, new DataCallback<List<Favorite>>() {
+        FavoriteRepository.getInstance().loadFavorites(context, false, new DataCallback<List<Favorite>>() {
             @Override
             public void onSuccess(List<Favorite> favorites) {
                 Set<String> favTourIds = new HashSet<>();

@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/urbanist"
-            android:text="Bộ lọc"
+            android:text="@string/filter_title"
             android:textColor="@color/black"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/urbanist"
-                android:text="Loại hình"
+                android:text="@string/filter_section_property_type"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -75,14 +75,14 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Khách sạn"
+                    android:text="@string/home_category_hotel"
                     app:chipIcon="@drawable/ic_hotel" />
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipTours"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tours"
+                    android:text="@string/home_category_tour"
                     app:chipIcon="@drawable/ic_tour" />
             </com.google.android.material.chip.ChipGroup>
 
@@ -92,12 +92,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:fontFamily="@font/urbanist"
-                android:text="Khoảng giá (VNĐ)"
+                android:text="@string/filter_section_price_range"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
-            <!-- Popular Price Chips -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,25 +113,25 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dưới 500k" />
+                        android:text="@string/filter_price_under_500k" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipPrice500to2M"
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="500k - 2tr" />
+                        android:text="@string/filter_price_500k_2m" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipPrice2Mto5M"
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2tr - 5tr" />
+                        android:text="@string/filter_price_2m_5m" />
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipPriceOver5M"
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Trên 5tr" />
+                        android:text="@string/filter_price_over_5m" />
                 </com.google.android.material.chip.ChipGroup>
             </HorizontalScrollView>
 
@@ -148,7 +147,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="Tối thiểu">
+                    android:hint="@string/filter_min_price">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etMinPrice"
                         android:layout_width="match_parent"
@@ -162,7 +161,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:hint="Tối đa">
+                    android:hint="@string/filter_max_price">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etMaxPrice"
                         android:layout_width="match_parent"
@@ -172,13 +171,13 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Amenities (Multiple Selection) -->
+            <!-- Amenities -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:fontFamily="@font/urbanist"
-                android:text="Tiện nghi"
+                android:text="@string/filter_section_amenities"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -196,7 +195,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Wifi"
+                    android:text="@string/amenity_wifi"
                     app:chipIcon="@drawable/ic_wifi"
                     app:chipIconVisible="true" />
                 <com.google.android.material.chip.Chip
@@ -204,7 +203,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hồ bơi"
+                    android:text="@string/amenity_pool"
                     app:chipIcon="@drawable/ic_pool"
                     app:chipIconVisible="true" />
                 <com.google.android.material.chip.Chip
@@ -212,7 +211,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bãi đỗ xe"
+                    android:text="@string/amenity_parking"
                     app:chipIcon="@drawable/ic_garage"
                     app:chipIconVisible="true" />
                 <com.google.android.material.chip.Chip
@@ -220,7 +219,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Làm việc"
+                    android:text="@string/amenity_workplace"
                     app:chipIcon="@drawable/ic_workplace"
                     app:chipIconVisible="true" />
                 <com.google.android.material.chip.Chip
@@ -228,7 +227,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bàn tour"
+                    android:text="@string/amenity_tour_desk"
                     app:chipIcon="@drawable/ic_tour"
                     app:chipIconVisible="true" />
             </com.google.android.material.chip.ChipGroup>
@@ -239,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:fontFamily="@font/urbanist"
-                android:text="Đánh giá"
+                android:text="@string/filter_section_rating"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -256,7 +255,7 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tất cả" />
+                    android:text="@string/filter_all" />
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipRating5"
                     style="@style/Widget.Material3.Chip.Filter"
@@ -317,7 +316,7 @@
                     android:layout_height="56dp"
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
-                    android:text="Hủy"
+                    android:text="@string/filter_reset"
                     app:cornerRadius="28dp" />
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnApplyFilter"
@@ -325,7 +324,7 @@
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/black"
-                    android:text="Áp dụng"
+                    android:text="@string/filter_apply"
                     android:textColor="@color/white"
                     app:cornerRadius="28dp" />
             </LinearLayout>

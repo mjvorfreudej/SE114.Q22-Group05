@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,26 +11,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tourgo.R;
-import com.example.tourgo.adapters.HotelListAdapter;
-import com.example.tourgo.data.repository.HotelRepository;
-import com.example.tourgo.interfaces.ApiErrorCode;
-import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.response.Hotel;
-import com.example.tourgo.data.local.SessionManager;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.example.tourgo.fragments.FavoriteListFragment;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class FavoriteFragment extends Fragment {
 
-    private SessionManager session;
-    private HotelListAdapter adapter;
-    private View progressBar;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
 
     public FavoriteFragment() {
     }
@@ -39,34 +30,42 @@ public class FavoriteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_favorite, container, false);
-        session = new SessionManager(requireContext());
-        progressBar = view.findViewById(R.id.pbFavorite);
-        
-        RecyclerView rv = view.findViewById(R.id.rvFavoriteItem);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        adapter = new HotelListAdapter(new ArrayList<>());
-        rv.setAdapter(adapter);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_favorite, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         applyTopInset(view);
+
+        tabLayout = view.findViewById(R.id.tabLayoutFavorite);
+        viewPager = view.findViewById(R.id.viewPagerFavorite);
+
+        setupViewPager();
+
         View btnBack = view.findViewById(R.id.btnFavoriteBack);
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).switchToHome();
                 } else if (getActivity() != null) {
-                    getActivity().onBackPressed();
+                    getActivity().getOnBackPressedDispatcher().onBackPressed();
                 }
             });
         }
-        loadFavorites();
+    }
+
+    private void setupViewPager() {
+        FavoritePagerAdapter adapter = new FavoritePagerAdapter(this);
+        viewPager.setAdapter(adapter);
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            if (position == 0) {
+                tab.setText(R.string.home_category_hotel);
+            } else {
+                tab.setText(R.string.home_category_tour);
+            }
+        }).attach();
     }
 
     private void applyTopInset(View root) {
@@ -79,44 +78,21 @@ public class FavoriteFragment extends Fragment {
         ViewCompat.requestApplyInsets(root);
     }
 
-    private void loadFavorites() {
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
-        
-        String userId = session.getUserId();
-        String token = session.getAccessToken();
+    private static class FavoritePagerAdapter extends FragmentStateAdapter {
+        public FavoritePagerAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+        }
 
-        HotelRepository.getInstance().loadHotels(getContext(), userId, token, new DataCallback<List<Hotel>>() {
-            @Override
-            public void onSuccess(List<Hotel> data) {
-                if (getActivity() == null) return;
-                getActivity().runOnUiThread(() -> {
-                    if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    
-                    List<Hotel> favoriteHotels = new ArrayList<>();
-                    if (data != null) {
-                        for (Hotel hotel : data) {
-                            if (hotel.isFavorite()) {
-                                favoriteHotels.add(hotel);
-                            }
-                        }
-                    }
-                    Collections.reverse(favoriteHotels);
-                    adapter.setData(favoriteHotels);
-                    
-                    if (favoriteHotels.isEmpty()) {
-                        Toast.makeText(getContext(), R.string.no_favorites, Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
+            // 0: Hotels, 1: Tours
+            return FavoriteListFragment.newInstance(position == 0 ? FavoriteListFragment.TYPE_HOTEL : FavoriteListFragment.TYPE_TOUR);
+        }
 
-            @Override
-            public void onError(ApiErrorCode code, String msg) {
-                if (getActivity() == null) return;
-                getActivity().runOnUiThread(() -> {
-                    if (progressBar != null) progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), R.string.err_load_favorites, Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
+        @Override
+        public int getItemCount() {
+            return 2;
+        }
     }
 }

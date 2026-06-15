@@ -61,7 +61,7 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
         holder.tvName.setText(item.getName());
         
         // Hiển thị giá tiền đa ngôn ngữ
-        String formattedPrice = item.formatPrice(item.getPricePerNight());
+        String formattedPrice = item.formatPrice(holder.itemView.getContext(), item.getPricePerNight());
         holder.tvPrice.setText(holder.itemView.getContext().getString(R.string.price_per_night_format, formattedPrice));
         
         holder.tvRating.setText(String.format(Locale.getDefault(), "★ %.1f", item.getRating()));
@@ -86,8 +86,8 @@ public class PopularHotelAdapter extends RecyclerView.Adapter<PopularHotelAdapte
 
             if (newState) {
                 Favorite favorite = new Favorite(userId, null, item.getId());
-                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Void>() {
-                    @Override public void onSuccess(Void data) {}
+                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Favorite>() {
+                    @Override public void onSuccess(Favorite data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
                         holder.imgHeart.post(() -> {
                             item.setFavorite(false);

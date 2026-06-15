@@ -26,28 +26,22 @@ public class HotelRepository {
         return instance;
     }
 
-    // Hàm load cũ để không làm hỏng code hiện tại
-    public void loadHotels(Context context, DataCallback<List<Hotel>> callback) {
-        if (cachedHotels != null) {
-            callback.onSuccess(cachedHotels);
-            return;
-        }
-        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
-            @Override
-            public void onSuccess(List<Hotel> data) {
-                cachedHotels = data;
-                mainHandler.post(() -> callback.onSuccess(data));
-            }
-            @Override
-            public void onError(ApiErrorCode code, String msg) {
-                mainHandler.post(() -> callback.onError(code, msg));
-            }
-        });
-    }
-
     public void loadHotels(Context context, String userId, String token, DataCallback<List<Hotel>> callback) {
         if (cachedHotels != null) {
-            callback.onSuccess(cachedHotels);
+            if (userId != null && token != null) {
+                syncFavorites(context, userId, token, new DataCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                    }
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) {
+                        mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                    }
+                });
+            } else {
+                callback.onSuccess(cachedHotels);
+            }
             return;
         }
 

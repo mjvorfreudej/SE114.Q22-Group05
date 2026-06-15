@@ -136,4 +136,33 @@ public class BookingService {
                     }
                 });
     }
+
+    public static void hasBookedTour(Context context, String tourId, DataCallback<Boolean> callback) {
+        RetrofitClient.getInstance(context)
+                .getBookingApi()
+                .hasBookedTour(tourId)
+                .enqueue(new Callback<ApiResponse<BookingCheckResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<BookingCheckResponse>> call, Response<ApiResponse<BookingCheckResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<BookingCheckResponse> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData().getHasBooked());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<BookingCheckResponse>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
 }
