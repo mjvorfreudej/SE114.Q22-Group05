@@ -134,9 +134,30 @@ public class AddListingActivity extends AppCompatActivity {
 
     private void buildStepper() {
         stepperRow.removeAllViews();
-        stepperLabels.removeAllViews();
+        stepperLabels.setVisibility(View.GONE);
+
         for (int n = 1; n <= TOTAL; n++) {
-            stepperRow.addView(buildCircle(n));
+            // Column: circle on top, label below — guarantees alignment
+            LinearLayout col = new LinearLayout(this);
+            col.setOrientation(LinearLayout.VERTICAL);
+            col.setGravity(Gravity.CENTER_HORIZONTAL);
+
+            col.addView(buildCircle(n));
+
+            TextView label = new TextView(this);
+            label.setText(LABELS[n - 1]);
+            label.setGravity(Gravity.CENTER);
+            label.setTextSize(10f);
+            label.setTextColor(color(n <= step ? R.color.adm_gray_900 : R.color.adm_gray_400));
+            label.setTypeface(label.getTypeface(), n == step ? Typeface.BOLD : Typeface.NORMAL);
+            LinearLayout.LayoutParams labelLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            labelLp.topMargin = dp(6);
+            col.addView(label, labelLp);
+
+            stepperRow.addView(col, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
             if (n < TOTAL) {
                 View line = new View(this);
                 GradientDrawable g = new GradientDrawable();
@@ -146,17 +167,11 @@ public class AddListingActivity extends AppCompatActivity {
                 line.setBackground(g);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(2), 1f);
                 lp.setMargins(dp(2), 0, dp(2), 0);
+                // Position line at vertical center of circle: (circleSize - lineHeight) / 2
+                lp.topMargin = dp(10);
+                lp.gravity = Gravity.TOP;
                 stepperRow.addView(line, lp);
             }
-
-            TextView label = new TextView(this);
-            label.setText(LABELS[n - 1]);
-            label.setGravity(Gravity.CENTER);
-            label.setTextSize(10f);
-            label.setTextColor(color(n <= step ? R.color.adm_gray_900 : R.color.adm_gray_400));
-            label.setTypeface(label.getTypeface(), n == step ? Typeface.BOLD : Typeface.NORMAL);
-            stepperLabels.addView(label, new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         }
     }
 
