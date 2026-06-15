@@ -242,6 +242,11 @@
     <string name="amenity_tour_desk">Tour Desk</string>
     <string name="filter_all">All</string>
     <string name="filter_with_photos">With Photos</string>
+    <string name="filter_rating_5">5 ★</string>
+    <string name="filter_rating_4">4 ★</string>
+    <string name="filter_rating_3">3 ★</string>
+    <string name="filter_rating_2">2 ★</string>
+    <string name="filter_rating_1">1 ★</string>
 
     <!-- Hotel List -->
     <string name="hotel_in_location">Hotels in %s</string>

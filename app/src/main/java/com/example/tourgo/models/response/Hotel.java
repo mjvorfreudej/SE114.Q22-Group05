@@ -116,6 +116,8 @@ public class Hotel implements Serializable {
     public int getImageResId() { return imageResId; }
     public double getLatitude() { return latitude; }
     public double getLongitude() { return longitude; }
+    public String getAmenities() { return amenities; }
+    public void setAmenities(String amenities) { this.amenities = amenities; }
     public boolean hasCoordinates() {
         return !(latitude == 0 && longitude == 0);
     }

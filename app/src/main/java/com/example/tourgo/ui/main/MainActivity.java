@@ -31,6 +31,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     View currentTab;
+    int currentIndex = 0; // Theo dõi vị trí tab hiện tại
 
     LinearLayout navHome, navTours, navHotels, navProfile;
     SessionManager session;
@@ -48,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
         navHotels = findViewById(R.id.navHotels);
         navProfile = findViewById(R.id.navProfile);
 
-        // Edge-to-edge: floating nav uses bottom margin so it stays above the
-        // gesture/nav bar. Fragments can draw behind the status bar at the top.
         View bottomNav = findViewById(R.id.bottomNavContainer);
         ViewGroup.MarginLayoutParams navLp = (ViewGroup.MarginLayoutParams) bottomNav.getLayoutParams();
         final int baseNavBottomMargin = navLp.bottomMargin;
@@ -64,30 +63,22 @@ public class MainActivity extends AppCompatActivity {
         setupNavigation();
         
         if (savedInstanceState == null) {
+            currentIndex = 0;
             updateTabUI(navHome);
-            loadFragment(new HomeFragment(), false);
+            loadFragment(new HomeFragment(), 0); // Không animate lần đầu
         } else {
-            // Khôi phục UI của tab sau khi đổi ngôn ngữ/tái tạo activity
+            currentIndex = savedInstanceState.getInt("selected_tab_index", 0);
             int selectedId = savedInstanceState.getInt("selected_tab_id", R.id.navHome);
             View savedTab = findViewById(selectedId);
-            if (savedTab != null) {
-                updateTabUI(savedTab);
-            }
+            if (savedTab != null) updateTabUI(savedTab);
         }
 
         HotelRepository.getInstance().loadHotels(this, session.getUserId(), session.getAccessToken(), new DataCallback<List<Hotel>>() {
-            @Override
-            public void onSuccess(List<Hotel> data) {
-                if (session.isLoggedIn()) {
-                    HotelRepository.getInstance().syncFavorites(MainActivity.this, session.getUserId(), session.getAccessToken());
-                }
+            @Override public void onSuccess(List<Hotel> data) {
+                if (session.isLoggedIn()) HotelRepository.getInstance().syncFavorites(MainActivity.this, session.getUserId(), session.getAccessToken());
             }
-
-            @Override
-            public void onError(ApiErrorCode code, String msg) {
-                runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show();
-                });
+            @Override public void onError(ApiErrorCode code, String msg) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, getString(R.string.err_network), Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -97,39 +88,29 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         if (currentTab != null) {
             outState.putInt("selected_tab_id", currentTab.getId());
+            outState.putInt("selected_tab_index", currentIndex);
         }
     }
 
     private void setupNavigation() {
-        navHome.setOnClickListener(v -> {
-            if (currentTab == navHome) return;
-            updateTabUI(navHome);
-            loadFragment(new HomeFragment(), true);
-        });
-
-        navTours.setOnClickListener(v -> {
-            if (currentTab == navTours) return;
-            updateTabUI(navTours);
-            loadFragment(new SearchFragment(), true);
-        });
-
-        navHotels.setOnClickListener(v -> {
-            if (currentTab == navHotels) return;
-            updateTabUI(navHotels);
-            loadFragment(new FavoriteFragment(), true);
-        });
-
-        navProfile.setOnClickListener(v -> {
-            if (currentTab == navProfile) return;
-            updateTabUI(navProfile);
-            loadFragment(new ProfileFragment(), true);
-        });
+        navHome.setOnClickListener(v -> switchTab(0, navHome, new HomeFragment()));
+        navTours.setOnClickListener(v -> switchTab(1, navTours, new SearchFragment()));
+        navHotels.setOnClickListener(v -> switchTab(2, navHotels, new FavoriteFragment()));
+        navProfile.setOnClickListener(v -> switchTab(3, navProfile, new ProfileFragment()));
     }
 
-    public void switchToSearch() {
-        updateTabUI(navTours);
-        loadFragment(new SearchFragment(), true);
+    private void switchTab(int index, View tabView, Fragment fragment) {
+        if (currentIndex == index) return;
+        
+        int direction = (index > currentIndex) ? 1 : -1; // 1: sang phải (tiến), -1: sang trái (lùi)
+        currentIndex = index;
+        
+        updateTabUI(tabView);
+        loadFragment(fragment, direction);
     }
+
+    public void switchToSearch() { switchTab(1, navTours, new SearchFragment()); }
+    public void switchToHome() { switchTab(0, navHome, new HomeFragment()); }
 
     public void switchToHotelList(String title, String destination, String date, String guest) {
         HotelListFragment fragment = new HotelListFragment();
@@ -139,63 +120,42 @@ public class MainActivity extends AppCompatActivity {
         args.putString("date", date);
         args.putString("guest", guest);
         fragment.setArguments(args);
-        loadFragment(fragment, true);
+        loadFragment(fragment, 1);
     }
 
-    public void switchToHotelScreen() {
-        loadFragment(new HotelScreenFragment(), true);
-    }
+    public void switchToHotelScreen() { loadFragment(new HotelScreenFragment(), 1); }
+    public void switchToTourScreen() { loadFragment(new TourScreenFragment(), 1); }
 
-    public void switchToTourScreen() {
-        loadFragment(new TourScreenFragment(), true);
-    }
-
-    public void switchToHome() {
-        updateTabUI(navHome);
-        loadFragment(new HomeFragment(), true);
-    }
-
-    private void loadFragment(Fragment fragment, boolean animate) {
+    private void loadFragment(Fragment fragment, int direction) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (animate) {
-            transaction.setCustomAnimations(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left,
-                R.anim.slide_in_left,
-                R.anim.slide_out_right
-            );
+        
+        if (direction > 0) {
+            // Tiến sang phải (tab cao hơn): trượt từ phải sang trái
+            transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        } else if (direction < 0) {
+            // Lùi sang trái (tab thấp hơn): trượt từ trái sang phải
+            transaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
         } else {
             transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         }
+        
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
     }
 
     private void updateTabUI(View newTab) {
-        if (currentTab != null) {
-            resetTabState(currentTab);
-        }
-
+        if (currentTab != null) resetTabState(currentTab);
         newTab.setBackgroundResource(R.drawable.bg_nav_selected);
-        
         if (newTab instanceof LinearLayout) {
             LinearLayout layout = (LinearLayout) newTab;
-            
-            // Icon
-            ImageView icon = (ImageView) layout.getChildAt(0);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.black));
-
-            // Text
+            ((ImageView) layout.getChildAt(0)).setColorFilter(ContextCompat.getColor(this, R.color.black));
             TextView tv = (TextView) layout.getChildAt(1);
             tv.setVisibility(View.VISIBLE);
             tv.setTextColor(ContextCompat.getColor(this, R.color.black));
-
-            // Weight adjustment
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
             params.weight = 1.5f; 
             layout.setLayoutParams(params);
         }
-        
         currentTab = newTab;
     }
 
@@ -203,16 +163,8 @@ public class MainActivity extends AppCompatActivity {
         tab.setBackground(null);
         if (tab instanceof LinearLayout) {
             LinearLayout layout = (LinearLayout) tab;
-            
-            // Icon
-            ImageView icon = (ImageView) layout.getChildAt(0);
-            icon.setColorFilter(ContextCompat.getColor(this, R.color.dark_gray));
-            
-            // Text
-            TextView tv = (TextView) layout.getChildAt(1);
-            tv.setVisibility(View.GONE);
-
-            // Weight adjustment
+            ((ImageView) layout.getChildAt(0)).setColorFilter(ContextCompat.getColor(this, R.color.dark_gray));
+            layout.getChildAt(1).setVisibility(View.GONE);
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
             params.weight = 1.0f;
             layout.setLayoutParams(params);

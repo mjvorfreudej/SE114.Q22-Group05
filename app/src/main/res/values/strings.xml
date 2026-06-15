@@ -261,6 +261,11 @@
     <string name="amenity_tickets">Vé tham quan</string>
     <string name="filter_all">Tất cả</string>
     <string name="filter_with_photos">Có ảnh</string>
+    <string name="filter_rating_5">5 ★</string>
+    <string name="filter_rating_4">4 ★</string>
+    <string name="filter_rating_3">3 ★</string>
+    <string name="filter_rating_2">2 ★</string>
+    <string name="filter_rating_1">1 ★</string>
 
     <!-- Hotel List -->
     <string name="hotel_in_location">Khách sạn tại %s</string>

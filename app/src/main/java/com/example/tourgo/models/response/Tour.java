@@ -23,6 +23,7 @@ public class Tour implements Serializable {
     private String region;
     private String duration;
     private String status;
+    private String amenities;
 
     @SerializedName("owner_id")
     private String ownerId;
@@ -156,4 +157,7 @@ public class Tour implements Serializable {
 
     public int getImageResId() { return imageResId; }
     public String getLocation() { return location != null ? location : destination; }
+
+    public String getAmenities() { return amenities; }
+    public void setAmenities(String amenities) { this.amenities = amenities; }
 }

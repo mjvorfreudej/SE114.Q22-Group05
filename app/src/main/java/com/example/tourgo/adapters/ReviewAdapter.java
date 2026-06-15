@@ -17,7 +17,12 @@ import com.example.tourgo.R;
 import com.example.tourgo.models.response.Review;
 import com.example.tourgo.utils.ImageLoader;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentViewHolder> {
 
@@ -65,7 +70,7 @@ public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentView
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Review review = getItem(position);
         holder.tvUserName.setText(review.getUserName());
-        holder.tvCommentDate.setText(review.getDate());
+        holder.tvCommentDate.setText(formatReviewDate(review.getDate()));
         holder.tvCommentContent.setText(review.getContent());
         // Sử dụng Locale mặc định để đồng bộ với định dạng hệ thống
         holder.tvUserRating.setText(String.format(Locale.getDefault(), "★ %.1f", review.getRating()));
@@ -111,6 +116,63 @@ public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentView
 
             popup.show();
         });
+    }
+
+    /**
+     * Định dạng ngày giờ bình luận.
+     * Xử lý triệt để các định dạng ISO 8601 (có mili giây, múi giờ) hoặc Timestamp.
+     */
+    private String formatReviewDate(String rawDate) {
+        if (rawDate == null || rawDate.isEmpty()) return "";
+        
+        try {
+            // 1. Xử lý định dạng ISO 8601 bằng Regex để lấy chính xác phần cần thiết
+            // Mẫu: 2025-02-18T09:15:35.336154Z hoặc 2025-02-18 09:15:35+07:00
+            Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})[T ](\\d{2}:\\d{2}:\\d{2})");
+            Matcher matcher = pattern.matcher(rawDate);
+            
+            if (matcher.find()) {
+                String cleanDate = matcher.group(1) + " " + matcher.group(2);
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+                
+                // Giả định Server trả về UTC nếu có Z hoặc +
+                if (rawDate.contains("Z") || rawDate.contains("+")) {
+                    inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                }
+                
+                Date date = inputFormat.parse(cleanDate);
+                if (date != null) {
+                    // Định dạng hiển thị gọn gàng cho người dùng
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                    return outputFormat.format(date);
+                }
+            }
+            
+            // 2. Xử lý nếu rawDate là một số (Unix Timestamp)
+            if (rawDate.matches("\\d+")) {
+                long ts = Long.parseLong(rawDate);
+                // Nếu timestamp tính bằng giây (10 chữ số), đổi sang mili giây
+                if (ts < 10000000000L) ts *= 1000;
+                Date date = new Date(ts);
+                return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(date);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // 3. Fallback: Nếu mọi cách trên thất bại, thử cắt chuỗi cơ bản
+        if (rawDate.length() >= 16) {
+            try {
+                // Giả định định dạng yyyy-MM-dd...
+                String y = rawDate.substring(0, 4);
+                String m = rawDate.substring(5, 7);
+                String d = rawDate.substring(8, 10);
+                String time = rawDate.substring(11, 16);
+                return d + "/" + m + "/" + y + " " + time;
+            } catch (Exception ignored) {}
+        }
+
+        return rawDate;
     }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
