@@ -27,6 +27,9 @@ public interface BookingApi {
     @GET("api/bookings/check")
     Call<ApiResponse<BookingCheckResponse>> hasBookedHotel(@Query("hotelId") String hotelId);
 
+    @GET("api/bookings/check")
+    Call<ApiResponse<BookingCheckResponse>> hasBookedTour(@Query("tourId") String tourId);
+
     @PATCH("api/bookings/{bookingId}/cancel")
     Call<ApiResponse<Void>> cancelBooking(@Path("bookingId") String bookingId);
 }

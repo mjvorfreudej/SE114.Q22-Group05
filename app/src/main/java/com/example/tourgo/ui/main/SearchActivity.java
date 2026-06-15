@@ -6,19 +6,27 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.tourgo.R;
+import com.example.tourgo.adapters.HotelSearchAdapter;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.databinding.ActivitySearchBinding;
+import com.example.tourgo.databinding.LayoutFilterBottomSheetBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.remote.service.HotelService;
 import com.example.tourgo.remote.service.TourService;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +37,22 @@ public class SearchActivity extends AppCompatActivity {
     private static final long SEARCH_TIMEOUT_MS = 5000;
 
     private ActivitySearchBinding binding;
-    private TourAdapter searchAdapter;
+    private TourAdapter tourAdapter;
+    private HotelSearchAdapter hotelAdapter;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable debounceRunnable;
     private Runnable timeoutRunnable;
 
-    // Incremented on every new search; used to discard stale callbacks.
     private int currentSearchVersion = 0;
+    
+    // Filter State
+    private int selectedPropertyTypeId = R.id.chipTours; 
+    private int selectedQuickPriceId = -1;
+    private String minPriceStr = "";
+    private String maxPriceStr = "";
+    private final List<Integer> selectedAmenityIds = new ArrayList<>();
+    private int selectedRatingId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,122 +60,230 @@ public class SearchActivity extends AppCompatActivity {
         binding = ActivitySearchBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setupRecyclerView();
+        initViews();
         setupSearchInput();
-        setupRecentSearches();
-
-        binding.btnBackSearch.setOnClickListener(v -> finish());
+        setupRecentContent();
     }
 
-    // -------------------------------------------------------------------------
-    // Setup
-    // -------------------------------------------------------------------------
+    private void initViews() {
+        tourAdapter = new TourAdapter(new ArrayList<>());
+        tourAdapter.setOnTourClickListener(tour -> navigateToDetail(tour, "tour"));
+        
+        hotelAdapter = new HotelSearchAdapter(new ArrayList<>());
 
-    private void setupRecyclerView() {
-        searchAdapter = new TourAdapter(new ArrayList<>());
-        searchAdapter.setOnTourClickListener(tour -> {
-            Intent intent = new Intent(this, BookingActivity.class);
-            intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
-            startActivity(intent);
-        });
         binding.rvSearchResults.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvSearchResults.setAdapter(searchAdapter);
+        binding.rvSearchResults.setAdapter(tourAdapter); 
+
+        binding.btnBackSearch.setOnClickListener(v -> finish());
+        
+        binding.btnFilterSearch.setOnClickListener(v -> showFilterBottomSheet());
+    }
+
+    private void navigateToDetail(Object obj, String type) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        if ("tour".equals(type)) {
+            intent.putExtra("hotel_object", (Tour)obj);
+        } else {
+            intent.putExtra("hotel_object", (Hotel)obj);
+        }
+        startActivity(intent);
+    }
+
+    private void showFilterBottomSheet() {
+        try {
+            BottomSheetDialog dialog = new BottomSheetDialog(this);
+            LayoutFilterBottomSheetBinding sheet = LayoutFilterBottomSheetBinding.inflate(getLayoutInflater());
+            dialog.setContentView(sheet.getRoot());
+
+            View bottomSheetInternal = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheetInternal != null) {
+                BottomSheetBehavior<View> behavior = BottomSheetBehavior.from(bottomSheetInternal);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setSkipCollapsed(true);
+            }
+
+            restoreFilterState(sheet);
+
+            sheet.cgQuickPrice.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (checkedIds.isEmpty()) return;
+                int id = checkedIds.get(0);
+                selectedQuickPriceId = id;
+                if (id == R.id.chipPriceUnder500) {
+                    sheet.etMinPrice.setText("0");
+                    sheet.etMaxPrice.setText("500000");
+                } else if (id == R.id.chipPrice500to2M) {
+                    sheet.etMinPrice.setText("500000");
+                    sheet.etMaxPrice.setText("2000000");
+                } else if (id == R.id.chipPrice2Mto5M) {
+                    sheet.etMinPrice.setText("2000000");
+                    sheet.etMaxPrice.setText("5000000");
+                } else if (id == R.id.chipPriceOver5M) {
+                    sheet.etMinPrice.setText("5000000");
+                    sheet.etMaxPrice.setText("");
+                }
+            });
+
+            TextWatcher manualPriceWatcher = new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (sheet.etMinPrice.hasFocus() || sheet.etMaxPrice.hasFocus()) {
+                        sheet.cgQuickPrice.clearCheck();
+                        selectedQuickPriceId = -1;
+                    }
+                }
+            };
+            sheet.etMinPrice.addTextChangedListener(manualPriceWatcher);
+            sheet.etMaxPrice.addTextChangedListener(manualPriceWatcher);
+
+            sheet.btnCloseFilter.setOnClickListener(v -> dialog.dismiss());
+            sheet.btnCancelFilter.setOnClickListener(v -> {
+                resetFilters();
+                dialog.dismiss();
+                triggerSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            sheet.btnApplyFilter.setOnClickListener(v -> {
+                saveFilterState(sheet);
+                dialog.dismiss();
+                triggerSearch(binding.etSearchQuery.getText().toString());
+            });
+
+            dialog.show();
+        } catch (Exception e) {
+            Log.e("SearchActivity", "Error showing BottomSheet", e);
+        }
+    }
+
+    private void restoreFilterState(LayoutFilterBottomSheetBinding sheet) {
+        if (selectedPropertyTypeId != -1) sheet.cgPropertyType.check(selectedPropertyTypeId);
+        if (selectedQuickPriceId != -1) sheet.cgQuickPrice.check(selectedQuickPriceId);
+        sheet.etMinPrice.setText(minPriceStr);
+        sheet.etMaxPrice.setText(maxPriceStr);
+        for (int id : selectedAmenityIds) sheet.cgAmenities.check(id);
+        if (selectedRatingId != -1) sheet.cgRating.check(selectedRatingId);
+    }
+
+    private void saveFilterState(LayoutFilterBottomSheetBinding sheet) {
+        selectedPropertyTypeId = sheet.cgPropertyType.getCheckedChipId();
+        selectedQuickPriceId = sheet.cgQuickPrice.getCheckedChipId();
+        minPriceStr = sheet.etMinPrice.getText().toString();
+        maxPriceStr = sheet.etMaxPrice.getText().toString();
+        selectedRatingId = sheet.cgRating.getCheckedChipId();
+        selectedAmenityIds.clear();
+        selectedAmenityIds.addAll(sheet.cgAmenities.getCheckedChipIds());
+    }
+
+    private void resetFilters() {
+        selectedPropertyTypeId = R.id.chipTours;
+        selectedQuickPriceId = -1;
+        minPriceStr = "";
+        maxPriceStr = "";
+        selectedAmenityIds.clear();
+        selectedRatingId = -1;
     }
 
     private void setupSearchInput() {
         binding.etSearchQuery.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
-
-                // Cancel any pending debounce and timeout immediately.
                 cancelPendingCallbacks();
-
                 if (query.isEmpty()) {
-                    // Invalidate any in-flight search so its callback is silently dropped.
                     currentSearchVersion++;
                     showRecentContent();
                     return;
                 }
-
-                // Immediately hide recent content and show the spinner — the UI
-                // responds to the keystroke even before the debounce fires.
                 showSearchMode();
-
                 debounceRunnable = () -> triggerSearch(query);
                 handler.postDelayed(debounceRunnable, DEBOUNCE_DELAY_MS);
             }
         });
     }
 
-    private void setupRecentSearches() {
-        String[] recent = {"Phuket", "Pattaya City", "Surat Thani"};
+    private void triggerSearch(String query) {
+        final int version = ++currentSearchVersion;
+        timeoutRunnable = () -> {
+            if (version != currentSearchVersion) return;
+            showNoResults(getString(R.string.search_no_results));
+        };
+        handler.postDelayed(timeoutRunnable, SEARCH_TIMEOUT_MS);
+
+        Double min = parseDouble(minPriceStr);
+        Double max = parseDouble(maxPriceStr);
+        Double rating = getRatingValue(selectedRatingId);
+
+        if (selectedPropertyTypeId == R.id.chipHotels) {
+            HotelService.searchHotelsAdvanced(this, query, null, min, max, rating, "rating", "desc", new DataCallback<List<Hotel>>() {
+                @Override public void onSuccess(List<Hotel> data) {
+                    runOnUiThread(() -> {
+                        if (version != currentSearchVersion) return;
+                        cancelTimeoutCallback();
+                        handleSearchResult(data, hotelAdapter);
+                    });
+                }
+                @Override public void onError(ApiErrorCode code, String msg) {
+                    runOnUiThread(() -> { if (version == currentSearchVersion) showNoResults(getString(R.string.search_no_results)); });
+                }
+            });
+        } else {
+            TourService.searchToursAdvanced(this, query, null, min, max, rating, "rating", "desc", new DataCallback<List<Tour>>() {
+                @Override public void onSuccess(List<Tour> data) {
+                    runOnUiThread(() -> {
+                        if (version != currentSearchVersion) return;
+                        cancelTimeoutCallback();
+                        handleSearchResult(data, tourAdapter);
+                    });
+                }
+                @Override public void onError(ApiErrorCode code, String msg) {
+                    runOnUiThread(() -> { if (version == currentSearchVersion) showNoResults(getString(R.string.search_no_results)); });
+                }
+            });
+        }
+    }
+
+    private void handleSearchResult(List<?> data, Object adapter) {
+        binding.pbSearchLoading.setVisibility(View.GONE);
+        if (data != null && !data.isEmpty()) {
+            binding.rvSearchResults.setVisibility(View.VISIBLE);
+            binding.tvNoResults.setVisibility(View.GONE);
+            binding.rvSearchResults.setAdapter((androidx.recyclerview.widget.RecyclerView.Adapter) adapter);
+            if (adapter instanceof TourAdapter) ((TourAdapter) adapter).setData((List<Tour>) data);
+            else if (adapter instanceof HotelSearchAdapter) ((HotelSearchAdapter) adapter).setData((List<Hotel>) data);
+        } else {
+            showNoResults(getString(R.string.search_no_results));
+        }
+    }
+
+    private Double parseDouble(String value) {
+        try { return Double.parseDouble(value); } catch (Exception e) { return null; }
+    }
+
+    private Double getRatingValue(int chipId) {
+        if (chipId == R.id.chipRating5) return 5.0;
+        if (chipId == R.id.chipRating4) return 4.0;
+        if (chipId == R.id.chipRating3) return 3.0;
+        if (chipId == R.id.chipRating2) return 2.0;
+        if (chipId == R.id.chipRating1) return 1.0;
+        return null;
+    }
+
+    private void setupRecentContent() {
+        String[] recent = {"Hà Nội", "Hạ Long", "Đà Nẵng", "Phú Quốc"};
+        binding.llRecentSearches.removeAllViews();
         for (String city : recent) {
             TextView tv = new TextView(this);
             tv.setText(city);
-            tv.setPadding(0, 16, 0, 16);
-            tv.setTextColor(getResources().getColor(R.color.black));
+            tv.setPadding(32, 24, 32, 24);
+            tv.setTextColor(getColor(R.color.black));
+            tv.setOnClickListener(v -> binding.etSearchQuery.setText(city));
             binding.llRecentSearches.addView(tv);
         }
         binding.btnClearRecent.setOnClickListener(v -> binding.llRecentSearches.removeAllViews());
     }
-
-    // -------------------------------------------------------------------------
-    // Search logic
-    // -------------------------------------------------------------------------
-
-    private void triggerSearch(String query) {
-        final int version = ++currentSearchVersion;
-
-        // 5-second hard timeout — hides the spinner and shows an error message
-        // if the network call hasn't resolved by then.
-        timeoutRunnable = () -> {
-            if (version != currentSearchVersion) return;
-            showNoResults(getString(R.string.search_timeout));
-        };
-        handler.postDelayed(timeoutRunnable, SEARCH_TIMEOUT_MS);
-
-        TourService.searchTours(this, query, new DataCallback<List<Tour>>() {
-            @Override
-            public void onSuccess(List<Tour> data) {
-                runOnUiThread(() -> {
-                    cancelTimeoutCallback();
-
-                    // Stale response — a newer search has already been issued.
-                    if (version != currentSearchVersion) return;
-
-                    binding.pbSearchLoading.setVisibility(View.GONE);
-
-                    if (data != null && !data.isEmpty()) {
-                        binding.rvSearchResults.setVisibility(View.VISIBLE);
-                        binding.tvNoResults.setVisibility(View.GONE);
-                        searchAdapter.setData(data);
-                    } else {
-                        showNoResults(getString(R.string.search_no_results));
-                    }
-                });
-            }
-
-            @Override
-            public void onError(ApiErrorCode code, String rawMessage) {
-                runOnUiThread(() -> {
-                    cancelTimeoutCallback();
-
-                    // Stale error — discard silently.
-                    if (version != currentSearchVersion) return;
-
-                    showNoResults(getString(R.string.search_no_results));
-                });
-            }
-        });
-    }
-
-    // -------------------------------------------------------------------------
-    // UI state helpers
-    // -------------------------------------------------------------------------
 
     private void showSearchMode() {
         binding.layoutRecentContent.setVisibility(View.GONE);
@@ -182,23 +306,13 @@ public class SearchActivity extends AppCompatActivity {
         binding.tvNoResults.setVisibility(View.VISIBLE);
     }
 
-    // -------------------------------------------------------------------------
-    // Handler cleanup
-    // -------------------------------------------------------------------------
-
     private void cancelPendingCallbacks() {
-        if (debounceRunnable != null) {
-            handler.removeCallbacks(debounceRunnable);
-            debounceRunnable = null;
-        }
+        if (debounceRunnable != null) handler.removeCallbacks(debounceRunnable);
         cancelTimeoutCallback();
     }
 
     private void cancelTimeoutCallback() {
-        if (timeoutRunnable != null) {
-            handler.removeCallbacks(timeoutRunnable);
-            timeoutRunnable = null;
-        }
+        if (timeoutRunnable != null) handler.removeCallbacks(timeoutRunnable);
     }
 
     @Override

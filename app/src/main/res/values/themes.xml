@@ -1,20 +1,55 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.TourGo" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
         <item name="android:windowBackground">@color/light_gray</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="fontFamily">sans-serif</item>
+        <item name="android:fontFamily">@font/urbanist</item>
+        <item name="fontFamily">@font/urbanist</item>
         <item name="colorPrimary">@color/black</item>
         <item name="colorAccent">@color/black</item>
         <item name="colorControlActivated">@color/black</item>
         <item name="android:colorControlActivated">@color/black</item>
         <item name="colorControlNormal">@color/black</item>
         <item name="android:colorControlNormal">@color/black</item>
-        <item name="android:textColorHighlight">@color/light_gray</item>
     </style>
 
     <style name="Theme.TourGo" parent="Base.Theme.TourGo" />
+
+    <!-- Style cho Filter Chips: Nền xanh khi chọn, chữ trắng, icon hiện rõ -->
+    <style name="Widget.Material3.Chip.Filter" parent="Widget.Material3.Chip.Suggestion">
+        <item name="chipBackgroundColor">@color/chip_bg_filter</item>
+        <item name="chipStrokeColor">@color/adm_gray_200</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">28dp</item>
+        <item name="android:textColor">@color/chip_text_color_filter</item>
+        <item name="chipIconTint">@color/chip_icon_tint_filter</item>
+        <item name="android:fontFamily">@font/urbanist</item>
+        <item name="chipMinHeight">44dp</item>
+        <item name="android:checkable">true</item>
+        <item name="chipIconVisible">true</item>
+    </style>
+
+    <!-- Bottom Sheet Material 3 Style -->
+    <style name="BottomSheetDialogTheme" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.App.Corner24</item>
+    </style>
+
+    <style name="ProfileSettingRow">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">@dimen/screen_margin_horizontal</item>
+        <item name="android:paddingVertical">14dp</item>
+    </style>
 
     <style name="CircleImage">
         <item name="cornerSize">50%</item>
@@ -31,47 +66,18 @@
         <item name="cornerSizeBottomRight">24dp</item>
     </style>
 
-    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
-    </style>
-
-    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
-    <style name="ProfileSettingRow">
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:orientation">horizontal</item>
-        <item name="android:paddingHorizontal">@dimen/screen_margin_horizontal</item>
-        <item name="android:paddingVertical">14dp</item>
-    </style>
-
-    <style name="ProfileSettingIcon">
-        <item name="android:layout_width">22dp</item>
-        <item name="android:layout_height">22dp</item>
-        <item name="tint">@color/black</item>
-    </style>
-
-    <style name="ProfileSettingLabel">
-        <item name="android:layout_width">0dp</item>
+    <style name="AdmSectionLabel">
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginStart">@dimen/gutter_space</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="ProfileSettingChevron">
-        <item name="android:layout_width">20dp</item>
-        <item name="android:layout_height">20dp</item>
-        <item name="tint">@color/dark_gray</item>
-    </style>
-
-    <!-- Admin Console — detail-sheet nav row (icon · label · trailing · chevron) -->
     <style name="AdmDetailNavRow">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -109,18 +115,5 @@
         <item name="android:layout_marginStart">6dp</item>
         <item name="android:contentDescription">@null</item>
         <item name="tint">@color/adm_gray_400</item>
-    </style>
-
-    <!-- Admin Console — uppercase section label above grouped rows -->
-    <style name="AdmSectionLabel">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">14dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:textColor">@color/adm_gray_400</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">0.04</item>
-        <item name="android:textAllCaps">true</item>
     </style>
 </resources>
