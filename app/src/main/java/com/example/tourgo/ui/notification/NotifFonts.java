@@ -11,12 +11,16 @@ import com.example.tourgo.utils.LocaleHelper;
 /**
  * Picks the right UI typeface for the active language.
  *
- * The Urbanist files bundled in res/font are a Latin subset — they do NOT contain
- * the Vietnamese precomposed letters (Đ, đ, ề, ữ, ố, ờ, ẩ …), so rendering Vietnamese
- * in Urbanist breaks mid-word (those glyphs fall back to the system font). Urbanist is
- * therefore used for English only; Vietnamese — and any non-English locale, which falls
- * back to the default Vietnamese strings — uses the system {@code sans-serif}, the same
- * font the rest of the app renders Vietnamese in (the app theme's default fontFamily).
+ * Two Urbanist subsets ship in res/font:
+ *  • the Latin {@code .ttf} files (regular/medium/semibold/bold) — full weight range, but
+ *    they do NOT contain the Vietnamese precomposed letters (Đ, đ, ề, ữ, ố, ờ, ẩ …), so
+ *    rendering Vietnamese with them breaks mid-word (missing glyphs fall back to the
+ *    system font). These are used for English.
+ *  • the Vietnamese {@code .otf} files ({@code *_vn.otf}) — they carry the Vietnamese
+ *    glyphs, so Vietnamese (and any non-English locale, which falls back to the default
+ *    Vietnamese strings) renders in Urbanist without breaking. Only Light and Regular
+ *    weights are shipped, so the heavier UI weights (semibold/bold) are synthesized
+ *    (faux-bold) from the Regular {@code .otf} — keeping the Vietnamese glyphs.
  */
 public final class NotifFonts {
 
@@ -24,13 +28,13 @@ public final class NotifFonts {
 
     public enum Weight { REGULAR, MEDIUM, SEMIBOLD, BOLD }
 
-    /** Urbanist only covers the Latin/English text we ship; everything else uses sans-serif. */
-    private static boolean useUrbanist() {
+    /** The Latin .ttf set only covers the English text we ship. */
+    private static boolean useLatinUrbanist() {
         return "en".equals(LocaleHelper.getCurrentLanguageTag());
     }
 
     public static Typeface get(Context ctx, Weight w) {
-        if (useUrbanist()) {
+        if (useLatinUrbanist()) {
             int res;
             switch (w) {
                 case MEDIUM:   res = R.font.urbanist_medium; break;
@@ -40,8 +44,22 @@ public final class NotifFonts {
             }
             Typeface t = ResourcesCompat.getFont(ctx, res);
             if (t != null) return t;
+        } else {
+            // Vietnamese / non-English: Urbanist Vietnamese .otf subset. Only Regular is
+            // shipped, so semibold/bold are synthesized (faux-bold) off the same file —
+            // medium stays Regular (it's used for subtitles/timestamps, not emphasis).
+            Typeface base = ResourcesCompat.getFont(ctx, R.font.urbanist_regular_vn);
+            if (base != null) {
+                switch (w) {
+                    case SEMIBOLD:
+                    case BOLD:
+                        return Typeface.create(base, Typeface.BOLD);
+                    default:
+                        return base;
+                }
+            }
         }
-        // Vietnamese / fallback: system sans-serif at the matching weight (API 28+).
+        // Last-resort fallback: system sans-serif at the matching weight (API 28+).
         int weight;
         switch (w) {
             case MEDIUM:   weight = 500; break;
