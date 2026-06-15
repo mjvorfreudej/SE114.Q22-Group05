@@ -466,4 +466,79 @@
     <string name="adm_toast_biz_approved">Đã duyệt %s</string>
     <string name="adm_users_empty">Không có người dùng</string>
 
+    <!-- ============================================================
+         Traveler notifications (ui_kits/notifications/traveler.html)
+         Chrome is localized; notification record content lives in
+         NotificationMockData, kept verbatim from the design.
+         ============================================================ -->
+    <string name="notif_title">Thông báo</string>
+    <string name="notif_unread">%d chưa đọc</string>
+    <string name="notif_mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="notif_settings">Cài đặt thông báo</string>
+    <string name="notif_toast_marked_all">Đã đánh dấu tất cả là đã đọc</string>
+
+    <!-- Filters -->
+    <string name="notif_filter_all">Tất cả</string>
+    <string name="notif_filter_unread">Chưa đọc</string>
+    <string name="notif_cat_bookings">Đặt chỗ</string>
+    <string name="notif_cat_payments">Thanh toán</string>
+    <string name="notif_cat_offers">Ưu đãi</string>
+    <string name="notif_cat_trips">Chuyến đi</string>
+    <string name="notif_cat_account">Tài khoản</string>
+
+    <!-- Date groups -->
+    <string name="notif_group_today">Hôm nay</string>
+    <string name="notif_group_yesterday">Hôm qua</string>
+    <string name="notif_group_earlier">Trước đó</string>
+
+    <!-- Empty states -->
+    <string name="notif_empty_all_title">Chưa có thông báo</string>
+    <string name="notif_empty_all_msg">Cập nhật đặt chỗ, ưu đãi và nhắc nhở sẽ xuất hiện ở đây.</string>
+    <string name="notif_empty_unread_title">Bạn đã xem hết</string>
+    <string name="notif_empty_unread_msg">Mọi thông báo đều đã được đọc.</string>
+
+    <!-- Notification content (sample data; localized to match the active language) -->
+    <string name="notif_t1_title">Đặt chỗ đã xác nhận</string>
+    <string name="notif_t1_body">Kỳ nghỉ của bạn tại The Grand Orchid Resort đã được xác nhận cho ngày 13–15/08.</string>
+    <string name="notif_t1_when">Vừa xong</string>
+    <string name="notif_t1_action">Xem đặt chỗ</string>
+
+    <string name="notif_t2_title">Thanh toán thành công · $636.08</string>
+    <string name="notif_t2_body">Thanh toán cho đơn #TG-4821 đã hoàn tất.</string>
+    <string name="notif_t2_when">12 phút</string>
+    <string name="notif_t2_action">Xem biên lai</string>
+
+    <string name="notif_t3_title">Nhận phòng vào ngày mai</string>
+    <string name="notif_t3_body">Nhận phòng tại The Grand Orchid Resort mở lúc 14:00. Chuẩn bị hành lý nhé!</string>
+    <string name="notif_t3_when">2 giờ</string>
+    <string name="notif_t3_action">Xem chi tiết</string>
+
+    <string name="notif_t4_title">Giảm 15% cho chuyến đi tiếp theo</string>
+    <string name="notif_t4_body">Một ưu đãi có thời hạn đang chờ trong tài khoản của bạn.</string>
+    <string name="notif_t4_when">4 giờ</string>
+    <string name="notif_t4_action">Khám phá ưu đãi</string>
+
+    <string name="notif_t5_title">Giảm giá mục trong danh sách yêu thích</string>
+    <string name="notif_t5_body">Lavender Lakehouse hiện còn $149/đêm — giảm 16%.</string>
+    <string name="notif_t5_when">6 giờ</string>
+    <string name="notif_t5_action">Xem chỗ ở</string>
+
+    <string name="notif_t6_title">Cedar Cove thế nào?</string>
+    <string name="notif_t6_body">Chia sẻ đánh giá nhanh để giúp các du khách khác lựa chọn.</string>
+    <string name="notif_t6_when">Hôm qua</string>
+    <string name="notif_t6_action">Viết đánh giá</string>
+
+    <string name="notif_t7_title">Đã cập nhật mật khẩu</string>
+    <string name="notif_t7_body">Mật khẩu tài khoản của bạn đã được thay đổi thành công.</string>
+    <string name="notif_t7_when">Hôm qua</string>
+
+    <string name="notif_t8_title">Cập nhật chính sách hủy</string>
+    <string name="notif_t8_body">Chúng tôi đã cập nhật điều khoản hủy — chạm để xem thay đổi.</string>
+    <string name="notif_t8_when">2 ngày</string>
+
+    <string name="notif_t9_title">Chuyến đi của bạn bắt đầu sau 2 ngày</string>
+    <string name="notif_t9_body">Tour đi bộ Phố cổ Kyoto của bạn bắt đầu ngày 13/08.</string>
+    <string name="notif_t9_when">3 ngày</string>
+    <string name="notif_t9_action">Xem hành trình</string>
+
 </resources>

@@ -28,6 +28,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.models.response.User;
+import com.example.tourgo.ui.notification.NotificationsActivity;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
 
@@ -123,6 +124,9 @@ public class HomeFragment extends Fragment {
 
         binding.fabAddTour.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), CreateTourActivity.class)));
+
+        binding.btnNotification.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), NotificationsActivity.class)));
     }
 
     private void openHotelScreen() {

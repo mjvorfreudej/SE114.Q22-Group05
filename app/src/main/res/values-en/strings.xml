@@ -466,4 +466,78 @@
     <string name="adm_toast_biz_approved">%s approved</string>
     <string name="adm_users_empty">No users found</string>
 
+    <!-- ============================================================
+         Traveler notifications (ui_kits/notifications/traveler.html)
+         English mirror of the strings in values/strings.xml.
+         ============================================================ -->
+    <string name="notif_title">Notifications</string>
+    <string name="notif_unread">%d unread</string>
+    <string name="notif_mark_all_read">Mark all read</string>
+    <string name="notif_settings">Notification settings</string>
+    <string name="notif_toast_marked_all">All notifications marked as read</string>
+
+    <!-- Filters -->
+    <string name="notif_filter_all">All</string>
+    <string name="notif_filter_unread">Unread</string>
+    <string name="notif_cat_bookings">Bookings</string>
+    <string name="notif_cat_payments">Payments</string>
+    <string name="notif_cat_offers">Offers</string>
+    <string name="notif_cat_trips">Trips</string>
+    <string name="notif_cat_account">Account</string>
+
+    <!-- Date groups -->
+    <string name="notif_group_today">Today</string>
+    <string name="notif_group_yesterday">Yesterday</string>
+    <string name="notif_group_earlier">Earlier</string>
+
+    <!-- Empty states -->
+    <string name="notif_empty_all_title">No notifications yet</string>
+    <string name="notif_empty_all_msg">Booking updates, offers and reminders will show up here.</string>
+    <string name="notif_empty_unread_title">You\'re all caught up</string>
+    <string name="notif_empty_unread_msg">Every notification has been read.</string>
+
+    <!-- Notification content (sample data; verbatim from the design) -->
+    <string name="notif_t1_title">Booking confirmed</string>
+    <string name="notif_t1_body">Your stay at The Grand Orchid Resort is confirmed for Aug 13 – 15.</string>
+    <string name="notif_t1_when">Just now</string>
+    <string name="notif_t1_action">View booking</string>
+
+    <string name="notif_t2_title">Payment successful · $636.08</string>
+    <string name="notif_t2_body">Your payment for booking #TG-4821 went through.</string>
+    <string name="notif_t2_when">12m</string>
+    <string name="notif_t2_action">View receipt</string>
+
+    <string name="notif_t3_title">Check-in tomorrow</string>
+    <string name="notif_t3_body">Check-in at The Grand Orchid Resort opens 2:00 PM. Pack your bags!</string>
+    <string name="notif_t3_when">2h</string>
+    <string name="notif_t3_action">View details</string>
+
+    <string name="notif_t4_title">15% off your next trip</string>
+    <string name="notif_t4_body">A limited-time discount is waiting in your account.</string>
+    <string name="notif_t4_when">4h</string>
+    <string name="notif_t4_action">Browse deals</string>
+
+    <string name="notif_t5_title">Price drop on your wishlist</string>
+    <string name="notif_t5_body">Lavender Lakehouse is now $149 / night — down 16%.</string>
+    <string name="notif_t5_when">6h</string>
+    <string name="notif_t5_action">View stay</string>
+
+    <string name="notif_t6_title">How was Cedar Cove?</string>
+    <string name="notif_t6_body">Share a quick review and help other travelers choose.</string>
+    <string name="notif_t6_when">Yesterday</string>
+    <string name="notif_t6_action">Write review</string>
+
+    <string name="notif_t7_title">Password updated</string>
+    <string name="notif_t7_body">Your account password was changed successfully.</string>
+    <string name="notif_t7_when">Yesterday</string>
+
+    <string name="notif_t8_title">Cancellation policy updated</string>
+    <string name="notif_t8_body">We\'ve updated our cancellation terms — tap to review what changed.</string>
+    <string name="notif_t8_when">2d</string>
+
+    <string name="notif_t9_title">Your trip starts in 2 days</string>
+    <string name="notif_t9_body">Your Kyoto Old Town walking tour begins Aug 13.</string>
+    <string name="notif_t9_when">3d</string>
+    <string name="notif_t9_action">View itinerary</string>
+
 </resources>

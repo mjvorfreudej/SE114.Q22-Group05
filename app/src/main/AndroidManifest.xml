@@ -88,6 +88,9 @@
             android:name=".ui.main.CreateTourActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.notification.NotificationsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
