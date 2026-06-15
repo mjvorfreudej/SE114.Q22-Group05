@@ -8,7 +8,14 @@
     <TextView style="@style/BizStepHeading" android:text="@string/biz_s2_title" />
     <TextView style="@style/BizStepSub" android:text="@string/biz_s2_sub" />
 
-    <!-- Address -->
+    <!-- City & Address -->
+    <TextView style="@style/BizFieldLabel" android:layout_marginTop="14dp" android:text="City" />
+    <EditText
+        style="@style/BizInput"
+        android:id="@+id/bizCity"
+        android:hint="e.g. Da Lat"
+        android:inputType="text" />
+
     <TextView style="@style/BizFieldLabel" android:layout_marginTop="14dp" android:text="@string/biz_address" />
 
     <LinearLayout
@@ -138,6 +145,7 @@
         android:paddingHorizontal="6dp">
 
         <FrameLayout
+            android:id="@+id/bizCapacityMinus"
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:background="@drawable/bg_adm_circle"
@@ -156,6 +164,7 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/bizCapacityText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -163,11 +172,10 @@
             android:text="4"
             android:textColor="@color/adm_gray_900"
             android:textSize="16sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText"
-            xmlns:tools="http://schemas.android.com/tools" />
+            android:textStyle="bold" />
 
         <FrameLayout
+            android:id="@+id/bizCapacityPlus"
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:background="@drawable/bg_adm_circle"

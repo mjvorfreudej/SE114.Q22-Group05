@@ -1,12 +1,15 @@
 package com.example.tourgo.remote.api;
 
+import com.example.tourgo.models.request.CreateHotelRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Hotel;
 
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -27,4 +30,7 @@ public interface HotelApi {
             @Query("sort_by") String sortBy,
             @Query("order") String order
     );
+
+    @POST("api/hotels")
+    Call<ApiResponse<Hotel>> createHotel(@Body CreateHotelRequest request);
 }
