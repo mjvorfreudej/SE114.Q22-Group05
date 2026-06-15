@@ -25,6 +25,7 @@ import com.example.tourgo.models.response.AuthData;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.admin.AdminActivity;
+import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.main.MainActivity;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.databinding.ActivityLoginBinding;
@@ -184,10 +185,13 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * Routes the user after a successful login / auto-login: admins land on the
-     * Admin Console, everyone else on the standard Traveler home.
+     * Admin Console, business/partner accounts on the Business Console, everyone
+     * else on the standard Traveler home.
      */
     private void goToHome() {
-        Class<?> destination = session.isAdmin() ? AdminActivity.class : MainActivity.class;
+        Class<?> destination = session.isAdmin() ? AdminActivity.class
+                : session.isBusiness() ? BusinessActivity.class
+                : MainActivity.class;
         Intent intent = new Intent(LoginActivity.this, destination);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

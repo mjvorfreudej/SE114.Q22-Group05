@@ -22,6 +22,15 @@ public class SessionManager {
 //            "hinduck3206@gmail.com",
     };
 
+    // ── Business access control (Email suffix + Predefined whitelist) ─────────
+    /** Any account whose email ends with this domain is routed to the Business Console. */
+    private static final String BUSINESS_EMAIL_DOMAIN = "@business.tourgo.com";
+    /** Extra business (partner) accounts that don't use the partner domain. */
+    private static final String[] BUSINESS_EMAIL_WHITELIST = {
+            "business@tourgo.com",
+            "partner@tourgo.com",
+    };
+
     // Auth keys
     private static final String KEY_ACCESS_TOKEN = "access_token";
     private static final String KEY_REFRESH_TOKEN = "refresh_token";
@@ -136,6 +145,24 @@ public class SessionManager {
         if (email.endsWith(ADMIN_EMAIL_DOMAIN)) return true;
         for (String admin : ADMIN_EMAIL_WHITELIST) {
             if (admin != null && email.equals(admin.trim().toLowerCase(Locale.ROOT))) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns true when the logged-in user is a business/partner account, using the
+     * same "email suffix + whitelist" strategy as {@link #isAdmin()}. Admins take
+     * precedence (an admin email is never treated as a business).
+     */
+    public boolean isBusiness() {
+        if (isAdmin()) return false;
+        String email = getEmail();
+        if (email == null) return false;
+        email = email.trim().toLowerCase(Locale.ROOT);
+        if (email.isEmpty()) return false;
+        if (email.endsWith(BUSINESS_EMAIL_DOMAIN)) return true;
+        for (String biz : BUSINESS_EMAIL_WHITELIST) {
+            if (biz != null && email.equals(biz.trim().toLowerCase(Locale.ROOT))) return true;
         }
         return false;
     }

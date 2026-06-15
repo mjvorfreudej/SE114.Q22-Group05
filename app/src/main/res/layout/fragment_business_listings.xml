@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_gray_100">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/biz_my_listings"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <FrameLayout
+                    android:id="@+id/bizAddListing"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_adm_circle"
+                    android:backgroundTint="@color/adm_gray_900"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/biz_qa_add"
+                        android:src="@drawable/ic_plus"
+                        app:tint="@color/white" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- Search bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_adm_pill"
+                android:backgroundTint="@color/adm_gray_100"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_search_24"
+                    app:tint="@color/adm_gray_400" />
+
+                <EditText
+                    android:id="@+id/bizSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="@string/biz_search_listings"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/adm_gray_900"
+                    android:textColorHint="@color/adm_gray_400"
+                    android:textSize="13sp" />
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:contentDescription="@string/biz_filter"
+                    android:src="@drawable/ic_sliders"
+                    app:tint="@color/adm_gray_600" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Status tabs -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/bizListingTabs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <!-- Category filter chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/bizChipAll"
+                style="@style/BizCatChip"
+                android:text="@string/biz_cat_all" />
+
+            <TextView
+                android:id="@+id/bizChipHotels"
+                style="@style/BizCatChip"
+                android:layout_marginStart="6dp"
+                android:text="@string/biz_cat_hotels" />
+
+            <TextView
+                android:id="@+id/bizChipTours"
+                style="@style/BizCatChip"
+                android:layout_marginStart="6dp"
+                android:text="@string/biz_cat_tours" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bizListingsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="96dp"
+                android:scrollbars="none" />
+
+            <!-- Empty state -->
+            <LinearLayout
+                android:id="@+id/bizListingsEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="40dp"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_adm_rounded_16"
+                    android:backgroundTint="@color/adm_gray_100">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_building"
+                        app:tint="@color/adm_gray_400" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/biz_empty_listings_title"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/bizListingsEmptyMsg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:maxWidth="240dp"
+                    android:text="@string/biz_empty_listings_msg"
+                    android:textColor="@color/adm_gray_500"
+                    android:textSize="12.5sp" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Bulk actions bar -->
+    <LinearLayout
+        android:id="@+id/bizBulkBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="88dp"
+        android:background="@drawable/bg_adm_rounded_14"
+        android:backgroundTint="@color/adm_gray_900"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/bizBulkClear"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="#33FFFFFF"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/biz_cancel"
+                android:src="@drawable/ic_close"
+                app:tint="@color/white" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/bizBulkCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bizBulkPause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="8dp"
+            android:text="@string/biz_bulk_pause"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bizBulkDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="8dp"
+            android:text="@string/biz_bulk_delete"
+            android:textColor="@color/adm_red_500"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</FrameLayout>
