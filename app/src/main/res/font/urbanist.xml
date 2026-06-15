@@ -1,44 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Default (Vietnamese) Urbanist family.
-
-    Built from the *_vn.otf subset, which DOES contain the Vietnamese precomposed
-    letters (Đ, đ, ề, ữ, ố, ờ, ẩ …) — so Vietnamese renders in Urbanist without
-    breaking mid-word. Only Light (300) and Regular (400) weights ship in the .otf
-    subset, so the heavier UI weights (medium/semibold/bold) are NOT declared here:
-    the framework resolves them to the closest available weight (400) and synthesizes
-    a faux-bold for bold requests — keeping the Vietnamese glyphs intact.
-
-    English (full 400/500/600/700 .ttf range) is provided by res/font-en/urbanist.xml.
--->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
-        android:font="@font/urbanist_light_vn"
-        android:fontWeight="300"
-        android:fontStyle="normal"
-        app:font="@font/urbanist_light_vn"
-        app:fontWeight="300"
-        app:fontStyle="normal" />
-    <font
-        android:font="@font/urbanist_lightitalic_vn"
-        android:fontWeight="300"
-        android:fontStyle="italic"
-        app:font="@font/urbanist_lightitalic_vn"
-        app:fontWeight="300"
-        app:fontStyle="italic" />
-    <font
-        android:font="@font/urbanist_regular_vn"
+        android:font="@font/urbanist_regular"
         android:fontWeight="400"
         android:fontStyle="normal"
-        app:font="@font/urbanist_regular_vn"
+        app:font="@font/urbanist_regular"
         app:fontWeight="400"
         app:fontStyle="normal" />
     <font
-        android:font="@font/urbanist_italic_vn"
-        android:fontWeight="400"
-        android:fontStyle="italic"
-        app:font="@font/urbanist_italic_vn"
-        app:fontWeight="400"
-        app:fontStyle="italic" />
+        android:font="@font/urbanist_medium"
+        android:fontWeight="500"
+        android:fontStyle="normal"
+        app:font="@font/urbanist_medium"
+        app:fontWeight="500"
+        app:fontStyle="normal" />
+    <font
+        android:font="@font/urbanist_semibold"
+        android:fontWeight="600"
+        android:fontStyle="normal"
+        app:font="@font/urbanist_semibold"
+        app:fontWeight="600"
+        app:fontStyle="normal" />
+    <font
+        android:font="@font/urbanist_bold"
+        android:fontWeight="700"
+        android:fontStyle="normal"
+        app:font="@font/urbanist_bold"
+        app:fontWeight="700"
+        app:fontStyle="normal" />
 </font-family>
