@@ -142,6 +142,15 @@ public class SessionManager {
         if (email == null) return false;
         email = email.trim().toLowerCase(Locale.ROOT);
         if (email.isEmpty()) return false;
+
+        // Business whitelist takes precedence over the admin domain match,
+        // because emails like business@tourgo.com end with @tourgo.com but
+        // should be routed to the Business Console, not the Admin Console.
+        for (String biz : BUSINESS_EMAIL_WHITELIST) {
+            if (biz != null && email.equals(biz.trim().toLowerCase(Locale.ROOT))) return false;
+        }
+        if (email.endsWith(BUSINESS_EMAIL_DOMAIN)) return false;
+
         if (email.endsWith(ADMIN_EMAIL_DOMAIN)) return true;
         for (String admin : ADMIN_EMAIL_WHITELIST) {
             if (admin != null && email.equals(admin.trim().toLowerCase(Locale.ROOT))) return true;
