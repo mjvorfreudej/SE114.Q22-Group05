@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Bell-anchored notification popover card (design: TravelerBell dropdown).
+  White rounded panel with a hairline edge; the drop shadow comes from the
+  PopupWindow's elevation, not from this shape.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/white" />
+    <corners android:radius="16dp" />
+    <stroke android:width="1dp" android:color="@color/adm_gray_100" />
+</shape>

@@ -35,8 +35,9 @@ import java.util.List;
  * Traveler notification center — the canonical full-screen surface from
  * ui_kits/notifications/traveler.html. App bar (back · title + unread count ·
  * overflow) over a filter chip row over a date-grouped feed, with loading,
- * empty and unread states. The bell-anchored popover in the prototype is a
- * web hover pattern; on Android the bell opens this screen directly.
+ * empty and unread states. This is the second stage of the flow: the home bell
+ * first opens the compact {@link NotificationPopover}, whose "View all
+ * notifications" footer opens this full center.
  *
  * No notifications API exists yet, so state is local + optimistic (mark-as-read
  * on tap, mark-all-read from the overflow menu), exactly as the prototype behaves.

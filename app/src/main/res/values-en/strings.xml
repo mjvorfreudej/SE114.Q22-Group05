@@ -475,6 +475,7 @@
     <string name="notif_mark_all_read">Mark all read</string>
     <string name="notif_settings">Notification settings</string>
     <string name="notif_toast_marked_all">All notifications marked as read</string>
+    <string name="notif_view_all">View all notifications</string>
 
     <!-- Filters -->
     <string name="notif_filter_all">All</string>

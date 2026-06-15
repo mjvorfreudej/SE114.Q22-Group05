@@ -496,6 +496,7 @@
     <string name="notif_mark_all_read">Đánh dấu tất cả đã đọc</string>
     <string name="notif_settings">Cài đặt thông báo</string>
     <string name="notif_toast_marked_all">Đã đánh dấu tất cả là đã đọc</string>
+    <string name="notif_view_all">Xem tất cả thông báo</string>
 
     <!-- Filters -->
     <string name="notif_filter_all">Tất cả</string>
