@@ -8,22 +8,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -34,7 +30,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,7 +52,6 @@ import com.example.tourgo.remote.service.ReviewService;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.BookingService;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +152,9 @@ public class DetailActivity extends AppCompatActivity {
 
         if (isTourMode) {
             binding.tvDetailName.setText(tour.getName());
-            binding.tvDetailLocation.setText(tour.getDestination() != null ? tour.getDestination() : tour.getLocation());
+            String loc = tour.getDestination() != null ? tour.getDestination() : tour.getLocation();
+            binding.tvDetailLocation.setText(formatShortLocation(loc));
+            
             String formattedPrice = tour.formatPrice(this, tour.getPrice());
             binding.tvDetailPrice.setText(formattedPrice);
             binding.tvDetailDescription.setText(tour.getDescription());
@@ -168,7 +164,8 @@ public class DetailActivity extends AppCompatActivity {
             binding.tvPriceLabel.setText(R.string.tour_price_label);
         } else {
             binding.tvDetailName.setText(hotel.getName());
-            binding.tvDetailLocation.setText(hotel.getAddress());
+            binding.tvDetailLocation.setText(formatShortLocation(hotel.getAddress()));
+            
             String formattedPrice = hotel.formatPrice(this, hotel.getPricePerNight());
             binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
             binding.tvDetailDescription.setText(hotel.getDescription());
@@ -177,40 +174,74 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    private String formatShortLocation(String location) {
+        if (location == null || location.isEmpty()) return "";
+        String[] parts = location.split(",");
+        if (parts.length >= 2) {
+            // Lấy 2 vế cuối cùng (thường là Tỉnh/Thành phố và Quốc gia)
+            return parts[parts.length - 2].trim() + ", " + parts[parts.length - 1].trim();
+        }
+        return location.trim();
+    }
+
     private void setupAmenities() {
         LinearLayout container = binding.layoutAmenities;
         container.removeAllViews();
 
-        int[][] items;
-        if (isTourMode) {
-            items = new int[][] {
-                    {R.drawable.ic_tour, R.string.amenity_guide},
-                    {R.drawable.ic_garage, R.string.amenity_transport},
-                    {R.drawable.ic_workplace, R.string.amenity_meals},
-                    {R.drawable.ic_wifi, R.string.amenity_tickets}
-            };
-            if (tour.getDuration() != null && !tour.getDuration().isEmpty()) {
-                addDurationAmenity(container, tour.getDuration());
+        String amenitiesStr = isTourMode ? tour.getAmenities() : hotel.getAmenities();
+        if (amenitiesStr != null && !amenitiesStr.isEmpty()) {
+            String[] amenities = amenitiesStr.split(",");
+            LayoutInflater inflater = LayoutInflater.from(this);
+            for (String amenity : amenities) {
+                amenity = amenity.trim();
+                if (amenity.isEmpty()) continue;
+
+                View row = inflater.inflate(R.layout.item_amenity, container, false);
+                ImageView icon = row.findViewById(R.id.imgAmenity);
+                TextView label = row.findViewById(R.id.tvAmenityLabel);
+
+                int iconRes = getAmenityIcon(amenity);
+                icon.setImageResource(iconRes);
+                label.setText(amenity);
+                container.addView(row);
             }
-        } else {
-            items = new int[][] {
-                    {R.drawable.ic_wifi, R.string.amenity_wifi},
-                    {R.drawable.ic_garage, R.string.amenity_parking},
-                    {R.drawable.ic_pool, R.string.amenity_pool},
-                    {R.drawable.ic_workplace, R.string.amenity_workplace},
-                    {R.drawable.ic_tour, R.string.amenity_tour_desk}
-            };
         }
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        for (int[] item : items) {
-            View row = inflater.inflate(R.layout.item_amenity, container, false);
-            ImageView icon = row.findViewById(R.id.imgAmenity);
-            TextView label = row.findViewById(R.id.tvAmenityLabel);
-            icon.setImageResource(item[0]);
-            label.setText(item[1]);
-            container.addView(row);
+        if (isTourMode && tour.getDuration() != null && !tour.getDuration().isEmpty()) {
+            // Check if duration is already in amenities to avoid duplication
+            boolean alreadyAdded = false;
+            for (int i = 0; i < container.getChildCount(); i++) {
+                View child = container.getChildAt(i);
+                TextView tv = child.findViewById(R.id.tvAmenityLabel);
+                if (tv != null && tv.getText().toString().equalsIgnoreCase(tour.getDuration())) {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+            if (!alreadyAdded) {
+                addDurationAmenity(container, tour.getDuration());
+            }
         }
+    }
+
+    private int getAmenityIcon(String amenity) {
+        if (amenity == null) return R.drawable.ic_check_circle;
+        String lower = amenity.toLowerCase().trim();
+
+        if (lower.contains("wifi") || lower.contains("mạng") || lower.contains("internet")) return R.drawable.ic_wifi;
+        if (lower.contains("pool") || lower.contains("hồ bơi") || lower.contains("bể bơi")) return R.drawable.ic_pool;
+        if (lower.contains("parking") || lower.contains("đỗ xe") || lower.contains("gửi xe") || lower.contains("garage")) return R.drawable.ic_garage;
+        if (lower.contains("work") || lower.contains("gym") || lower.contains("làm việc") || lower.contains("văn phòng")) return R.drawable.ic_workplace;
+        if (lower.contains("tour") || lower.contains("guide") || lower.contains("hướng dẫn") || lower.contains("desk")) return R.drawable.ic_tour;
+        if (lower.contains("transport") || lower.contains("shuttle") || lower.contains("xe đưa đón") || lower.contains("di chuyển")) return R.drawable.ic_garage;
+        if (lower.contains("meal") || lower.contains("ăn") || lower.contains("breakfast") || lower.contains("nhà hàng")) return R.drawable.ic_workplace;
+        if (lower.contains("ticket") || lower.contains("vé") || lower.contains("tham quan")) return R.drawable.ic_check_circle;
+        if (lower.contains("time") || lower.contains("thời gian") || lower.contains("giờ") || lower.contains("duration")) return R.drawable.ic_time;
+        if (lower.contains("security") || lower.contains("an toàn") || lower.contains("bảo vệ")) return R.drawable.ic_shield;
+        if (lower.contains("building") || lower.contains("phòng") || lower.contains("tòa nhà")) return R.drawable.ic_building;
+        if (lower.contains("user") || lower.contains("khách") || lower.contains("người")) return R.drawable.ic_users;
+
+        return R.drawable.ic_check_circle;
     }
 
     private void addDurationAmenity(LinearLayout container, String duration) {
@@ -228,37 +259,58 @@ public class DetailActivity extends AppCompatActivity {
         if (mapFragment == null) return;
 
         mapFragment.getMapAsync(googleMap -> {
-            googleMap.getUiSettings().setMapToolbarEnabled(false);
-            googleMap.getUiSettings().setZoomControlsEnabled(false);
+            googleMap.getUiSettings().setMapToolbarEnabled(true);
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
 
             LatLng target = resolveLatLng();
             String title = isTourMode ? tour.getName() : hotel.getName();
             googleMap.addMarker(new MarkerOptions().position(target).title(title));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 14f));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 15f));
+
+            googleMap.setOnMapClickListener(latLng -> {
+                String address = isTourMode ? tour.getDestination() : hotel.getAddress();
+                Uri gmmIntentUri = Uri.parse("geo:" + target.latitude + "," + target.longitude + "?q=" + Uri.encode(address));
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                } else {
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, 
+                        Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(address)));
+                    startActivity(webIntent);
+                }
+            });
         });
     }
 
     private LatLng resolveLatLng() {
-        if (!isTourMode && hotel.hasCoordinates()) {
-            return new LatLng(hotel.getLatitude(), hotel.getLongitude());
-        }
 
-        String addressStr = isTourMode ? tour.getDestination() : hotel.getAddress();
+        String addressStr = isTourMode
+                ? tour.getDestination()
+                : hotel.getAddress();
+
+        Log.d("MAP_DEBUG", "Address = " + addressStr);
+
         if (!TextUtils.isEmpty(addressStr) && Geocoder.isPresent()) {
             try {
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                List<Address> matches = geocoder.getFromLocationName(addressStr, 1);
-                if (matches != null && !matches.isEmpty()) {
-                    Address a = matches.get(0);
+                Geocoder geocoder = new Geocoder(this);
+
+                List<Address> result =
+                        geocoder.getFromLocationName(addressStr, 1);
+
+                if (result != null && !result.isEmpty()) {
+                    Address a = result.get(0);
+                    Log.d("MAP_DEBUG", "Found: " + a.getLatitude() + "," + a.getLongitude());
                     return new LatLng(a.getLatitude(), a.getLongitude());
                 }
-            } catch (IOException e) {
-                Log.w("DetailActivity", "Geocoder failed: " + e.getMessage());
+
+            } catch (Exception e) {
+                Log.e("MAP_DEBUG", e.toString());
             }
         }
-        return new LatLng(21.0285, 105.8542);
-    }
 
+        return new LatLng(21.0285,105.8542);
+    }
     private void loadReviews() {
         String id = isTourMode ? tour.getId() : hotel.getId();
         DataCallback<List<Review>> callback = new DataCallback<List<Review>>() {
@@ -376,14 +428,14 @@ public class DetailActivity extends AppCompatActivity {
         if (isTourMode) {
             TourService.getTourDetail(this, id, new DataCallback<Tour>() {
                 @Override public void onSuccess(Tour fresh) {
-                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(tour.isFavorite()); tour = fresh; updateRatingSummaryUI(); } });
+                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(tour.isFavorite()); tour = fresh; updateRatingSummaryUI(); setupAmenities(); } });
                 }
                 @Override public void onError(ApiErrorCode code, String msg) {}
             });
         } else {
             HotelService.getHotelDetail(this, id, new DataCallback<Hotel>() {
                 @Override public void onSuccess(Hotel fresh) {
-                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(hotel.isFavorite()); hotel = fresh; updateRatingSummaryUI(); } });
+                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(hotel.isFavorite()); hotel = fresh; updateRatingSummaryUI(); setupAmenities(); } });
                 }
                 @Override public void onError(ApiErrorCode code, String msg) {}
             });
