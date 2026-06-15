@@ -50,12 +50,15 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Review;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.remote.service.HotelService;
+import com.example.tourgo.remote.service.TourService;
 import com.example.tourgo.remote.service.ReviewService;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.BookingService;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +67,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private ActivityDetailBinding binding;
     private Hotel hotel;
+    private Tour tour;
+    private boolean isTourMode = false;
+    
     private final Handler sliderHandler = new Handler(Looper.getMainLooper());
     private Runnable sliderRunnable;
     private ReviewAdapter reviewAdapter;
@@ -83,10 +89,19 @@ public class DetailActivity extends AppCompatActivity {
         applyStatusBarInset();
 
         session = new SessionManager(this);
-        hotel = (Hotel) getIntent().getSerializableExtra("hotel_object");
+        
+        Serializable data = getIntent().getSerializableExtra("hotel_object");
+        if (data instanceof Tour) {
+            tour = (Tour) data;
+            isTourMode = true;
+        } else if (data instanceof Hotel) {
+            hotel = (Hotel) data;
+            isTourMode = false;
+        }
+
         setupImagePicker();
 
-        if (hotel != null) {
+        if (tour != null || hotel != null) {
             setupUI();
         } else {
             finish();
@@ -94,12 +109,15 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
-
         binding.btnFavoriteDetail.setOnClickListener(v -> toggleFavorite());
 
         binding.btnBookNow.setOnClickListener(v -> {
             Intent intent = new Intent(this, BookingActivity.class);
-            intent.putExtra("hotel_item", hotel);
+            if (isTourMode) {
+                intent.putExtra("tour_item", tour);
+            } else {
+                intent.putExtra("hotel_item", hotel);
+            }
             startActivity(intent);
         });
 
@@ -130,37 +148,59 @@ public class DetailActivity extends AppCompatActivity {
     private void setupUI() {
         setupGallery();
         setupComments();
-        loadHotelReviews();
+        loadReviews();
         checkReviewPermission();
         setupReviewForm();
         setupAmenities();
         setupMap();
-        updateRatingSummary();
-        refreshHotelSummary();
+        updateRatingSummaryUI();
+        refreshSummary();
 
-        binding.tvDetailName.setText(hotel.getName());
-        binding.tvDetailLocation.setText(hotel.getAddress());
-
-        // SỬA TẠI ĐÂY: Truyền 'this' để định dạng đúng VND/USD theo cài đặt Profile
-        String formattedPrice = hotel.formatPrice(this, hotel.getPricePerNight());
-        binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
-
-        binding.tvDetailDescription.setText(hotel.getDescription());
-
-        updateHeartIcon(hotel.isFavorite());
+        if (isTourMode) {
+            binding.tvDetailName.setText(tour.getName());
+            binding.tvDetailLocation.setText(tour.getDestination() != null ? tour.getDestination() : tour.getLocation());
+            String formattedPrice = tour.formatPrice(this, tour.getPrice());
+            binding.tvDetailPrice.setText(formattedPrice);
+            binding.tvDetailDescription.setText(tour.getDescription());
+            updateHeartIcon(tour.isFavorite());
+            
+            // Adjust labels for Tour
+            binding.tvPriceLabel.setText(R.string.tour_price_label);
+        } else {
+            binding.tvDetailName.setText(hotel.getName());
+            binding.tvDetailLocation.setText(hotel.getAddress());
+            String formattedPrice = hotel.formatPrice(this, hotel.getPricePerNight());
+            binding.tvDetailPrice.setText(getString(R.string.price_per_night_format, formattedPrice));
+            binding.tvDetailDescription.setText(hotel.getDescription());
+            updateHeartIcon(hotel.isFavorite());
+            binding.tvPriceLabel.setText(R.string.detail_staying_price_label);
+        }
     }
 
     private void setupAmenities() {
         LinearLayout container = binding.layoutAmenities;
         container.removeAllViews();
 
-        int[][] items = new int[][] {
-                {R.drawable.ic_wifi, R.string.amenity_wifi},
-                {R.drawable.ic_garage, R.string.amenity_parking},
-                {R.drawable.ic_pool, R.string.amenity_pool},
-                {R.drawable.ic_workplace, R.string.amenity_workplace},
-                {R.drawable.ic_tour, R.string.amenity_tour_desk}
-        };
+        int[][] items;
+        if (isTourMode) {
+            items = new int[][] {
+                    {R.drawable.ic_tour, R.string.amenity_guide},
+                    {R.drawable.ic_garage, R.string.amenity_transport},
+                    {R.drawable.ic_workplace, R.string.amenity_meals},
+                    {R.drawable.ic_wifi, R.string.amenity_tickets}
+            };
+            if (tour.getDuration() != null && !tour.getDuration().isEmpty()) {
+                addDurationAmenity(container, tour.getDuration());
+            }
+        } else {
+            items = new int[][] {
+                    {R.drawable.ic_wifi, R.string.amenity_wifi},
+                    {R.drawable.ic_garage, R.string.amenity_parking},
+                    {R.drawable.ic_pool, R.string.amenity_pool},
+                    {R.drawable.ic_workplace, R.string.amenity_workplace},
+                    {R.drawable.ic_tour, R.string.amenity_tour_desk}
+            };
+        }
 
         LayoutInflater inflater = LayoutInflater.from(this);
         for (int[] item : items) {
@@ -173,34 +213,41 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    private void addDurationAmenity(LinearLayout container, String duration) {
+        View row = LayoutInflater.from(this).inflate(R.layout.item_amenity, container, false);
+        ImageView icon = row.findViewById(R.id.imgAmenity);
+        TextView label = row.findViewById(R.id.tvAmenityLabel);
+        icon.setImageResource(R.drawable.ic_time);
+        label.setText(duration);
+        container.addView(row);
+    }
+
     private void setupMap() {
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         if (mapFragment == null) return;
 
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull GoogleMap googleMap) {
-                googleMap.getUiSettings().setMapToolbarEnabled(false);
-                googleMap.getUiSettings().setZoomControlsEnabled(false);
+        mapFragment.getMapAsync(googleMap -> {
+            googleMap.getUiSettings().setMapToolbarEnabled(false);
+            googleMap.getUiSettings().setZoomControlsEnabled(false);
 
-                LatLng target = resolveHotelLatLng();
-                String title = hotel != null && !TextUtils.isEmpty(hotel.getName()) ? hotel.getName() : "Location";
-                googleMap.addMarker(new MarkerOptions().position(target).title(title));
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 14f));
-            }
+            LatLng target = resolveLatLng();
+            String title = isTourMode ? tour.getName() : hotel.getName();
+            googleMap.addMarker(new MarkerOptions().position(target).title(title));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 14f));
         });
     }
 
-    private LatLng resolveHotelLatLng() {
-        if (hotel != null && hotel.hasCoordinates()) {
+    private LatLng resolveLatLng() {
+        if (!isTourMode && hotel.hasCoordinates()) {
             return new LatLng(hotel.getLatitude(), hotel.getLongitude());
         }
 
-        if (hotel != null && !TextUtils.isEmpty(hotel.getAddress()) && Geocoder.isPresent()) {
+        String addressStr = isTourMode ? tour.getDestination() : hotel.getAddress();
+        if (!TextUtils.isEmpty(addressStr) && Geocoder.isPresent()) {
             try {
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                List<Address> matches = geocoder.getFromLocationName(hotel.getAddress(), 1);
+                List<Address> matches = geocoder.getFromLocationName(addressStr, 1);
                 if (matches != null && !matches.isEmpty()) {
                     Address a = matches.get(0);
                     return new LatLng(a.getLatitude(), a.getLongitude());
@@ -209,54 +256,37 @@ public class DetailActivity extends AppCompatActivity {
                 Log.w("DetailActivity", "Geocoder failed: " + e.getMessage());
             }
         }
-
-        // Fallback: Hanoi city center
         return new LatLng(21.0285, 105.8542);
     }
 
-    private void loadHotelReviews() {
-        if (hotel == null || hotel.getId() == null) return;
+    private void loadReviews() {
+        String id = isTourMode ? tour.getId() : hotel.getId();
+        DataCallback<List<Review>> callback = new DataCallback<List<Review>>() {
+            @Override
+            public void onSuccess(List<Review> data) {
+                runOnUiThread(() -> {
+                    allReviews = data != null ? data : new ArrayList<>();
+                    sortCurrentUserReviewFirst(allReviews);
+                    myReview = findMyReview(allReviews);
+                    bindReviewForm();
+                    reviewAdapter.submitList(new ArrayList<>(allReviews));
+                });
+            }
+            @Override public void onError(ApiErrorCode code, String msg) {
+                runOnUiThread(() -> { allReviews = new ArrayList<>(); myReview = null; reviewAdapter.submitList(new ArrayList<>()); });
+            }
+        };
 
-        ReviewService.getReviewsByHotelId(
-                this,
-                hotel.getId(),
-                new DataCallback<List<Review>>() {
-                    @Override
-                    public void onSuccess(List<Review> data) {
-                        runOnUiThread(() -> {
-                            allReviews = data != null ? data : new ArrayList<>();
-                            sortCurrentUserReviewFirst(allReviews);
-
-                            myReview = findMyReview(allReviews);
-                            bindReviewForm();
-
-                            reviewAdapter.submitList(new ArrayList<>(allReviews));
-                        });
-                    }
-
-                    @Override
-                    public void onError(ApiErrorCode code, String rawMessage) {
-                        runOnUiThread(() -> {
-                            allReviews = new ArrayList<>();
-                            myReview = null;
-                            reviewAdapter.submitList(new ArrayList<>());
-                        });
-                    }
-                }
-        );
+        if (isTourMode) ReviewService.getReviewsByTourId(this, id, callback);
+        else ReviewService.getReviewsByHotelId(this, id, callback);
     }
 
     private Review findMyReview(List<Review> reviews) {
         if (reviews == null || session == null || session.getUserId() == null) return null;
-
         String currentUserId = session.getUserId();
-
         for (Review review : reviews) {
-            if (currentUserId.equals(review.getUserId())) {
-                return review;
-            }
+            if (currentUserId.equals(review.getUserId())) return review;
         }
-
         return null;
     }
 
@@ -265,23 +295,19 @@ public class DetailActivity extends AppCompatActivity {
             binding.ratingBarReview.setRating(5);
             binding.edtReviewText.setText("");
             binding.btnSubmitReview.setText(R.string.review_submit_button);
-            return;
+        } else {
+            binding.ratingBarReview.setRating(myReview.getRating());
+            binding.edtReviewText.setText(myReview.getContent());
+            binding.btnSubmitReview.setText(R.string.review_update_button);
         }
-
-        binding.ratingBarReview.setRating(myReview.getRating());
-        binding.edtReviewText.setText(myReview.getContent());
-        binding.btnSubmitReview.setText(R.string.review_update_button);
     }
 
     private void sortCurrentUserReviewFirst(List<Review> reviews) {
         if (session == null || session.getUserId() == null || reviews == null) return;
-
         String currentUserId = session.getUserId();
-
         reviews.sort((c1, c2) -> {
             boolean c1IsMine = currentUserId.equals(c1.getUserId());
             boolean c2IsMine = currentUserId.equals(c2.getUserId());
-
             if (c1IsMine && !c2IsMine) return -1;
             if (!c1IsMine && c2IsMine) return 1;
             return 0;
@@ -294,37 +320,38 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        final boolean currentState = hotel.isFavorite();
+        final boolean currentState = isTourMode ? tour.isFavorite() : hotel.isFavorite();
         final boolean newState = !currentState;
         
-        hotel.setFavorite(newState);
+        if (isTourMode) tour.setFavorite(newState);
+        else hotel.setFavorite(newState);
+        
         updateHeartIcon(newState);
         animateHeart(binding.btnFavoriteDetail);
 
-        final String userId = session.getUserId();
-        final String token = session.getAccessToken();
-        final String hotelId = hotel.getId();
+        String userId = session.getUserId();
+        String id = isTourMode ? tour.getId() : hotel.getId();
 
         if (newState) {
-            Favorite favorite = new Favorite(userId, null, hotelId);
-            FavoriteRepository.getInstance().addFavorite(this, favorite, new DataCallback<Void>() {
-                @Override public void onSuccess(Void data) {}
+            Favorite favorite = isTourMode ? new Favorite(userId, id, null) : new Favorite(userId, null, id);
+            FavoriteRepository.getInstance().addFavorite(this, favorite, new DataCallback<Favorite>() {
+                @Override public void onSuccess(Favorite data) {}
                 @Override public void onError(ApiErrorCode code, String msg) {
                     runOnUiThread(() -> {
-                        hotel.setFavorite(currentState);
+                        if (isTourMode) tour.setFavorite(currentState); else hotel.setFavorite(currentState);
                         updateHeartIcon(currentState);
                         Toast.makeText(DetailActivity.this, getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                     });
                 }
             });
         } else {
-            String favoriteId = FavoriteRepository.getInstance().findFavoriteIdByHotelId(hotelId);
+            String favoriteId = isTourMode ? FavoriteRepository.getInstance().findFavoriteIdByTourId(id) : FavoriteRepository.getInstance().findFavoriteIdByHotelId(id);
             if (favoriteId != null) {
                 FavoriteRepository.getInstance().removeFavorite(this, favoriteId, new DataCallback<Void>() {
                     @Override public void onSuccess(Void data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
                         runOnUiThread(() -> {
-                            hotel.setFavorite(currentState);
+                            if (isTourMode) tour.setFavorite(currentState); else hotel.setFavorite(currentState);
                             updateHeartIcon(currentState);
                             Toast.makeText(DetailActivity.this, getString(R.string.err_prefix, msg), Toast.LENGTH_SHORT).show();
                         });
@@ -334,38 +361,33 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-    private void updateRatingSummary() {
-        if (hotel == null) return;
-        updateRatingSummary(hotel.getRating(), hotel.getReviewCount());
-    }
-
-    private void updateRatingSummary(float rating, int reviewCount) {
+    private void updateRatingSummaryUI() {
+        float rating = isTourMode ? tour.getRating() : hotel.getRating();
+        int count = isTourMode ? tour.getReviewCount() : hotel.getReviewCount();
         binding.tvHeaderRating.setText(String.format(Locale.getDefault(), "★ %.1f (%d %s)",
-                rating, reviewCount, getString(R.string.reviews_count_label)));
+                rating, count, getString(R.string.reviews_count_label)));
         binding.tvBigRating.setText(String.format(Locale.getDefault(), "%.1f", rating));
         binding.tvReviewCount.setText(String.format(Locale.getDefault(), "%d %s",
-                reviewCount, getString(R.string.reviews_count_label).toLowerCase()));
+                count, getString(R.string.reviews_count_label).toLowerCase()));
     }
 
-    private void refreshHotelSummary() {
-        if (hotel == null || hotel.getId() == null) return;
-
-        HotelService.getHotelDetail(this, hotel.getId(), new DataCallback<Hotel>() {
-            @Override
-            public void onSuccess(Hotel freshHotel) {
-                runOnUiThread(() -> {
-                    if (freshHotel == null) return;
-                    freshHotel.setFavorite(hotel.isFavorite());
-                    hotel = freshHotel;
-                    updateRatingSummary();
-                });
-            }
-
-            @Override
-            public void onError(ApiErrorCode code, String rawMessage) {
-                Log.e("DetailActivity", "Can not refresh hotel summary: " + rawMessage);
-            }
-        });
+    private void refreshSummary() {
+        String id = isTourMode ? tour.getId() : hotel.getId();
+        if (isTourMode) {
+            TourService.getTourDetail(this, id, new DataCallback<Tour>() {
+                @Override public void onSuccess(Tour fresh) {
+                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(tour.isFavorite()); tour = fresh; updateRatingSummaryUI(); } });
+                }
+                @Override public void onError(ApiErrorCode code, String msg) {}
+            });
+        } else {
+            HotelService.getHotelDetail(this, id, new DataCallback<Hotel>() {
+                @Override public void onSuccess(Hotel fresh) {
+                    runOnUiThread(() -> { if (fresh != null) { fresh.setFavorite(hotel.isFavorite()); hotel = fresh; updateRatingSummaryUI(); } });
+                }
+                @Override public void onError(ApiErrorCode code, String msg) {}
+            });
+        }
     }
 
     private void setupFilters() {
@@ -384,55 +406,37 @@ public class DetailActivity extends AppCompatActivity {
 
     private void filterComments(String type) {
         List<Review> filtered = new ArrayList<>();
-
         for (Review review : allReviews) {
-            if ("all".equals(type)) {
-                filtered.add(review);
-            } else if ("photos".equals(type) && review.hasImages()) {
-                filtered.add(review);
-            } else {
+            if ("all".equals(type)) filtered.add(review);
+            else if ("photos".equals(type) && review.hasImages()) filtered.add(review);
+            else {
                 try {
                     int rating = Integer.parseInt(type);
-                    if ((int) review.getRating() == rating) {
-                        filtered.add(review);
-                    }
-                } catch (NumberFormatException ignored) {
-                }
+                    if ((int) review.getRating() == rating) filtered.add(review);
+                } catch (NumberFormatException ignored) {}
             }
         }
-
         sortCurrentUserReviewFirst(filtered);
         reviewAdapter.submitList(filtered);
     }
 
     private void setupGallery() {
-        List<String> imageUrls = hotel.getImageUrls();
+        List<String> imageUrls = isTourMode ? tour.getImageUrls() : hotel.getImageUrls();
         if (imageUrls == null || imageUrls.isEmpty()) {
             imageUrls = new ArrayList<>();
-            imageUrls.add("android.resource://" + getPackageName() + "/" + R.drawable.hotel_1);
+            imageUrls.add("android.resource://" + getPackageName() + "/" + (isTourMode ? R.drawable.banner_travel : R.drawable.hotel_1));
         }
         final List<String> images = imageUrls;
-        
-        GalleryAdapter galleryAdapter = new GalleryAdapter(images);
-        binding.vpGallery.setAdapter(galleryAdapter);
-        
+        binding.vpGallery.setAdapter(new GalleryAdapter(images));
         setupDots(images.size());
-        
         binding.vpGallery.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                updateDots(position);
+            @Override public void onPageSelected(int pos) {
+                super.onPageSelected(pos); updateDots(pos);
                 sliderHandler.removeCallbacks(sliderRunnable);
                 sliderHandler.postDelayed(sliderRunnable, 3000);
             }
         });
-
-        sliderRunnable = () -> {
-            int current = binding.vpGallery.getCurrentItem();
-            int next = (current + 1) % images.size();
-            binding.vpGallery.setCurrentItem(next, true);
-        };
+        sliderRunnable = () -> binding.vpGallery.setCurrentItem((binding.vpGallery.getCurrentItem() + 1) % images.size(), true);
     }
 
     private void setupDots(int count) {
@@ -464,44 +468,20 @@ public class DetailActivity extends AppCompatActivity {
         view.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150).withEndAction(() -> view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()).start();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sliderHandler.removeCallbacks(sliderRunnable);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (sliderRunnable != null) {
-            sliderHandler.postDelayed(sliderRunnable, 3000);
-        }
-    }
-
     private void setupReviewForm() {
         binding.btnPickReviewImages.setOnClickListener(v -> openImagePicker());
         binding.btnSubmitReview.setOnClickListener(v -> submitReview());
     }
 
     private void setupImagePicker() {
-        pickImagesLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
-
-                    Intent data = result.getData();
-                    if (data.getClipData() != null) {
-                        int count = data.getClipData().getItemCount();
-                        for (int i = 0; i < count; i++) {
-                            selectedImageUris.add(data.getClipData().getItemAt(i).getUri());
-                        }
-                    } else if (data.getData() != null) {
-                        selectedImageUris.add(data.getData());
-                    }
-
-                    updateSelectedImagesText();
-                }
-        );
+        pickImagesLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+            Intent data = result.getData();
+            if (data.getClipData() != null) {
+                for (int i = 0; i < data.getClipData().getItemCount(); i++) selectedImageUris.add(data.getClipData().getItemAt(i).getUri());
+            } else if (data.getData() != null) selectedImageUris.add(data.getData());
+            updateSelectedImagesText();
+        });
     }
 
     private void openImagePicker() {
@@ -513,47 +493,40 @@ public class DetailActivity extends AppCompatActivity {
 
     private void updateSelectedImagesText() {
         int count = selectedImageUris.size();
-        if (count == 0) {
-            binding.tvSelectedReviewImages.setVisibility(View.GONE);
-            return;
+        if (count == 0) binding.tvSelectedReviewImages.setVisibility(View.GONE);
+        else {
+            binding.tvSelectedReviewImages.setVisibility(View.VISIBLE);
+            binding.tvSelectedReviewImages.setText(getString(R.string.review_selected_images_count, count));
         }
-
-        binding.tvSelectedReviewImages.setVisibility(View.VISIBLE);
-        binding.tvSelectedReviewImages.setText(getString(R.string.review_selected_images_count, count));
     }
 
     private void checkReviewPermission() {
-        if (hotel == null || hotel.getId() == null || !session.isLoggedIn()) {
+        String id = isTourMode ? tour.getId() : hotel.getId();
+        if (id == null || !session.isLoggedIn()) {
             binding.layoutWriteReview.setVisibility(View.GONE);
             binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
             return;
         }
 
-        BookingService.hasBookedHotel(
-                this,
-                hotel.getId(),
-                new DataCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean hasBooked) {
-                        runOnUiThread(() -> {
-                            binding.layoutWriteReview.setVisibility(hasBooked ? View.VISIBLE : View.GONE);
-                            binding.tvReviewPermissionMessage.setVisibility(hasBooked ? View.GONE : View.VISIBLE);
-                        });
-                    }
+        DataCallback<Boolean> callback = new DataCallback<Boolean>() {
+            @Override public void onSuccess(Boolean hasBooked) {
+                runOnUiThread(() -> {
+                    binding.layoutWriteReview.setVisibility(hasBooked ? View.VISIBLE : View.GONE);
+                    binding.tvReviewPermissionMessage.setVisibility(hasBooked ? View.GONE : View.VISIBLE);
+                });
+            }
+            @Override public void onError(ApiErrorCode code, String msg) {
+                runOnUiThread(() -> { binding.layoutWriteReview.setVisibility(View.GONE); binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE); });
+            }
+        };
 
-                    @Override
-                    public void onError(ApiErrorCode code, String rawMessage) {
-                        runOnUiThread(() -> {
-                            binding.layoutWriteReview.setVisibility(View.GONE);
-                            binding.tvReviewPermissionMessage.setVisibility(View.VISIBLE);
-                        });
-                    }
-                }
-        );
+        if (isTourMode) BookingService.hasBookedTour(this, id, callback);
+        else BookingService.hasBookedHotel(this, id, callback);
     }
 
     private void submitReview() {
-        if (hotel == null || hotel.getId() == null || !session.isLoggedIn()) return;
+        String id = isTourMode ? tour.getId() : hotel.getId();
+        if (id == null || !session.isLoggedIn()) return;
 
         int stars = (int) binding.ratingBarReview.getRating();
         String reviewText = binding.edtReviewText.getText().toString().trim();
@@ -562,7 +535,6 @@ public class DetailActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.review_rating_required, Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (reviewText.isEmpty()) {
             Toast.makeText(this, R.string.review_text_required, Toast.LENGTH_SHORT).show();
             return;
@@ -570,123 +542,46 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.btnSubmitReview.setEnabled(false);
 
-        if (myReview != null && myReview.getId() != null && !myReview.getId().isEmpty()) {
-            ReviewService.updateReview(
-                    this,
-                    myReview.getId(),
-                    "hotel",
-                    reviewText,
-                    stars,
-                    new DataCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void data) {
-                            uploadSelectedReviewImages(myReview.getId(), R.string.review_update_success);
-                        }
-
-                        @Override
-                        public void onError(ApiErrorCode code, String rawMessage) {
-                            runOnUiThread(() -> {
-                                binding.btnSubmitReview.setEnabled(true);
-                                Toast.makeText(DetailActivity.this, R.string.review_update_error, Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
-            );
+        if (myReview != null && myReview.getId() != null) {
+            ReviewService.updateReview(this, myReview.getId(), isTourMode ? "tour" : "hotel", reviewText, stars, new DataCallback<Void>() {
+                @Override public void onSuccess(Void data) { uploadSelectedReviewImages(myReview.getId(), R.string.review_update_success); }
+                @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { binding.btnSubmitReview.setEnabled(true); Toast.makeText(DetailActivity.this, R.string.review_update_error, Toast.LENGTH_SHORT).show(); }); }
+            });
             return;
         }
 
-        ReviewService.createReview(
-                this,
-                hotel.getId(),
-                null,
-                reviewText,
-                stars,
-                new DataCallback<String>() {
-                    @Override
-                    public void onSuccess(String reviewId) {
-                        uploadSelectedReviewImages(reviewId, R.string.review_submit_success);
-                    }
-
-                    @Override
-                    public void onError(ApiErrorCode code, String rawMessage) {
-                        runOnUiThread(() -> {
-                            binding.btnSubmitReview.setEnabled(true);
-                            Toast.makeText(DetailActivity.this, R.string.review_submit_error, Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                }
-        );
+        ReviewService.createReview(this, isTourMode ? null : id, isTourMode ? id : null, reviewText, stars, new DataCallback<String>() {
+            @Override public void onSuccess(String reviewId) { uploadSelectedReviewImages(reviewId, R.string.review_submit_success); }
+            @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { binding.btnSubmitReview.setEnabled(true); Toast.makeText(DetailActivity.this, R.string.review_submit_error, Toast.LENGTH_SHORT).show(); }); }
+        });
     }
 
     private void uploadSelectedReviewImages(String reviewId, int successMessageRes) {
-        if (selectedImageUris.isEmpty()) {
-            runOnUiThread(() -> completeReviewSave(successMessageRes));
-            return;
-        }
-
+        if (selectedImageUris.isEmpty()) { runOnUiThread(() -> completeReviewSave(successMessageRes)); return; }
         final int total = selectedImageUris.size();
         final int[] completed = {0};
         final boolean[] hasError = {false};
         final List<String> uploadedUrls = new ArrayList<>();
-        List<Uri> imagesToUpload = new ArrayList<>(selectedImageUris);
 
-        for (Uri imageUri : imagesToUpload) {
-            ReviewService.uploadReviewImage(
-                    this,
-                    imageUri,
-                    reviewId,
-                    new DataCallback<String>() {
-                        @Override
-                        public void onSuccess(String imageUrl) {
-                            synchronized (uploadedUrls) {
-                                uploadedUrls.add(imageUrl);
-                            }
-                            markImageUploadDone(completed, hasError, total, successMessageRes, reviewId, uploadedUrls);
-                        }
-
-                        @Override
-                        public void onError(ApiErrorCode code, String rawMessage) {
-                            hasError[0] = true;
-                            markImageUploadDone(completed, hasError, total, successMessageRes, reviewId, uploadedUrls);
-                        }
-                    }
-            );
+        for (Uri imageUri : selectedImageUris) {
+            ReviewService.uploadReviewImage(this, imageUri, reviewId, new DataCallback<String>() {
+                @Override public void onSuccess(String imageUrl) {
+                    synchronized (uploadedUrls) { uploadedUrls.add(imageUrl); }
+                    markImageUploadDone(completed, hasError, total, successMessageRes, reviewId, uploadedUrls);
+                }
+                @Override public void onError(ApiErrorCode code, String msg) { hasError[0] = true; markImageUploadDone(completed, hasError, total, successMessageRes, reviewId, uploadedUrls); }
+            });
         }
     }
 
     private void markImageUploadDone(int[] completed, boolean[] hasError, int total, int successMessageRes, String reviewId, List<String> uploadedUrls) {
-        synchronized (completed) {
-            completed[0]++;
-            if (completed[0] < total) return;
-        }
-
+        synchronized (completed) { completed[0]++; if (completed[0] < total) return; }
         if (!uploadedUrls.isEmpty()) {
-            ReviewService.saveReviewImages(
-                    this,
-                    "hotel",
-                    reviewId,
-                    uploadedUrls,
-                    new DataCallback<Void>() {
-                        @Override
-                        public void onSuccess(Void data) {
-                            runOnUiThread(() -> {
-                                int messageRes = hasError[0] ? R.string.review_image_upload_partial_error : successMessageRes;
-                                completeReviewSave(messageRes);
-                            });
-                        }
-
-                        @Override
-                        public void onError(ApiErrorCode code, String message) {
-                            runOnUiThread(() -> completeReviewSave(R.string.review_image_upload_partial_error));
-                        }
-                    }
-            );
-        } else {
-            runOnUiThread(() -> {
-                int messageRes = hasError[0] ? R.string.review_image_upload_partial_error : successMessageRes;
-                completeReviewSave(messageRes);
+            ReviewService.saveReviewImages(this, isTourMode ? "tour" : "hotel", reviewId, uploadedUrls, new DataCallback<Void>() {
+                @Override public void onSuccess(Void data) { runOnUiThread(() -> completeReviewSave(hasError[0] ? R.string.review_image_upload_partial_error : successMessageRes)); }
+                @Override public void onError(ApiErrorCode code, String message) { runOnUiThread(() -> completeReviewSave(R.string.review_image_upload_partial_error)); }
             });
-        }
+        } else runOnUiThread(() -> completeReviewSave(hasError[0] ? R.string.review_image_upload_partial_error : successMessageRes));
     }
 
     private void completeReviewSave(int messageRes) {
@@ -694,131 +589,34 @@ public class DetailActivity extends AppCompatActivity {
         selectedImageUris.clear();
         updateSelectedImagesText();
         Toast.makeText(DetailActivity.this, messageRes, Toast.LENGTH_SHORT).show();
-        loadHotelReviews();
-        refreshHotelSummary();
+        loadReviews();
+        refreshSummary();
     }
 
     private void setupComments() {
         String currentUserId = session != null ? session.getUserId() : null;
-
         reviewAdapter = new ReviewAdapter(currentUserId, new ReviewAdapter.ReviewActionListener() {
-            @Override
-            public void onDelete(Review review) {
-                deleteReview(review);
-            }
-
-            @Override
-            public void onEdit(Review review) {}
+            @Override public void onDelete(Review review) { deleteReview(review); }
+            @Override public void onEdit(Review review) {}
         });
-
         binding.rvComments.setLayoutManager(new LinearLayoutManager(this));
         binding.rvComments.setAdapter(reviewAdapter);
     }
 
     private void deleteReview(Review review) {
-        if (review == null || review.getId() == null || review.getId().isEmpty()) {
-            Toast.makeText(this, R.string.review_delete_error, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        if (review == null || review.getId() == null) return;
         new AlertDialog.Builder(this)
                 .setTitle(R.string.review_delete_title)
                 .setMessage(R.string.review_delete_message)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.delete_review, (dialog, which) -> {
-                    ReviewService.deleteReview(
-                            DetailActivity.this,
-                            review.getId(),
-                            "hotel",
-                            new DataCallback<Void>() {
-                                @Override
-                                public void onSuccess(Void data) {
-                                    runOnUiThread(() -> {
-                                        Toast.makeText(DetailActivity.this, R.string.review_delete_success,
-                                                Toast.LENGTH_SHORT).show();
-                                        loadHotelReviews();
-                                        refreshHotelSummary();
-                                        checkReviewPermission();
-                                    });
-                                }
-
-                                @Override
-                                public void onError(ApiErrorCode code, String rawMessage) {
-                                    runOnUiThread(() ->
-                                            Toast.makeText(DetailActivity.this, R.string.review_delete_error,
-                                                    Toast.LENGTH_SHORT).show()
-                                    );
-                                }
-                            }
-                    );
-                })
-                .show();
+                    ReviewService.deleteReview(this, review.getId(), isTourMode ? "tour" : "hotel", new DataCallback<Void>() {
+                        @Override public void onSuccess(Void data) { runOnUiThread(() -> { Toast.makeText(DetailActivity.this, R.string.review_delete_success, Toast.LENGTH_SHORT).show(); loadReviews(); refreshSummary(); checkReviewPermission(); }); }
+                        @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> Toast.makeText(DetailActivity.this, R.string.review_delete_error, Toast.LENGTH_SHORT).show()); }
+                    });
+                }).show();
     }
 
-    private void updateReview(String reviewId, int stars, String reviewText) {
-        ReviewService.updateReview(
-                this,
-                reviewId,
-                "hotel",
-                reviewText,
-                stars,
-                new DataCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void data) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(DetailActivity.this, R.string.review_update_success,
-                                    Toast.LENGTH_SHORT).show();
-                            loadHotelReviews();
-                            refreshHotelSummary();
-                        });
-                    }
-
-                    @Override
-                    public void onError(ApiErrorCode code, String rawMessage) {
-                        runOnUiThread(() ->
-                                Toast.makeText(DetailActivity.this, R.string.review_update_error,
-                                        Toast.LENGTH_SHORT).show()
-                        );
-                    }
-                }
-        );
-    }
-
-    private void showEditReviewDialog(Review review) {
-        LinearLayout container = new LinearLayout(this);
-        container.setOrientation(LinearLayout.VERTICAL);
-        int padding = (int) (16 * getResources().getDisplayMetrics().density);
-        container.setPadding(padding, padding, padding, 0);
-
-        RatingBar ratingBar = new RatingBar(this);
-        ratingBar.setNumStars(5);
-        ratingBar.setStepSize(1);
-        ratingBar.setRating(review.getRating());
-
-        EditText edtReview = new EditText(this);
-        edtReview.setMinLines(4);
-        edtReview.setGravity(android.view.Gravity.TOP | android.view.Gravity.START);
-        edtReview.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-        edtReview.setText(review.getContent());
-
-        container.addView(ratingBar);
-        container.addView(edtReview);
-
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.review_edit_title)
-                .setView(container)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.review_update_button, (dialog, which) -> {
-                    int stars = (int) ratingBar.getRating();
-                    String reviewText = edtReview.getText().toString().trim();
-
-                    if (reviewText.isEmpty()) {
-                        Toast.makeText(this, R.string.review_text_required, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    updateReview(review.getId(), stars, reviewText);
-                })
-                .show();
-    }
+    @Override protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }
+    @Override protected void onResume() { super.onResume(); if (sliderRunnable != null) sliderHandler.postDelayed(sliderRunnable, 3000); }
 }

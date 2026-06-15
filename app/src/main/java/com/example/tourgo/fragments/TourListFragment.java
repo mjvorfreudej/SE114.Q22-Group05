@@ -1,5 +1,6 @@
 package com.example.tourgo.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.data.local.SessionManager;
+import com.example.tourgo.ui.main.DetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +44,18 @@ public class TourListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         
         adapter = new TourAdapter(new ArrayList<>());
+        adapter.setOnTourClickListener(this::navigateToDetail);
         recyclerView.setAdapter(adapter);
 
         loadTours();
         
         return view;
+    }
+
+    private void navigateToDetail(Tour tour) {
+        Intent intent = new Intent(requireContext(), DetailActivity.class);
+        intent.putExtra("hotel_object", tour); // DetailActivity handles both now
+        startActivity(intent);
     }
 
     private void loadTours() {

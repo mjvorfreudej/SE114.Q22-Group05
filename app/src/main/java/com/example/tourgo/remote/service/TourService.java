@@ -56,37 +56,6 @@ public class TourService {
                 });
     }
 
-
-    public static void getToursByRegion(Context context, String region, DataCallback<List<Tour>> callback) {
-        RetrofitClient.getInstance(context)
-                .getTourApi()
-                .searchTours(null, region, null, null, null, "rating", "desc")
-                .enqueue(new Callback<ApiResponse<List<Tour>>>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse<List<Tour>>> call, Response<ApiResponse<List<Tour>>> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            ApiResponse<List<Tour>> apiResponse = response.body();
-                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
-                                callback.onSuccess(apiResponse.getData());
-                            } else {
-                                ApiError error = ErrorHandler.parseError(response);
-                                callback.onError(error.getCode(), error.getMessage());
-                            }
-                        } else {
-                            ApiError error = ErrorHandler.parseError(response);
-                            callback.onError(error.getCode(), error.getMessage());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApiResponse<List<Tour>>> call, Throwable t) {
-                        ApiError error = ErrorHandler.parseError(t);
-                        callback.onError(error.getCode(), error.getMessage());
-                    }
-                });
-    }
-
-
     public static void getTourDetail(Context context, String tourId, DataCallback<Tour> callback) {
         RetrofitClient.getInstance(context)
                 .getTourApi()
@@ -116,11 +85,16 @@ public class TourService {
                 });
     }
 
-
     public static void searchTours(Context context, String keyword, DataCallback<List<Tour>> callback) {
+        searchToursAdvanced(context, keyword, null, null, null, null, "rating", "desc", callback);
+    }
+
+    public static void searchToursAdvanced(Context context, String query, String region,
+                                          Double minPrice, Double maxPrice, Double minRating,
+                                          String sortBy, String order, DataCallback<List<Tour>> callback) {
         RetrofitClient.getInstance(context)
                 .getTourApi()
-                .searchTours(keyword, null, null, null, null, "rating", "desc")
+                .searchTours(query, region, minPrice, maxPrice, minRating, sortBy, order)
                 .enqueue(new Callback<ApiResponse<List<Tour>>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<List<Tour>>> call, Response<ApiResponse<List<Tour>>> response) {
@@ -146,7 +120,6 @@ public class TourService {
                 });
     }
 
-
     public static void createTour(Context context, CreateTourRequest request, DataCallback<Tour> callback) {
         RetrofitClient.getInstance(context)
                 .getTourApi()
@@ -156,7 +129,7 @@ public class TourService {
                     public void onResponse(Call<ApiResponse<Tour>> call, Response<ApiResponse<Tour>> response) {
                         if (response.isSuccessful() && response.body() != null) {
                             ApiResponse<Tour> apiResponse = response.body();
-                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
                                 callback.onSuccess(apiResponse.getData());
                             } else {
                                 ApiError error = ErrorHandler.parseError(response);
@@ -175,7 +148,6 @@ public class TourService {
                     }
                 });
     }
-
 
     public static void getPendingTours(Context context, DataCallback<List<Tour>> callback) {
         RetrofitClient.getInstance(context)
@@ -206,7 +178,6 @@ public class TourService {
                 });
     }
 
-
     public static void approveTour(Context context, String tourId, DataCallback<Tour> callback) {
         RetrofitClient.getInstance(context)
                 .getTourApi()
@@ -235,7 +206,6 @@ public class TourService {
                     }
                 });
     }
-
 
     public static void uploadTourImage(Context context, Uri imageUri, String tourId, DataCallback<String> callback) {
         try {

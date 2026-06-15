@@ -171,10 +171,10 @@
 
                 <ProgressBar
                     android:id="@+id/pbLoginLoading"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_gravity="center"
-                    android:indeterminateTint="@color/white"
+                    android:indeterminateTint="@color/black"
                     android:visibility="gone" />
             </FrameLayout>
 

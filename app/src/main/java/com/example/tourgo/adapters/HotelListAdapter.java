@@ -1,7 +1,5 @@
 package com.example.tourgo.adapters;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
@@ -109,13 +107,12 @@ public class HotelListAdapter extends RecyclerView.Adapter<HotelListAdapter.Hote
                 v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
             }).start();
 
-            String token = session.getAccessToken();
             String userId = session.getUserId();
 
             if (newState) {
                 Favorite favorite = new Favorite(userId, null, item.getId());
-                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Void>() {
-                    @Override public void onSuccess(Void data) {}
+                FavoriteRepository.getInstance().addFavorite(v.getContext(), favorite, new DataCallback<Favorite>() {
+                    @Override public void onSuccess(Favorite data) {}
                     @Override public void onError(ApiErrorCode code, String msg) {
                         holder.btnFavorite.post(() -> {
                             item.setFavorite(false);

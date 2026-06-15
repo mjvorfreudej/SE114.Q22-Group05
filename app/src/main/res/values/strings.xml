@@ -177,6 +177,21 @@
     <string name="search_clear">Xóa</string>
     <string name="search_recent_viewed">Đã xem gần đây</string>
 
+    <!-- Filter -->
+    <string name="filter_title">Bộ lọc</string>
+    <string name="filter_section_property_type">Loại hình</string>
+    <string name="filter_section_price_range">Khoảng giá (VNĐ)</string>
+    <string name="filter_section_amenities">Tiện nghi</string>
+    <string name="filter_section_rating">Đánh giá</string>
+    <string name="filter_price_under_500k">Dưới 500k</string>
+    <string name="filter_price_500k_2m">500k - 2tr</string>
+    <string name="filter_price_2m_5m">2tr - 5tr</string>
+    <string name="filter_price_over_5m">Trên 5tr</string>
+    <string name="filter_min_price">Tối thiểu</string>
+    <string name="filter_max_price">Tối đa</string>
+    <string name="filter_apply">Áp dụng</string>
+    <string name="filter_reset">Hủy</string>
+
     <!-- Favorites -->
     <string name="no_favorites">Chưa có mục yêu thích nào</string>
     <string name="err_load_favorites">Lỗi tải danh sách yêu thích</string>
@@ -228,6 +243,7 @@
     <string name="detail_description_label">Mô tả</string>
     <string name="detail_reviews_label">Đánh giá</string>
     <string name="detail_staying_price_label">Giá phòng</string>
+    <string name="tour_price_label">Giá Tour</string>
     <string name="detail_book_now_button">Đặt ngay</string>
     <string name="detail_amenities_label">Tiện nghi</string>
     <string name="detail_location_label">Vị trí</string>
@@ -237,6 +253,10 @@
     <string name="amenity_pool">Hồ bơi</string>
     <string name="amenity_workplace">Khu làm việc</string>
     <string name="amenity_tour_desk">Tư vấn tour</string>
+    <string name="amenity_guide">Hướng dẫn viên</string>
+    <string name="amenity_transport">Xe đưa đón</string>
+    <string name="amenity_meals">Ăn uống</string>
+    <string name="amenity_tickets">Vé tham quan</string>
     <string name="filter_all">Tất cả</string>
     <string name="filter_with_photos">Có ảnh</string>
 

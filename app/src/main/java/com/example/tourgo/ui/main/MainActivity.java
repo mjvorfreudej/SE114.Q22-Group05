@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        HotelRepository.getInstance().loadHotels(this, new DataCallback<List<Hotel>>() {
+        HotelRepository.getInstance().loadHotels(this, session.getUserId(), session.getAccessToken(), new DataCallback<List<Hotel>>() {
             @Override
             public void onSuccess(List<Hotel> data) {
                 if (session.isLoggedIn()) {

@@ -84,15 +84,12 @@ public class HomeFragment extends Fragment {
         if (binding == null || session == null) return;
 
         if (session.isLoggedIn()) {
-            // Lấy user từ UserRepository (cache)
             User cachedUser = UserRepository.getInstance().getCachedUser();
 
             if (cachedUser != null && cachedUser.getName() != null) {
-                // Dùng tên từ UserRepository nếu có
                 String firstName = cachedUser.getName().split(" ")[0];
                 binding.tvHomeUserName.setText(firstName);
             } else {
-                // Fallback về SessionManager nếu chưa có cache
                 binding.tvHomeUserName.setText(session.getShortName());
             }
         } else {
@@ -197,7 +194,6 @@ public class HomeFragment extends Fragment {
                 if (binding == null || getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     if (data != null) {
-                        // Home only surfaces published tours; pending/rejected ones stay hidden.
                         cachedTours = filterApproved(data);
                         preloadTourImages(cachedTours);
                     }
@@ -228,10 +224,11 @@ public class HomeFragment extends Fragment {
 
         if (currentFilter == OfferFilter.TOUR) {
             if (offersTourAdapter == null) {
-                offersTourAdapter = new TourAdapter(new ArrayList<>());
+                // Sử dụng VIEW_TYPE_HORIZONTAL cho trang chủ
+                offersTourAdapter = new TourAdapter(new ArrayList<>(), TourAdapter.VIEW_TYPE_HORIZONTAL);
                 offersTourAdapter.setOnTourClickListener(tour -> {
-                    Intent intent = new Intent(getContext(), BookingActivity.class);
-                    intent.putExtra(BookingActivity.EXTRA_TOUR, tour);
+                    Intent intent = new Intent(getContext(), DetailActivity.class);
+                    intent.putExtra("hotel_object", tour);
                     startActivity(intent);
                 });
             }
@@ -253,8 +250,6 @@ public class HomeFragment extends Fragment {
         if (source == null) return approved;
         for (Tour tour : source) {
             String status = tour.getStatus();
-            // Treat a missing status as approved so older records without the
-            // column still appear; only PENDING/rejected tours are filtered out.
             if (status == null || "APPROVED".equalsIgnoreCase(status)) {
                 approved.add(tour);
             }

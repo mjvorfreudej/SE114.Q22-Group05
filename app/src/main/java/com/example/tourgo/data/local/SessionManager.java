@@ -19,7 +19,7 @@ public class SessionManager {
      *  role is verified solely by their email at login. */
     private static final String[] ADMIN_EMAIL_WHITELIST = {
             "lamquyen290391@gmail.com",
-            "hinduck3206@gmail.com",
+//            "hinduck3206@gmail.com",
     };
 
     // Auth keys

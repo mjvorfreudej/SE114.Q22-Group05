@@ -20,6 +20,10 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
+            android:name=".ui.main.SearchActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.main.WishlistActivity"
             android:exported="false" />
 

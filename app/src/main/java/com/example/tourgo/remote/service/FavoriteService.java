@@ -17,7 +17,7 @@ import retrofit2.Response;
 
 public class FavoriteService {
 
-    public static void addFavorite(Context context, Favorite favorite, DataCallback<Void> callback) {
+    public static void addFavorite(Context context, Favorite favorite, DataCallback<Favorite> callback) {
         RetrofitClient.getInstance(context)
                 .getFavoriteApi()
                 .addFavorite(favorite)
@@ -27,7 +27,7 @@ public class FavoriteService {
                         if (response.isSuccessful() && response.body() != null) {
                             ApiResponse<Favorite> apiResponse = response.body();
                             if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
-                                callback.onSuccess(null);
+                                callback.onSuccess(apiResponse.getData());
                             } else {
                                 ApiError error = ErrorHandler.parseError(response);
                                 callback.onError(error.getCode(), error.getMessage());

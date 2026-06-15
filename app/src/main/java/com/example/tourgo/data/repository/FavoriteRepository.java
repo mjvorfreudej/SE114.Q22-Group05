@@ -7,6 +7,8 @@ import android.os.Looper;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.remote.service.FavoriteService;
 
 import java.util.ArrayList;
@@ -48,17 +50,26 @@ public class FavoriteRepository {
         });
     }
 
-    public void addFavorite(Context context, Favorite favorite, DataCallback<Void> callback) {
-        FavoriteService.addFavorite(context, favorite, new DataCallback<Void>() {
+    public void addFavorite(Context context, Favorite favorite, DataCallback<Favorite> callback) {
+        FavoriteService.addFavorite(context, favorite, new DataCallback<Favorite>() {
             @Override
-            public void onSuccess(Void data) {
-                // Cập nhật cache
+            public void onSuccess(Favorite data) {
                 if (cachedFavorites == null) {
                     cachedFavorites = new ArrayList<>();
                 }
-                cachedFavorites.add(favorite);
+                cachedFavorites.add(data);
 
-                mainHandler.post(() -> callback.onSuccess(null));
+                // Đồng bộ trạng thái favorite vào cache của Tour/Hotel Repository
+                if (data.getTourId() != null) {
+                    Tour t = TourRepository.getInstance().findTourById(data.getTourId());
+                    if (t != null) t.setFavorite(true);
+                }
+                if (data.getHotelId() != null) {
+                    Hotel h = HotelRepository.getInstance().findHotelById(data.getHotelId());
+                    if (h != null) h.setFavorite(true);
+                }
+
+                mainHandler.post(() -> callback.onSuccess(data));
             }
 
             @Override
@@ -72,9 +83,27 @@ public class FavoriteRepository {
         FavoriteService.removeFavorite(context, favoriteId, new DataCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
-                // Cập nhật cache
                 if (cachedFavorites != null) {
-                    cachedFavorites.removeIf(f -> f.getId().equals(favoriteId));
+                    Favorite removedItem = null;
+                    for (Favorite f : cachedFavorites) {
+                        if (favoriteId.equals(f.getId())) {
+                            removedItem = f;
+                            break;
+                        }
+                    }
+
+                    if (removedItem != null) {
+                        // Cập nhật trạng thái trong các Repository khác
+                        if (removedItem.getTourId() != null) {
+                            Tour t = TourRepository.getInstance().findTourById(removedItem.getTourId());
+                            if (t != null) t.setFavorite(false);
+                        }
+                        if (removedItem.getHotelId() != null) {
+                            Hotel h = HotelRepository.getInstance().findHotelById(removedItem.getHotelId());
+                            if (h != null) h.setFavorite(false);
+                        }
+                        cachedFavorites.remove(removedItem);
+                    }
                 }
 
                 mainHandler.post(() -> callback.onSuccess(null));
