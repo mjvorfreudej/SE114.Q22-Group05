@@ -118,6 +118,8 @@
     <string name="profile_logout_confirm_btn">Confirm</string>
     <string name="profile_admin_console">Admin Console</string>
     <string name="profile_admin_console_sub">Manage the marketplace</string>
+    <string name="profile_business_console">Business Console</string>
+    <string name="profile_business_console_sub">Manage listings &amp; reviews</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Edit profile</string>
@@ -465,5 +467,318 @@
     <string name="adm_menu_approve">Approve</string>
     <string name="adm_toast_biz_approved">%s approved</string>
     <string name="adm_users_empty">No users found</string>
+
+    <!-- ============================================================
+         Traveler notifications (ui_kits/notifications/traveler.html)
+         English mirror of the strings in values/strings.xml.
+         ============================================================ -->
+    <string name="notif_title">Notifications</string>
+    <string name="notif_unread">%d unread</string>
+    <string name="notif_mark_all_read">Mark all read</string>
+    <string name="notif_settings">Notification settings</string>
+    <string name="notif_toast_marked_all">All notifications marked as read</string>
+    <string name="notif_view_all">View all notifications</string>
+
+    <!-- Filters -->
+    <string name="notif_filter_all">All</string>
+    <string name="notif_filter_unread">Unread</string>
+    <string name="notif_cat_bookings">Bookings</string>
+    <string name="notif_cat_payments">Payments</string>
+    <string name="notif_cat_offers">Offers</string>
+    <string name="notif_cat_trips">Trips</string>
+    <string name="notif_cat_account">Account</string>
+
+    <!-- Date groups -->
+    <string name="notif_group_today">Today</string>
+    <string name="notif_group_yesterday">Yesterday</string>
+    <string name="notif_group_earlier">Earlier</string>
+
+    <!-- Empty states -->
+    <string name="notif_empty_all_title">No notifications yet</string>
+    <string name="notif_empty_all_msg">Booking updates, offers and reminders will show up here.</string>
+    <string name="notif_empty_unread_title">You\'re all caught up</string>
+    <string name="notif_empty_unread_msg">Every notification has been read.</string>
+
+    <!-- Notification content (sample data; verbatim from the design) -->
+    <string name="notif_t1_title">Booking confirmed</string>
+    <string name="notif_t1_body">Your stay at The Grand Orchid Resort is confirmed for Aug 13 – 15.</string>
+    <string name="notif_t1_when">Just now</string>
+    <string name="notif_t1_action">View booking</string>
+
+    <string name="notif_t2_title">Payment successful · $636.08</string>
+    <string name="notif_t2_body">Your payment for booking #TG-4821 went through.</string>
+    <string name="notif_t2_when">12m</string>
+    <string name="notif_t2_action">View receipt</string>
+
+    <string name="notif_t3_title">Check-in tomorrow</string>
+    <string name="notif_t3_body">Check-in at The Grand Orchid Resort opens 2:00 PM. Pack your bags!</string>
+    <string name="notif_t3_when">2h</string>
+    <string name="notif_t3_action">View details</string>
+
+    <string name="notif_t4_title">15% off your next trip</string>
+    <string name="notif_t4_body">A limited-time discount is waiting in your account.</string>
+    <string name="notif_t4_when">4h</string>
+    <string name="notif_t4_action">Browse deals</string>
+
+    <string name="notif_t5_title">Price drop on your wishlist</string>
+    <string name="notif_t5_body">Lavender Lakehouse is now $149 / night — down 16%.</string>
+    <string name="notif_t5_when">6h</string>
+    <string name="notif_t5_action">View stay</string>
+
+    <string name="notif_t6_title">How was Cedar Cove?</string>
+    <string name="notif_t6_body">Share a quick review and help other travelers choose.</string>
+    <string name="notif_t6_when">Yesterday</string>
+    <string name="notif_t6_action">Write review</string>
+
+    <string name="notif_t7_title">Password updated</string>
+    <string name="notif_t7_body">Your account password was changed successfully.</string>
+    <string name="notif_t7_when">Yesterday</string>
+
+    <string name="notif_t8_title">Cancellation policy updated</string>
+    <string name="notif_t8_body">We\'ve updated our cancellation terms — tap to review what changed.</string>
+    <string name="notif_t8_when">2d</string>
+
+    <string name="notif_t9_title">Your trip starts in 2 days</string>
+    <string name="notif_t9_body">Your Kyoto Old Town walking tour begins Aug 13.</string>
+    <string name="notif_t9_when">3d</string>
+    <string name="notif_t9_action">View itinerary</string>
+
+    <!-- ============================================================
+         Business Dashboard (ui_kits/business) — English
+         Mirrors the TourGo design-system prototype. UI chrome only;
+         record content (names, review/report text) stays verbatim
+         in BusinessMockData, matching the Admin console convention.
+         ============================================================ -->
+    <!-- Bottom nav -->
+    <string name="biz_nav_home">Home</string>
+    <string name="biz_nav_listings">Listings</string>
+    <string name="biz_nav_calendar">Calendar</string>
+    <string name="biz_nav_reviews">Reviews</string>
+    <string name="biz_nav_profile">Profile</string>
+    <string name="biz_console">Business Console</string>
+
+    <!-- Common -->
+    <string name="biz_view_all">View All</string>
+    <string name="biz_cancel">Cancel</string>
+    <string name="biz_back">Back</string>
+    <string name="biz_continue">Continue</string>
+
+    <!-- Home -->
+    <string name="biz_role">Business</string>
+    <string name="biz_business_name">Orchid Hospitality</string>
+    <string name="biz_verified">VERIFIED</string>
+    <string name="biz_status_active">Business · Active</string>
+    <string name="biz_welcome">Welcome back, Maya</string>
+    <string name="biz_welcome_sub">You have 3 check-ins today and 8 reviews waiting for a reply.</string>
+    <string name="biz_stat_listings">Active Listings</string>
+    <string name="biz_stat_bookings">Total Bookings</string>
+    <string name="biz_stat_reviews">Pending Reviews</string>
+    <string name="biz_stat_reports">Reports to Review</string>
+    <string name="biz_quick_actions">Quick Actions</string>
+    <string name="biz_qa_add">Add Listing</string>
+    <string name="biz_qa_calendar">Calendar</string>
+    <string name="biz_qa_reviews">Reviews</string>
+    <string name="biz_recent_bookings">Recent Bookings</string>
+    <string name="biz_book_upcoming">Upcoming</string>
+    <string name="biz_book_completed">Completed</string>
+    <string name="biz_book_cancelled">Cancelled</string>
+
+    <!-- Listings -->
+    <string name="biz_my_listings">My Listings</string>
+    <string name="biz_search_listings">Search listings…</string>
+    <string name="biz_tab_all">All</string>
+    <string name="biz_tab_active">Active</string>
+    <string name="biz_tab_inactive">Inactive</string>
+    <string name="biz_tab_draft">Draft</string>
+    <string name="biz_cat_all">All categories</string>
+    <string name="biz_cat_hotels">Hotels</string>
+    <string name="biz_cat_tours">Tours</string>
+    <string name="biz_status_active_label">Active</string>
+    <string name="biz_status_inactive_label">Inactive</string>
+    <string name="biz_status_draft_label">Draft</string>
+    <string name="biz_per_night">/night</string>
+    <string name="biz_per_person">/person</string>
+    <string name="biz_bookings_count">%d bookings</string>
+    <string name="biz_action_edit">Edit</string>
+    <string name="biz_action_view">View</string>
+    <string name="biz_action_duplicate">Duplicate</string>
+    <string name="biz_action_delete">Delete</string>
+    <string name="biz_empty_listings_title">No listings here yet</string>
+    <string name="biz_empty_listings_msg">Try a different filter, or add a new listing to get started.</string>
+    <string name="biz_empty_drafts_msg">Drafts you save will appear in this tab.</string>
+    <string name="biz_selected_count">%d selected</string>
+    <string name="biz_bulk_pause">Pause</string>
+    <string name="biz_bulk_delete">Delete</string>
+    <string name="biz_delete_title">Delete listing?</string>
+    <string name="biz_delete_msg">This will remove \"%s\" and all its bookings history. This action cannot be undone.</string>
+    <string name="biz_toast_deleted">Listing deleted</string>
+
+    <!-- Calendar -->
+    <string name="biz_calendar">Calendar</string>
+    <string name="biz_calendar_month">August 2025</string>
+    <string name="biz_cal_available">Available</string>
+    <string name="biz_cal_partial">Partial</string>
+    <string name="biz_cal_booked">Booked</string>
+    <string name="biz_cal_blocked">Blocked</string>
+    <string name="biz_cal_today">Today · Aug 18</string>
+    <string name="biz_block_dates">Block dates</string>
+    <string name="biz_checkout_note">Standard check-out is 11:00 AM. Late check-out applies a $35 fee per booking.</string>
+    <string name="biz_booking_details">Booking Details</string>
+    <string name="biz_checkin">Check-in</string>
+    <string name="biz_checkout">Check-out</string>
+    <string name="biz_detail_contact">Contact</string>
+    <string name="biz_detail_guests">Guests</string>
+    <string name="biz_detail_nights">Nights</string>
+    <string name="biz_detail_total">Total</string>
+    <string name="biz_late_note">Late check-out after 11:00 AM applies a $35 fee, billed to the guest automatically.</string>
+    <string name="biz_mark_checkin">Mark Checked-in</string>
+    <string name="biz_status_confirmed">Confirmed</string>
+    <string name="biz_status_pending">Pending</string>
+    <string name="biz_status_checkedin">Checked-in</string>
+    <string name="biz_status_checkedout">Checked-out</string>
+
+    <!-- Reviews &amp; Reports -->
+    <string name="biz_reputation">Reputation</string>
+    <string name="biz_reviews_title">Reviews &amp; Reports</string>
+    <string name="biz_tab_reviews">Reviews</string>
+    <string name="biz_tab_reports">Reports</string>
+    <string name="biz_reviews_count">%d reviews</string>
+    <string name="biz_all_reviews">All reviews</string>
+    <string name="biz_filter">Filter</string>
+    <string name="biz_your_reply">Your reply</string>
+    <string name="biz_reply">Reply</string>
+    <string name="biz_reply_title">Reply to review</string>
+    <string name="biz_your_response">Your response</string>
+    <string name="biz_reply_hint">Write a thoughtful, public reply…</string>
+    <string name="biz_post_reply">Post reply</string>
+    <string name="biz_toast_reply">Reply posted</string>
+    <string name="biz_reports_note">Reports you submit go to TourGo moderators for final review.</string>
+    <string name="biz_report_detail_cta">Review detail</string>
+    <string name="biz_report_title">Report details</string>
+    <string name="biz_reported_by">Reported by %1$s · %2$s</string>
+    <string name="biz_original_comment">Original comment</string>
+    <string name="biz_reporter_reasoning">Reporter reasoning</string>
+    <string name="biz_dismiss">Dismiss</string>
+    <string name="biz_approve_report">Approve report</string>
+    <string name="biz_toast_banned">Comment banned · user notified</string>
+    <string name="biz_empty_reports_title">No reports right now</string>
+    <string name="biz_empty_reports_msg">When a guest review is flagged, it\'ll appear here for you to review.</string>
+
+    <!-- Profile -->
+    <string name="biz_account">Account</string>
+    <string name="biz_profile">Profile</string>
+    <string name="biz_owner_name">Maya Chen</string>
+    <string name="biz_org_name">Orchid Hospitality Group</string>
+    <string name="biz_verified_business">Verified business</string>
+    <string name="biz_stat_listings_short">Listings</string>
+    <string name="biz_stat_bookings_short">Bookings</string>
+    <string name="biz_stat_rating_short">Rating</string>
+    <string name="biz_section_business">Business</string>
+    <string name="biz_row_details">Business details</string>
+    <string name="biz_row_payouts">Payouts &amp; banking</string>
+    <string name="biz_row_tax">Tax &amp; legal</string>
+    <string name="biz_row_team">Team &amp; access</string>
+    <string name="biz_section_preferences">Preferences</string>
+    <string name="biz_row_notifications">Notifications</string>
+    <string name="biz_row_language">Language</string>
+    <string name="biz_row_language_value">English</string>
+    <string name="biz_row_security">Password &amp; security</string>
+    <string name="biz_row_help">Help &amp; support</string>
+    <string name="biz_logout">Log out</string>
+    <string name="biz_toast_logout">Logged out</string>
+
+    <!-- Add Listing -->
+    <string name="biz_new_listing">New Listing</string>
+    <string name="biz_step_of">Step %1$d of %2$d</string>
+    <string name="biz_save_draft">Save Draft</string>
+    <string name="biz_toast_draft">Draft saved</string>
+    <string name="biz_step_basic">Basic</string>
+    <string name="biz_step_location">Location</string>
+    <string name="biz_step_pricing">Pricing</string>
+    <string name="biz_step_calendar">Calendar</string>
+    <string name="biz_step_review">Review</string>
+    <string name="biz_publish">Publish</string>
+    <string name="biz_toast_published">Listing submitted for review</string>
+    <string name="biz_discard_title">Discard new listing?</string>
+    <string name="biz_discard_msg">All progress on this form will be lost. Save as draft instead?</string>
+    <string name="biz_discard">Discard</string>
+    <!-- Step 1 -->
+    <string name="biz_s1_title">Tell us the basics</string>
+    <string name="biz_s1_sub">Pick a category and give your listing a name.</string>
+    <string name="biz_category">Category</string>
+    <string name="biz_kind_hotel">Hotel</string>
+    <string name="biz_kind_hotel_sub">Rooms &amp; stays</string>
+    <string name="biz_kind_tour">Tour</string>
+    <string name="biz_kind_tour_sub">Guided activities</string>
+    <string name="biz_listing_name">Listing name</string>
+    <string name="biz_listing_name_hint">The Grand Orchid Resort</string>
+    <string name="biz_description">Description</string>
+    <string name="biz_description_hint">A short description of your listing…</string>
+    <string name="biz_photos">Photos · %1$d/6</string>
+    <string name="biz_upload">Upload</string>
+    <string name="biz_cover">COVER</string>
+    <!-- Step 2 -->
+    <string name="biz_s2_title">Where &amp; what\'s included</string>
+    <string name="biz_s2_sub">Help guests find you and know what to expect.</string>
+    <string name="biz_address">Address</string>
+    <string name="biz_address_hint">Bangkok, Thailand</string>
+    <string name="biz_latitude">Latitude</string>
+    <string name="biz_longitude">Longitude</string>
+    <string name="biz_map_preview">Map preview</string>
+    <string name="biz_amenities">Amenities / Highlights</string>
+    <string name="biz_am_wifi">Wi-Fi</string>
+    <string name="biz_am_pool">Pool</string>
+    <string name="biz_am_parking">Parking</string>
+    <string name="biz_am_breakfast">Breakfast</string>
+    <string name="biz_am_workspace">Workspace</string>
+    <string name="biz_am_ac">A/C</string>
+    <string name="biz_capacity">Capacity (guests)</string>
+    <!-- Step 3 -->
+    <string name="biz_s3_title">Set your pricing</string>
+    <string name="biz_s3_sub">You can adjust seasonal rates and fees below.</string>
+    <string name="biz_base_price_night">Base price (per night)</string>
+    <string name="biz_base_price_person">Base price (per person)</string>
+    <string name="biz_seasonal">Seasonal rates</string>
+    <string name="biz_seasonal_sub">Charge more during peak season (Dec–Feb), less in off-peak.</string>
+    <string name="biz_season_peak">Peak season</string>
+    <string name="biz_season_peak_range">Dec 1 – Feb 28</string>
+    <string name="biz_season_peak_delta">+25%</string>
+    <string name="biz_season_mid">Mid season</string>
+    <string name="biz_season_mid_range">Mar 1 – May 31</string>
+    <string name="biz_season_mid_delta">±0%</string>
+    <string name="biz_season_off">Off-peak</string>
+    <string name="biz_season_off_range">Jun 1 – Nov 30</string>
+    <string name="biz_season_off_delta">−15%</string>
+    <string name="biz_extra_fees">Extra fees</string>
+    <string name="biz_fee_cleaning">Cleaning fee</string>
+    <string name="biz_fee_cleaning_value">$25</string>
+    <string name="biz_fee_late">Late check-out</string>
+    <string name="biz_fee_late_value">$35 after 12:00 PM</string>
+    <string name="biz_fee_extra_guest">Extra guest</string>
+    <string name="biz_fee_extra_guest_value">$15 / night</string>
+    <!-- Step 4 -->
+    <string name="biz_s4_title">Pick your availability</string>
+    <string name="biz_s4_sub">Mark dates as open, blocked, or part of a custom range.</string>
+    <string name="biz_date_range">Date range</string>
+    <string name="biz_open_from">Open from</string>
+    <string name="biz_open_until">Open until</string>
+    <string name="biz_legend_selected">Selected</string>
+    <string name="biz_legend_blocked">Blocked</string>
+    <string name="biz_legend_open">Open</string>
+    <string name="biz_block_additional">Block additional dates</string>
+    <!-- Step 5 -->
+    <string name="biz_s5_title">Review &amp; publish</string>
+    <string name="biz_s5_sub">Double-check everything below. You can edit later.</string>
+    <string name="biz_preview">Preview</string>
+    <string name="biz_new_listing_badge">New listing</string>
+    <string name="biz_summary_photos">Photos</string>
+    <string name="biz_summary_photos_value">3 added</string>
+    <string name="biz_summary_amenities">Amenities</string>
+    <string name="biz_summary_amenities_value">Wi-Fi, Pool</string>
+    <string name="biz_summary_capacity">Capacity</string>
+    <string name="biz_summary_capacity_value">4 guests</string>
+    <string name="biz_summary_pricing">Pricing</string>
+    <string name="biz_summary_pricing_value">Seasonal · 3 fees</string>
+    <string name="biz_terms">I agree to TourGo\'s Host Terms and confirm this listing complies with local regulations.</string>
 
 </resources>

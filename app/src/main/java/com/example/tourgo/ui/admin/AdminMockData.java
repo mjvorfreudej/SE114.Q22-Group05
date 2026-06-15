@@ -110,7 +110,11 @@ public final class AdminMockData {
 
         /** Map a backend business account into the directory display model. */
         public static BizAccount fromServer(BusinessAccount dto) {
-            return new BizAccount(dto.getId(), dto.getName(), dto.getOwner(),
+            // The directory's subtitle/search use "owner"; fall back to the
+            // contact email when the server doesn't supply an owner name.
+            String owner = dto.getOwner() != null && !dto.getOwner().isEmpty()
+                    ? dto.getOwner() : dto.getEmail();
+            return new BizAccount(dto.getId(), dto.getName(), owner,
                     dto.getListings(), dto.getBookings(), dto.getStatus(), dateOnly(dto.getCreatedAt()));
         }
     }

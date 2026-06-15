@@ -33,6 +33,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.admin.AdminActivity;
+import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.ui.main.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
@@ -129,6 +130,14 @@ public class ProfileFragment extends Fragment {
             rowAdmin.setVisibility(session.isAdmin() ? View.VISIBLE : View.GONE);
             rowAdmin.setOnClickListener(v ->
                     startActivity(new Intent(requireContext(), AdminActivity.class)));
+        }
+
+        // Business Console — visible only to business/partner accounts
+        View rowBusiness = root.findViewById(R.id.rowBusinessConsole);
+        if (rowBusiness != null) {
+            rowBusiness.setVisibility(session.isBusiness() ? View.VISIBLE : View.GONE);
+            rowBusiness.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), BusinessActivity.class)));
         }
 
         // Edit Profile

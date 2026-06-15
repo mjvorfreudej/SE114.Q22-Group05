@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Bell-anchored notification popover (design: TravelerBell dropdown) — the
+  compact panel shown when tapping the home bell, before the full notification
+  center. Header (title + unread count · mark-all-read) over a short recent
+  feed over a "View all notifications" footer that opens NotificationsActivity.
+  Drawn as a PopupWindow; width/height and content are bound in NotificationPopover.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_notif_popover"
+    android:orientation="vertical">
+
+    <!-- ── Header: (title + unread count) · mark all read ────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNotifPopHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/notif_title"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tvNotifPopUnread"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="10.5sp"
+                android:visibility="gone"
+                tools:text="3 unread"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnNotifPopMarkAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="6dp"
+            android:text="@string/notif_mark_all_read"
+            android:textColor="@color/adm_blue_500"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/adm_gray_100" />
+
+    <!-- ── Recent feed (compact rows inflated in code) ───────────────────── -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/notifPopList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <!-- ── Empty state (shown when there are no notifications) ───────────── -->
+    <TextView
+        android:id="@+id/tvNotifPopEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="32dp"
+        android:text="@string/notif_empty_all_title"
+        android:textColor="@color/adm_gray_500"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/adm_gray_100" />
+
+    <!-- ── Footer: view all notifications → full center ──────────────────── -->
+    <LinearLayout
+        android:id="@+id/btnNotifPopViewAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="13dp">
+
+        <TextView
+            android:id="@+id/tvNotifPopViewAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notif_view_all"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="5dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_arrow_right"
+            app:tint="@color/adm_gray_900" />
+    </LinearLayout>
+</LinearLayout>

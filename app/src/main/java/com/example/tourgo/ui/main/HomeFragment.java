@@ -28,6 +28,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.models.response.User;
+import com.example.tourgo.ui.notification.NotificationPopover;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
 
@@ -120,6 +121,10 @@ public class HomeFragment extends Fragment {
 
         binding.fabAddTour.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), CreateTourActivity.class)));
+
+        // Bell opens the compact popover first; "View all notifications" inside it
+        // then opens the full NotificationsActivity center.
+        binding.btnNotification.setOnClickListener(NotificationPopover::show);
     }
 
     private void openHotelScreen() {

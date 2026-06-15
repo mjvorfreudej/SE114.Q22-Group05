@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Business home welcome banner: dark-blue → light-blue diagonal, 18dp corners.
+     Mirrors the prototype's linear-gradient(135deg, #194185, #2E90FA). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:startColor="@color/adm_blue_700"
+        android:endColor="@color/adm_blue_500"
+        android:type="linear" />
+    <corners android:radius="18dp" />
+</shape>

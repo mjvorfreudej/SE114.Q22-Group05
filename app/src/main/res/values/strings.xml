@@ -117,6 +117,8 @@
     <string name="profile_logout_confirm_btn">Xác nhận</string>
     <string name="profile_admin_console">Bảng quản trị</string>
     <string name="profile_admin_console_sub">Quản lý nền tảng &amp; kiểm duyệt</string>
+    <string name="profile_business_console">Bảng doanh nghiệp</string>
+    <string name="profile_business_console_sub">Quản lý tin đăng &amp; đánh giá</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>
@@ -485,5 +487,318 @@
     <string name="adm_menu_approve">Duyệt</string>
     <string name="adm_toast_biz_approved">Đã duyệt %s</string>
     <string name="adm_users_empty">Không có người dùng</string>
+
+    <!-- ============================================================
+         Traveler notifications (ui_kits/notifications/traveler.html)
+         Chrome is localized; notification record content lives in
+         NotificationMockData, kept verbatim from the design.
+         ============================================================ -->
+    <string name="notif_title">Thông báo</string>
+    <string name="notif_unread">%d chưa đọc</string>
+    <string name="notif_mark_all_read">Đánh dấu tất cả đã đọc</string>
+    <string name="notif_settings">Cài đặt thông báo</string>
+    <string name="notif_toast_marked_all">Đã đánh dấu tất cả là đã đọc</string>
+    <string name="notif_view_all">Xem tất cả thông báo</string>
+
+    <!-- Filters -->
+    <string name="notif_filter_all">Tất cả</string>
+    <string name="notif_filter_unread">Chưa đọc</string>
+    <string name="notif_cat_bookings">Đặt chỗ</string>
+    <string name="notif_cat_payments">Thanh toán</string>
+    <string name="notif_cat_offers">Ưu đãi</string>
+    <string name="notif_cat_trips">Chuyến đi</string>
+    <string name="notif_cat_account">Tài khoản</string>
+
+    <!-- Date groups -->
+    <string name="notif_group_today">Hôm nay</string>
+    <string name="notif_group_yesterday">Hôm qua</string>
+    <string name="notif_group_earlier">Trước đó</string>
+
+    <!-- Empty states -->
+    <string name="notif_empty_all_title">Chưa có thông báo</string>
+    <string name="notif_empty_all_msg">Cập nhật đặt chỗ, ưu đãi và nhắc nhở sẽ xuất hiện ở đây.</string>
+    <string name="notif_empty_unread_title">Bạn đã xem hết</string>
+    <string name="notif_empty_unread_msg">Mọi thông báo đều đã được đọc.</string>
+
+    <!-- Notification content (sample data; localized to match the active language) -->
+    <string name="notif_t1_title">Đặt chỗ đã xác nhận</string>
+    <string name="notif_t1_body">Kỳ nghỉ của bạn tại The Grand Orchid Resort đã được xác nhận cho ngày 13–15/08.</string>
+    <string name="notif_t1_when">Vừa xong</string>
+    <string name="notif_t1_action">Xem đặt chỗ</string>
+
+    <string name="notif_t2_title">Thanh toán thành công · $636.08</string>
+    <string name="notif_t2_body">Thanh toán cho đơn #TG-4821 đã hoàn tất.</string>
+    <string name="notif_t2_when">12 phút</string>
+    <string name="notif_t2_action">Xem biên lai</string>
+
+    <string name="notif_t3_title">Nhận phòng vào ngày mai</string>
+    <string name="notif_t3_body">Nhận phòng tại The Grand Orchid Resort mở lúc 14:00. Chuẩn bị hành lý nhé!</string>
+    <string name="notif_t3_when">2 giờ</string>
+    <string name="notif_t3_action">Xem chi tiết</string>
+
+    <string name="notif_t4_title">Giảm 15% cho chuyến đi tiếp theo</string>
+    <string name="notif_t4_body">Một ưu đãi có thời hạn đang chờ trong tài khoản của bạn.</string>
+    <string name="notif_t4_when">4 giờ</string>
+    <string name="notif_t4_action">Khám phá ưu đãi</string>
+
+    <string name="notif_t5_title">Giảm giá mục trong danh sách yêu thích</string>
+    <string name="notif_t5_body">Lavender Lakehouse hiện còn $149/đêm — giảm 16%.</string>
+    <string name="notif_t5_when">6 giờ</string>
+    <string name="notif_t5_action">Xem chỗ ở</string>
+
+    <string name="notif_t6_title">Cedar Cove thế nào?</string>
+    <string name="notif_t6_body">Chia sẻ đánh giá nhanh để giúp các du khách khác lựa chọn.</string>
+    <string name="notif_t6_when">Hôm qua</string>
+    <string name="notif_t6_action">Viết đánh giá</string>
+
+    <string name="notif_t7_title">Đã cập nhật mật khẩu</string>
+    <string name="notif_t7_body">Mật khẩu tài khoản của bạn đã được thay đổi thành công.</string>
+    <string name="notif_t7_when">Hôm qua</string>
+
+    <string name="notif_t8_title">Cập nhật chính sách hủy</string>
+    <string name="notif_t8_body">Chúng tôi đã cập nhật điều khoản hủy — chạm để xem thay đổi.</string>
+    <string name="notif_t8_when">2 ngày</string>
+
+    <string name="notif_t9_title">Chuyến đi của bạn bắt đầu sau 2 ngày</string>
+    <string name="notif_t9_body">Tour đi bộ Phố cổ Kyoto của bạn bắt đầu ngày 13/08.</string>
+    <string name="notif_t9_when">3 ngày</string>
+    <string name="notif_t9_action">Xem hành trình</string>
+
+    <!-- ============================================================
+         Bảng điều khiển Doanh nghiệp (ui_kits/business) — Tiếng Việt
+         Chỉ dịch phần giao diện; nội dung mẫu (tên, đánh giá, báo cáo)
+         giữ nguyên trong BusinessMockData như Bảng quản trị.
+         ============================================================ -->
+    <!-- Thanh điều hướng -->
+    <string name="biz_nav_home">Trang chủ</string>
+    <string name="biz_nav_listings">Tin đăng</string>
+    <string name="biz_nav_calendar">Lịch</string>
+    <string name="biz_nav_reviews">Đánh giá</string>
+    <string name="biz_nav_profile">Cá nhân</string>
+    <string name="biz_console">Bảng doanh nghiệp</string>
+
+    <!-- Chung -->
+    <string name="biz_view_all">Xem tất cả</string>
+    <string name="biz_cancel">Hủy</string>
+    <string name="biz_back">Quay lại</string>
+    <string name="biz_continue">Tiếp tục</string>
+
+    <!-- Trang chủ -->
+    <string name="biz_role">Doanh nghiệp</string>
+    <string name="biz_business_name">Orchid Hospitality</string>
+    <string name="biz_verified">ĐÃ XÁC MINH</string>
+    <string name="biz_status_active">Doanh nghiệp · Đang hoạt động</string>
+    <string name="biz_welcome">Chào mừng trở lại, Maya</string>
+    <string name="biz_welcome_sub">Hôm nay bạn có 3 lượt nhận phòng và 8 đánh giá đang chờ phản hồi.</string>
+    <string name="biz_stat_listings">Tin đang hoạt động</string>
+    <string name="biz_stat_bookings">Tổng lượt đặt</string>
+    <string name="biz_stat_reviews">Đánh giá chờ xử lý</string>
+    <string name="biz_stat_reports">Báo cáo cần duyệt</string>
+    <string name="biz_quick_actions">Thao tác nhanh</string>
+    <string name="biz_qa_add">Thêm tin đăng</string>
+    <string name="biz_qa_calendar">Lịch</string>
+    <string name="biz_qa_reviews">Đánh giá</string>
+    <string name="biz_recent_bookings">Lượt đặt gần đây</string>
+    <string name="biz_book_upcoming">Sắp tới</string>
+    <string name="biz_book_completed">Hoàn tất</string>
+    <string name="biz_book_cancelled">Đã hủy</string>
+
+    <!-- Tin đăng -->
+    <string name="biz_my_listings">Tin đăng của tôi</string>
+    <string name="biz_search_listings">Tìm tin đăng…</string>
+    <string name="biz_tab_all">Tất cả</string>
+    <string name="biz_tab_active">Hoạt động</string>
+    <string name="biz_tab_inactive">Tạm ẩn</string>
+    <string name="biz_tab_draft">Nháp</string>
+    <string name="biz_cat_all">Tất cả danh mục</string>
+    <string name="biz_cat_hotels">Khách sạn</string>
+    <string name="biz_cat_tours">Tour</string>
+    <string name="biz_status_active_label">Hoạt động</string>
+    <string name="biz_status_inactive_label">Tạm ẩn</string>
+    <string name="biz_status_draft_label">Nháp</string>
+    <string name="biz_per_night">/đêm</string>
+    <string name="biz_per_person">/người</string>
+    <string name="biz_bookings_count">%d lượt đặt</string>
+    <string name="biz_action_edit">Sửa</string>
+    <string name="biz_action_view">Xem</string>
+    <string name="biz_action_duplicate">Nhân bản</string>
+    <string name="biz_action_delete">Xóa</string>
+    <string name="biz_empty_listings_title">Chưa có tin đăng nào ở đây</string>
+    <string name="biz_empty_listings_msg">Thử bộ lọc khác, hoặc thêm tin đăng mới để bắt đầu.</string>
+    <string name="biz_empty_drafts_msg">Các bản nháp bạn lưu sẽ hiển thị ở tab này.</string>
+    <string name="biz_selected_count">Đã chọn %d</string>
+    <string name="biz_bulk_pause">Tạm dừng</string>
+    <string name="biz_bulk_delete">Xóa</string>
+    <string name="biz_delete_title">Xóa tin đăng?</string>
+    <string name="biz_delete_msg">Thao tác này sẽ xóa \"%s\" và toàn bộ lịch sử đặt chỗ. Không thể hoàn tác.</string>
+    <string name="biz_toast_deleted">Đã xóa tin đăng</string>
+
+    <!-- Lịch -->
+    <string name="biz_calendar">Lịch</string>
+    <string name="biz_calendar_month">Tháng 8, 2025</string>
+    <string name="biz_cal_available">Còn trống</string>
+    <string name="biz_cal_partial">Một phần</string>
+    <string name="biz_cal_booked">Đã đặt</string>
+    <string name="biz_cal_blocked">Đã chặn</string>
+    <string name="biz_cal_today">Hôm nay · 18/8</string>
+    <string name="biz_block_dates">Chặn ngày</string>
+    <string name="biz_checkout_note">Giờ trả phòng tiêu chuẩn là 11:00. Trả phòng muộn tính phí $35 mỗi lượt đặt.</string>
+    <string name="biz_booking_details">Chi tiết lượt đặt</string>
+    <string name="biz_checkin">Nhận phòng</string>
+    <string name="biz_checkout">Trả phòng</string>
+    <string name="biz_detail_contact">Liên hệ</string>
+    <string name="biz_detail_guests">Khách</string>
+    <string name="biz_detail_nights">Số đêm</string>
+    <string name="biz_detail_total">Tổng cộng</string>
+    <string name="biz_late_note">Trả phòng muộn sau 11:00 tính phí $35, tự động tính vào hóa đơn của khách.</string>
+    <string name="biz_mark_checkin">Đánh dấu đã nhận phòng</string>
+    <string name="biz_status_confirmed">Đã xác nhận</string>
+    <string name="biz_status_pending">Chờ duyệt</string>
+    <string name="biz_status_checkedin">Đã nhận phòng</string>
+    <string name="biz_status_checkedout">Đã trả phòng</string>
+
+    <!-- Đánh giá & Báo cáo -->
+    <string name="biz_reputation">Uy tín</string>
+    <string name="biz_reviews_title">Đánh giá &amp; Báo cáo</string>
+    <string name="biz_tab_reviews">Đánh giá</string>
+    <string name="biz_tab_reports">Báo cáo</string>
+    <string name="biz_reviews_count">%d đánh giá</string>
+    <string name="biz_all_reviews">Tất cả đánh giá</string>
+    <string name="biz_filter">Lọc</string>
+    <string name="biz_your_reply">Phản hồi của bạn</string>
+    <string name="biz_reply">Phản hồi</string>
+    <string name="biz_reply_title">Phản hồi đánh giá</string>
+    <string name="biz_your_response">Phản hồi của bạn</string>
+    <string name="biz_reply_hint">Viết phản hồi công khai, chu đáo…</string>
+    <string name="biz_post_reply">Đăng phản hồi</string>
+    <string name="biz_toast_reply">Đã đăng phản hồi</string>
+    <string name="biz_reports_note">Báo cáo bạn gửi sẽ được kiểm duyệt viên TourGo duyệt lần cuối.</string>
+    <string name="biz_report_detail_cta">Xem chi tiết</string>
+    <string name="biz_report_title">Chi tiết báo cáo</string>
+    <string name="biz_reported_by">Báo cáo bởi %1$s · %2$s</string>
+    <string name="biz_original_comment">Bình luận gốc</string>
+    <string name="biz_reporter_reasoning">Lý do báo cáo</string>
+    <string name="biz_dismiss">Bỏ qua</string>
+    <string name="biz_approve_report">Duyệt báo cáo</string>
+    <string name="biz_toast_banned">Đã cấm bình luận · đã thông báo người dùng</string>
+    <string name="biz_empty_reports_title">Hiện không có báo cáo nào</string>
+    <string name="biz_empty_reports_msg">Khi một đánh giá bị gắn cờ, nó sẽ hiển thị ở đây để bạn xem xét.</string>
+
+    <!-- Cá nhân -->
+    <string name="biz_account">Tài khoản</string>
+    <string name="biz_profile">Hồ sơ</string>
+    <string name="biz_owner_name">Maya Chen</string>
+    <string name="biz_org_name">Orchid Hospitality Group</string>
+    <string name="biz_verified_business">Doanh nghiệp đã xác minh</string>
+    <string name="biz_stat_listings_short">Tin đăng</string>
+    <string name="biz_stat_bookings_short">Lượt đặt</string>
+    <string name="biz_stat_rating_short">Đánh giá</string>
+    <string name="biz_section_business">Doanh nghiệp</string>
+    <string name="biz_row_details">Thông tin doanh nghiệp</string>
+    <string name="biz_row_payouts">Thanh toán &amp; ngân hàng</string>
+    <string name="biz_row_tax">Thuế &amp; pháp lý</string>
+    <string name="biz_row_team">Nhóm &amp; quyền truy cập</string>
+    <string name="biz_section_preferences">Tùy chọn</string>
+    <string name="biz_row_notifications">Thông báo</string>
+    <string name="biz_row_language">Ngôn ngữ</string>
+    <string name="biz_row_language_value">Tiếng Việt</string>
+    <string name="biz_row_security">Mật khẩu &amp; bảo mật</string>
+    <string name="biz_row_help">Trợ giúp &amp; hỗ trợ</string>
+    <string name="biz_logout">Đăng xuất</string>
+    <string name="biz_toast_logout">Đã đăng xuất</string>
+
+    <!-- Thêm tin đăng -->
+    <string name="biz_new_listing">Tin đăng mới</string>
+    <string name="biz_step_of">Bước %1$d / %2$d</string>
+    <string name="biz_save_draft">Lưu nháp</string>
+    <string name="biz_toast_draft">Đã lưu nháp</string>
+    <string name="biz_step_basic">Cơ bản</string>
+    <string name="biz_step_location">Vị trí</string>
+    <string name="biz_step_pricing">Giá</string>
+    <string name="biz_step_calendar">Lịch</string>
+    <string name="biz_step_review">Xem lại</string>
+    <string name="biz_publish">Đăng</string>
+    <string name="biz_toast_published">Đã gửi tin đăng để duyệt</string>
+    <string name="biz_discard_title">Hủy tin đăng mới?</string>
+    <string name="biz_discard_msg">Mọi tiến trình của biểu mẫu sẽ bị mất. Lưu nháp thay vì hủy?</string>
+    <string name="biz_discard">Hủy bỏ</string>
+    <!-- Bước 1 -->
+    <string name="biz_s1_title">Cho chúng tôi biết thông tin cơ bản</string>
+    <string name="biz_s1_sub">Chọn danh mục và đặt tên cho tin đăng của bạn.</string>
+    <string name="biz_category">Danh mục</string>
+    <string name="biz_kind_hotel">Khách sạn</string>
+    <string name="biz_kind_hotel_sub">Phòng &amp; lưu trú</string>
+    <string name="biz_kind_tour">Tour</string>
+    <string name="biz_kind_tour_sub">Hoạt động có hướng dẫn</string>
+    <string name="biz_listing_name">Tên tin đăng</string>
+    <string name="biz_listing_name_hint">The Grand Orchid Resort</string>
+    <string name="biz_description">Mô tả</string>
+    <string name="biz_description_hint">Mô tả ngắn về tin đăng của bạn…</string>
+    <string name="biz_photos">Ảnh · %1$d/6</string>
+    <string name="biz_upload">Tải lên</string>
+    <string name="biz_cover">ẢNH BÌA</string>
+    <!-- Bước 2 -->
+    <string name="biz_s2_title">Ở đâu &amp; có gì</string>
+    <string name="biz_s2_sub">Giúp khách tìm thấy bạn và biết những gì cần mong đợi.</string>
+    <string name="biz_address">Địa chỉ</string>
+    <string name="biz_address_hint">Bangkok, Thái Lan</string>
+    <string name="biz_latitude">Vĩ độ</string>
+    <string name="biz_longitude">Kinh độ</string>
+    <string name="biz_map_preview">Xem trước bản đồ</string>
+    <string name="biz_amenities">Tiện nghi / Điểm nổi bật</string>
+    <string name="biz_am_wifi">Wi-Fi</string>
+    <string name="biz_am_pool">Hồ bơi</string>
+    <string name="biz_am_parking">Bãi đỗ xe</string>
+    <string name="biz_am_breakfast">Bữa sáng</string>
+    <string name="biz_am_workspace">Không gian làm việc</string>
+    <string name="biz_am_ac">Máy lạnh</string>
+    <string name="biz_capacity">Sức chứa (khách)</string>
+    <!-- Bước 3 -->
+    <string name="biz_s3_title">Đặt giá của bạn</string>
+    <string name="biz_s3_sub">Bạn có thể điều chỉnh giá theo mùa và phụ phí bên dưới.</string>
+    <string name="biz_base_price_night">Giá cơ bản (mỗi đêm)</string>
+    <string name="biz_base_price_person">Giá cơ bản (mỗi người)</string>
+    <string name="biz_seasonal">Giá theo mùa</string>
+    <string name="biz_seasonal_sub">Tính giá cao hơn vào mùa cao điểm (T12–T2), thấp hơn vào mùa thấp điểm.</string>
+    <string name="biz_season_peak">Mùa cao điểm</string>
+    <string name="biz_season_peak_range">1/12 – 28/2</string>
+    <string name="biz_season_peak_delta">+25%</string>
+    <string name="biz_season_mid">Mùa giữa</string>
+    <string name="biz_season_mid_range">1/3 – 31/5</string>
+    <string name="biz_season_mid_delta">±0%</string>
+    <string name="biz_season_off">Mùa thấp điểm</string>
+    <string name="biz_season_off_range">1/6 – 30/11</string>
+    <string name="biz_season_off_delta">−15%</string>
+    <string name="biz_extra_fees">Phụ phí</string>
+    <string name="biz_fee_cleaning">Phí dọn dẹp</string>
+    <string name="biz_fee_cleaning_value">$25</string>
+    <string name="biz_fee_late">Trả phòng muộn</string>
+    <string name="biz_fee_late_value">$35 sau 12:00</string>
+    <string name="biz_fee_extra_guest">Khách thêm</string>
+    <string name="biz_fee_extra_guest_value">$15 / đêm</string>
+    <!-- Bước 4 -->
+    <string name="biz_s4_title">Chọn lịch trống</string>
+    <string name="biz_s4_sub">Đánh dấu ngày mở, ngày chặn, hoặc một khoảng tùy chỉnh.</string>
+    <string name="biz_date_range">Khoảng ngày</string>
+    <string name="biz_open_from">Mở từ</string>
+    <string name="biz_open_until">Mở đến</string>
+    <string name="biz_legend_selected">Đã chọn</string>
+    <string name="biz_legend_blocked">Đã chặn</string>
+    <string name="biz_legend_open">Mở</string>
+    <string name="biz_block_additional">Chặn thêm ngày</string>
+    <!-- Bước 5 -->
+    <string name="biz_s5_title">Xem lại &amp; đăng</string>
+    <string name="biz_s5_sub">Kiểm tra lại mọi thứ bên dưới. Bạn có thể sửa sau.</string>
+    <string name="biz_preview">Xem trước</string>
+    <string name="biz_new_listing_badge">Tin đăng mới</string>
+    <string name="biz_summary_photos">Ảnh</string>
+    <string name="biz_summary_photos_value">3 ảnh</string>
+    <string name="biz_summary_amenities">Tiện nghi</string>
+    <string name="biz_summary_amenities_value">Wi-Fi, Hồ bơi</string>
+    <string name="biz_summary_capacity">Sức chứa</string>
+    <string name="biz_summary_capacity_value">4 khách</string>
+    <string name="biz_summary_pricing">Giá</string>
+    <string name="biz_summary_pricing_value">Theo mùa · 3 phụ phí</string>
+    <string name="biz_terms">Tôi đồng ý với Điều khoản Chủ nhà của TourGo và xác nhận tin đăng này tuân thủ quy định địa phương.</string>
 
 </resources>

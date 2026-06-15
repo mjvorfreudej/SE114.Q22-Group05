@@ -1,32 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    App text family — DEFAULT (Vietnamese) variant.
+
+    NOTE: the resource is named "urbanist" because every theme/style/layout in the
+    app references @font/urbanist; this file is the locale-default it resolves to.
+
+    Urbanist itself does NOT contain the Vietnamese precomposed letters (Đ đ ề ữ ố
+    ờ ẩ ạ …) — rendering Vietnamese in it breaks mid-word (missing glyphs fall back
+    to the system font). So for the default (Vietnamese) locale we use Be Vietnam Pro
+    (OFL, designed for Vietnamese, full 400/500/600/700 weights, covers Latin too).
+
+    The English override — real Urbanist — lives in res/font-en/urbanist.xml.
+-->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
-        android:font="@font/urbanist_regular"
+        android:font="@font/bevietnampro_regular"
         android:fontWeight="400"
         android:fontStyle="normal"
-        app:font="@font/urbanist_regular"
+        app:font="@font/bevietnampro_regular"
         app:fontWeight="400"
         app:fontStyle="normal" />
     <font
-        android:font="@font/urbanist_medium"
+        android:font="@font/bevietnampro_medium"
         android:fontWeight="500"
         android:fontStyle="normal"
-        app:font="@font/urbanist_medium"
+        app:font="@font/bevietnampro_medium"
         app:fontWeight="500"
         app:fontStyle="normal" />
     <font
-        android:font="@font/urbanist_semibold"
+        android:font="@font/bevietnampro_semibold"
         android:fontWeight="600"
         android:fontStyle="normal"
-        app:font="@font/urbanist_semibold"
+        app:font="@font/bevietnampro_semibold"
         app:fontWeight="600"
         app:fontStyle="normal" />
     <font
-        android:font="@font/urbanist_bold"
+        android:font="@font/bevietnampro_bold"
         android:fontWeight="700"
         android:fontStyle="normal"
-        app:font="@font/urbanist_bold"
+        app:font="@font/bevietnampro_bold"
         app:fontWeight="700"
         app:fontStyle="normal" />
 </font-family>

@@ -66,6 +66,22 @@
         <item name="cornerSizeBottomRight">24dp</item>
     </style>
 
+    <!-- Business Console rounded-image overlays -->
+    <style name="ShapeAppearanceOverlay.Biz.Corner10" parent="">
+        <item name="cornerSize">10dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Biz.Corner12" parent="">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Biz.TopCorner16" parent="">
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
     <style name="AdmSectionLabel">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

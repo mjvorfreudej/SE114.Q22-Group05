@@ -31,6 +31,14 @@
             android:name=".ui.admin.AdminActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.business.BusinessActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.business.AddListingActivity"
+            android:exported="false" />
+
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
@@ -92,6 +100,9 @@
             android:name=".ui.main.CreateTourActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.notification.NotificationsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
