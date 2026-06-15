@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -363,6 +364,7 @@ public class AddListingActivity extends AppCompatActivity {
         java.util.Set<Integer> blocked = new java.util.HashSet<>(java.util.Arrays.asList(7, 8, 21, 22));
         java.util.Set<Integer> selected = new java.util.HashSet<>(java.util.Arrays.asList(13, 14, 15, 16));
         LinearLayout grid = content.findViewById(R.id.bizMiniGrid);
+        int gap = dp(2);
         // 35 cells, day = index - 2 (Aug starts mid-row, matching the prototype)
         int idx = 0;
         for (int w = 0; w < 5; w++) {
@@ -373,11 +375,29 @@ public class AddListingActivity extends AppCompatActivity {
             for (int c = 0; c < 7; c++, idx++) {
                 int day = idx - 2;
                 boolean valid = day > 0 && day <= 31;
-                week.addView(buildMiniCell(valid ? day : 0,
-                        valid && blocked.contains(day), valid && selected.contains(day)),
-                        new LinearLayout.LayoutParams(0, dp(30), 1f));
+                View cell = buildMiniCell(valid ? day : 0,
+                        valid && blocked.contains(day), valid && selected.contains(day));
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(30), 1f);
+                lp.setMargins(gap, gap, gap, gap);
+                week.addView(cell, lp);
             }
         }
+
+        // After layout, make each cell square (height = measured width)
+        grid.post(() -> {
+            for (int w2 = 0; w2 < grid.getChildCount(); w2++) {
+                LinearLayout weekRow = (LinearLayout) grid.getChildAt(w2);
+                for (int c2 = 0; c2 < weekRow.getChildCount(); c2++) {
+                    View cell = weekRow.getChildAt(c2);
+                    int cellWidth = cell.getWidth();
+                    if (cellWidth > 0) {
+                        ViewGroup.LayoutParams lp = cell.getLayoutParams();
+                        lp.height = cellWidth;
+                        cell.setLayoutParams(lp);
+                    }
+                }
+            }
+        });
 
         LinearLayout legend = content.findViewById(R.id.bizMiniLegend);
         miniLegend(legend, R.color.adm_gray_900, R.string.biz_legend_selected, false);
