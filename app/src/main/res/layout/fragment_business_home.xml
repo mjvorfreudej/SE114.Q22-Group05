@@ -118,6 +118,7 @@
                         android:background="@drawable/bg_adm_pill"
                         android:backgroundTint="#33FFFFFF"
                         android:drawablePadding="4dp"
+                        android:gravity="center_vertical"
                         android:paddingHorizontal="8dp"
                         android:paddingVertical="4dp"
                         android:text="@string/biz_verified"
