@@ -433,6 +433,34 @@
     <string name="adm_logout">Log out</string>
     <string name="adm_toast_logged_out">Logged out</string>
 
+    <!-- Profile › settings sheets -->
+    <string name="adm_set_save">Save changes</string>
+    <string name="adm_policy_rules">Content rules</string>
+    <string name="adm_policy_automation">Automation</string>
+    <string name="adm_toast_policy_saved">Moderation policy saved</string>
+    <string name="adm_team_members">Team members</string>
+    <string name="adm_team_invite">Invite teammate</string>
+    <string name="adm_toast_invite_sent">Invitation sent</string>
+    <string name="adm_audit_recent">Recent activity</string>
+    <string name="adm_sec_change_password">Change password</string>
+    <string name="adm_sec_two_factor">Two-factor authentication</string>
+    <string name="adm_pwd_current_hint">Current password</string>
+    <string name="adm_pwd_new_hint">New password</string>
+    <string name="adm_pwd_confirm_hint">Confirm new password</string>
+    <string name="adm_pwd_update">Update password</string>
+    <string name="adm_2fa_label">Require a verification code</string>
+    <string name="adm_2fa_desc">Ask for a one-time code at every admin sign-in.</string>
+    <string name="adm_pwd_err_current">Enter your current password</string>
+    <string name="adm_pwd_err_short">New password must be at least 8 characters</string>
+    <string name="adm_pwd_err_match">New passwords don\'t match</string>
+    <string name="adm_toast_password_updated">Password updated</string>
+    <string name="adm_toast_2fa_enabled">Two-factor authentication enabled</string>
+    <string name="adm_toast_2fa_disabled">Two-factor authentication disabled</string>
+    <string name="adm_help_topics">Help topics</string>
+    <string name="adm_help_reach">Get in touch</string>
+    <string name="adm_help_contact">Contact support</string>
+    <string name="adm_toast_no_mail">No email app found</string>
+
     <!-- Create Tour -->
     <string name="create_tour_title">Create new tour</string>
     <string name="create_tour_subtitle">Submit your tour for review</string>

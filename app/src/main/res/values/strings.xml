@@ -453,6 +453,34 @@
     <string name="adm_logout">Đăng xuất</string>
     <string name="adm_toast_logged_out">Đã đăng xuất</string>
 
+    <!-- Profile › settings sheets -->
+    <string name="adm_set_save">Lưu thay đổi</string>
+    <string name="adm_policy_rules">Quy tắc nội dung</string>
+    <string name="adm_policy_automation">Tự động hóa</string>
+    <string name="adm_toast_policy_saved">Đã lưu chính sách kiểm duyệt</string>
+    <string name="adm_team_members">Thành viên</string>
+    <string name="adm_team_invite">Mời thành viên</string>
+    <string name="adm_toast_invite_sent">Đã gửi lời mời</string>
+    <string name="adm_audit_recent">Hoạt động gần đây</string>
+    <string name="adm_sec_change_password">Đổi mật khẩu</string>
+    <string name="adm_sec_two_factor">Xác thực hai lớp</string>
+    <string name="adm_pwd_current_hint">Mật khẩu hiện tại</string>
+    <string name="adm_pwd_new_hint">Mật khẩu mới</string>
+    <string name="adm_pwd_confirm_hint">Nhập lại mật khẩu mới</string>
+    <string name="adm_pwd_update">Cập nhật mật khẩu</string>
+    <string name="adm_2fa_label">Yêu cầu mã xác minh</string>
+    <string name="adm_2fa_desc">Yêu cầu mã dùng một lần mỗi khi admin đăng nhập.</string>
+    <string name="adm_pwd_err_current">Nhập mật khẩu hiện tại</string>
+    <string name="adm_pwd_err_short">Mật khẩu mới phải có ít nhất 8 ký tự</string>
+    <string name="adm_pwd_err_match">Mật khẩu mới không khớp</string>
+    <string name="adm_toast_password_updated">Đã cập nhật mật khẩu</string>
+    <string name="adm_toast_2fa_enabled">Đã bật xác thực hai lớp</string>
+    <string name="adm_toast_2fa_disabled">Đã tắt xác thực hai lớp</string>
+    <string name="adm_help_topics">Chủ đề trợ giúp</string>
+    <string name="adm_help_reach">Liên hệ</string>
+    <string name="adm_help_contact">Liên hệ hỗ trợ</string>
+    <string name="adm_toast_no_mail">Không tìm thấy ứng dụng email</string>
+
     <!-- Create Tour -->
     <string name="create_tour_title">Tạo tour mới</string>
     <string name="create_tour_subtitle">Gửi tour của bạn để được duyệt</string>
