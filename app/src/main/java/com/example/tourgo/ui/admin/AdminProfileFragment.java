@@ -1,14 +1,10 @@
 package com.example.tourgo.ui.admin;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,7 +19,6 @@ import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.ui.auth.LoginActivity;
-import com.google.android.material.button.MaterialButton;
 
 /** Admin › Profile / Settings — account card, moderation & preferences rows, log out. */
 public class AdminProfileFragment extends Fragment {
@@ -51,21 +46,13 @@ public class AdminProfileFragment extends Fragment {
     }
 
     private void showLogoutDialog() {
-        Dialog dialog = new Dialog(requireContext());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_logout);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        MaterialButton cancel = dialog.findViewById(R.id.btnLogoutCancel);
-        MaterialButton confirm = dialog.findViewById(R.id.btnLogoutConfirm);
-        if (cancel != null) cancel.setOnClickListener(v -> dialog.dismiss());
-        if (confirm != null) confirm.setOnClickListener(v -> {
-            dialog.dismiss();
-            logout();
-        });
-        dialog.show();
+        // Shared centered confirm popup (warning icon + red danger button) — same
+        // across Traveler / Business / Admin.
+        AdminUi.confirm(requireContext(),
+                getString(R.string.profile_logout_title),
+                getString(R.string.profile_logout_confirm),
+                getString(R.string.profile_logout_title),
+                true, this::logout);
     }
 
     private void logout() {

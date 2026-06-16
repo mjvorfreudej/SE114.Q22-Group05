@@ -20,7 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.tourgo.R;
 
 /**
- * Admin Console host. Mirrors {@link com.example.tourgo.ui.main.MainActivity}'s pattern
+ * Admin Console host. Mirrors {@link com.example.tourgo.ui.main.home.MainActivity}'s pattern
  * and visual style: a floating white pill bottom nav with 5 tabs
  * (Home · Moderate · Business · Users · Profile). Like the user app, only the selected
  * tab shows its label on a light-gray pill and expands; the rest show icon-only.

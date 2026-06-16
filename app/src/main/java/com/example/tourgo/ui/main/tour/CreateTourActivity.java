@@ -1,4 +1,4 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.tour;
 
 import android.net.Uri;
 import android.os.Bundle;

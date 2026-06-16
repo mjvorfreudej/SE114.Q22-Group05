@@ -26,7 +26,7 @@ import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.business.BusinessActivity;
-import com.example.tourgo.ui.main.MainActivity;
+import com.example.tourgo.ui.main.home.MainActivity;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.databinding.ActivityLoginBinding;
 

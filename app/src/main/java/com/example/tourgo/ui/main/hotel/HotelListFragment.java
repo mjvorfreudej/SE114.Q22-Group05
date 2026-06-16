@@ -1,4 +1,4 @@
-package com.example.tourgo.fragments;
+package com.example.tourgo.ui.main.hotel;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

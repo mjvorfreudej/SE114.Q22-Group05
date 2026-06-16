@@ -1,4 +1,5 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.hotel;
+import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

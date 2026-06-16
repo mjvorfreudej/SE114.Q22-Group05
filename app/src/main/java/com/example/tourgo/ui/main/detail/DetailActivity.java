@@ -1,4 +1,5 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.detail;
+import com.example.tourgo.ui.main.booking.BookingActivity;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;

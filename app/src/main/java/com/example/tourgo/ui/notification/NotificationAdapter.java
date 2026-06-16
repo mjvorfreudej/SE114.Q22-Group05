@@ -24,10 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Renders the date-grouped notification feed (design TravelerCenter body):
+ * Renders the date-grouped notification feed (design NotifCenter body):
  * a flat list of group headers + notification rows. Mirrors the prototype's
- * {@code buildTGroups(items, 'date')} — Today / Yesterday / Earlier, in order,
+ * {@code buildGroups(items, 'date')} — Today / Yesterday / Earlier, in order,
  * with the bottom divider suppressed on each group's last row.
+ *
+ * Role-aware: the {@link NotificationMockData.Role} fixes the category palette
+ * used for the disc + tag colours. Business/Admin rows additionally show a
+ * category tag pill before the quick actions (design NotifRow, "center" variant,
+ * comfortable density); the Traveler center omits it, matching traveler.html.
  */
 public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -60,9 +65,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private final List<Row> rows = new ArrayList<>();
     private final OnNotificationClick listener;
+    private final NotificationMockData.Role role;
+    /** Category tag pill is part of the Business/Admin center only (design parity). */
+    private final boolean showCategoryTag;
 
-    public NotificationAdapter(OnNotificationClick listener) {
+    public NotificationAdapter(OnNotificationClick listener, NotificationMockData.Role role) {
         this.listener = listener;
+        this.role = role;
+        this.showCategoryTag = role != NotificationMockData.Role.TRAVELER;
     }
 
     /** Rebuild the flat row list from an already-filtered set of notifications. */
@@ -145,7 +155,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         void bind(NotificationItem n, boolean lastInGroup) {
             Context ctx = itemView.getContext();
-            NotificationMockData.Category cat = NotificationMockData.category(n.cat);
+            NotificationMockData.Category cat = NotificationMockData.category(role, n.cat);
 
             // Category disc: tinted background + tinted glyph.
             iconDisc.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.bgColor)));
@@ -166,25 +176,63 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             unreadDot.setVisibility(n.read ? View.GONE : View.VISIBLE);
             divider.setVisibility(lastInGroup ? View.GONE : View.VISIBLE);
 
-            bindActions(n);
+            bindTagAndActions(n, cat);
 
             itemView.setOnClickListener(v -> {
                 if (listener != null) listener.onClick(n);
             });
         }
 
-        private void bindActions(NotificationItem n) {
+        /**
+         * Builds the bottom row: an optional category tag pill (Business/Admin)
+         * followed by the quick-action pills. The row is shown when it carries a
+         * tag or at least one action — design NotifRow's
+         * {@code (showActs || (!inPop && !compact))} condition.
+         */
+        private void bindTagAndActions(NotificationItem n, NotificationMockData.Category cat) {
             actions.removeAllViews();
-            if (n.actions == null || n.actions.isEmpty()) {
-                actions.setVisibility(View.GONE);
-                return;
-            }
-            actions.setVisibility(View.VISIBLE);
             Context ctx = actions.getContext();
-            for (int i = 0; i < n.actions.size(); i++) {
-                NotificationItem.QuickAction a = n.actions.get(i);
-                actions.addView(buildActionPill(ctx, a, i > 0, n));
+
+            if (showCategoryTag) {
+                actions.addView(buildCategoryTag(ctx, cat));
             }
+
+            boolean hasActions = n.actions != null && !n.actions.isEmpty();
+            if (hasActions) {
+                for (int i = 0; i < n.actions.size(); i++) {
+                    NotificationItem.QuickAction a = n.actions.get(i);
+                    actions.addView(buildActionPill(ctx, a, actions.getChildCount() > 0, n));
+                }
+            }
+
+            actions.setVisibility(actions.getChildCount() > 0 ? View.VISIBLE : View.GONE);
+        }
+
+        private View buildCategoryTag(Context ctx, NotificationMockData.Category cat) {
+            LinearLayout tag = new LinearLayout(ctx);
+            tag.setOrientation(LinearLayout.HORIZONTAL);
+            tag.setGravity(Gravity.CENTER_VERTICAL);
+            tag.setBackgroundResource(R.drawable.bg_adm_pill);
+            tag.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.bgColor)));
+            tag.setPadding(dp(ctx, 8), dp(ctx, 3), dp(ctx, 8), dp(ctx, 3));
+
+            View dot = new View(ctx);
+            dot.setBackgroundResource(R.drawable.bg_adm_circle);
+            dot.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.solidColor)));
+            LinearLayout.LayoutParams dlp = new LinearLayout.LayoutParams(dp(ctx, 4), dp(ctx, 4));
+            dlp.setMarginEnd(dp(ctx, 4));
+            dot.setLayoutParams(dlp);
+            tag.addView(dot);
+
+            TextView label = new TextView(ctx);
+            label.setText(cat.labelRes);
+            label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9.5f);
+            label.setTypeface(NotifFonts.get(ctx, NotifFonts.Weight.BOLD));
+            label.setIncludeFontPadding(false);
+            label.setTextColor(ContextCompat.getColor(ctx, cat.inkColor));
+            tag.addView(label);
+
+            return tag;
         }
 
         private TextView buildActionPill(Context ctx, NotificationItem.QuickAction a,
@@ -210,6 +258,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             LinearLayout.LayoutParams lp =
                     new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER_VERTICAL;
             if (leadingGap) lp.setMarginStart(dp(ctx, 7));
             b.setLayoutParams(lp);
 

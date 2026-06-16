@@ -29,7 +29,7 @@ public class NotificationItem {
     }
 
     public final String id;
-    public final String cat;            // category key: bookings|payments|offers|trips|account
+    public final String cat;            // category key, role-specific (see NotificationMockData.cats)
     @DrawableRes public final int iconRes;
     public final String title;
     public final String body;

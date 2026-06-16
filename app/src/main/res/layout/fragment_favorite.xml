@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".ui.main.FavoriteFragment">
+    tools:context=".ui.main.favorite.FavoriteFragment">
 
     <!-- Modern Header -->
     <androidx.constraintlayout.widget.ConstraintLayout

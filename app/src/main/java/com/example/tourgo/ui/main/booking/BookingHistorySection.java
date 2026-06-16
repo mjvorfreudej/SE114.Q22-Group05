@@ -1,4 +1,4 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.booking;
 
 import android.content.Context;
 import android.view.View;

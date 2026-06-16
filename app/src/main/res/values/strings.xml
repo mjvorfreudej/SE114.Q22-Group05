@@ -570,6 +570,101 @@
     <string name="notif_t9_action">Xem hành trình</string>
 
     <!-- ============================================================
+         Thông báo Doanh nghiệp & Quản trị (ui_kits/notifications) — Tiếng Việt
+         Mã hoá theo vai trò: business (Đơn hàng/Vận hành/Hỗ trợ/Khuyến mãi)
+         và admin (Hệ thống/Phê duyệt/Báo cáo/Cột mốc).
+         ============================================================ -->
+    <!-- Danh mục — Doanh nghiệp -->
+    <string name="notif_cat_orders">Đơn hàng</string>
+    <string name="notif_cat_operations">Vận hành</string>
+    <string name="notif_cat_support">Hỗ trợ</string>
+    <string name="notif_cat_promotions">Khuyến mãi</string>
+
+    <!-- Danh mục — Quản trị -->
+    <string name="notif_cat_system">Hệ thống</string>
+    <string name="notif_cat_approvals">Phê duyệt</string>
+    <string name="notif_cat_reports">Báo cáo</string>
+    <string name="notif_cat_milestones">Cột mốc</string>
+
+    <!-- Nội dung Doanh nghiệp (dữ liệu mẫu, theo thiết kế) -->
+    <string name="notif_b1_title">Nhận được đặt chỗ mới</string>
+    <string name="notif_b1_body">Amelia R. đã đặt The Grand Orchid Resort · Suite 2 cho ngày 22–25/08.</string>
+    <string name="notif_b1_when">Vừa xong</string>
+    <string name="notif_b1_action">Xem đặt chỗ</string>
+
+    <string name="notif_b2_title">Đã nhận thanh toán · $636.08</string>
+    <string name="notif_b2_body">Khoản chi cho đơn #TG-4821 đã chuyển vào tài khoản của bạn.</string>
+    <string name="notif_b2_when">38 phút</string>
+    <string name="notif_b2_action">Xem khoản chi</string>
+
+    <string name="notif_b3_title">Sắp hết phòng · Cedar Cove</string>
+    <string name="notif_b3_body">Chỉ còn 2 phòng cho ngày 18–20/08. Cân nhắc mở thêm phòng.</string>
+    <string name="notif_b3_when">1 giờ</string>
+    <string name="notif_b3_action">Quản lý phòng trống</string>
+
+    <string name="notif_b4_title">3 lượt nhận phòng hôm nay</string>
+    <string name="notif_b4_body">Khách đến The Grand Orchid Resort từ 14:00.</string>
+    <string name="notif_b4_when">2 giờ</string>
+    <string name="notif_b4_action">Xem lịch</string>
+
+    <string name="notif_b5_title">Hỗ trợ đã phản hồi phiếu #TS-209</string>
+    <string name="notif_b5_body">Đội ngũ của chúng tôi đã trả lời về lịch thanh toán của bạn.</string>
+    <string name="notif_b5_when">4 giờ</string>
+    <string name="notif_b5_action">Xem phản hồi</string>
+
+    <string name="notif_b6_title">Đánh giá 5 sao mới từ Liam K.</string>
+    <string name="notif_b6_body">“Phòng sạch sẽ và chủ nhà tuyệt vời. Sẽ quay lại!”</string>
+    <string name="notif_b6_when">Hôm qua</string>
+    <string name="notif_b6_action">Trả lời</string>
+
+    <string name="notif_b7_title">Tăng hiển thị tin đăng tuần này</string>
+    <string name="notif_b7_body">Tin được nổi bật trong tuần nhận thêm tới 30% lượt xem.</string>
+    <string name="notif_b7_when">Hôm qua</string>
+    <string name="notif_b7_action">Tìm hiểu thêm</string>
+
+    <string name="notif_b8_title">Bảo trì theo lịch · 2:00 CN</string>
+    <string name="notif_b8_body">TourGo Business sẽ tạm thời gián đoạn trong quá trình cập nhật.</string>
+    <string name="notif_b8_when">2 ngày</string>
+
+    <!-- Nội dung Quản trị (dữ liệu mẫu, theo thiết kế) -->
+    <string name="notif_a1_title">Đăng ký doanh nghiệp mới</string>
+    <string name="notif_a1_body">Lotus Travel Co. đã gửi hồ sơ để xác minh.</string>
+    <string name="notif_a1_when">Vừa xong</string>
+    <string name="notif_a1_action">Xem xét</string>
+
+    <string name="notif_a2_title">Yêu cầu rút tiền · $2,400</string>
+    <string name="notif_a2_body">Orchid Hospitality yêu cầu chuyển tiền tới tài khoản •4471.</string>
+    <string name="notif_a2_when">22 phút</string>
+    <string name="notif_a2_action">Xem xét</string>
+
+    <string name="notif_a3_title">Độ trễ API tăng cao</string>
+    <string name="notif_a3_body">Cổng đặt chỗ có p95 trên 1.2s trong 15 phút qua.</string>
+    <string name="notif_a3_when">40 phút</string>
+    <string name="notif_a3_action">Xem trạng thái</string>
+
+    <string name="notif_a4_title">Tin đăng bị báo cáo 3×</string>
+    <string name="notif_a4_body">“Sunset Villa” bị 3 du khách gắn cờ vì ảnh gây hiểu nhầm.</string>
+    <string name="notif_a4_when">1 giờ</string>
+    <string name="notif_a4_action">Xem báo cáo</string>
+
+    <string name="notif_a5_title">Người dùng bị báo cáo spam đánh giá</string>
+    <string name="notif_a5_body">Tài khoản harry_b đã đăng 6 đánh giá trong 4 phút.</string>
+    <string name="notif_a5_when">3 giờ</string>
+    <string name="notif_a5_action">Xem xét</string>
+
+    <string name="notif_a6_title">Đạt cột mốc doanh thu</string>
+    <string name="notif_a6_body">GMV nền tảng vượt $1.0M trong tháng này — một kỷ lục mới.</string>
+    <string name="notif_a6_when">Hôm qua</string>
+
+    <string name="notif_a7_title">10.000 du khách hoạt động hằng tuần</string>
+    <string name="notif_a7_body">Du khách hoạt động tăng 18% so với tuần trước.</string>
+    <string name="notif_a7_when">Hôm qua</string>
+
+    <string name="notif_a8_title">Đã xác nhận khung giờ bảo trì</string>
+    <string name="notif_a8_body">Nâng cấp cơ sở dữ liệu dự kiến CN 2:00 – 3:00 sáng UTC.</string>
+    <string name="notif_a8_when">2 ngày</string>
+
+    <!-- ============================================================
          Bảng điều khiển Doanh nghiệp (ui_kits/business) — Tiếng Việt
          Chỉ dịch phần giao diện; nội dung mẫu (tên, đánh giá, báo cáo)
          giữ nguyên trong BusinessMockData như Bảng quản trị.

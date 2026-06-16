@@ -1,4 +1,5 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.favorite;
+import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +16,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tourgo.R;
-import com.example.tourgo.fragments.FavoriteListFragment;
+import com.example.tourgo.ui.main.favorite.FavoriteListFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 

@@ -1,4 +1,5 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.booking;
+import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.content.Intent;
 import android.os.Bundle;

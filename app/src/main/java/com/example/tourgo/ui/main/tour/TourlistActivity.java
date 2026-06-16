@@ -1,4 +1,4 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.tour;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,8 +11,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.tourgo.R;
 import com.example.tourgo.adapters.SearchPagerAdapter;
-import com.example.tourgo.fragments.HotelListFragment;
-import com.example.tourgo.fragments.TourListFragment;
+import com.example.tourgo.ui.main.hotel.HotelListFragment;
+import com.example.tourgo.ui.main.tour.TourListFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 

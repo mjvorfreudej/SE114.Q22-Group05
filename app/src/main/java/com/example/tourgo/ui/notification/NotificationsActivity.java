@@ -45,6 +45,13 @@ import java.util.List;
 public class NotificationsActivity extends AppCompatActivity
         implements NotificationAdapter.OnNotificationClick {
 
+    /**
+     * Which surface to render: a {@link NotificationMockData.Role} name. Defaults
+     * to {@link NotificationMockData.Role#TRAVELER} when absent, so the existing
+     * Traveler entry points keep working without passing an extra.
+     */
+    public static final String EXTRA_ROLE = "notif_role";
+
     private static final int SKELETON_ROWS = 6;
     private static final long SIMULATED_LOAD_MS = 500L;
     /** Count-badge fill when a chip is selected: 20% white over the dark pill. */
@@ -52,6 +59,7 @@ public class NotificationsActivity extends AppCompatActivity
 
     private ActivityNotificationsBinding binding;
     private NotificationAdapter adapter;
+    private NotificationMockData.Role role = NotificationMockData.Role.TRAVELER;
     private final List<NotificationItem> items = new ArrayList<>();
     private String currentFilter = "all";
     private boolean loading = true;
@@ -64,14 +72,16 @@ public class NotificationsActivity extends AppCompatActivity
         binding = ActivityNotificationsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        role = parseRole(getIntent().getStringExtra(EXTRA_ROLE));
+
         applyInsets();
         applyLightStatusBar();
         applyStaticFonts();
 
         items.clear();
-        items.addAll(NotificationMockData.seed(this));
+        items.addAll(NotificationMockData.seed(this, role));
 
-        adapter = new NotificationAdapter(this);
+        adapter = new NotificationAdapter(this, role);
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(this));
         binding.rvNotifications.setAdapter(adapter);
 
@@ -207,9 +217,21 @@ public class NotificationsActivity extends AppCompatActivity
     private void renderFilters() {
         LinearLayout row = binding.rowNotifFilters;
         row.removeAllViews();
-        for (NotificationMockData.Filter f : NotificationMockData.FILTERS) {
+        for (NotificationMockData.Filter f : NotificationMockData.filters(role)) {
             row.addView(buildChip(f, countFor(f), currentFilter.equals(f.id)));
         }
+    }
+
+    /** Map the {@link #EXTRA_ROLE} string to a role, tolerant of nulls/typos. */
+    private static NotificationMockData.Role parseRole(String name) {
+        if (name != null) {
+            try {
+                return NotificationMockData.Role.valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                // fall through to the default
+            }
+        }
+        return NotificationMockData.Role.TRAVELER;
     }
 
     private int countFor(NotificationMockData.Filter f) {

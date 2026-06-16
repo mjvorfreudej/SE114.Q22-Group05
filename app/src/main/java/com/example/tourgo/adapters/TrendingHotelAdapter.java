@@ -19,7 +19,7 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Favorite;
 import com.example.tourgo.models.response.Hotel;
-import com.example.tourgo.ui.main.DetailActivity;
+import com.example.tourgo.ui.main.detail.DetailActivity;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
 

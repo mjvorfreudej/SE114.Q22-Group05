@@ -1,14 +1,10 @@
-package com.example.tourgo.fragments;
+package com.example.tourgo.ui.main.profile;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,12 +29,12 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.admin.AdminActivity;
+import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
-import com.example.tourgo.ui.main.BookingHistorySection;
+import com.example.tourgo.ui.main.booking.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.ArrayList;
@@ -216,30 +212,26 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showLogoutDialog() {
-        Dialog dialog = new Dialog(requireContext());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_logout);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+        // Shared centered confirm popup (warning icon + red danger button) — same
+        // across Traveler / Business / Admin.
+        AdminUi.confirm(requireContext(),
+                getString(R.string.profile_logout_title),
+                getString(R.string.profile_logout_confirm),
+                getString(R.string.profile_logout_title),
+                true, this::logout);
+    }
 
-        MaterialButton cancel = dialog.findViewById(R.id.btnLogoutCancel);
-        MaterialButton confirm = dialog.findViewById(R.id.btnLogoutConfirm);
-        if (cancel != null) cancel.setOnClickListener(v -> dialog.dismiss());
-        if (confirm != null) confirm.setOnClickListener(v -> {
-            dialog.dismiss();
-            session.clear();
+    private void logout() {
+        session.clear();
 
-            // Clear all repository caches khi logout
-            UserRepository.getInstance().clearCache();
-            FavoriteRepository.getInstance().clearCache();
-            HotelRepository.getInstance().clearCache();
-            TourRepository.getInstance().clearCache();
+        // Clear all repository caches khi logout
+        UserRepository.getInstance().clearCache();
+        FavoriteRepository.getInstance().clearCache();
+        HotelRepository.getInstance().clearCache();
+        TourRepository.getInstance().clearCache();
 
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
-        dialog.show();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }
