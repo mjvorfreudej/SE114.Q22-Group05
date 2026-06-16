@@ -1,4 +1,4 @@
-package com.example.tourgo.fragments;
+package com.example.tourgo.ui.main.favorite;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +24,7 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
-import com.example.tourgo.ui.main.DetailActivity;
+import com.example.tourgo.ui.main.detail.DetailActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;

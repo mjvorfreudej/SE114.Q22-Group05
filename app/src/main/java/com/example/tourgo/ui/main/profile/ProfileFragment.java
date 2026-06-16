@@ -1,4 +1,4 @@
-package com.example.tourgo.fragments;
+package com.example.tourgo.ui.main.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +32,7 @@ import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
-import com.example.tourgo.ui.main.BookingHistorySection;
+import com.example.tourgo.ui.main.booking.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButtonToggleGroup;

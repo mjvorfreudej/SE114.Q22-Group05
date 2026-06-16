@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.tourgo.fragments.HotelListFragment;
-import com.example.tourgo.fragments.TourListFragment;
+import com.example.tourgo.ui.main.hotel.HotelListFragment;
+import com.example.tourgo.ui.main.tour.TourListFragment;
 
 public class SearchPagerAdapter extends FragmentStateAdapter {
 

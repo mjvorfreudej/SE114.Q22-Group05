@@ -1,4 +1,6 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.home;
+import com.example.tourgo.ui.main.detail.DetailActivity;
+import com.example.tourgo.ui.main.tour.CreateTourActivity;
 
 import android.content.Intent;
 import android.os.Bundle;

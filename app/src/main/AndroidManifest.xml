@@ -21,7 +21,7 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ui.main.SearchActivity"
+            android:name=".ui.main.search.SearchActivity"
             android:exported="false" />
 
         <activity
@@ -50,7 +50,7 @@
         </service>
 
         <activity
-            android:name=".ui.main.DetailActivity"
+            android:name=".ui.main.detail.DetailActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.ResetPasswordActivity"
@@ -70,7 +70,7 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.main.home.MainActivity"
             android:exported="true" />
         <activity
             android:name=".ui.auth.LoginActivity"
@@ -83,22 +83,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.main.HotelListAcitivity"
+            android:name=".ui.main.hotel.HotelListAcitivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.ProfileActivity"
+            android:name=".ui.main.profile.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.TourlistActivity"
+            android:name=".ui.main.tour.TourlistActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.BookingActivity"
+            android:name=".ui.main.booking.BookingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.PaymentActivity"
+            android:name=".ui.main.booking.PaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.main.CreateTourActivity"
+            android:name=".ui.main.tour.CreateTourActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity

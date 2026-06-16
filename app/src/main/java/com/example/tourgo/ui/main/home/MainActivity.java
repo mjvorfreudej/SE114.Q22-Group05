@@ -1,4 +1,8 @@
-package com.example.tourgo.ui.main;
+package com.example.tourgo.ui.main.home;
+import com.example.tourgo.ui.main.tour.TourScreenFragment;
+import com.example.tourgo.ui.main.hotel.HotelScreenFragment;
+import com.example.tourgo.ui.main.favorite.FavoriteFragment;
+import com.example.tourgo.ui.main.search.SearchFragment;
 
 import android.os.Bundle;
 import android.view.View;
@@ -20,8 +24,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tourgo.R;
 import com.example.tourgo.data.repository.HotelRepository;
-import com.example.tourgo.fragments.HotelListFragment;
-import com.example.tourgo.fragments.ProfileFragment;
+import com.example.tourgo.ui.main.hotel.HotelListFragment;
+import com.example.tourgo.ui.main.profile.ProfileFragment;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
