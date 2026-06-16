@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
@@ -20,12 +21,22 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminActivityItem;
+import com.example.tourgo.models.response.AdminStats;
+import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.notification.NotificationItem;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
-/** Admin › Home dashboard — KPI tiles, critical alert, quick actions, recent activity. */
+import java.text.NumberFormat;
+import java.util.List;
+
+/** Admin › Home dashboard — KPI tiles, critical alert, quick actions, recent activity (live). */
 public class AdminHomeFragment extends Fragment {
+
+    private View root;
 
     @Nullable
     @Override
@@ -37,43 +48,168 @@ public class AdminHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+        root = v;
 
         setupBell(v);
 
-        // Critical alert
-        ((TextView) v.findViewById(R.id.admAlertTitle)).setText(getString(R.string.adm_alert_title, 23));
-        ((TextView) v.findViewById(R.id.admAlertSub)).setText(getString(R.string.adm_alert_sub, 17, 6));
         v.findViewById(R.id.admBtnOpenMod).setOnClickListener(view -> goTab(AdminActivity.TAB_MODERATION));
 
-        // KPI tiles (label, value, icon, accent ink, soft bg, optional +delta)
-        stat(v, R.id.admStat1, R.drawable.ic_users, R.color.adm_blue_700, R.color.adm_blue_50, "12.4k", R.string.adm_stat_users, "+312");
-        stat(v, R.id.admStat2, R.drawable.ic_building, R.color.adm_teal_ink, R.color.adm_teal_50, "184", R.string.adm_stat_biz, "+8");
-        stat(v, R.id.admStat3, R.drawable.ic_map, R.color.adm_purple_ink, R.color.adm_purple_50, "1268", R.string.adm_stat_listings, "+34");
-        stat(v, R.id.admStat4, R.drawable.ic_gavel, R.color.adm_orange_ink, R.color.adm_orange_50, "17", R.string.adm_stat_pending, null);
-        stat(v, R.id.admStat5, R.drawable.ic_flag, R.color.adm_red_700, R.color.adm_red_100, "6", R.string.adm_stat_reports, null);
-        stat(v, R.id.admStat6, R.drawable.ic_shield_x, R.color.adm_red_700, R.color.adm_red_100, "3", R.string.adm_stat_flagged, null);
+        // KPI tile chrome (icon + label). Values fill in from GET /api/admin/stats.
+        stat(v, R.id.admStat1, R.drawable.ic_users, R.color.adm_blue_700, R.color.adm_blue_50, "—", R.string.adm_stat_users);
+        stat(v, R.id.admStat2, R.drawable.ic_building, R.color.adm_teal_ink, R.color.adm_teal_50, "—", R.string.adm_stat_biz);
+        stat(v, R.id.admStat3, R.drawable.ic_map, R.color.adm_purple_ink, R.color.adm_purple_50, "—", R.string.adm_stat_listings);
+        stat(v, R.id.admStat4, R.drawable.ic_gavel, R.color.adm_orange_ink, R.color.adm_orange_50, "—", R.string.adm_stat_pending);
+        stat(v, R.id.admStat5, R.drawable.ic_flag, R.color.adm_red_700, R.color.adm_red_100, "—", R.string.adm_stat_reports);
+        stat(v, R.id.admStat6, R.drawable.ic_shield_x, R.color.adm_red_700, R.color.adm_red_100, "—", R.string.adm_stat_flagged);
 
-        // Quick actions (cat hotel=amber, special=purple, tour=teal)
+        // Quick actions chrome (subtitle + badge fill in from stats).
         action(v, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
-                R.string.adm_qa_review_listings, getString(R.string.adm_qa_review_listings_sub, 17), 17, AdminActivity.TAB_MODERATION);
+                R.string.adm_qa_review_listings, "", 0, AdminActivity.TAB_MODERATION);
         action(v, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
-                R.string.adm_qa_review_reports, getString(R.string.adm_qa_review_reports_sub, 6), 6, AdminActivity.TAB_MODERATION);
+                R.string.adm_qa_review_reports, "", 0, AdminActivity.TAB_MODERATION);
         action(v, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
-                R.string.adm_qa_browse_users, getString(R.string.adm_qa_browse_users_sub, "12,438"), 0, AdminActivity.TAB_USERS);
+                R.string.adm_qa_browse_users, "", 0, AdminActivity.TAB_USERS);
 
-        // Recent activity
-        LinearLayout list = v.findViewById(R.id.admActivityList);
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        addActivity(inf, list, R.drawable.ic_building, R.color.adm_purple_100, R.color.adm_purple_500,
-                span("Skyline Marina", " registered as a new business", true), "Awaiting approval · 7 listings", "2m", false);
-        addActivity(inf, list, R.drawable.ic_map, R.color.adm_amber_100, R.color.adm_amber_500,
-                span("The Grand Orchid Resort", " submitted a new listing", true), "Hotel · Bangkok, Thailand", "24m", false);
-        addActivity(inf, list, R.drawable.ic_flag, R.color.adm_red_100, R.color.adm_red_500,
-                spanMid("New report on ", "guest_jay_88", " for toxic language"), "Filed by Cedar Cove LLC", "1h", false);
-        addActivity(inf, list, R.drawable.ic_map, R.color.adm_teal_100, R.color.adm_teal_500,
-                span("Riverbend Tours Co.", " submitted a new listing", true), "Tour · Kyoto, Japan", "3h", false);
-        addActivity(inf, list, R.drawable.ic_users, R.color.adm_purple_100, R.color.adm_purple_500,
-                new SpannableStringBuilder("14 new traveler accounts created"), "Last 24 hours", "6h", true);
+        loadStats();
+        loadActivity();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Keep the dashboard in sync after approvals / suspensions elsewhere.
+        loadStats();
+        loadActivity();
+    }
+
+    // ── Live data ─────────────────────────────────────────────────────────────
+    private void loadStats() {
+        AdminService.getStats(requireContext(), new DataCallback<AdminStats>() {
+            @Override
+            public void onSuccess(AdminStats s) {
+                if (!isAdded() || root == null || s == null) return;
+
+                stat(root, R.id.admStat1, R.drawable.ic_users, R.color.adm_blue_700, R.color.adm_blue_50, fmt(s.getUsers()), R.string.adm_stat_users);
+                stat(root, R.id.admStat2, R.drawable.ic_building, R.color.adm_teal_ink, R.color.adm_teal_50, fmt(s.getBusinesses()), R.string.adm_stat_biz);
+                stat(root, R.id.admStat3, R.drawable.ic_map, R.color.adm_purple_ink, R.color.adm_purple_50, fmt(s.getListings()), R.string.adm_stat_listings);
+                stat(root, R.id.admStat4, R.drawable.ic_gavel, R.color.adm_orange_ink, R.color.adm_orange_50, fmt(s.getPendingListings()), R.string.adm_stat_pending);
+                stat(root, R.id.admStat5, R.drawable.ic_flag, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getReports()), R.string.adm_stat_reports);
+                stat(root, R.id.admStat6, R.drawable.ic_shield_x, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getFlaggedUsers()), R.string.adm_stat_flagged);
+
+                ((TextView) root.findViewById(R.id.admAlertTitle))
+                        .setText(getString(R.string.adm_alert_title, s.getQueueTotal()));
+                ((TextView) root.findViewById(R.id.admAlertSub))
+                        .setText(getString(R.string.adm_alert_sub, s.getPendingListings(), s.getReports()));
+
+                action(root, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
+                        R.string.adm_qa_review_listings, getString(R.string.adm_qa_review_listings_sub, s.getPendingListings()),
+                        s.getPendingListings(), AdminActivity.TAB_MODERATION);
+                action(root, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
+                        R.string.adm_qa_review_reports, getString(R.string.adm_qa_review_reports_sub, s.getReports()),
+                        s.getReports(), AdminActivity.TAB_MODERATION);
+                action(root, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
+                        R.string.adm_qa_browse_users, getString(R.string.adm_qa_browse_users_sub, fmt(s.getUsers())),
+                        0, AdminActivity.TAB_USERS);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadActivity() {
+        AdminService.getActivity(requireContext(), new DataCallback<List<AdminActivityItem>>() {
+            @Override
+            public void onSuccess(List<AdminActivityItem> items) {
+                if (!isAdded() || root == null) return;
+                LinearLayout list = root.findViewById(R.id.admActivityList);
+                list.removeAllViews();
+                if (items == null || items.isEmpty()) return;
+                LayoutInflater inf = LayoutInflater.from(requireContext());
+                for (int i = 0; i < items.size(); i++) {
+                    AdminActivityItem a = items.get(i);
+                    int icon = iconFor(a.getKind());
+                    int soft = softFor(a.getKind());
+                    int accent = accentFor(a.getKind());
+                    addActivity(inf, list, icon, soft, accent, title(a), a.getMeta(),
+                            relativeTime(a.getCreatedAt()), i == items.size() - 1);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the recent-activity section empty on failure.
+            }
+        });
+    }
+
+    private SpannableStringBuilder title(AdminActivityItem a) {
+        return span(a.getBold(), a.getRest(), true);
+    }
+
+    private int iconFor(String kind) {
+        switch (kind) {
+            case "report": return R.drawable.ic_flag;
+            case "tour":   return R.drawable.ic_map;
+            case "user":   return R.drawable.ic_users;
+            case "business":
+            default:       return R.drawable.ic_building;
+        }
+    }
+
+    @ColorRes
+    private int softFor(String kind) {
+        switch (kind) {
+            case "report": return R.color.adm_red_100;
+            case "tour":   return R.color.adm_teal_100;
+            case "business":
+            case "user":
+            default:       return R.color.adm_purple_100;
+        }
+    }
+
+    @ColorRes
+    private int accentFor(String kind) {
+        switch (kind) {
+            case "report": return R.color.adm_red_500;
+            case "tour":   return R.color.adm_teal_500;
+            case "business":
+            case "user":
+            default:       return R.color.adm_purple_500;
+        }
+    }
+
+    private String fmt(int n) {
+        return NumberFormat.getInstance().format(n);
+    }
+
+    /**
+     * Short relative time ("2m", "3h", "Yesterday", "5d") from an ISO timestamp.
+     * Falls back to the raw date portion (or empty) when parsing fails.
+     */
+    private String relativeTime(String iso) {
+        if (iso == null || iso.length() < 19) return iso != null && iso.length() >= 10 ? iso.substring(0, 10) : "";
+        try {
+            java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US);
+            f.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            long then = f.parse(iso.substring(0, 19)).getTime();
+            long diff = System.currentTimeMillis() - then;
+            if (diff < 0) diff = 0;
+            long min = diff / 60000;
+            if (min < 1) return "now";
+            if (min < 60) return min + "m";
+            long hr = min / 60;
+            if (hr < 24) return hr + "h";
+            long day = hr / 24;
+            if (day == 1) return getString(R.string.adm_time_yesterday);
+            return day + "d";
+        } catch (Exception e) {
+            return iso.length() >= 10 ? iso.substring(0, 10) : "";
+        }
     }
 
     private void goTab(int tab) {
@@ -82,8 +218,7 @@ public class AdminHomeFragment extends Fragment {
 
     /**
      * Header bell → Admin notification popover (design index.html, role="admin").
-     * The red count badge shows the initial unread tally; the popover and full center
-     * hold their own optimistic state, mirroring the prototype (no notifications API yet).
+     * Notifications are a separate module and remain on their own optimistic state.
      */
     private void setupBell(View root) {
         View bell = root.findViewById(R.id.admBellBtn);
@@ -104,7 +239,7 @@ public class AdminHomeFragment extends Fragment {
     }
 
     private void stat(View root, int id, int iconRes, @ColorRes int accent, @ColorRes int soft,
-                      String value, int labelRes, @Nullable String delta) {
+                      String value, int labelRes) {
         View tile = root.findViewById(id);
         tile.findViewById(R.id.admStatIconWrap).setBackgroundTintList(ColorStateList.valueOf(color(soft)));
         ImageView icon = tile.findViewById(R.id.admStatIcon);
@@ -112,11 +247,8 @@ public class AdminHomeFragment extends Fragment {
         icon.setImageTintList(ColorStateList.valueOf(color(accent)));
         ((TextView) tile.findViewById(R.id.admStatValue)).setText(value);
         ((TextView) tile.findViewById(R.id.admStatLabel)).setText(labelRes);
-        TextView d = tile.findViewById(R.id.admStatDelta);
-        if (delta != null) {
-            d.setText(delta);
-            d.setVisibility(View.VISIBLE);
-        }
+        View delta = tile.findViewById(R.id.admStatDelta);
+        if (delta != null) delta.setVisibility(View.GONE);
     }
 
     private void action(View root, int id, int iconRes, @ColorRes int soft, @ColorRes int accent,
@@ -132,6 +264,8 @@ public class AdminHomeFragment extends Fragment {
         if (badge > 0) {
             badgeView.setText(String.valueOf(badge));
             badgeView.setVisibility(View.VISIBLE);
+        } else {
+            badgeView.setVisibility(View.GONE);
         }
         row.setOnClickListener(view -> goTab(targetTab));
     }
@@ -161,15 +295,6 @@ public class AdminHomeFragment extends Fragment {
             sb.setSpan(new StyleSpan(Typeface.BOLD), 0, bold.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append(rest);
         }
-        return sb;
-    }
-
-    private static SpannableStringBuilder spanMid(String before, String bold, String after) {
-        SpannableStringBuilder sb = new SpannableStringBuilder(before);
-        int start = sb.length();
-        sb.append(bold);
-        sb.setSpan(new StyleSpan(Typeface.BOLD), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.append(after);
         return sb;
     }
 }

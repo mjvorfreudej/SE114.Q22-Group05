@@ -1,6 +1,11 @@
 package com.example.tourgo.remote.api;
 
 import com.example.tourgo.models.response.AdminAccount;
+import com.example.tourgo.models.response.AdminActivityItem;
+import com.example.tourgo.models.response.AdminAuditEntry;
+import com.example.tourgo.models.response.AdminReport;
+import com.example.tourgo.models.response.AdminStats;
+import com.example.tourgo.models.response.AdminTeamMember;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
 
@@ -48,4 +53,38 @@ public interface AdminApi {
     /** Re-activate / unlock a user. */
     @PUT("api/admin/users/{id}/activate")
     Call<ApiResponse<Void>> activateUser(@Path("id") String userId);
+
+    // ── Dashboard ──────────────────────────────────────────────────────────────
+
+    /** Live KPI counts for the Admin home dashboard. */
+    @GET("api/admin/stats")
+    Call<ApiResponse<AdminStats>> getStats();
+
+    /** Recent activity feed for the Admin home dashboard. */
+    @GET("api/admin/activity")
+    Call<ApiResponse<List<AdminActivityItem>>> getActivity();
+
+    // ── Reports (Moderation) ─────────────────────────────────────────────────────
+
+    /** Open user reports awaiting moderation. */
+    @GET("api/admin/reports")
+    Call<ApiResponse<List<AdminReport>>> getReports();
+
+    /** Dismiss a report (no action taken). */
+    @PUT("api/admin/reports/{id}/dismiss")
+    Call<ApiResponse<Void>> dismissReport(@Path("id") String reportId);
+
+    /** Resolve a report (action taken against the target). */
+    @PUT("api/admin/reports/{id}/resolve")
+    Call<ApiResponse<Void>> resolveReport(@Path("id") String reportId);
+
+    // ── Profile ──────────────────────────────────────────────────────────────────
+
+    /** Admin team members (users with role = admin). */
+    @GET("api/admin/team")
+    Call<ApiResponse<List<AdminTeamMember>>> getTeam();
+
+    /** Recent moderation actions for the audit log. */
+    @GET("api/admin/audit-log")
+    Call<ApiResponse<List<AdminAuditEntry>>> getAuditLog();
 }

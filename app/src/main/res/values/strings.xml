@@ -341,6 +341,7 @@
     <string name="adm_stat_flagged">Người dùng bị gắn cờ</string>
     <string name="adm_alert_title">%d mục cần bạn duyệt</string>
     <string name="adm_alert_sub">%1$d tin chờ duyệt · %2$d báo cáo đang mở</string>
+    <string name="adm_time_yesterday">Hôm qua</string>
     <string name="adm_open">Mở</string>
     <string name="adm_quick_actions">Thao tác nhanh</string>
     <string name="adm_qa_review_listings">Duyệt tin đăng chờ</string>

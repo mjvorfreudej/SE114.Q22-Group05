@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminReport;
 import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.remote.service.TourService;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
 import com.example.tourgo.ui.admin.AdminMockData.UserReport;
@@ -33,12 +35,15 @@ import java.util.List;
 /** Admin › Moderation — pending tours (from the backend) & user reports. */
 public class AdminModerationFragment extends Fragment {
 
-    // Pending tours are fetched live from the server (GET /api/tours/pending).
+    // Both lists are fetched live from the backend:
+    //   pending tours  → GET /api/tours/pending
+    //   user reports   → GET /api/admin/reports
     private final List<PendingListing> listings = new ArrayList<>();
-    private final List<UserReport> reports = AdminMockData.userReports();
+    private final List<UserReport> reports = new ArrayList<>();
 
     private PendingListingAdapter listingAdapter;
     private ReportAdapter reportAdapter;
+    private LinearLayout tabsContainer;
     private RecyclerView rv;
     private ProgressBar progress;
     private TextView empty;
@@ -65,24 +70,32 @@ public class AdminModerationFragment extends Fragment {
         listingAdapter.setItems(listings);
         reportAdapter.setItems(reports);
 
-        LinearLayout tabs = v.findViewById(R.id.admTopTabs);
-        java.util.List<AdminTabBar.Tab> tabList = new java.util.ArrayList<>();
-        tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_tab_pending_listings), 17));
-        tabList.add(new AdminTabBar.Tab("reports", getString(R.string.adm_tab_user_reports), 6));
-        AdminTabBar.build(tabs, tabList, tab, id -> {
-            tab = id;
-            showTab();
-        });
+        tabsContainer = v.findViewById(R.id.admTopTabs);
+        buildTabs();
 
         showTab();
         loadPendingTours();
+        loadReports();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh so newly submitted / externally approved tours stay in sync.
+        // Refresh so newly submitted tours / filed reports stay in sync.
         loadPendingTours();
+        loadReports();
+    }
+
+    /** (Re)build the segmented tab strip with the current live counts. */
+    private void buildTabs() {
+        if (tabsContainer == null) return;
+        List<AdminTabBar.Tab> tabList = new ArrayList<>();
+        tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_tab_pending_listings), listings.size()));
+        tabList.add(new AdminTabBar.Tab("reports", getString(R.string.adm_tab_user_reports), reports.size()));
+        AdminTabBar.build(tabsContainer, tabList, tab, id -> {
+            tab = id;
+            showTab();
+        });
     }
 
     private void showTab() {
@@ -91,13 +104,12 @@ public class AdminModerationFragment extends Fragment {
     }
 
     private void loadPendingTours() {
-        if (!"pending".equals(tab)) return;
-        setLoading(true);
+        if ("pending".equals(tab)) setLoading(true);
         TourService.getPendingTours(requireContext(), new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> tours) {
                 if (!isAdded()) return;
-                setLoading(false);
+                if ("pending".equals(tab)) setLoading(false);
                 listings.clear();
                 if (tours != null) {
                     for (Tour tour : tours) {
@@ -105,18 +117,49 @@ public class AdminModerationFragment extends Fragment {
                     }
                 }
                 listingAdapter.setItems(listings);
+                buildTabs();
                 updateEmptyState();
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
                 if (!isAdded()) return;
-                setLoading(false);
+                if ("pending".equals(tab)) setLoading(false);
                 listings.clear();
                 listingAdapter.setItems(listings);
+                buildTabs();
                 updateEmptyState();
                 Toast.makeText(requireContext(),
                         msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadReports() {
+        if ("reports".equals(tab)) setLoading(true);
+        AdminService.getReports(requireContext(), new DataCallback<List<AdminReport>>() {
+            @Override
+            public void onSuccess(List<AdminReport> data) {
+                if (!isAdded()) return;
+                if ("reports".equals(tab)) setLoading(false);
+                reports.clear();
+                if (data != null) {
+                    for (AdminReport r : data) reports.add(UserReport.fromServer(r));
+                }
+                reportAdapter.setItems(reports);
+                buildTabs();
+                updateEmptyState();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                if ("reports".equals(tab)) setLoading(false);
+                reports.clear();
+                reportAdapter.setItems(reports);
+                buildTabs();
+                updateEmptyState();
+                // No toast here — an empty reports table is a valid state.
             }
         });
     }
@@ -128,8 +171,8 @@ public class AdminModerationFragment extends Fragment {
 
     private void updateEmptyState() {
         if (empty == null) return;
-        boolean showEmpty = "pending".equals(tab) && listings.isEmpty()
-                && progress != null && progress.getVisibility() != View.VISIBLE;
+        boolean listEmpty = "pending".equals(tab) ? listings.isEmpty() : reports.isEmpty();
+        boolean showEmpty = listEmpty && progress != null && progress.getVisibility() != View.VISIBLE;
         empty.setVisibility(showEmpty ? View.VISIBLE : View.GONE);
     }
 
@@ -204,20 +247,53 @@ public class AdminModerationFragment extends Fragment {
         ((TextView) sheet.findViewById(R.id.admReportReasoning)).setText(r.reasoning);
 
         sheet.findViewById(R.id.admReportClose).setOnClickListener(view -> dialog.dismiss());
+        // "Contact both" has no backend action — it's an out-of-band message.
         sheet.findViewById(R.id.admBtnContactBoth).setOnClickListener(view -> {
             dialog.dismiss();
             toast(R.string.adm_toast_contacted);
         });
-        sheet.findViewById(R.id.admBtnDismiss).setOnClickListener(view -> {
-            dialog.dismiss();
-            toast(R.string.adm_toast_report_dismissed);
-        });
-        sheet.findViewById(R.id.admBtnApproveReport).setOnClickListener(view -> {
-            dialog.dismiss();
-            toast(R.string.adm_toast_report_approved);
-        });
+        // Dismiss → mark the report dismissed (no action against the target).
+        sheet.findViewById(R.id.admBtnDismiss).setOnClickListener(view ->
+                actOnReport(r, dialog, false, R.string.adm_toast_report_dismissed));
+        // Approve → resolve the report (action taken against the target).
+        sheet.findViewById(R.id.admBtnApproveReport).setOnClickListener(view ->
+                actOnReport(r, dialog, true, R.string.adm_toast_report_approved));
 
         dialog.show();
+    }
+
+    /**
+     * Dismiss or resolve a report via the backend
+     * (PUT /api/admin/reports/{id}/dismiss|resolve). On success the row leaves
+     * the open-reports list.
+     */
+    private void actOnReport(UserReport r, BottomSheetDialog dialog, boolean resolve, int toastRes) {
+        if (r.serverId == null) {
+            dialog.dismiss();
+            toast(toastRes);
+            return;
+        }
+        DataCallback<Void> cb = new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                if (!isAdded()) return;
+                dialog.dismiss();
+                reports.remove(r);
+                reportAdapter.setItems(reports);
+                buildTabs();
+                updateEmptyState();
+                toast(toastRes);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        };
+        if (resolve) AdminService.resolveReport(requireContext(), r.serverId, cb);
+        else AdminService.dismissReport(requireContext(), r.serverId, cb);
     }
 
     private void expandFull(BottomSheetDialog dialog, View sheet) {

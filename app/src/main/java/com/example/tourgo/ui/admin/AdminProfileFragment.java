@@ -33,35 +33,23 @@ import com.example.tourgo.data.repository.FavoriteRepository;
 import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.data.repository.UserRepository;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminAuditEntry;
+import com.example.tourgo.models.response.AdminTeamMember;
+import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationsActivity;
 import com.example.tourgo.utils.LocaleHelper;
+
+import java.util.List;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
 /** Admin › Profile / Settings — account card, moderation & preferences rows, log out. */
 public class AdminProfileFragment extends Fragment {
-
-    // ── Sample data (mirrors AdminMockData's "content kept verbatim" convention) ──
-    // {name, email, role label, role kind}
-    private static final String[][] TEAM = {
-            {"Jamie Sato", "admin@tourgo.app", "Owner", "owner"},
-            {"Priya Nair", "priya@tourgo.app", "Moderator", "mod"},
-            {"Marcus Lee", "marcus@tourgo.app", "Moderator", "mod"},
-            {"Sofia Alvarez", "sofia@tourgo.app", "Support", "support"},
-    };
-
-    // {action, actor • when, kind}
-    private static final String[][] AUDIT = {
-            {"Approved listing “Cedar Cove Seaside Stay”", "Jamie Sato • 2h ago", "approve"},
-            {"Suspended user guest_jay_88", "Priya Nair • 5h ago", "suspend"},
-            {"Rejected listing “Bargain City Day Tour”", "Marcus Lee • Yesterday", "reject"},
-            {"Requested revision on “Skyline Marina”", "Jamie Sato • Yesterday", "revision"},
-            {"Changed Sofia Alvarez’s role to Support", "Jamie Sato • 2 days ago", "role"},
-            {"Updated the moderation policy", "Jamie Sato • 3 days ago", "policy"},
-    };
 
     @Nullable
     @Override
@@ -124,26 +112,41 @@ public class AdminProfileFragment extends Fragment {
         d.show();
     }
 
-    // ── Admin team & roles ────────────────────────────────────────────────────
+    // ── Admin team & roles (live: GET /api/admin/team) ─────────────────────────
     private void openAdminTeam() {
         BottomSheetDialog d = scaffold(R.drawable.ic_users, R.string.adm_admin_team);
         LinearLayout body = body(d);
         sectionLabel(body, getString(R.string.adm_team_members));
 
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        for (String[] m : TEAM) {
-            View card = inf.inflate(R.layout.item_admin_team_member, body, false);
-            AdminUi.avatar(card.findViewById(R.id.admMemberAvatar), m[0]);
-            ((TextView) card.findViewById(R.id.admMemberName)).setText(m[0]);
-            ((TextView) card.findViewById(R.id.admMemberEmail)).setText(m[1]);
-            TextView chip = card.findViewById(R.id.admMemberRole);
-            chip.setText(m[2]);
-            styleRoleChip(chip, m[3]);
-            body.addView(card);
-        }
-
+        // The invite button is added now (synchronously); members are inserted
+        // above it as soon as the request returns.
         primaryButton(body, getString(R.string.adm_team_invite), R.color.adm_gray_100, R.color.adm_gray_900,
                 view -> { d.dismiss(); toast(R.string.adm_toast_invite_sent); });
+
+        AdminService.getTeam(requireContext(), new DataCallback<List<AdminTeamMember>>() {
+            @Override
+            public void onSuccess(List<AdminTeamMember> members) {
+                if (!isAdded() || members == null) return;
+                LayoutInflater inf = LayoutInflater.from(requireContext());
+                int pos = 1; // after the section label, before the invite button
+                for (AdminTeamMember m : members) {
+                    View card = inf.inflate(R.layout.item_admin_team_member, body, false);
+                    AdminUi.avatar(card.findViewById(R.id.admMemberAvatar), m.getName());
+                    ((TextView) card.findViewById(R.id.admMemberName)).setText(m.getName());
+                    ((TextView) card.findViewById(R.id.admMemberEmail)).setText(m.getEmail());
+                    TextView chip = card.findViewById(R.id.admMemberRole);
+                    chip.setText(m.getRole());
+                    styleRoleChip(chip, "owner");
+                    body.addView(card, pos++);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the team section empty on failure.
+            }
+        });
+
         d.show();
     }
 
@@ -159,21 +162,40 @@ public class AdminProfileFragment extends Fragment {
         chip.setTextColor(color(ink));
     }
 
-    // ── Audit log ─────────────────────────────────────────────────────────────
+    // ── Audit log (live: GET /api/admin/audit-log) ─────────────────────────────
     private void openAuditLog() {
         BottomSheetDialog d = scaffold(R.drawable.ic_history, R.string.adm_audit_log);
         LinearLayout body = body(d);
         sectionLabel(body, getString(R.string.adm_audit_recent));
 
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        for (String[] e : AUDIT) {
-            View card = inf.inflate(R.layout.item_admin_audit, body, false);
-            ((TextView) card.findViewById(R.id.admAuditAction)).setText(e[0]);
-            ((TextView) card.findViewById(R.id.admAuditMeta)).setText(e[1]);
-            applyAuditIcon(card, e[2]);
-            body.addView(card);
-        }
+        AdminService.getAuditLog(requireContext(), new DataCallback<List<AdminAuditEntry>>() {
+            @Override
+            public void onSuccess(List<AdminAuditEntry> logs) {
+                if (!isAdded() || logs == null) return;
+                LayoutInflater inf = LayoutInflater.from(requireContext());
+                for (AdminAuditEntry e : logs) {
+                    View card = inf.inflate(R.layout.item_admin_audit, body, false);
+                    ((TextView) card.findViewById(R.id.admAuditAction)).setText(e.getAction());
+                    ((TextView) card.findViewById(R.id.admAuditMeta)).setText(auditMeta(e));
+                    applyAuditIcon(card, e.getKind());
+                    body.addView(card);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the audit log empty on failure.
+            }
+        });
+
         d.show();
+    }
+
+    /** "Actor • 2h" meta line for an audit entry. */
+    private String auditMeta(AdminAuditEntry e) {
+        String when = AdminMockData.relativeShort(e.getCreatedAt());
+        if (e.getActorName().isEmpty()) return when;
+        return when.isEmpty() ? e.getActorName() : e.getActorName() + " • " + when;
     }
 
     private void applyAuditIcon(View card, String kind) {

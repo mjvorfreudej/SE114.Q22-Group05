@@ -321,6 +321,7 @@
     <string name="adm_stat_flagged">Flagged Users</string>
     <string name="adm_alert_title">%d items need your review</string>
     <string name="adm_alert_sub">%1$d pending listings · %2$d active reports</string>
+    <string name="adm_time_yesterday">Yesterday</string>
     <string name="adm_open">Open</string>
     <string name="adm_quick_actions">Quick Actions</string>
     <string name="adm_qa_review_listings">Review pending listings</string>

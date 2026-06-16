@@ -6,6 +6,11 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
 import com.example.tourgo.models.response.AdminAccount;
+import com.example.tourgo.models.response.AdminActivityItem;
+import com.example.tourgo.models.response.AdminAuditEntry;
+import com.example.tourgo.models.response.AdminReport;
+import com.example.tourgo.models.response.AdminStats;
+import com.example.tourgo.models.response.AdminTeamMember;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.remote.RetrofitClient;
@@ -121,7 +126,71 @@ public class AdminService {
         Call<ApiResponse<Void>> call = suspend
                 ? RetrofitClient.getInstance(context).getAdminApi().suspendUser(userId)
                 : RetrofitClient.getInstance(context).getAdminApi().activateUser(userId);
+        enqueueVoid(call, callback);
+    }
 
+    // ── Dashboard ──────────────────────────────────────────────────────────────
+
+    public static void getStats(Context context, DataCallback<AdminStats> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getStats(), callback);
+    }
+
+    public static void getActivity(Context context, DataCallback<List<AdminActivityItem>> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getActivity(), callback);
+    }
+
+    // ── Reports (Moderation) ─────────────────────────────────────────────────────
+
+    public static void getReports(Context context, DataCallback<List<AdminReport>> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getReports(), callback);
+    }
+
+    public static void dismissReport(Context context, String reportId, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi().dismissReport(reportId), callback);
+    }
+
+    public static void resolveReport(Context context, String reportId, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi().resolveReport(reportId), callback);
+    }
+
+    // ── Profile ──────────────────────────────────────────────────────────────────
+
+    public static void getTeam(Context context, DataCallback<List<AdminTeamMember>> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getTeam(), callback);
+    }
+
+    public static void getAuditLog(Context context, DataCallback<List<AdminAuditEntry>> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getAuditLog(), callback);
+    }
+
+    // ── Shared enqueue helpers ───────────────────────────────────────────────────
+
+    /** Enqueue a call whose success payload is required (non-null data). */
+    private static <T> void enqueueData(Call<ApiResponse<T>> call, DataCallback<T> callback) {
+        call.enqueue(new Callback<ApiResponse<T>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<T>> call, Response<ApiResponse<T>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<T> apiResponse = response.body();
+                    if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                        callback.onSuccess(apiResponse.getData());
+                        return;
+                    }
+                }
+                ApiError error = ErrorHandler.parseError(response);
+                callback.onError(error.getCode(), error.getMessage());
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<T>> call, Throwable t) {
+                ApiError error = ErrorHandler.parseError(t);
+                callback.onError(error.getCode(), error.getMessage());
+            }
+        });
+    }
+
+    /** Enqueue a call that only signals success/failure (no payload). */
+    private static void enqueueVoid(Call<ApiResponse<Void>> call, DataCallback<Void> callback) {
         call.enqueue(new Callback<ApiResponse<Void>>() {
             @Override
             public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
@@ -129,14 +198,11 @@ public class AdminService {
                     ApiResponse<Void> apiResponse = response.body();
                     if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
                         callback.onSuccess(null);
-                    } else {
-                        ApiError error = ErrorHandler.parseError(response);
-                        callback.onError(error.getCode(), error.getMessage());
+                        return;
                     }
-                } else {
-                    ApiError error = ErrorHandler.parseError(response);
-                    callback.onError(error.getCode(), error.getMessage());
                 }
+                ApiError error = ErrorHandler.parseError(response);
+                callback.onError(error.getCode(), error.getMessage());
             }
 
             @Override
