@@ -51,11 +51,13 @@ public class BusinessProfileFragment extends Fragment {
         addRow(inf, prefs, R.drawable.ic_lock_24, R.string.biz_row_security, 0);
         addRow(inf, prefs, R.drawable.ic_help_circle, R.string.biz_row_help, 0);
 
+        // Shared centered confirm popup (warning icon + red danger button) — same
+        // across Traveler / Business / Admin.
         v.findViewById(R.id.bizLogout).setOnClickListener(view ->
                 AdminUi.confirm(requireContext(),
-                        getString(R.string.biz_logout),
-                        getString(R.string.biz_toast_logout),
-                        getString(R.string.biz_logout), true, this::logout));
+                        getString(R.string.profile_logout_title),
+                        getString(R.string.profile_logout_confirm),
+                        getString(R.string.profile_logout_title), true, this::logout));
     }
 
     private void addRow(LayoutInflater inf, LinearLayout parent, int iconRes, int labelRes, int trailingRes) {

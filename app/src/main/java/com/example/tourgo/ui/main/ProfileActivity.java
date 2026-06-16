@@ -1,12 +1,8 @@
 package com.example.tourgo.ui.main;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,10 +16,10 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.service.UserService;
+import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
 import java.util.ArrayList;
@@ -95,25 +91,21 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void showLogoutDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_logout);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+        // Shared centered confirm popup (warning icon + red danger button) — same
+        // across Traveler / Business / Admin.
+        AdminUi.confirm(this,
+                getString(R.string.profile_logout_title),
+                getString(R.string.profile_logout_confirm),
+                getString(R.string.profile_logout_title),
+                true, this::logout);
+    }
 
-        MaterialButton cancel = dialog.findViewById(R.id.btnLogoutCancel);
-        MaterialButton confirm = dialog.findViewById(R.id.btnLogoutConfirm);
-        if (cancel != null) cancel.setOnClickListener(v -> dialog.dismiss());
-        if (confirm != null) confirm.setOnClickListener(v -> {
-            dialog.dismiss();
-            session.clear();
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
-        dialog.show();
+    private void logout() {
+        session.clear();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void setupLanguage() {
