@@ -29,6 +29,10 @@
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
     <string name="login_or_with">Or Log In With</string>
+    <string name="login_with_google">Log in with Google</string>
+    <string name="login_with_facebook">Log in with Facebook</string>
+    <string name="login_social_failed">Social sign-in failed. Please try again.</string>
+    <string name="login_fb_pending">Facebook login is coming soon.</string>
     <string name="register_or_with">Or Sign up With</string>
 
     <!-- activity_register.xml -->

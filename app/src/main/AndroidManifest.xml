@@ -75,11 +75,24 @@
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.TourGo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Facebook (Supabase) web-OAuth redirect target. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="login-callback"
+                    android:scheme="tourgo" />
             </intent-filter>
         </activity>
         <activity

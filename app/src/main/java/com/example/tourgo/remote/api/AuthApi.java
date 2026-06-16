@@ -1,6 +1,7 @@
 package com.example.tourgo.remote.api;
 
 import com.example.tourgo.models.request.LoginRequest;
+import com.example.tourgo.models.request.SocialLoginRequest;
 import com.example.tourgo.models.request.RefreshTokenRequest;
 import com.example.tourgo.models.request.RegisterRequest;
 import com.example.tourgo.models.request.ResetPasswordRequest;
@@ -15,6 +16,9 @@ import retrofit2.http.POST;
 public interface AuthApi {
     @POST("api/auth/login")
     Call<ApiResponse<AuthData>> login(@Body LoginRequest request);
+
+    @POST("api/auth/social")
+    Call<ApiResponse<AuthData>> socialLogin(@Body SocialLoginRequest request);
 
     @POST("api/auth/register")
     Call<ApiResponse<AuthData>> register(@Body RegisterRequest request);
