@@ -18,6 +18,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
 import com.example.tourgo.ui.business.BusinessMockData.RecentBooking;
+import com.example.tourgo.ui.notification.NotificationItem;
+import com.example.tourgo.ui.notification.NotificationMockData;
+import com.example.tourgo.ui.notification.NotificationPopover;
 
 /** Business › Home dashboard — welcome banner, 4 KPI tiles, quick actions, recent bookings. */
 public class BusinessHomeFragment extends Fragment {
@@ -33,6 +36,8 @@ public class BusinessHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
         LayoutInflater inf = LayoutInflater.from(requireContext());
+
+        setupBell(v);
 
         // KPI tiles (2×2)
         GridLayout grid = v.findViewById(R.id.bizStatGrid);
@@ -73,6 +78,29 @@ public class BusinessHomeFragment extends Fragment {
 
     private BusinessActivity activity() {
         return (BusinessActivity) requireActivity();
+    }
+
+    /**
+     * Header bell → Business notification popover (design index.html, role="business").
+     * The red count badge shows the initial unread tally; the popover and full center
+     * hold their own optimistic state, mirroring the prototype (no notifications API yet).
+     */
+    private void setupBell(View root) {
+        View bell = root.findViewById(R.id.bizBellBtn);
+        TextView badge = root.findViewById(R.id.bizBellBadge);
+
+        int unread = 0;
+        for (NotificationItem n : NotificationMockData.seed(requireContext(), NotificationMockData.Role.BUSINESS)) {
+            if (!n.read) unread++;
+        }
+        if (unread > 0) {
+            badge.setText(unread > 9 ? "9+" : String.valueOf(unread));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+
+        bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.BUSINESS));
     }
 
     private void addStat(LayoutInflater inf, GridLayout grid, int index, int iconRes,

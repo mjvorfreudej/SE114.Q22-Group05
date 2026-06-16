@@ -49,6 +49,8 @@
     <color name="adm_teal_500">#0EA5A4</color>
     <color name="adm_purple_ink">#5B21B6</color>
     <color name="adm_purple_50">#FAF8FF</color>
+    <!-- Notification "Support" category disc/tag background (design data.js: #F4F0FF) -->
+    <color name="adm_purple_bg">#F4F0FF</color>
     <color name="adm_purple_100">#EDE4FF</color>
     <color name="adm_purple_500">#8B5CF6</color>
     <color name="adm_orange_ink">#B54708</color>

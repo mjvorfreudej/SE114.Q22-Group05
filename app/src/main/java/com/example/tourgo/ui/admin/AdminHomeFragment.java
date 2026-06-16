@@ -20,6 +20,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.ui.notification.NotificationItem;
+import com.example.tourgo.ui.notification.NotificationMockData;
+import com.example.tourgo.ui.notification.NotificationPopover;
 
 /** Admin › Home dashboard — KPI tiles, critical alert, quick actions, recent activity. */
 public class AdminHomeFragment extends Fragment {
@@ -34,6 +37,8 @@ public class AdminHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+
+        setupBell(v);
 
         // Critical alert
         ((TextView) v.findViewById(R.id.admAlertTitle)).setText(getString(R.string.adm_alert_title, 23));
@@ -73,6 +78,29 @@ public class AdminHomeFragment extends Fragment {
 
     private void goTab(int tab) {
         if (getActivity() instanceof AdminActivity) ((AdminActivity) getActivity()).goToTab(tab);
+    }
+
+    /**
+     * Header bell → Admin notification popover (design index.html, role="admin").
+     * The red count badge shows the initial unread tally; the popover and full center
+     * hold their own optimistic state, mirroring the prototype (no notifications API yet).
+     */
+    private void setupBell(View root) {
+        View bell = root.findViewById(R.id.admBellBtn);
+        TextView badge = root.findViewById(R.id.admBellBadge);
+
+        int unread = 0;
+        for (NotificationItem n : NotificationMockData.seed(requireContext(), NotificationMockData.Role.ADMIN)) {
+            if (!n.read) unread++;
+        }
+        if (unread > 0) {
+            badge.setText(unread > 9 ? "9+" : String.valueOf(unread));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+
+        bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.ADMIN));
     }
 
     private void stat(View root, int id, int iconRes, @ColorRes int accent, @ColorRes int soft,

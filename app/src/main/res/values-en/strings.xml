@@ -549,6 +549,101 @@
     <string name="notif_t9_action">View itinerary</string>
 
     <!-- ============================================================
+         Business & Admin notifications (ui_kits/notifications) — English
+         Role-keyed: business (Orders/Operations/Support/Promotions) and
+         admin (System/Approvals/Reports/Milestones). Verbatim from the design.
+         ============================================================ -->
+    <!-- Categories — Business -->
+    <string name="notif_cat_orders">Orders</string>
+    <string name="notif_cat_operations">Operations</string>
+    <string name="notif_cat_support">Support</string>
+    <string name="notif_cat_promotions">Promotions</string>
+
+    <!-- Categories — Admin -->
+    <string name="notif_cat_system">System</string>
+    <string name="notif_cat_approvals">Approvals</string>
+    <string name="notif_cat_reports">Reports</string>
+    <string name="notif_cat_milestones">Milestones</string>
+
+    <!-- Business content (sample data; verbatim from the design) -->
+    <string name="notif_b1_title">New booking received</string>
+    <string name="notif_b1_body">Amelia R. booked The Grand Orchid Resort · Suite 2 for Aug 22 – 25.</string>
+    <string name="notif_b1_when">Just now</string>
+    <string name="notif_b1_action">View booking</string>
+
+    <string name="notif_b2_title">Payment received · $636.08</string>
+    <string name="notif_b2_body">Payout for booking #TG-4821 has cleared to your account.</string>
+    <string name="notif_b2_when">38m</string>
+    <string name="notif_b2_action">View payout</string>
+
+    <string name="notif_b3_title">Low availability · Cedar Cove</string>
+    <string name="notif_b3_body">Only 2 rooms left for Aug 18 – 20. Consider opening more inventory.</string>
+    <string name="notif_b3_when">1h</string>
+    <string name="notif_b3_action">Manage availability</string>
+
+    <string name="notif_b4_title">3 check-ins today</string>
+    <string name="notif_b4_body">Guests arrive at The Grand Orchid Resort from 2:00 PM.</string>
+    <string name="notif_b4_when">2h</string>
+    <string name="notif_b4_action">View schedule</string>
+
+    <string name="notif_b5_title">Support replied to ticket #TS-209</string>
+    <string name="notif_b5_body">Our team responded about your payout schedule question.</string>
+    <string name="notif_b5_when">4h</string>
+    <string name="notif_b5_action">View reply</string>
+
+    <string name="notif_b6_title">New 5-star review from Liam K.</string>
+    <string name="notif_b6_body">“Spotless rooms and a wonderful host. Will return!”</string>
+    <string name="notif_b6_when">Yesterday</string>
+    <string name="notif_b6_action">Reply</string>
+
+    <string name="notif_b7_title">Boost your listing this week</string>
+    <string name="notif_b7_body">Listings featured this week get up to 30% more views.</string>
+    <string name="notif_b7_when">Yesterday</string>
+    <string name="notif_b7_action">Learn more</string>
+
+    <string name="notif_b8_title">Scheduled maintenance · Sun 2:00 AM</string>
+    <string name="notif_b8_body">TourGo Business will be briefly unavailable during the update.</string>
+    <string name="notif_b8_when">2d</string>
+
+    <!-- Admin content (sample data; verbatim from the design) -->
+    <string name="notif_a1_title">New business registration</string>
+    <string name="notif_a1_body">Lotus Travel Co. submitted documents for verification.</string>
+    <string name="notif_a1_when">Just now</string>
+    <string name="notif_a1_action">Review</string>
+
+    <string name="notif_a2_title">Withdrawal request · $2,400</string>
+    <string name="notif_a2_body">Orchid Hospitality requested a payout to bank •4471.</string>
+    <string name="notif_a2_when">22m</string>
+    <string name="notif_a2_action">Review</string>
+
+    <string name="notif_a3_title">API latency elevated</string>
+    <string name="notif_a3_body">Booking gateway p95 above 1.2s for the last 15 minutes.</string>
+    <string name="notif_a3_when">40m</string>
+    <string name="notif_a3_action">View status</string>
+
+    <string name="notif_a4_title">Listing reported 3×</string>
+    <string name="notif_a4_body">“Sunset Villa” flagged for misleading photos by 3 travelers.</string>
+    <string name="notif_a4_when">1h</string>
+    <string name="notif_a4_action">Review report</string>
+
+    <string name="notif_a5_title">User reported for spam reviews</string>
+    <string name="notif_a5_body">Account harry_b posted 6 reviews in 4 minutes.</string>
+    <string name="notif_a5_when">3h</string>
+    <string name="notif_a5_action">Review</string>
+
+    <string name="notif_a6_title">Revenue milestone reached</string>
+    <string name="notif_a6_body">Platform GMV crossed $1.0M this month — a new record.</string>
+    <string name="notif_a6_when">Yesterday</string>
+
+    <string name="notif_a7_title">10,000 weekly active travelers</string>
+    <string name="notif_a7_body">Active travelers up 18% week over week.</string>
+    <string name="notif_a7_when">Yesterday</string>
+
+    <string name="notif_a8_title">Maintenance window confirmed</string>
+    <string name="notif_a8_body">Database upgrade scheduled for Sun 2:00 – 3:00 AM UTC.</string>
+    <string name="notif_a8_when">2d</string>
+
+    <!-- ============================================================
          Business Dashboard (ui_kits/business) — English
          Mirrors the TourGo design-system prototype. UI chrome only;
          record content (names, review/report text) stays verbatim

@@ -42,13 +42,18 @@ public final class NotificationPopover {
 
     private NotificationPopover() {}
 
-    /** Build and show the popover anchored below {@code anchor} (the bell button). */
+    /** Traveler-default entry point (kept for the existing user-app home bell). */
     public static void show(View anchor) {
+        show(anchor, NotificationMockData.Role.TRAVELER);
+    }
+
+    /** Build and show the popover anchored below {@code anchor} (the bell button). */
+    public static void show(View anchor, NotificationMockData.Role role) {
         Context ctx = anchor.getContext();
         LayoutInflater inf = LayoutInflater.from(ctx);
         View content = inf.inflate(R.layout.popup_notifications, null, false);
 
-        final List<NotificationItem> items = NotificationMockData.seed(ctx);
+        final List<NotificationItem> items = NotificationMockData.seed(ctx, role);
 
         TextView headerTitle = content.findViewById(R.id.tvNotifPopHeaderTitle);
         TextView unread = content.findViewById(R.id.tvNotifPopUnread);
@@ -75,18 +80,18 @@ public final class NotificationPopover {
 
         // First render.
         bindUnread(ctx, unread, markAll, items);
-        renderList(ctx, list, empty, items, popup);
+        renderList(ctx, list, empty, items, popup, role);
 
         markAll.setOnClickListener(v -> {
             for (NotificationItem n : items) n.read = true;
             Toast.makeText(ctx, R.string.notif_toast_marked_all, Toast.LENGTH_SHORT).show();
             bindUnread(ctx, unread, markAll, items);
-            renderList(ctx, list, empty, items, popup);
+            renderList(ctx, list, empty, items, popup, role);
         });
 
         View.OnClickListener openCenter = v -> {
             popup.dismiss();
-            ctx.startActivity(new Intent(ctx, NotificationsActivity.class));
+            ctx.startActivity(centerIntent(ctx, role));
         };
         viewAll.setOnClickListener(openCenter);
 
@@ -111,7 +116,8 @@ public final class NotificationPopover {
 
     // ── Recent feed ─────────────────────────────────────────────────────────
     private static void renderList(Context ctx, LinearLayout list, TextView empty,
-                                   List<NotificationItem> items, PopupWindow popup) {
+                                   List<NotificationItem> items, PopupWindow popup,
+                                   NotificationMockData.Role role) {
         list.removeAllViews();
         if (items.isEmpty()) {
             list.setVisibility(View.GONE);
@@ -126,17 +132,25 @@ public final class NotificationPopover {
         for (int i = 0; i < rows; i++) {
             NotificationItem n = items.get(i);
             View row = inf.inflate(R.layout.item_notif_popover, list, false);
-            bindRow(ctx, row, n, i == rows - 1);
+            bindRow(ctx, row, n, i == rows - 1, role);
             // Tapping a row opens the full center (the popover holds no detail view).
             row.setOnClickListener(v -> {
                 popup.dismiss();
-                ctx.startActivity(new Intent(ctx, NotificationsActivity.class));
+                ctx.startActivity(centerIntent(ctx, role));
             });
             list.addView(row);
         }
     }
 
-    private static void bindRow(Context ctx, View row, NotificationItem n, boolean last) {
+    /** Intent for the full center, carrying the role so it seeds the right data. */
+    private static Intent centerIntent(Context ctx, NotificationMockData.Role role) {
+        Intent i = new Intent(ctx, NotificationsActivity.class);
+        i.putExtra(NotificationsActivity.EXTRA_ROLE, role.name());
+        return i;
+    }
+
+    private static void bindRow(Context ctx, View row, NotificationItem n, boolean last,
+                                NotificationMockData.Role role) {
         View disc = row.findViewById(R.id.notifPopIconDisc);
         ImageView icon = row.findViewById(R.id.ivNotifPopIcon);
         TextView title = row.findViewById(R.id.tvNotifPopTitle);
@@ -145,7 +159,7 @@ public final class NotificationPopover {
         View dot = row.findViewById(R.id.notifPopUnreadDot);
         View divider = row.findViewById(R.id.notifPopDivider);
 
-        NotificationMockData.Category cat = NotificationMockData.category(n.cat);
+        NotificationMockData.Category cat = NotificationMockData.category(role, n.cat);
         disc.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.bgColor)));
         icon.setImageResource(n.iconRes);
         ImageViewCompat.setImageTintList(icon,

@@ -88,10 +88,13 @@
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/admBellBtn"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="@drawable/bg_adm_circle"
-            android:backgroundTint="@color/adm_gray_100">
+            android:backgroundTint="@color/adm_gray_100"
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="18dp"
@@ -101,13 +104,25 @@
                 android:src="@drawable/ic_bell_20"
                 app:tint="@color/adm_gray_900" />
 
-            <View
-                android:layout_width="8dp"
-                android:layout_height="8dp"
+            <!-- Unread-count badge (design RoleHeader: red pill, white border) -->
+            <TextView
+                android:id="@+id/admBellBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
                 android:layout_gravity="top|end"
-                android:layout_marginTop="7dp"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/bg_adm_notif_dot" />
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@drawable/bg_notif_count_badge"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:minWidth="16dp"
+                android:paddingHorizontal="4dp"
+                android:textColor="@color/white"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:text="4"
+                tools:visibility="visible" />
         </FrameLayout>
     </LinearLayout>
 
