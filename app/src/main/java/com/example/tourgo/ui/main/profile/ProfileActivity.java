@@ -8,11 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
-import com.example.tourgo.adapters.MyBookingAdapter;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.User;
@@ -22,10 +19,6 @@ import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButtonToggleGroup;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
