@@ -37,25 +37,51 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
+import com.example.tourgo.data.local.AdminPreferences;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.UpdatePasswordRequest;
 import com.example.tourgo.models.response.AdminAuditEntry;
 import com.example.tourgo.models.response.AdminTeamMember;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.utils.LocaleHelper;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_DIGEST;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_PENDING;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_REPORTED;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_SECURITY;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_SLA;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_TEAM;
+import static com.example.tourgo.data.local.AdminPreferences.NOTIF_WEEKLY;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_AUTOHIDE;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_GEO;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_HIDE_AT;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_PHOTO;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_PROFANITY;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_SLA;
+import static com.example.tourgo.data.local.AdminPreferences.POLICY_TERMS;
+import static com.example.tourgo.data.local.AdminPreferences.TFA_ENABLED;
 
 /**
  * Admin › Settings detail screens — the seven destinations behind the Admin
@@ -89,10 +115,14 @@ public class AdminDetailActivity extends AppCompatActivity {
     private Chip policyAddChip;
     private int openFaq = -1;
 
+    /** Local store for settings that have no backend endpoint (policy / notif / 2FA). */
+    private AdminPreferences prefs;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        prefs = new AdminPreferences(this);
 
         String screen = getIntent().getStringExtra(EXTRA_SCREEN);
         if (screen == null) screen = SCREEN_MOD_POLICY;
@@ -168,26 +198,46 @@ public class AdminDetailActivity extends AppCompatActivity {
     // 1 · MODERATION POLICY
     // ════════════════════════════════════════════════════════════════════════
     private void bindModPolicy(View root) {
-        wireStepper(root, R.id.admHideAtMinus, R.id.admHideAtValue, R.id.admHideAtPlus,
-                5, 1, 20, null);
-        wireStepper(root, R.id.admSlaMinus, R.id.admSlaValue, R.id.admSlaPlus,
-                24, 4, 72, getString(R.string.adm_hours_suffix));
+        final SwitchCompat autoHide = root.findViewById(R.id.admPolicyAutohide);
+        final SwitchCompat profanity = root.findViewById(R.id.admPolicyProfanity);
+        final SwitchCompat photo = root.findViewById(R.id.admPolicyPhoto);
+        final SwitchCompat geo = root.findViewById(R.id.admPolicyGeo);
+        autoHide.setChecked(prefs.getBool(POLICY_AUTOHIDE, true));
+        profanity.setChecked(prefs.getBool(POLICY_PROFANITY, true));
+        photo.setChecked(prefs.getBool(POLICY_PHOTO, false));
+        geo.setChecked(prefs.getBool(POLICY_GEO, false));
 
-        bindTerms(root.findViewById(R.id.admPolicyTerms));
+        final int[] hideAt = {prefs.getInt(POLICY_HIDE_AT, 5)};
+        final int[] sla = {prefs.getInt(POLICY_SLA, 24)};
+        wireStepper(root, R.id.admHideAtMinus, R.id.admHideAtValue, R.id.admHideAtPlus,
+                hideAt, 1, 20, null);
+        wireStepper(root, R.id.admSlaMinus, R.id.admSlaValue, R.id.admSlaPlus,
+                sla, 4, 72, getString(R.string.adm_hours_suffix));
+
+        final ChipGroup terms = root.findViewById(R.id.admPolicyTerms);
+        bindTerms(terms, prefs.getList(POLICY_TERMS, Arrays.asList("scam", "counterfeit", "unsafe")));
 
         root.findViewById(R.id.admPolicySave).setOnClickListener(v -> {
+            prefs.setBool(POLICY_AUTOHIDE, autoHide.isChecked());
+            prefs.setBool(POLICY_PROFANITY, profanity.isChecked());
+            prefs.setBool(POLICY_PHOTO, photo.isChecked());
+            prefs.setBool(POLICY_GEO, geo.isChecked());
+            prefs.setInt(POLICY_HIDE_AT, hideAt[0]);
+            prefs.setInt(POLICY_SLA, sla[0]);
+            prefs.setList(POLICY_TERMS, currentTerms(terms));
             toast(R.string.adm_toast_policy_saved);
             finish();
         });
     }
 
-    /** Wire a ± stepper backed by a single mutable int. */
+    /** Wire a ± stepper backed by a caller-owned cell, so the live value is
+     *  readable at save time. Clamps the initial value into [min, max]. */
     private void wireStepper(View root, int minusId, int valueId, int plusId,
-                             int initial, int min, int max, @Nullable String suffix) {
+                             int[] v, int min, int max, @Nullable String suffix) {
         final ImageView minus = root.findViewById(minusId);
         final TextView value = root.findViewById(valueId);
         final ImageView plus = root.findViewById(plusId);
-        final int[] v = {initial};
+        v[0] = Math.max(min, Math.min(max, v[0]));
         final Runnable render = () -> {
             value.setText(suffix == null ? String.valueOf(v[0]) : v[0] + " " + suffix);
             stepEnabled(minus, v[0] > min);
@@ -204,7 +254,7 @@ public class AdminDetailActivity extends AppCompatActivity {
         btn.setAlpha(enabled ? 1f : 0.4f);
     }
 
-    private void bindTerms(ChipGroup group) {
+    private void bindTerms(ChipGroup group, List<String> initialTerms) {
         policyAddChip = new Chip(this);
         policyAddChip.setText(R.string.adm_policy_add_term);
         policyAddChip.setTextColor(color(R.color.adm_blue_500));
@@ -218,8 +268,19 @@ public class AdminDetailActivity extends AppCompatActivity {
         policyAddChip.setChipMinHeight(dp(30));
         policyAddChip.setOnClickListener(v -> showAddTermDialog(group));
 
-        for (String w : new String[]{"scam", "counterfeit", "unsafe"}) addTermChip(group, w);
+        for (String w : initialTerms) addTermChip(group, w);
         group.addView(policyAddChip);
+    }
+
+    /** Current term chips (in order), excluding the trailing "Add term" chip. */
+    private List<String> currentTerms(ChipGroup group) {
+        List<String> out = new ArrayList<>();
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child == policyAddChip || !(child instanceof Chip)) continue;
+            out.add(((Chip) child).getText().toString());
+        }
+        return out;
     }
 
     private void addTermChip(ChipGroup group, String term) {
@@ -503,8 +564,25 @@ public class AdminDetailActivity extends AppCompatActivity {
     // 4 · NOTIFICATIONS (preferences)
     // ════════════════════════════════════════════════════════════════════════
     private void bindNotifications(View root) {
-        // Security alerts are locked on for owners (design footnote).
-        ((SwitchCompat) root.findViewById(R.id.admNotifSecurity)).setEnabled(false);
+        bindNotifToggle(root, R.id.admNotifPending, NOTIF_PENDING, true);
+        bindNotifToggle(root, R.id.admNotifReported, NOTIF_REPORTED, true);
+        bindNotifToggle(root, R.id.admNotifTeam, NOTIF_TEAM, false);
+        bindNotifToggle(root, R.id.admNotifSla, NOTIF_SLA, true);
+        bindNotifToggle(root, R.id.admNotifDigest, NOTIF_DIGEST, true);
+        bindNotifToggle(root, R.id.admNotifWeekly, NOTIF_WEEKLY, false);
+
+        // Security alerts are locked on for owners (design footnote): always on, not editable.
+        SwitchCompat security = root.findViewById(R.id.admNotifSecurity);
+        security.setChecked(true);
+        security.setEnabled(false);
+        prefs.setBool(NOTIF_SECURITY, true);
+    }
+
+    /** A persisted notification toggle: restores the saved value, saves on change. */
+    private void bindNotifToggle(View root, int switchId, String key, boolean def) {
+        SwitchCompat sw = root.findViewById(switchId);
+        sw.setChecked(prefs.getBool(key, def));
+        sw.setOnCheckedChangeListener((b, checked) -> prefs.setBool(key, checked));
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -546,7 +624,8 @@ public class AdminDetailActivity extends AppCompatActivity {
             eye.setImageResource(shown[0] ? R.drawable.ic_eye_closed : R.drawable.ic_eye_open);
         });
 
-        root.findViewById(R.id.admPwdUpdate).setOnClickListener(v -> {
+        final View update = root.findViewById(R.id.admPwdUpdate);
+        update.setOnClickListener(v -> {
             String now = fresh.getText().toString();
             if (current.getText().toString().trim().isEmpty()) {
                 current.setError(getString(R.string.adm_pwd_err_current));
@@ -558,8 +637,7 @@ public class AdminDetailActivity extends AppCompatActivity {
                 confirm.setError(getString(R.string.adm_pwd_err_match));
                 confirm.requestFocus();
             } else {
-                toast(R.string.adm_toast_password_updated);
-                finish();
+                updatePassword(update, now);
             }
         });
 
@@ -568,15 +646,54 @@ public class AdminDetailActivity extends AppCompatActivity {
         final ImageView tileIcon = root.findViewById(R.id.admTfaIcon);
         final TextView sub = root.findViewById(R.id.admTfaSub);
         final View factors = root.findViewById(R.id.admTfaFactors);
+        boolean tfaOn = prefs.getBool(TFA_ENABLED, true);
+        tfa.setChecked(tfaOn);
+        applyTfaState(tfaOn, tile, tileIcon, sub, factors);
         tfa.setOnCheckedChangeListener((b, checked) -> {
-            tile.setBackgroundTintList(ColorStateList.valueOf(
-                    color(checked ? R.color.adm_green_100 : R.color.adm_gray_100)));
-            tileIcon.setImageTintList(ColorStateList.valueOf(
-                    color(checked ? R.color.adm_green_700 : R.color.adm_gray_700)));
-            sub.setText(checked ? R.string.adm_2fa_on_sub : R.string.adm_2fa_off_sub);
-            factors.setVisibility(checked ? View.VISIBLE : View.GONE);
+            applyTfaState(checked, tile, tileIcon, sub, factors);
+            prefs.setBool(TFA_ENABLED, checked);
             toast(checked ? R.string.adm_toast_2fa_enabled : R.string.adm_toast_2fa_disabled);
         });
+    }
+
+    /** Change the signed-in admin's password via POST /api/auth/update-password. */
+    private void updatePassword(View button, String newPassword) {
+        button.setEnabled(false);
+        RetrofitClient.getInstance(this)
+                .getAuthApi()
+                .updatePassword(new UpdatePasswordRequest(newPassword))
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call,
+                                           Response<ApiResponse<Void>> response) {
+                        ApiResponse<Void> body = response.body();
+                        if (response.isSuccessful() && body != null
+                                && body.getSuccess() != null && body.getSuccess()) {
+                            toast(R.string.adm_toast_password_updated);
+                            finish();
+                        } else {
+                            button.setEnabled(true);
+                            ErrorHandler.showError(AdminDetailActivity.this,
+                                    ErrorHandler.parseError(response));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        button.setEnabled(true);
+                        ErrorHandler.showError(AdminDetailActivity.this, ErrorHandler.parseError(t));
+                    }
+                });
+    }
+
+    /** Reflect the 2FA on/off state in the tile tint, subtitle and factor list. */
+    private void applyTfaState(boolean on, FrameLayout tile, ImageView icon, TextView sub, View factors) {
+        tile.setBackgroundTintList(ColorStateList.valueOf(
+                color(on ? R.color.adm_green_100 : R.color.adm_gray_100)));
+        icon.setImageTintList(ColorStateList.valueOf(
+                color(on ? R.color.adm_green_700 : R.color.adm_gray_700)));
+        sub.setText(on ? R.string.adm_2fa_on_sub : R.string.adm_2fa_off_sub);
+        factors.setVisibility(on ? View.VISIBLE : View.GONE);
     }
 
     // ════════════════════════════════════════════════════════════════════════
