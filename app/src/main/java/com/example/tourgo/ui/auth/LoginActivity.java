@@ -131,7 +131,8 @@ public class LoginActivity extends AppCompatActivity {
                                         session.saveUserInfo(
                                                 authData.getUser().getId(),
                                                 authData.getUser().getEmail(),
-                                                authData.getUser().getName()
+                                                authData.getUser().getName(),
+                                                authData.getUser().getRole()
                                         );
 
                                         session.setRememberMe(binding.cbLoginRemember.isChecked());
@@ -140,6 +141,14 @@ public class LoginActivity extends AppCompatActivity {
                                         UserRepository.getInstance().getCurrentUser(LoginActivity.this, true, new DataCallback<User>() {
                                             @Override
                                             public void onSuccess(User user) {
+                                                if (user != null) {
+                                                    session.saveUserInfo(
+                                                            user.getId(),
+                                                            user.getEmail(),
+                                                            user.getName(),
+                                                            user.getRole()
+                                                    );
+                                                }
                                                 Toast.makeText(LoginActivity.this,
                                                         getString(R.string.msg_login_success),
                                                         Toast.LENGTH_SHORT).show();

@@ -18,20 +18,38 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.Booking;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.business.BusinessMockData.CalBooking;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import com.example.tourgo.remote.api.BookingApi;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+
 /** Business › Calendar — monthly occupancy grid, today's bookings, timeline view, detail sheet. */
 public class BusinessCalendarFragment extends Fragment {
-
-    private static final int TODAY = 18;
-    private static final int START_BLANK = 5; // Aug 1 2025 is a Friday
-    private static final int DAYS = 31;
 
     private View monthView, timelineView;
     private View toggleMonth, toggleTimeline;
     private ImageView toggleMonthIcon, toggleTimelineIcon;
+    private TextView monthTitleText;
+    private LinearLayout calGrid, todayBookingsList, timelineRows;
+
+    private int mTodayDay;
+    private int mStartBlank;
+    private int mDays;
+    private List<CalBooking> mBookings = new ArrayList<>();
 
     @Nullable
     @Override
@@ -50,17 +68,113 @@ public class BusinessCalendarFragment extends Fragment {
         toggleTimeline = v.findViewById(R.id.bizToggleTimeline);
         toggleMonthIcon = v.findViewById(R.id.bizToggleMonthIcon);
         toggleTimelineIcon = v.findViewById(R.id.bizToggleTimelineIcon);
+        monthTitleText = v.findViewById(R.id.bizCalendarMonthText);
+        calGrid = v.findViewById(R.id.bizCalGrid);
+        todayBookingsList = v.findViewById(R.id.bizTodayBookings);
+        timelineRows = v.findViewById(R.id.bizTimelineRows);
 
         toggleMonth.setOnClickListener(view -> setView(true));
         toggleTimeline.setOnClickListener(view -> setView(false));
 
+        // Compute current month parameters
+        Calendar calendar = Calendar.getInstance();
+        mTodayDay = calendar.get(Calendar.DAY_OF_MONTH);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+        if (monthTitleText != null) {
+            monthTitleText.setText(sdf.format(calendar.getTime()));
+        }
+
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        mStartBlank = dayOfWeek - 1;
+        mDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
         buildLegend(v.findViewById(R.id.bizCalLegend));
         buildWeekdays(v.findViewById(R.id.bizWeekdays));
-        buildGrid(v.findViewById(R.id.bizCalGrid));
-        buildTodayBookings(v.findViewById(R.id.bizTodayBookings));
-        buildTimeline(v.findViewById(R.id.bizTimelineRows));
 
         setView(true);
+        loadBookings();
+    }
+
+    private void loadBookings() {
+        BookingApi api = RetrofitClient.getInstance(requireContext()).getBookingApi();
+        api.getBusinessBookings().enqueue(new Callback<ApiResponse<List<Booking>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<Booking>>> call, Response<ApiResponse<List<Booking>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    mapBookings(response.body().getData());
+                } else {
+                    mBookings.clear();
+                }
+                rebuildCalendar();
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<Booking>>> call, Throwable t) {
+                mBookings.clear();
+                rebuildCalendar();
+            }
+        });
+    }
+
+    private void mapBookings(List<Booking> bookings) {
+        mBookings.clear();
+        for (Booking b : bookings) {
+            int id = b.getId() != null ? b.getId().hashCode() : 0;
+            
+            String guest = "Khách";
+            String phone = "";
+            if (b.getGuestInfo() != null) {
+                guest = b.getGuestInfo().getName();
+                phone = b.getGuestInfo().getPhone();
+            }
+            
+            String room = "Dịch vụ";
+            if (b.getHotelInfo() != null && b.getHotelInfo().getName() != null) {
+                room = b.getHotelInfo().getName();
+            } else if (b.getTourInfo() != null && b.getTourInfo().getName() != null) {
+                room = b.getTourInfo().getName();
+            }
+            
+            int day = mTodayDay;
+            String inTime = "12:00";
+            String outTime = "12:00";
+            
+            String dateStr = b.getBookingDate();
+            if (dateStr != null && dateStr.length() >= 10) {
+                try {
+                    day = Integer.parseInt(dateStr.substring(8, 10));
+                    if (dateStr.length() >= 16) {
+                        inTime = dateStr.substring(11, 16);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            String status = b.getStatus() != null ? b.getStatus().toLowerCase() : "pending";
+            mBookings.add(new CalBooking(id, guest, room, inTime, outTime, day, status, phone));
+        }
+    }
+
+    private void rebuildCalendar() {
+        if (!isAdded()) return;
+
+        if (calGrid != null) {
+            calGrid.removeAllViews();
+            buildGrid(calGrid);
+        }
+
+        if (todayBookingsList != null) {
+            todayBookingsList.removeAllViews();
+            buildTodayBookings(todayBookingsList);
+        }
+
+        if (timelineRows != null) {
+            timelineRows.removeAllViews();
+            buildTimeline(timelineRows);
+        }
     }
 
     private void setView(boolean month) {
@@ -74,6 +188,8 @@ public class BusinessCalendarFragment extends Fragment {
 
     // ── Legend ────────────────────────────────────────────────────────────────
     private void buildLegend(LinearLayout legend) {
+        if (legend == null) return;
+        legend.removeAllViews();
         addLegend(legend, R.color.adm_green_500, R.string.biz_cal_available);
         addLegend(legend, R.color.adm_amber_500, R.string.biz_cal_partial);
         addLegend(legend, R.color.adm_red_500, R.string.biz_cal_booked);
@@ -111,6 +227,8 @@ public class BusinessCalendarFragment extends Fragment {
 
     // ── Weekday header ──────────────────────────────────────────────────────────
     private void buildWeekdays(LinearLayout row) {
+        if (row == null) return;
+        row.removeAllViews();
         String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         for (String d : days) {
             TextView tv = new TextView(requireContext());
@@ -126,7 +244,7 @@ public class BusinessCalendarFragment extends Fragment {
 
     // ── Month grid ──────────────────────────────────────────────────────────────
     private void buildGrid(LinearLayout grid) {
-        int total = START_BLANK + DAYS;
+        int total = mStartBlank + mDays;
         int weeks = (int) Math.ceil(total / 7.0);
         int day = 1;
         int cellIndex = 0;
@@ -142,7 +260,7 @@ public class BusinessCalendarFragment extends Fragment {
             for (int c = 0; c < 7; c++, cellIndex++) {
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, cellHeight, 1f);
                 lp.setMargins(gap, gap, gap, gap);
-                if (cellIndex < START_BLANK || day > DAYS) {
+                if (cellIndex < mStartBlank || day > mDays) {
                     View blank = new View(requireContext());
                     week.addView(blank, lp);
                 } else {
@@ -154,8 +272,8 @@ public class BusinessCalendarFragment extends Fragment {
     }
 
     private View buildDayCell(int day) {
-        String occ = BusinessMockData.occupancy(day);
-        boolean today = day == TODAY;
+        String occ = getDynamicOccupancy(day);
+        boolean today = day == mTodayDay;
         int bg, fg, dot;
         boolean border = false;
         switch (occ) {
@@ -206,8 +324,8 @@ public class BusinessCalendarFragment extends Fragment {
     // ── Today's bookings ──────────────────────────────────────────────────────
     private void buildTodayBookings(LinearLayout list) {
         LayoutInflater inf = LayoutInflater.from(requireContext());
-        for (CalBooking b : BusinessMockData.calBookings()) {
-            if (b.day != TODAY) continue;
+        for (CalBooking b : mBookings) {
+            if (b.day != mTodayDay) continue;
             View row = inf.inflate(R.layout.item_biz_today_booking, list, false);
             AdminUi.avatar(row.findViewById(R.id.bizTodayAvatar), b.guest);
             ((TextView) row.findViewById(R.id.bizTodayGuest)).setText(b.guest);
@@ -221,7 +339,7 @@ public class BusinessCalendarFragment extends Fragment {
 
     // ── Timeline ────────────────────────────────────────────────────────────────
     private void buildTimeline(LinearLayout rows) {
-        for (CalBooking b : BusinessMockData.calBookings()) {
+        for (CalBooking b : mBookings) {
             LinearLayout row = new LinearLayout(requireContext());
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
@@ -274,9 +392,9 @@ public class BusinessCalendarFragment extends Fragment {
         LinearLayout summary = sheet.findViewById(R.id.bizDetailSummary);
         LayoutInflater inf = LayoutInflater.from(requireContext());
         addSummary(inf, summary, getString(R.string.biz_detail_contact), b.phone);
-        addSummary(inf, summary, getString(R.string.biz_detail_guests), "2 adults, 1 child");
-        addSummary(inf, summary, getString(R.string.biz_detail_nights), "2 nights");
-        addSummary(inf, summary, getString(R.string.biz_detail_total), "$398.00");
+        addSummary(inf, summary, getString(R.string.biz_detail_guests), "2 adults");
+        addSummary(inf, summary, getString(R.string.biz_detail_nights), "1 night");
+        addSummary(inf, summary, getString(R.string.biz_detail_total), "Paid");
 
         sheet.findViewById(R.id.bizSheetClose).setOnClickListener(view -> dialog.dismiss());
         sheet.findViewById(R.id.bizDetailCheckinBtn).setOnClickListener(view -> dialog.dismiss());
@@ -290,6 +408,18 @@ public class BusinessCalendarFragment extends Fragment {
         ((TextView) row.findViewById(R.id.bizSummaryLabel)).setText(label);
         ((TextView) row.findViewById(R.id.bizSummaryValue)).setText(value);
         parent.addView(row);
+    }
+
+    private String getDynamicOccupancy(int day) {
+        int count = 0;
+        for (CalBooking b : mBookings) {
+            if (b.day == day) {
+                count++;
+            }
+        }
+        if (count == 0) return "free";
+        if (count == 1) return "partial";
+        return "full";
     }
 
     private int color(@ColorRes int res) {

@@ -4,6 +4,7 @@ import com.example.tourgo.models.request.CreateReviewRequest;
 import com.example.tourgo.models.request.SaveReviewImagesRequest;
 import com.example.tourgo.models.request.UpdateReviewRequest;
 import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.BusinessReview;
 import com.example.tourgo.models.response.HotelReview;
 import com.example.tourgo.models.response.UploadImageResponse;
 
@@ -27,6 +28,9 @@ public interface ReviewApi {
 
     @GET("api/reviews")
     Call<ApiResponse<List<HotelReview>>> getReviewsByTourId(@Query("tourId") String tourId);
+
+    @GET("api/reviews/business")
+    Call<ApiResponse<List<BusinessReview>>> getBusinessReviews();
 
     @POST("api/reviews")
     Call<ApiResponse<HotelReview>> createReview(@Body CreateReviewRequest request);

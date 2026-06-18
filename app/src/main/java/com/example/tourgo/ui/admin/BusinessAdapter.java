@@ -30,6 +30,7 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
     public static final String ACTION_SUSPEND = "suspend";
     public static final String ACTION_REACTIVATE = "reactivate";
     public static final String ACTION_APPROVE = "approve";
+    public static final String ACTION_REJECT = "reject";
 
     private final List<BizAccount> items = new ArrayList<>();
     private final Listener listener;
@@ -86,6 +87,16 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
         h.statusLabel.setTextColor(ContextCompat.getColor(ctx, chipFg));
         h.statusLabel.setText(label);
 
+        if (h.layoutPendingActions != null) {
+            h.layoutPendingActions.setVisibility(pending ? View.VISIBLE : View.GONE);
+            h.btnApproveBiz.setOnClickListener(v -> {
+                if (listener != null) listener.onAction(b, ACTION_APPROVE);
+            });
+            h.btnRejectBiz.setOnClickListener(v -> {
+                if (listener != null) listener.onAction(b, ACTION_REJECT);
+            });
+        }
+
         h.more.setOnClickListener(v -> showMenu(v, b));
     }
 
@@ -140,6 +151,8 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
         final ImageView icon, more;
         final View iconWrap, statusDot;
         final LinearLayout statusChip;
+        final View layoutPendingActions;
+        final View btnApproveBiz, btnRejectBiz;
 
         VH(@NonNull View v) {
             super(v);
@@ -153,6 +166,9 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.VH> {
             iconWrap = v.findViewById(R.id.admBizIconWrap);
             statusDot = v.findViewById(R.id.admBizStatusDot);
             statusChip = v.findViewById(R.id.admBizStatus);
+            layoutPendingActions = v.findViewById(R.id.layoutPendingActions);
+            btnApproveBiz = v.findViewById(R.id.btnApproveBiz);
+            btnRejectBiz = v.findViewById(R.id.btnRejectBiz);
         }
     }
 }

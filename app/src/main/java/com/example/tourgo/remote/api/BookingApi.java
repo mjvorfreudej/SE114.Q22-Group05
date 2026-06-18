@@ -21,6 +21,9 @@ public interface BookingApi {
     @GET("api/bookings")
     Call<ApiResponse<List<Booking>>> getMyBookings();
 
+    @GET("api/bookings/business")
+    Call<ApiResponse<List<Booking>>> getBusinessBookings();
+
     @GET("api/bookings/{bookingId}")
     Call<ApiResponse<Booking>> getBookingById(@Path("bookingId") String bookingId);
 

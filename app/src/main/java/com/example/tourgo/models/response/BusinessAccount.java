@@ -38,6 +38,9 @@ public class BusinessAccount {
     @SerializedName("bookings")
     private int bookings;
 
+    @SerializedName("reviews")
+    private int reviews;
+
     /** "pending" | "active" | "suspended" | "rejected" */
     @SerializedName("status")
     private String status;
@@ -81,6 +84,7 @@ public class BusinessAccount {
 
     public int getListings() { return listings; }
     public int getBookings() { return bookings; }
+    public int getReviews() { return reviews; }
     public String getStatus() { return status; }
     public String getCreatedAt() { return createdAt; }
 

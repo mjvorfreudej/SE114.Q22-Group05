@@ -119,6 +119,8 @@
     <string name="profile_admin_console_sub">Quản lý nền tảng &amp; kiểm duyệt</string>
     <string name="profile_business_console">Bảng doanh nghiệp</string>
     <string name="profile_business_console_sub">Quản lý tin đăng &amp; đánh giá</string>
+    <string name="profile_register_business">Đăng ký đối tác</string>
+    <string name="profile_register_business_sub">Trở thành đối tác cung cấp dịch vụ</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>

@@ -4,7 +4,10 @@ import com.example.tourgo.models.request.BusinessRequest;
 import com.example.tourgo.models.request.UpdateProfileRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
+import com.example.tourgo.models.response.BusinessListing;
 import com.example.tourgo.models.response.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -30,6 +33,10 @@ public interface UserApi {
     /** User lấy thông tin Business. */
     @GET("api/users/businesses/me")
     Call<ApiResponse<BusinessAccount>> getBusinesses();
+
+    /** User lấy danh sách Listing của Business. */
+    @GET("api/users/businesses/me/listings")
+    Call<ApiResponse<List<BusinessListing>>> getMyListings();
 
     /** User sửa Business Profile. */
     @PUT("api/users/businesses/me")

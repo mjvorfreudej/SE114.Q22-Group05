@@ -13,7 +13,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TourGo">
+        android:theme="@style/Theme.TourGo"
+        android:usesCleartextTraffic="true">
 
         <!-- Google Maps API Key -->
         <meta-data
@@ -38,6 +39,10 @@
 
         <activity
             android:name=".ui.business.AddListingActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.business.RegisterBusinessActivity"
             android:exported="false" />
 
         <service

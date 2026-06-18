@@ -144,6 +144,8 @@ public class AdminBusinessesFragment extends Fragment {
     private void onAction(BizAccount biz, String action) {
         if (BusinessAdapter.ACTION_APPROVE.equals(action)) {
             approve(biz);
+        } else if (BusinessAdapter.ACTION_REJECT.equals(action)) {
+            reject(biz);
         }
     }
 
@@ -155,6 +157,28 @@ public class AdminBusinessesFragment extends Fragment {
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(),
                         getString(R.string.adm_toast_biz_approved, biz.name), Toast.LENGTH_SHORT).show();
+                all.remove(biz);
+                buildTabs();
+                applyFilter();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void reject(BizAccount biz) {
+        if (biz.serverId == null) return;
+        AdminService.rejectBusiness(requireContext(), biz.serverId, new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        "Đã từ chối đơn đăng ký của " + biz.name, Toast.LENGTH_SHORT).show();
                 all.remove(biz);
                 buildTabs();
                 applyFilter();

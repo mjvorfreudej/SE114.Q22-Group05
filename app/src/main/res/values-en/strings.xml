@@ -120,6 +120,8 @@
     <string name="profile_admin_console_sub">Manage the marketplace</string>
     <string name="profile_business_console">Business Console</string>
     <string name="profile_business_console_sub">Manage listings &amp; reviews</string>
+    <string name="profile_register_business">Register as Partner</string>
+    <string name="profile_register_business_sub">Become a service provider partner</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Edit profile</string>

@@ -16,6 +16,36 @@ public class Booking {
     private String bookingDate;
     private String status;
 
+    @SerializedName("users")
+    private GuestInfo guestInfo;
+
+    @SerializedName("hotels")
+    private HotelInfo hotelInfo;
+
+    @SerializedName("tours")
+    private TourInfo tourInfo;
+
+    public static class GuestInfo {
+        private String name;
+        private String phone;
+        public String getName() { return name != null ? name : "Khách"; }
+        public String getPhone() { return phone != null ? phone : ""; }
+    }
+
+    public static class HotelInfo {
+        private String name;
+        public String getName() { return name; }
+    }
+
+    public static class TourInfo {
+        private String name;
+        public String getName() { return name; }
+    }
+
+    public GuestInfo getGuestInfo() { return guestInfo; }
+    public HotelInfo getHotelInfo() { return hotelInfo; }
+    public TourInfo getTourInfo() { return tourInfo; }
+
     public Booking() {}
 
     public Booking(String userId, String tourId, String hotelId) {

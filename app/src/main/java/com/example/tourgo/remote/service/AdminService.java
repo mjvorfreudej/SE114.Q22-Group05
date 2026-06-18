@@ -80,6 +80,35 @@ public class AdminService {
                 });
     }
 
+    public static void rejectBusiness(Context context, String businessId, DataCallback<Void> callback) {
+        RetrofitClient.getInstance(context)
+                .getAdminApi()
+                .rejectBusiness(businessId)
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Void> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
+                                callback.onSuccess(null);
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
     public static void getUsers(Context context, DataCallback<List<AdminAccount>> callback) {
         RetrofitClient.getInstance(context)
                 .getAdminApi()

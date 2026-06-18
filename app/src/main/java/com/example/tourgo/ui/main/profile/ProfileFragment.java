@@ -31,6 +31,7 @@ import com.example.tourgo.remote.service.UserService;
 import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.business.BusinessActivity;
+import com.example.tourgo.ui.business.RegisterBusinessActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
 import com.example.tourgo.ui.main.booking.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
@@ -90,7 +91,7 @@ public class ProfileFragment extends Fragment {
                     if (tvProfileName != null) tvProfileName.setText(user.getName());
                     if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
 
-                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName());
+                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole());
                 }
             }
 
@@ -134,6 +135,14 @@ public class ProfileFragment extends Fragment {
             rowBusiness.setVisibility(session.isBusiness() ? View.VISIBLE : View.GONE);
             rowBusiness.setOnClickListener(v ->
                     startActivity(new Intent(requireContext(), BusinessActivity.class)));
+        }
+
+        // Business Registration — visible to normal users (neither admin nor business)
+        View rowRegisterBusiness = root.findViewById(R.id.rowRegisterBusiness);
+        if (rowRegisterBusiness != null) {
+            rowRegisterBusiness.setVisibility((!session.isAdmin() && !session.isBusiness()) ? View.VISIBLE : View.GONE);
+            rowRegisterBusiness.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), RegisterBusinessActivity.class)));
         }
 
         // Edit Profile
