@@ -3,6 +3,7 @@ package com.example.tourgo.ui.business;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+import com.example.tourgo.utils.ToastHelper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -120,14 +121,14 @@ public class RegisterBusinessActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ApiResponse<BusinessAccount>> call, Response<ApiResponse<BusinessAccount>> response) {
                         if (response.isSuccessful() && response.body() != null && response.body().getSuccess()) {
-                            Toast.makeText(RegisterBusinessActivity.this, "Đăng ký thành công! Đang chờ phê duyệt và email xác nhận.", Toast.LENGTH_LONG).show();
+                            ToastHelper.showSuccess(RegisterBusinessActivity.this, "Đăng ký đối tác thành công! Vui lòng chờ phản hồi qua email.");
                             finish();
                         } else {
                             btnSubmitBiz.setEnabled(true);
                             btnSubmitBiz.setText("Gửi đơn đăng ký");
                             com.example.tourgo.models.error.ApiError error = com.example.tourgo.models.error.ErrorHandler.parseError(response);
                             String message = com.example.tourgo.models.error.ErrorHandler.getUserMessage(RegisterBusinessActivity.this, error);
-                            Toast.makeText(RegisterBusinessActivity.this, "Đăng ký thất bại: " + message, Toast.LENGTH_SHORT).show();
+                            ToastHelper.showError(RegisterBusinessActivity.this, "Đăng ký thất bại: " + message);
                         }
                     }
 
@@ -135,7 +136,7 @@ public class RegisterBusinessActivity extends AppCompatActivity {
                     public void onFailure(Call<ApiResponse<BusinessAccount>> call, Throwable t) {
                         btnSubmitBiz.setEnabled(true);
                         btnSubmitBiz.setText("Gửi đơn đăng ký");
-                        Toast.makeText(RegisterBusinessActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        ToastHelper.showError(RegisterBusinessActivity.this, "Lỗi kết nối: " + t.getMessage());
                     }
                 });
     }

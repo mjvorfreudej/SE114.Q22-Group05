@@ -29,6 +29,7 @@ import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.main.home.MainActivity;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.databinding.ActivityLoginBinding;
+import com.example.tourgo.utils.ToastHelper;
 
 import org.json.JSONObject;
 
@@ -149,9 +150,8 @@ public class LoginActivity extends AppCompatActivity {
                                                             user.getRole()
                                                     );
                                                 }
-                                                Toast.makeText(LoginActivity.this,
-                                                        getString(R.string.msg_login_success),
-                                                        Toast.LENGTH_SHORT).show();
+                                                ToastHelper.showSuccess(LoginActivity.this,
+                                                        getString(R.string.msg_login_success));
 
                                                 goToHome();
                                             }
@@ -159,9 +159,8 @@ public class LoginActivity extends AppCompatActivity {
                                             @Override
                                             public void onError(ApiErrorCode code, String message) {
                                                 // Nếu lỗi khi lấy user info, vẫn cho login nhưng không có cache
-                                                Toast.makeText(LoginActivity.this,
-                                                        getString(R.string.msg_login_success),
-                                                        Toast.LENGTH_SHORT).show();
+                                                ToastHelper.showSuccess(LoginActivity.this,
+                                                        getString(R.string.msg_login_success));
 
                                                 goToHome();
                                             }

@@ -146,11 +146,11 @@
     <string name="err_name_empty">Tên không được để trống</string>
 
     <!-- Success messages -->
-    <string name="msg_login_success">Đăng nhập thành công!</string>
-    <string name="msg_register_success">Đăng ký thành công!</string>
-    <string name="msg_reset_success">Đổi mật khẩu thành công!</string>
+    <string name="msg_login_success">Chào mừng bạn quay trở lại!</string>
+    <string name="msg_register_success">Đăng ký tài khoản thành công! Chào mừng bạn đến với TourGo.</string>
+    <string name="msg_reset_success">Thiết lập mật khẩu mới thành công.</string>
     <string name="msg_recovery_sent">Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.</string>
-    <string name="msg_login_fail">Đăng nhập thất bại</string>
+    <string name="msg_login_fail">Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.</string>
 
     <!--  Error Code  -->
     <string name="err_unauthorized">Sai email hoặc mật khẩu</string>

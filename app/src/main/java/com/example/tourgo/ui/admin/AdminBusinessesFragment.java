@@ -24,6 +24,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.admin.AdminMockData.BizAccount;
+import com.example.tourgo.utils.ToastHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,6 +114,7 @@ public class AdminBusinessesFragment extends Fragment {
                     setLoading(false);
                     rebuildUi();
                 }
+                ToastHelper.showError(requireContext(), "Lỗi tải danh sách chờ duyệt: " + msg);
             }
         });
 
@@ -140,6 +142,7 @@ public class AdminBusinessesFragment extends Fragment {
                     setLoading(false);
                     rebuildUi();
                 }
+                ToastHelper.showError(requireContext(), "Lỗi tải danh sách đã duyệt: " + msg);
             }
         });
     }

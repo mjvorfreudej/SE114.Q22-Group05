@@ -147,11 +147,11 @@
     <string name="err_name_empty">Name cannot be empty</string>
 
     <!-- Success messages -->
-    <string name="msg_login_success">Signed in successfully!</string>
-    <string name="msg_register_success">Account created!</string>
-    <string name="msg_reset_success">Password updated!</string>
+    <string name="msg_login_success">Welcome back! Signed in successfully.</string>
+    <string name="msg_register_success">Account registered successfully! Welcome to TourGo.</string>
+    <string name="msg_reset_success">Password updated successfully.</string>
     <string name="msg_recovery_sent">Recovery email sent!\nPlease check your inbox.</string>
-    <string name="msg_login_fail">Login failed</string>
+    <string name="msg_login_fail">Login failed. Please check your credentials.</string>
 
     <!--  Error Code  -->
     <string name="err_unauthorized">Invalid email or password</string>
