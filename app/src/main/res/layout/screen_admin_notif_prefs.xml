@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Admin › Notifications detail screen. Push & Email preference toggles with
+     severity-tinted category tiles. (The notification *centre* still opens from
+     the admin home bell; this screen is the per-admin delivery preferences.) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_canvas"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_admin_detail_bar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_notif_push" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp">
+
+                    <!-- New business pending (blue) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_blue_50">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_building"
+                                app:tint="@color/adm_blue_500" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_pending_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_pending_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifPending"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Content reported (amber) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_amber_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_flag"
+                                app:tint="@color/adm_amber_500" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_reported_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_reported_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifReported"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Team changes (gray) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_gray_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_users"
+                                app:tint="@color/adm_gray_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_team_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_team_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifTeam"
+                            style="@style/AdmSwitch" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- SLA breach (red) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_red_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_time"
+                                app:tint="@color/adm_red_500" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_sla_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_sla_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifSla"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_notif_email" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp">
+
+                    <!-- Daily digest (gray) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_gray_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_inbox"
+                                app:tint="@color/adm_gray_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_digest_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_digest_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifDigest"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Weekly report (gray) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_gray_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_calendar"
+                                app:tint="@color/adm_gray_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_weekly_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_weekly_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifWeekly"
+                            style="@style/AdmSwitch" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Security alerts (green) -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_green_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_shield_check"
+                                app:tint="@color/adm_green_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_notif_security_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_notif_security_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admNotifSecurity"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginTop="14dp"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/adm_notif_footnote"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

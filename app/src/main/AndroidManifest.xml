@@ -33,6 +33,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.admin.AdminDetailActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.business.BusinessActivity"
             android:exported="false" />
 

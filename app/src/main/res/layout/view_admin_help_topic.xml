@@ -1,55 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Audit log entry: tinted action icon · action text · actor • time meta. -->
+<!-- Help-center topic tile content (blue icon + label + article count).
+     Included 4× by screen_admin_help.xml; AdminDetailActivity sets each one's
+     icon / label / count via a scoped findViewById on the include's id. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
-    android:background="@drawable/bg_adm_rounded_12"
-    android:backgroundTint="@color/adm_gray_50"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="12dp">
 
     <FrameLayout
-        android:id="@+id/admAuditIconWrap"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="1dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:background="@drawable/bg_adm_rounded_8"
-        android:backgroundTint="@color/adm_gray_100">
+        android:backgroundTint="@color/adm_blue_50">
 
         <ImageView
-            android:id="@+id/admAuditIcon"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:id="@+id/admTopicIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:layout_gravity="center"
             android:contentDescription="@null"
-            android:src="@drawable/ic_history"
-            app:tint="@color/adm_gray_700" />
+            android:src="@drawable/ic_gavel"
+            app:tint="@color/adm_blue_500" />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/admAuditAction"
-            android:layout_width="match_parent"
+            android:id="@+id/admTopicLabel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lineSpacingMultiplier="1.3"
             android:textColor="@color/adm_gray_900"
             android:textSize="12.5sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/admAuditMeta"
-            android:layout_width="match_parent"
+            android:id="@+id/admTopicCount"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="2dp"
             android:textColor="@color/adm_gray_400"
-            android:textSize="11sp" />
+            android:textSize="10.5sp" />
     </LinearLayout>
 </LinearLayout>
