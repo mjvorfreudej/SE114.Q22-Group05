@@ -7,10 +7,11 @@ import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
 import com.example.tourgo.models.request.UpdateProfileRequest;
 import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.UploadImageResponse;
 import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
-import com.example.tourgo.remote.api.UserApi;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -71,6 +72,35 @@ public class UserService {
 
                     @Override
                     public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    public static void uploadAvatar(Context context, MultipartBody.Part image, DataCallback<UploadImageResponse> callback) {
+        RetrofitClient.getInstance(context)
+                .getUserApi()
+                .uploadAvatar(image)
+                .enqueue(new Callback<ApiResponse<UploadImageResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<UploadImageResponse>> call, Response<ApiResponse<UploadImageResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<UploadImageResponse> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<UploadImageResponse>> call, Throwable t) {
                         ApiError error = ErrorHandler.parseError(t);
                         callback.onError(error.getCode(), error.getMessage());
                     }

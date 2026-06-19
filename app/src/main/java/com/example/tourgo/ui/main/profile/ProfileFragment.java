@@ -217,13 +217,18 @@ public class ProfileFragment extends Fragment {
         }
 
         // Other Settings Rows
-        setupSimpleRow(root, R.id.rowPersonalInfo, "Personal Information");
+        View rowPersonalInfo = root.findViewById(R.id.rowPersonalInfo);
+        if (rowPersonalInfo != null) {
+            rowPersonalInfo.setOnClickListener(v -> startActivity(new Intent(requireContext(), EditProfileActivity.class)));
+        }
         setupSimpleRow(root, R.id.rowPaymentMethods, "Payment Methods");
         setupSimpleRow(root, R.id.rowNotifications, "Notifications");
         setupSimpleRow(root, R.id.rowPrivacy, "Privacy & Security");
 
         View btnEdit = root.findViewById(R.id.btnProfileEdit);
-        if (btnEdit != null) btnEdit.setOnClickListener(v -> Toast.makeText(getContext(), "Edit Profile", Toast.LENGTH_SHORT).show());
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> startActivity(new Intent(requireContext(), EditProfileActivity.class)));
+        }
 
         root.findViewById(R.id.btnLogout).setOnClickListener(v -> showLogoutDialog());
     }
