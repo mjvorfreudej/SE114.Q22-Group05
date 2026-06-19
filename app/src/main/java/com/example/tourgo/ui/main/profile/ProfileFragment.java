@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main.profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,38 +16,45 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
-import com.example.tourgo.adapters.MyBookingAdapter;
+import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.data.repository.FavoriteRepository;
 import com.example.tourgo.data.repository.HotelRepository;
 import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.models.response.User;
-import com.example.tourgo.remote.service.UserService;
+import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.admin.AdminActivity;
 import com.example.tourgo.ui.admin.AdminUi;
-import com.example.tourgo.ui.business.BusinessActivity;
-import com.example.tourgo.ui.business.RegisterBusinessActivity;
 import com.example.tourgo.ui.auth.LoginActivity;
+import com.example.tourgo.ui.business.BusinessActivity;
+import com.example.tourgo.ui.business.BusinessRegistrationDetailActivity;
+import com.example.tourgo.ui.business.RegisterBusinessActivity;
 import com.example.tourgo.ui.main.booking.BookingHistorySection;
 import com.example.tourgo.utils.LocaleHelper;
-import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.lang.reflect.Type;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
+    private static final String TAG = "ProfileFragment";
     private TextView tvProfileName, tvProfileEmail;
     private ImageView ivProfileAvatar;
     private SessionManager session;
+    private View rowBusinessStatus, rowRegisterBusiness;
+    private TextView tvBusinessStatusSub;
 
     @Nullable
     @Override
@@ -65,9 +73,9 @@ public class ProfileFragment extends Fragment {
         tvProfileName = view.findViewById(R.id.tvProfileName);
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         ivProfileAvatar = view.findViewById(R.id.ivProfileAvatar);
-
-        // Load user profile from server
-        loadUserProfile();
+        rowBusinessStatus = view.findViewById(R.id.rowBusinessStatus);
+        rowRegisterBusiness = view.findViewById(R.id.rowRegisterBusiness);
+        tvBusinessStatusSub = view.findViewById(R.id.tvBusinessStatusSub);
 
         View btnBack = view.findViewById(R.id.btnProfileBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> {
@@ -75,32 +83,41 @@ public class ProfileFragment extends Fragment {
         });
 
         setupBookings(view);
-        setupSettings(view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (session.isLoggedIn()) {
+            loadUserProfile();
+            if (getView() != null) {
+                setupSettings(getView());
+            }
+        }
     }
 
     private void loadUserProfile() {
-        if (!session.isLoggedIn()) {
-            return;
-        }
-
-        // Dùng UserRepository để lấy user từ cache hoặc API
         UserRepository.getInstance().getCurrentUser(requireContext(), false, new DataCallback<User>() {
             @Override
             public void onSuccess(User user) {
+                if (!isAdded()) return;
                 if (user != null) {
                     if (tvProfileName != null) tvProfileName.setText(user.getName());
                     if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
 
                     session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole());
+                    
+                    if (getView() != null) {
+                        setupSettings(getView());
+                    }
                 }
             }
 
             @Override
             public void onError(ApiErrorCode code, String message) {
+                if (!isAdded()) return;
                 if (tvProfileName != null) tvProfileName.setText(session.getShortName());
                 if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
-
-                Toast.makeText(requireContext(), "Failed to load profile: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -116,113 +133,192 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setupBookings(View root) {
-        // Real booking history from the bookings table, with PAID/COMPLETED tabs.
         new BookingHistorySection(requireContext()).bind(root);
     }
 
     private void setupSettings(View root) {
-        // Admin Console — visible only to admins (email suffix / whitelist via SessionManager)
+        // Admin Console
         View rowAdmin = root.findViewById(R.id.rowAdminConsole);
         if (rowAdmin != null) {
             rowAdmin.setVisibility(session.isAdmin() ? View.VISIBLE : View.GONE);
-            rowAdmin.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), AdminActivity.class)));
+            rowAdmin.setOnClickListener(v -> startActivity(new Intent(requireContext(), AdminActivity.class)));
         }
 
-        // Business Console — visible only to business/partner accounts
+        // Business Console
         View rowBusiness = root.findViewById(R.id.rowBusinessConsole);
         if (rowBusiness != null) {
             rowBusiness.setVisibility(session.isBusiness() ? View.VISIBLE : View.GONE);
-            rowBusiness.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), BusinessActivity.class)));
+            rowBusiness.setOnClickListener(v -> startActivity(new Intent(requireContext(), BusinessActivity.class)));
         }
 
-        // Business Registration — visible to normal users (neither admin nor business)
-        View rowRegisterBusiness = root.findViewById(R.id.rowRegisterBusiness);
-        if (rowRegisterBusiness != null) {
-            rowRegisterBusiness.setVisibility((!session.isAdmin() && !session.isBusiness()) ? View.VISIBLE : View.GONE);
-            rowRegisterBusiness.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), RegisterBusinessActivity.class)));
+        // Logic for Business Registration and Status
+        if (!session.isAdmin() && !session.isBusiness()) {
+            checkBusinessRegistrationStatus();
+        } else {
+            hideRegistrationRows();
         }
-
-        // Edit Profile
-        View btnEdit = root.findViewById(R.id.btnProfileEdit);
-        if (btnEdit != null) btnEdit.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Edit Profile", Toast.LENGTH_SHORT).show();
-        });
 
         // Language Selection
-        MaterialButtonToggleGroup toggleLanguage = root.findViewById(R.id.toggleLanguage);
-        if (toggleLanguage != null) {
+        final MaterialButtonToggleGroup toggleLanguage = root.findViewById(R.id.toggleLanguage);
+        View rowLanguage = root.findViewById(R.id.rowLanguage);
+        if (toggleLanguage != null && toggleLanguage.getTag() == null) {
+            toggleLanguage.setTag(true); // Mark as initialized to prevent duplicate listeners
+            
             String currentLang = LocaleHelper.getCurrentLanguageTag();
-            if ("vi".equals(currentLang)) {
-                toggleLanguage.check(R.id.btnLangVi);
-            } else {
-                toggleLanguage.check(R.id.btnLangEn);
-            }
+            if ("vi".equals(currentLang)) toggleLanguage.check(R.id.btnLangVi);
+            else toggleLanguage.check(R.id.btnLangEn);
 
             toggleLanguage.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
                     String lang = (checkedId == R.id.btnLangVi) ? "vi" : "en";
                     if (!lang.equals(LocaleHelper.getCurrentLanguageTag())) {
+                        Log.d(TAG, "Changing language to: " + lang);
                         LocaleHelper.setAppLocale(lang);
-                        // Activity will recreate automatically
                     }
                 }
             });
+
+            // Make the whole row clickable for easier interaction
+            if (rowLanguage != null) {
+                rowLanguage.setOnClickListener(v -> {
+                    int nextId = (toggleLanguage.getCheckedButtonId() == R.id.btnLangVi) ? R.id.btnLangEn : R.id.btnLangVi;
+                    toggleLanguage.check(nextId);
+                });
+            }
         }
 
         // Currency Selection
-        MaterialButtonToggleGroup toggleCurrency = root.findViewById(R.id.toggleCurrency);
-        if (toggleCurrency != null) {
+        final MaterialButtonToggleGroup toggleCurrency = root.findViewById(R.id.toggleCurrency);
+        View rowCurrency = root.findViewById(R.id.rowCurrency);
+        if (toggleCurrency != null && toggleCurrency.getTag() == null) {
+            toggleCurrency.setTag(true);
+            
             String currentCurr = session.getCurrency();
-            if ("VND".equals(currentCurr)) {
-                toggleCurrency.check(R.id.btnCurrVnd);
-            } else {
-                toggleCurrency.check(R.id.btnCurrUsd);
-            }
+            if ("VND".equals(currentCurr)) toggleCurrency.check(R.id.btnCurrVnd);
+            else toggleCurrency.check(R.id.btnCurrUsd);
 
             toggleCurrency.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
                 if (isChecked) {
                     String currency = (checkedId == R.id.btnCurrVnd) ? "VND" : "USD";
                     if (!currency.equals(session.getCurrency())) {
                         session.setCurrency(currency);
-                        setupBookings(root); // Reload bookings with new currency
+                        setupBookings(root);
                         Toast.makeText(getContext(), "Currency changed to: " + currency, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
+
+            if (rowCurrency != null) {
+                rowCurrency.setOnClickListener(v -> {
+                    int nextId = (toggleCurrency.getCheckedButtonId() == R.id.btnCurrVnd) ? R.id.btnCurrUsd : R.id.btnCurrVnd;
+                    toggleCurrency.check(nextId);
+                });
+            }
         }
 
-        // Settings Rows
+        // Other Settings Rows
         View rowPersonalInfo = root.findViewById(R.id.rowPersonalInfo);
-        if (rowPersonalInfo != null) rowPersonalInfo.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Personal Information", Toast.LENGTH_SHORT).show();
-        });
+        if (rowPersonalInfo != null) {
+            rowPersonalInfo.setOnClickListener(v -> startActivity(new Intent(requireContext(), EditProfileActivity.class)));
+        }
+        setupSimpleRow(root, R.id.rowPaymentMethods, "Payment Methods");
+        setupSimpleRow(root, R.id.rowNotifications, "Notifications");
+        setupSimpleRow(root, R.id.rowPrivacy, "Privacy & Security");
 
-        View rowPayment = root.findViewById(R.id.rowPaymentMethods);
-        if (rowPayment != null) rowPayment.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Payment Methods", Toast.LENGTH_SHORT).show();
-        });
+        View btnEdit = root.findViewById(R.id.btnProfileEdit);
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> startActivity(new Intent(requireContext(), EditProfileActivity.class)));
+        }
 
-        View rowNotifications = root.findViewById(R.id.rowNotifications);
-        if (rowNotifications != null) rowNotifications.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Notifications", Toast.LENGTH_SHORT).show();
-        });
+        root.findViewById(R.id.btnLogout).setOnClickListener(v -> showLogoutDialog());
+    }
 
-        View rowPrivacy = root.findViewById(R.id.rowPrivacy);
-        if (rowPrivacy != null) rowPrivacy.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Privacy & Security", Toast.LENGTH_SHORT).show();
-        });
+    private void setupSimpleRow(View root, int id, final String message) {
+        View row = root.findViewById(id);
+        if (row != null) {
+            row.setOnClickListener(v -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
+        }
+    }
 
-        // Logout
-        View btnLogout = root.findViewById(R.id.btnLogout);
-        if (btnLogout != null) btnLogout.setOnClickListener(v -> showLogoutDialog());
+    private void checkBusinessRegistrationStatus() {
+        RetrofitClient.getInstance(requireContext())
+                .getUserApi()
+                .getBusinesses()
+                .enqueue(new Callback<ApiResponse<BusinessAccount>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<BusinessAccount>> call, Response<ApiResponse<BusinessAccount>> response) {
+                        if (!isAdded()) return;
+
+                        ApiResponse<BusinessAccount> body = response.body();
+
+                        if (!response.isSuccessful() && response.errorBody() != null) {
+                            try {
+                                String errorJson = response.errorBody().string();
+                                Type type = new TypeToken<ApiResponse<BusinessAccount>>(){}.getType();
+                                body = new Gson().fromJson(errorJson, type);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Failed to parse error body", e);
+                            }
+                        }
+
+                        if (body != null) {
+                            String status = (body.getData() != null) ? body.getData().getStatus() : null;
+                            if (status == null && "BUSINESS_NOT_APPROVED".equals(body.getError())) {
+                                status = "pending";
+                            }
+                            
+                            if (status != null && (status.equalsIgnoreCase("pending") 
+                                    || status.equalsIgnoreCase("rejected")
+                                    || status.equalsIgnoreCase("not approved yet"))) {
+                                showStatusRow(status);
+                                return;
+                            } else if (status != null && status.equalsIgnoreCase("active")) {
+                                hideRegistrationRows();
+                                return;
+                            }
+                        }
+                        
+                        showRegisterRow();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<BusinessAccount>> call, Throwable t) {
+                        if (!isAdded()) return;
+                        showRegisterRow();
+                    }
+                });
+    }
+
+    private void showStatusRow(String status) {
+        if (rowBusinessStatus != null) {
+            rowBusinessStatus.setVisibility(View.VISIBLE);
+            rowBusinessStatus.setOnClickListener(v -> 
+                startActivity(new Intent(requireContext(), BusinessRegistrationDetailActivity.class)));
+        }
+        if (rowRegisterBusiness != null) rowRegisterBusiness.setVisibility(View.GONE);
+
+        if (tvBusinessStatusSub != null) {
+            tvBusinessStatusSub.setText(status.equalsIgnoreCase("rejected") 
+                ? R.string.profile_registration_status_rejected 
+                : R.string.profile_registration_status_pending);
+        }
+    }
+
+    private void showRegisterRow() {
+        if (rowRegisterBusiness != null) {
+            rowRegisterBusiness.setVisibility(View.VISIBLE);
+            rowRegisterBusiness.setOnClickListener(v ->
+                    startActivity(new Intent(requireContext(), RegisterBusinessActivity.class)));
+        }
+        if (rowBusinessStatus != null) rowBusinessStatus.setVisibility(View.GONE);
+    }
+
+    private void hideRegistrationRows() {
+        if (rowRegisterBusiness != null) rowRegisterBusiness.setVisibility(View.GONE);
+        if (rowBusinessStatus != null) rowBusinessStatus.setVisibility(View.GONE);
     }
 
     private void showLogoutDialog() {
-        // Shared centered confirm popup (warning icon + red danger button) — same
-        // across Traveler / Business / Admin.
         AdminUi.confirm(requireContext(),
                 getString(R.string.profile_logout_title),
                 getString(R.string.profile_logout_confirm),
@@ -232,8 +328,6 @@ public class ProfileFragment extends Fragment {
 
     private void logout() {
         session.clear();
-
-        // Clear all repository caches khi logout
         UserRepository.getInstance().clearCache();
         FavoriteRepository.getInstance().clearCache();
         HotelRepository.getInstance().clearCache();

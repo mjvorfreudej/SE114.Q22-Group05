@@ -12,280 +12,327 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.08" />
+        app:layout_constraintGuide_percent="0.06" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/bg_card"
         android:clipToPadding="false"
         android:fillViewport="true"
+        android:paddingBottom="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineTop">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="24dp">
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="10dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/white">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Đăng ký Đối tác"
-                android:textColor="@color/black"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="Trở thành đối tác cung cấp Tour và Khách sạn"
-                android:textColor="@color/dark_gray"
-                android:textSize="14sp" />
-
-            <!-- Business Name -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Tên doanh nghiệp"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizName"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="32dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizName"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/biz_reg_title"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:text="@string/biz_reg_subtitle"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="14sp" />
+
+                <!-- Already Registered Hint -->
+                <TextView
+                    android:id="@+id/tvAlreadyRegistered"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập tên doanh nghiệp của bạn"
-                    android:inputType="text"
+                    android:layout_marginTop="16dp"
+                    android:background="#FFF8E1"
+                    android:padding="12dp"
+                    android:text="@string/biz_reg_already_have"
+                    android:textColor="#FFA000"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    app:drawableStartCompat="@drawable/ic_time"
+                    android:drawablePadding="8dp"
+                    android:visibility="gone" />
+
+                <!-- Business Name -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/biz_reg_name_label"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <!-- Owner Name -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Người đại diện"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizOwner"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizOwner"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizName"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập họ và tên người đại diện"
-                    android:inputType="textPersonName"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_name_hint"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Owner Name -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/biz_reg_owner_label"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <!-- Tax Code -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Mã số thuế"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizTaxCode"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizTaxCode"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizOwner"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập mã số thuế"
-                    android:inputType="text"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizOwner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_owner_hint"
+                        android:inputType="textPersonName"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Tax Code -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/biz_reg_tax_code"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <!-- Phone Number -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Số điện thoại"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizPhone"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizPhone"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizTaxCode"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập số điện thoại liên hệ"
-                    android:inputType="phone"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizTaxCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_tax_hint"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Phone Number -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/biz_reg_phone_label"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <!-- Email Address -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Email doanh nghiệp"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizEmail"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizEmail"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizPhone"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập email doanh nghiệp"
-                    android:inputType="textEmailAddress"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizPhone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_phone_hint"
+                        android:inputType="phone"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Email Address -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/biz_reg_email_label"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <!-- Address -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="Địa chỉ doanh nghiệp"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBizAddress"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                app:boxBackgroundColor="@color/light_gray"
-                app:boxBackgroundMode="outline"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeWidth="0dp"
-                app:boxStrokeWidthFocused="0dp"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBizAddress"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizEmail"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Nhập địa chỉ chính thức"
-                    android:inputType="text"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_email_hint"
+                        android:inputType="textEmailAddress"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Address -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/biz_reg_address_label"
                     android:textColor="@color/black"
-                    android:textColorHint="@color/dark_gray" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSubmitBiz"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="32dp"
-                android:backgroundTint="#3D7BFF"
-                android:text="Gửi đơn đăng ký"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp" />
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilBizAddress"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/light_gray"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintEnabled="false">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancelBiz"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="12dp"
-                android:text="Hủy bỏ"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/light_gray" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etBizAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/biz_reg_address_hint"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/dark_gray" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-        </LinearLayout>
+                <!-- Action Buttons with Loading -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSubmitBiz"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:backgroundTint="#3D7BFF"
+                        android:text="@string/biz_reg_submit"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp" />
+
+                    <ProgressBar
+                        android:id="@+id/pbRegisterLoading"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/white"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancelBiz"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/biz_reg_cancel"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/light_gray" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,6 +45,10 @@
             android:name=".ui.business.RegisterBusinessActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.business.BusinessRegistrationDetailActivity"
+            android:exported="false" />
+
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
@@ -93,6 +97,10 @@
         <activity
             android:name=".ui.main.profile.ProfileActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.main.profile.EditProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.main.tour.TourlistActivity"
             android:exported="false" />

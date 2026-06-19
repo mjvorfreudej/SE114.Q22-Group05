@@ -5,16 +5,20 @@ import com.example.tourgo.models.request.UpdateProfileRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.models.response.BusinessListing;
+import com.example.tourgo.models.response.UploadImageResponse;
 import com.example.tourgo.models.response.User;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 
 public interface UserApi {
     @GET("api/users/me")
@@ -22,6 +26,10 @@ public interface UserApi {
 
     @PUT("api/users/me")
     Call<ApiResponse<User>> updateProfile(@Body UpdateProfileRequest request);
+
+    @Multipart
+    @POST("api/users/me/avatar")
+    Call<ApiResponse<UploadImageResponse>> uploadAvatar(@Part MultipartBody.Part image);
 
     @DELETE("api/users/me")
     Call<ApiResponse<Void>> deleteAccount();
