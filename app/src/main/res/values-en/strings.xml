@@ -122,6 +122,44 @@
     <string name="profile_business_console_sub">Manage listings &amp; reviews</string>
     <string name="profile_register_business">Register as Partner</string>
     <string name="profile_register_business_sub">Become a service provider partner</string>
+    <string name="profile_registration_status">Registration Status</string>
+    <string name="profile_registration_status_pending">Awaiting Approval</string>
+    <string name="profile_registration_status_rejected">Rejected - Tap to view details</string>
+
+    <!-- Register Business -->
+    <string name="biz_reg_title">Partner Registration</string>
+    <string name="biz_reg_subtitle">Become a partner to provide Tours and Hotels</string>
+    <string name="biz_reg_name_label">Business Name</string>
+    <string name="biz_reg_name_hint">Enter business name</string>
+    <string name="biz_reg_owner_label">Representative</string>
+    <string name="biz_reg_owner_hint">Full name of representative</string>
+    <string name="biz_reg_tax_label">Tax Code</string>
+    <string name="biz_reg_tax_hint">Enter tax code</string>
+    <string name="biz_reg_phone_label">Phone Number</string>
+    <string name="biz_reg_phone_hint">Enter phone number</string>
+    <string name="biz_reg_email_label">Business Email</string>
+    <string name="biz_reg_email_hint">example@company.com</string>
+    <string name="biz_reg_address_label">Business Address</string>
+    <string name="biz_reg_address_hint">Headquarters address</string>
+    <string name="biz_reg_submit">Submit Registration</string>
+    <string name="biz_reg_cancel">Cancel</string>
+    <string name="biz_reg_already_have">You have already submitted a registration. Tap to view status.</string>
+
+    <!-- Business Registration Detail -->
+    <string name="biz_reg_detail_title">Registration Details</string>
+    <string name="biz_reg_status_label">Order Status</string>
+    <string name="biz_reg_rejection_reason">Rejection Reason</string>
+    <string name="biz_reg_biz_info">Business Information</string>
+    <string name="biz_reg_biz_name">Business Name</string>
+    <string name="biz_reg_owner">Representative</string>
+    <string name="biz_reg_tax_code">Tax Code</string>
+    <string name="biz_reg_phone">Phone Number</string>
+    <string name="biz_reg_email">Email</string>
+    <string name="biz_reg_address">Address</string>
+    <string name="biz_reg_re_register">Re-register</string>
+    <string name="biz_reg_status_rejected">Rejected</string>
+    <string name="biz_reg_status_active">Activated</string>
+    <string name="biz_reg_no_reason">No specific reason provided.</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Edit profile</string>
@@ -637,7 +675,7 @@
     <string name="notif_a6_body">Platform GMV crossed $1.0M this month — a new record.</string>
     <string name="notif_a6_when">Yesterday</string>
 
-    <string name="notif_a7_title">10,000 weekly active travelers</string>
+    <string name="notif_a7_title">10.000 weekly active travelers</string>
     <string name="notif_a7_body">Active travelers up 18% week over week.</string>
     <string name="notif_a7_when">Yesterday</string>
 

@@ -121,6 +121,44 @@
     <string name="profile_business_console_sub">Quản lý tin đăng &amp; đánh giá</string>
     <string name="profile_register_business">Đăng ký đối tác</string>
     <string name="profile_register_business_sub">Trở thành đối tác cung cấp dịch vụ</string>
+    <string name="profile_registration_status">Tình trạng đăng ký</string>
+    <string name="profile_registration_status_pending">Đang chờ phê duyệt</string>
+    <string name="profile_registration_status_rejected">Đã bị từ chối - Chạm để xem chi tiết</string>
+
+    <!-- Register Business -->
+    <string name="biz_reg_title">Đăng ký Đối tác</string>
+    <string name="biz_reg_subtitle">Trở thành đối tác cung cấp Tour và Khách sạn</string>
+    <string name="biz_reg_name_label">Tên doanh nghiệp</string>
+    <string name="biz_reg_name_hint">Nhập tên doanh nghiệp</string>
+    <string name="biz_reg_owner_label">Người đại diện</string>
+    <string name="biz_reg_owner_hint">Họ và tên người đại diện</string>
+    <string name="biz_reg_tax_label">Mã số thuế</string>
+    <string name="biz_reg_tax_hint">Nhập mã số thuế</string>
+    <string name="biz_reg_phone_label">Số điện thoại</string>
+    <string name="biz_reg_phone_hint">Nhập số điện thoại</string>
+    <string name="biz_reg_email_label">Email doanh nghiệp</string>
+    <string name="biz_reg_email_hint">example@company.com</string>
+    <string name="biz_reg_address_label">Địa chỉ doanh nghiệp</string>
+    <string name="biz_reg_address_hint">Địa chỉ trụ sở chính</string>
+    <string name="biz_reg_submit">Gửi đơn đăng ký</string>
+    <string name="biz_reg_cancel">Hủy bỏ</string>
+    <string name="biz_reg_already_have">Bạn đã gửi đơn đăng ký. Chạm để xem tình trạng.</string>
+
+    <!-- Business Registration Detail -->
+    <string name="biz_reg_detail_title">Chi tiết đơn đăng ký</string>
+    <string name="biz_reg_status_label">Trạng thái đơn hàng</string>
+    <string name="biz_reg_rejection_reason">Lý do từ chối</string>
+    <string name="biz_reg_biz_info">Thông tin doanh nghiệp</string>
+    <string name="biz_reg_biz_name">Tên doanh nghiệp</string>
+    <string name="biz_reg_owner">Người đại diện</string>
+    <string name="biz_reg_tax_code">Mã số thuế</string>
+    <string name="biz_reg_phone">Số điện thoại</string>
+    <string name="biz_reg_email">Email</string>
+    <string name="biz_reg_address">Địa chỉ</string>
+    <string name="biz_reg_re_register">Đăng ký lại</string>
+    <string name="biz_reg_status_rejected">Bị từ chối</string>
+    <string name="biz_reg_status_active">Đã kích hoạt</string>
+    <string name="biz_reg_no_reason">Không có lý do cụ thể.</string>
 
     <!-- dialog_edit_profile.xml -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>
@@ -172,7 +210,7 @@
     <string name="payment_title">Thanh toán</string>
     <string name="payment_booking_id">Mã đặt phòng: %1$s</string>
     <string name="payment_total">Tổng tiền: %1$s</string>
-    
+
     <!-- Search -->
     <string name="search_no_results">Không tìm thấy kết quả</string>
     <string name="search_timeout">Hết thời gian chờ, vui lòng thử lại</string>
@@ -566,10 +604,10 @@
     <string name="notif_t8_body">Chúng tôi đã cập nhật điều khoản hủy — chạm để xem thay đổi.</string>
     <string name="notif_t8_when">2 ngày</string>
 
-    <string name="notif_t9_title">Chuyến đi của bạn bắt đầu sau 2 ngày</string>
-    <string name="notif_t9_body">Tour đi bộ Phố cổ Kyoto của bạn bắt đầu ngày 13/08.</string>
+    <string name="notif_t9_title">Lời nhắc đặt chỗ</string>
+    <string name="notif_t9_body">Bạn chưa hoàn tất đặt chỗ tại Sunset Villa. Chạm để tiếp tục.</string>
     <string name="notif_t9_when">3 ngày</string>
-    <string name="notif_t9_action">Xem hành trình</string>
+    <string name="notif_t9_action">Tiếp tục đặt</string>
 
     <!-- ============================================================
          Thông báo Doanh nghiệp & Quản trị (ui_kits/notifications) — Tiếng Việt
@@ -902,5 +940,12 @@
     <string name="biz_summary_pricing">Giá</string>
     <string name="biz_summary_pricing_value">Theo mùa · 3 phụ phí</string>
     <string name="biz_terms">Tôi đồng ý với Điều khoản Chủ nhà của TourGo và xác nhận tin đăng này tuân thủ quy định địa phương.</string>
+    <string name="biz_reg_msg_success">Registration successful! Please wait for email
+        confirmation.
+    </string>
+    <string name="biz_reg_submitting">Awaiting approval…</string>
+    <string name="biz_reg_toast_network_error">Server connection error</string>
+
+
 
 </resources>
