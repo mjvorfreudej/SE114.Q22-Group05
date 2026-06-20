@@ -14,6 +14,7 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -46,8 +48,12 @@ import com.example.tourgo.models.request.UpdatePasswordRequest;
 import com.example.tourgo.models.response.AdminAuditEntry;
 import com.example.tourgo.models.response.AdminTeamMember;
 import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuditExport;
+import com.example.tourgo.models.response.ModerationPolicy;
+import com.example.tourgo.models.response.NotificationPrefs;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.remote.service.AdminService;
+import com.example.tourgo.ui.main.profile.EditProfileActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
@@ -57,6 +63,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,10 +115,14 @@ public class AdminDetailActivity extends AppCompatActivity {
     public static final String SCREEN_HELP = "help";
 
     // ── Audit state ───────────────────────────────────────────────────────────
+    private static final int AUDIT_PAGE = 20;
     private final String[] auditKeys = {"all", "approval", "lock", "settings"};
     private TextView[] auditChips;
     private List<AdminAuditEntry> auditEntries = new ArrayList<>();
     private String auditFilter = "all";
+    private View auditRoot;
+    private boolean auditHasMore = true;
+    private boolean auditLoading;
 
     // ── Help (FAQ accordion) state ──────────────────────────────────────────────
     private Chip policyAddChip;
@@ -198,36 +211,83 @@ public class AdminDetailActivity extends AppCompatActivity {
     // 1 · MODERATION POLICY
     // ════════════════════════════════════════════════════════════════════════
     private void bindModPolicy(View root) {
+        // Load from the server; fall back to the local cache if it's unreachable.
+        AdminService.getModerationPolicy(this, new DataCallback<ModerationPolicy>() {
+            @Override
+            public void onSuccess(ModerationPolicy policy) {
+                if (isFinishing() || policy == null) return;
+                cachePolicy(policy);
+                applyPolicy(root, policy);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (isFinishing()) return;
+                applyPolicy(root, localPolicy());
+            }
+        });
+    }
+
+    private void applyPolicy(View root, ModerationPolicy p) {
         final SwitchCompat autoHide = root.findViewById(R.id.admPolicyAutohide);
         final SwitchCompat profanity = root.findViewById(R.id.admPolicyProfanity);
         final SwitchCompat photo = root.findViewById(R.id.admPolicyPhoto);
         final SwitchCompat geo = root.findViewById(R.id.admPolicyGeo);
-        autoHide.setChecked(prefs.getBool(POLICY_AUTOHIDE, true));
-        profanity.setChecked(prefs.getBool(POLICY_PROFANITY, true));
-        photo.setChecked(prefs.getBool(POLICY_PHOTO, false));
-        geo.setChecked(prefs.getBool(POLICY_GEO, false));
+        autoHide.setChecked(p.isAutoHide());
+        profanity.setChecked(p.isProfanity());
+        photo.setChecked(p.isPhotoReview());
+        geo.setChecked(p.isGeoBlock());
 
-        final int[] hideAt = {prefs.getInt(POLICY_HIDE_AT, 5)};
-        final int[] sla = {prefs.getInt(POLICY_SLA, 24)};
+        final int[] hideAt = {p.getHideAt() > 0 ? p.getHideAt() : 5};
+        final int[] sla = {p.getSlaHours() > 0 ? p.getSlaHours() : 24};
         wireStepper(root, R.id.admHideAtMinus, R.id.admHideAtValue, R.id.admHideAtPlus,
                 hideAt, 1, 20, null);
         wireStepper(root, R.id.admSlaMinus, R.id.admSlaValue, R.id.admSlaPlus,
                 sla, 4, 72, getString(R.string.adm_hours_suffix));
 
         final ChipGroup terms = root.findViewById(R.id.admPolicyTerms);
-        bindTerms(terms, prefs.getList(POLICY_TERMS, Arrays.asList("scam", "counterfeit", "unsafe")));
+        terms.removeAllViews();
+        policyAddChip = null;
+        List<String> seed = p.getTerms().isEmpty()
+                ? Arrays.asList("scam", "counterfeit", "unsafe") : p.getTerms();
+        bindTerms(terms, seed);
 
         root.findViewById(R.id.admPolicySave).setOnClickListener(v -> {
-            prefs.setBool(POLICY_AUTOHIDE, autoHide.isChecked());
-            prefs.setBool(POLICY_PROFANITY, profanity.isChecked());
-            prefs.setBool(POLICY_PHOTO, photo.isChecked());
-            prefs.setBool(POLICY_GEO, geo.isChecked());
-            prefs.setInt(POLICY_HIDE_AT, hideAt[0]);
-            prefs.setInt(POLICY_SLA, sla[0]);
-            prefs.setList(POLICY_TERMS, currentTerms(terms));
-            toast(R.string.adm_toast_policy_saved);
-            finish();
+            ModerationPolicy out = new ModerationPolicy(
+                    autoHide.isChecked(), profanity.isChecked(), photo.isChecked(), geo.isChecked(),
+                    hideAt[0], sla[0], currentTerms(terms));
+            cachePolicy(out); // cache immediately so the change is never lost
+            AdminService.updateModerationPolicy(AdminDetailActivity.this, out, new DataCallback<Void>() {
+                @Override public void onSuccess(Void unused) {
+                    toast(R.string.adm_toast_policy_saved);
+                    finish();
+                }
+                @Override public void onError(ApiErrorCode code, String msg) {
+                    toastMsg(msg);
+                }
+            });
         });
+    }
+
+    private void cachePolicy(ModerationPolicy p) {
+        prefs.setBool(POLICY_AUTOHIDE, p.isAutoHide());
+        prefs.setBool(POLICY_PROFANITY, p.isProfanity());
+        prefs.setBool(POLICY_PHOTO, p.isPhotoReview());
+        prefs.setBool(POLICY_GEO, p.isGeoBlock());
+        prefs.setInt(POLICY_HIDE_AT, p.getHideAt() > 0 ? p.getHideAt() : 5);
+        prefs.setInt(POLICY_SLA, p.getSlaHours() > 0 ? p.getSlaHours() : 24);
+        prefs.setList(POLICY_TERMS, p.getTerms());
+    }
+
+    private ModerationPolicy localPolicy() {
+        return new ModerationPolicy(
+                prefs.getBool(POLICY_AUTOHIDE, true),
+                prefs.getBool(POLICY_PROFANITY, true),
+                prefs.getBool(POLICY_PHOTO, false),
+                prefs.getBool(POLICY_GEO, false),
+                prefs.getInt(POLICY_HIDE_AT, 5),
+                prefs.getInt(POLICY_SLA, 24),
+                prefs.getList(POLICY_TERMS, Arrays.asList("scam", "counterfeit", "unsafe")));
     }
 
     /** Wire a ± stepper backed by a caller-owned cell, so the live value is
@@ -324,14 +384,17 @@ public class AdminDetailActivity extends AppCompatActivity {
         final LinearLayout container = root.findViewById(R.id.admTeamMembers);
         final TextView summary = root.findViewById(R.id.admTeamSummary);
         root.findViewById(R.id.admTeamInvite)
-                .setOnClickListener(v -> toast(R.string.adm_toast_invite_sent));
+                .setOnClickListener(v -> showInviteDialog(container, summary));
+        loadTeam(container, summary);
+    }
 
+    private void loadTeam(LinearLayout container, TextView summary) {
         final String myEmail = new SessionManager(this).getEmail();
-
         AdminService.getTeam(this, new DataCallback<List<AdminTeamMember>>() {
             @Override
             public void onSuccess(List<AdminTeamMember> members) {
                 if (isFinishing() || members == null) return;
+                container.removeAllViews();
                 summary.setText(getString(R.string.adm_team_summary, members.size()));
                 LayoutInflater inf = LayoutInflater.from(AdminDetailActivity.this);
                 for (int i = 0; i < members.size(); i++) {
@@ -346,7 +409,7 @@ public class AdminDetailActivity extends AppCompatActivity {
                     role.setText(m.getRole().toUpperCase(Locale.ROOT));
                     styleRoleBadge(role, m.getRole());
                     row.findViewById(R.id.admMemberMenu)
-                            .setOnClickListener(v -> showMemberMenu(v, isYou));
+                            .setOnClickListener(v -> showMemberMenu(v, m, isYou, container, summary));
                     container.addView(row);
                     if (i < members.size() - 1) addDivider(container);
                 }
@@ -375,31 +438,97 @@ public class AdminDetailActivity extends AppCompatActivity {
         chip.setTextColor(color(fg));
     }
 
-    private void showMemberMenu(View anchor, boolean isYou) {
+    private void showMemberMenu(View anchor, AdminTeamMember member, boolean isYou,
+                                LinearLayout container, TextView summary) {
         PopupMenu menu = new PopupMenu(this, anchor);
         if (isYou) {
             menu.getMenu().add(R.string.adm_team_edit_profile);
+            menu.setOnMenuItemClickListener(item -> {
+                startActivity(new Intent(AdminDetailActivity.this, EditProfileActivity.class));
+                return true;
+            });
         } else {
-            menu.getMenu().add(R.string.adm_team_change_role);
-            menu.getMenu().add(R.string.adm_team_resend);
-            menu.getMenu().add(R.string.adm_team_remove);
+            menu.getMenu().add(0, 1, 0, R.string.adm_team_change_role);
+            menu.getMenu().add(0, 2, 1, R.string.adm_team_remove);
+            menu.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == 1) showChangeRoleDialog(member, container, summary);
+                else if (item.getItemId() == 2) confirmRemoveAdmin(member, container, summary);
+                return true;
+            });
         }
-        menu.setOnMenuItemClickListener(item -> {
-            Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
-            return true;
-        });
         menu.show();
+    }
+
+    private void showInviteDialog(LinearLayout container, TextView summary) {
+        final EditText input = new EditText(this);
+        input.setHint(R.string.adm_team_invite_hint);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        int pad = dp(20);
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.adm_team_invite_admin)
+                .setView(input)
+                .setPositiveButton(android.R.string.ok, (d, w) -> {
+                    String email = input.getText().toString().trim();
+                    if (email.isEmpty()) return;
+                    AdminService.inviteAdmin(AdminDetailActivity.this, email, new DataCallback<AdminTeamMember>() {
+                        @Override public void onSuccess(AdminTeamMember m) {
+                            toast(R.string.adm_toast_invite_sent);
+                            loadTeam(container, summary);
+                        }
+                        @Override public void onError(ApiErrorCode code, String msg) {
+                            toastMsg(msg);
+                        }
+                    });
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+        input.setPadding(pad, dp(8), pad, dp(8));
+    }
+
+    private void showChangeRoleDialog(AdminTeamMember member, LinearLayout container, TextView summary) {
+        final String[] roles = {"OWNER", "ADMIN", "MODERATOR"};
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.adm_team_change_role)
+                .setItems(roles, (d, which) -> AdminService.changeAdminRole(
+                        AdminDetailActivity.this, member.getId(), roles[which], new DataCallback<Void>() {
+                            @Override public void onSuccess(Void unused) {
+                                toast(R.string.adm_toast_role_changed);
+                                loadTeam(container, summary);
+                            }
+                            @Override public void onError(ApiErrorCode code, String msg) {
+                                toastMsg(msg);
+                            }
+                        }))
+                .show();
+    }
+
+    private void confirmRemoveAdmin(AdminTeamMember member, LinearLayout container, TextView summary) {
+        AdminUi.confirm(this,
+                getString(R.string.adm_team_remove),
+                getString(R.string.adm_team_remove_confirm, member.getName()),
+                getString(R.string.adm_team_remove),
+                true,
+                () -> AdminService.removeAdmin(AdminDetailActivity.this, member.getId(), new DataCallback<Void>() {
+                    @Override public void onSuccess(Void unused) {
+                        toast(R.string.adm_toast_admin_removed);
+                        loadTeam(container, summary);
+                    }
+                    @Override public void onError(ApiErrorCode code, String msg) {
+                        toastMsg(msg);
+                    }
+                }));
     }
 
     // ════════════════════════════════════════════════════════════════════════
     // 3 · AUDIT LOG  (live: GET /api/admin/audit-log)
     // ════════════════════════════════════════════════════════════════════════
     private void bindAudit(View root) {
+        auditRoot = root;
         View action = root.findViewById(R.id.admDetailAction);
         action.setVisibility(View.VISIBLE);
         ((ImageView) root.findViewById(R.id.admDetailActionIcon))
                 .setImageResource(R.drawable.ic_download);
-        action.setOnClickListener(v -> toast(R.string.adm_audit_export));
+        action.setOnClickListener(v -> exportAudit());
 
         auditChips = new TextView[]{
                 root.findViewById(R.id.admChipAll),
@@ -411,17 +540,18 @@ public class AdminDetailActivity extends AppCompatActivity {
             auditChips[i].setOnClickListener(v -> {
                 auditFilter = key;
                 styleAuditChips();
-                renderAudit(root);
+                renderAudit();
             });
         }
         styleAuditChips();
 
-        AdminService.getAuditLog(this, new DataCallback<List<AdminAuditEntry>>() {
+        AdminService.getAuditLog(this, null, AUDIT_PAGE, new DataCallback<List<AdminAuditEntry>>() {
             @Override
             public void onSuccess(List<AdminAuditEntry> logs) {
                 if (isFinishing() || logs == null) return;
-                auditEntries = logs;
-                renderAudit(root);
+                auditEntries = new ArrayList<>(logs);
+                auditHasMore = logs.size() >= AUDIT_PAGE;
+                renderAudit();
             }
 
             @Override
@@ -429,6 +559,72 @@ public class AdminDetailActivity extends AppCompatActivity {
                 // Leave the timeline empty on failure.
             }
         });
+    }
+
+    /** Fetch the next page of older entries (cursor = oldest loaded created_at). */
+    private void loadMoreAudit() {
+        if (auditLoading || auditEntries.isEmpty()) return;
+        auditLoading = true;
+        String oldest = auditEntries.get(auditEntries.size() - 1).getCreatedAt();
+        AdminService.getAuditLog(this, oldest, AUDIT_PAGE, new DataCallback<List<AdminAuditEntry>>() {
+            @Override
+            public void onSuccess(List<AdminAuditEntry> logs) {
+                auditLoading = false;
+                if (isFinishing() || logs == null) return;
+                auditHasMore = logs.size() >= AUDIT_PAGE;
+                if (logs.isEmpty()) {
+                    toast(R.string.adm_audit_no_more);
+                } else {
+                    auditEntries.addAll(logs);
+                }
+                renderAudit();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                auditLoading = false;
+                toastMsg(msg);
+            }
+        });
+    }
+
+    /** Export the audit log as CSV (built server-side) and offer a share sheet. */
+    private void exportAudit() {
+        AdminService.exportAuditLog(this, new DataCallback<AuditExport>() {
+            @Override
+            public void onSuccess(AuditExport export) {
+                if (isFinishing() || export == null || export.getCsv() == null) return;
+                shareCsv(export.getFilename() != null ? export.getFilename() : "tourgo-audit-log.csv",
+                        export.getCsv());
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                toastMsg(msg);
+            }
+        });
+    }
+
+    /** Write the CSV to cache and share it as a real .csv file via FileProvider. */
+    private void shareCsv(String filename, String csv) {
+        try {
+            File dir = new File(getCacheDir(), "exports");
+            //noinspection ResultOfMethodCallIgnored
+            dir.mkdirs();
+            File file = new File(dir, filename);
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(csv);
+            }
+            Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/csv");
+            share.putExtra(Intent.EXTRA_STREAM, uri);
+            share.putExtra(Intent.EXTRA_SUBJECT, filename);
+            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(share, getString(R.string.adm_audit_export)));
+        } catch (IOException e) {
+            toastMsg(e.getMessage());
+        }
     }
 
     private void styleAuditChips() {
@@ -440,8 +636,8 @@ public class AdminDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void renderAudit(View root) {
-        LinearLayout container = root.findViewById(R.id.admAuditContainer);
+    private void renderAudit() {
+        LinearLayout container = auditRoot.findViewById(R.id.admAuditContainer);
         container.removeAllViews();
 
         LinkedHashMap<String, List<AdminAuditEntry>> groups = new LinkedHashMap<>();
@@ -493,14 +689,17 @@ public class AdminDetailActivity extends AppCompatActivity {
             container.addView(card);
         }
 
-        TextView more = new TextView(this);
-        more.setText(R.string.adm_audit_load_earlier);
-        more.setTextColor(color(R.color.adm_blue_500));
-        more.setTextSize(12f);
-        more.setTypeface(Typeface.DEFAULT_BOLD);
-        more.setGravity(android.view.Gravity.CENTER);
-        more.setPadding(0, dp(14), 0, dp(4));
-        container.addView(more);
+        if (auditHasMore) {
+            TextView more = new TextView(this);
+            more.setText(R.string.adm_audit_load_earlier);
+            more.setTextColor(color(R.color.adm_blue_500));
+            more.setTextSize(12f);
+            more.setTypeface(Typeface.DEFAULT_BOLD);
+            more.setGravity(android.view.Gravity.CENTER);
+            more.setPadding(0, dp(14), 0, dp(4));
+            more.setOnClickListener(v -> loadMoreAudit());
+            container.addView(more);
+        }
     }
 
     private boolean matchesFilter(String kind) {
@@ -564,25 +763,87 @@ public class AdminDetailActivity extends AppCompatActivity {
     // 4 · NOTIFICATIONS (preferences)
     // ════════════════════════════════════════════════════════════════════════
     private void bindNotifications(View root) {
-        bindNotifToggle(root, R.id.admNotifPending, NOTIF_PENDING, true);
-        bindNotifToggle(root, R.id.admNotifReported, NOTIF_REPORTED, true);
-        bindNotifToggle(root, R.id.admNotifTeam, NOTIF_TEAM, false);
-        bindNotifToggle(root, R.id.admNotifSla, NOTIF_SLA, true);
-        bindNotifToggle(root, R.id.admNotifDigest, NOTIF_DIGEST, true);
-        bindNotifToggle(root, R.id.admNotifWeekly, NOTIF_WEEKLY, false);
+        // Load from the server; fall back to the local cache if it's unreachable.
+        AdminService.getNotificationPrefs(this, new DataCallback<NotificationPrefs>() {
+            @Override
+            public void onSuccess(NotificationPrefs p) {
+                if (isFinishing() || p == null) return;
+                cacheNotif(p);
+                applyNotif(root, p);
+            }
 
-        // Security alerts are locked on for owners (design footnote): always on, not editable.
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (isFinishing()) return;
+                applyNotif(root, localNotif());
+            }
+        });
+    }
+
+    private void applyNotif(View root, NotificationPrefs p) {
+        SwitchCompat pending = root.findViewById(R.id.admNotifPending);
+        SwitchCompat reported = root.findViewById(R.id.admNotifReported);
+        SwitchCompat team = root.findViewById(R.id.admNotifTeam);
+        SwitchCompat sla = root.findViewById(R.id.admNotifSla);
+        SwitchCompat digest = root.findViewById(R.id.admNotifDigest);
+        SwitchCompat weekly = root.findViewById(R.id.admNotifWeekly);
         SwitchCompat security = root.findViewById(R.id.admNotifSecurity);
+
+        // Set state first, then attach listeners, so initialisation doesn't trigger a save.
+        pending.setChecked(p.isPending());
+        reported.setChecked(p.isReported());
+        team.setChecked(p.isTeam());
+        sla.setChecked(p.isSla());
+        digest.setChecked(p.isDigest());
+        weekly.setChecked(p.isWeekly());
         security.setChecked(true);
-        security.setEnabled(false);
+        security.setEnabled(false); // locked on for owners (design footnote)
+
+        CompoundButton.OnCheckedChangeListener saver = (b, checked) -> persistNotif(root);
+        pending.setOnCheckedChangeListener(saver);
+        reported.setOnCheckedChangeListener(saver);
+        team.setOnCheckedChangeListener(saver);
+        sla.setOnCheckedChangeListener(saver);
+        digest.setOnCheckedChangeListener(saver);
+        weekly.setOnCheckedChangeListener(saver);
+    }
+
+    /** Build prefs from the current switches; cache locally and sync to the server. */
+    private void persistNotif(View root) {
+        NotificationPrefs p = new NotificationPrefs(
+                ((SwitchCompat) root.findViewById(R.id.admNotifPending)).isChecked(),
+                ((SwitchCompat) root.findViewById(R.id.admNotifReported)).isChecked(),
+                ((SwitchCompat) root.findViewById(R.id.admNotifTeam)).isChecked(),
+                ((SwitchCompat) root.findViewById(R.id.admNotifSla)).isChecked(),
+                ((SwitchCompat) root.findViewById(R.id.admNotifDigest)).isChecked(),
+                ((SwitchCompat) root.findViewById(R.id.admNotifWeekly)).isChecked(),
+                true);
+        cacheNotif(p);
+        AdminService.updateNotificationPrefs(this, p, new DataCallback<Void>() {
+            @Override public void onSuccess(Void unused) { }
+            @Override public void onError(ApiErrorCode code, String msg) { }
+        });
+    }
+
+    private void cacheNotif(NotificationPrefs p) {
+        prefs.setBool(NOTIF_PENDING, p.isPending());
+        prefs.setBool(NOTIF_REPORTED, p.isReported());
+        prefs.setBool(NOTIF_TEAM, p.isTeam());
+        prefs.setBool(NOTIF_SLA, p.isSla());
+        prefs.setBool(NOTIF_DIGEST, p.isDigest());
+        prefs.setBool(NOTIF_WEEKLY, p.isWeekly());
         prefs.setBool(NOTIF_SECURITY, true);
     }
 
-    /** A persisted notification toggle: restores the saved value, saves on change. */
-    private void bindNotifToggle(View root, int switchId, String key, boolean def) {
-        SwitchCompat sw = root.findViewById(switchId);
-        sw.setChecked(prefs.getBool(key, def));
-        sw.setOnCheckedChangeListener((b, checked) -> prefs.setBool(key, checked));
+    private NotificationPrefs localNotif() {
+        return new NotificationPrefs(
+                prefs.getBool(NOTIF_PENDING, true),
+                prefs.getBool(NOTIF_REPORTED, true),
+                prefs.getBool(NOTIF_TEAM, false),
+                prefs.getBool(NOTIF_SLA, true),
+                prefs.getBool(NOTIF_DIGEST, true),
+                prefs.getBool(NOTIF_WEEKLY, false),
+                true);
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -816,5 +1077,12 @@ public class AdminDetailActivity extends AppCompatActivity {
 
     private void toast(@StringRes int res) {
         Toast.makeText(this, res, Toast.LENGTH_SHORT).show();
+    }
+
+    /** Toast a raw server/error message, falling back to a generic line. */
+    private void toastMsg(String message) {
+        Toast.makeText(this,
+                message != null && !message.isEmpty() ? message : getString(R.string.adm_error_generic),
+                Toast.LENGTH_SHORT).show();
     }
 }

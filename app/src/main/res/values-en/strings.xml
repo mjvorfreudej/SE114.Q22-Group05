@@ -561,6 +561,12 @@
     <string name="adm_team_pending_meta">Invited 2 days ago · MODERATOR</string>
     <string name="adm_team_pending_chip">PENDING</string>
     <string name="adm_team_invite_admin">Invite admin</string>
+    <string name="adm_team_invite_hint">Email of an existing TourGo account</string>
+    <string name="adm_team_remove_confirm">Remove %s from the admin team?</string>
+    <string name="adm_toast_role_changed">Role updated</string>
+    <string name="adm_toast_admin_removed">Admin removed</string>
+    <string name="adm_audit_no_more">No earlier activity</string>
+    <string name="adm_error_generic">Something went wrong. Please try again.</string>
 
     <!-- 3 · Audit log -->
     <string name="adm_audit_filter_approvals">Approvals</string>

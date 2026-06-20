@@ -565,6 +565,12 @@
     <string name="adm_team_pending_meta">Đã mời 2 ngày trước · MODERATOR</string>
     <string name="adm_team_pending_chip">ĐANG CHỜ</string>
     <string name="adm_team_invite_admin">Mời admin</string>
+    <string name="adm_team_invite_hint">Email của tài khoản TourGo hiện có</string>
+    <string name="adm_team_remove_confirm">Gỡ %s khỏi đội ngũ admin?</string>
+    <string name="adm_toast_role_changed">Đã cập nhật vai trò</string>
+    <string name="adm_toast_admin_removed">Đã gỡ admin</string>
+    <string name="adm_audit_no_more">Không còn hoạt động cũ hơn</string>
+    <string name="adm_error_generic">Đã xảy ra lỗi. Vui lòng thử lại.</string>
 
     <!-- 3 · Nhật ký kiểm toán -->
     <string name="adm_audit_filter_approvals">Phê duyệt</string>

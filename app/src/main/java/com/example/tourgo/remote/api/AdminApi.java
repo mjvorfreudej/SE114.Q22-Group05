@@ -1,5 +1,7 @@
 package com.example.tourgo.remote.api;
 
+import com.example.tourgo.models.request.ChangeRoleRequest;
+import com.example.tourgo.models.request.InviteAdminRequest;
 import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminAuditEntry;
@@ -7,14 +9,21 @@ import com.example.tourgo.models.response.AdminReport;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.models.response.AdminTeamMember;
 import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuditExport;
 import com.example.tourgo.models.response.BusinessAccount;
+import com.example.tourgo.models.response.ModerationPolicy;
+import com.example.tourgo.models.response.NotificationPrefs;
 
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Admin-console endpoints on the Node.js backend. The Android client only ever
@@ -91,4 +100,42 @@ public interface AdminApi {
     /** Recent moderation actions for the audit log. */
     @GET("api/admin/audit-log")
     Call<ApiResponse<List<AdminAuditEntry>>> getAuditLog();
+
+    // ── Team management ──────────────────────────────────────────────────────────
+
+    /** Promote an existing user (by email) to admin. */
+    @POST("api/admin/team/invite")
+    Call<ApiResponse<AdminTeamMember>> inviteAdmin(@Body InviteAdminRequest request);
+
+    /** Change an admin's display role (OWNER / ADMIN / MODERATOR). */
+    @PUT("api/admin/team/{userId}/role")
+    Call<ApiResponse<Void>> changeAdminRole(@Path("userId") String userId, @Body ChangeRoleRequest request);
+
+    /** Remove an admin (demote back to a regular user). */
+    @DELETE("api/admin/team/{userId}")
+    Call<ApiResponse<Void>> removeAdmin(@Path("userId") String userId);
+
+    // ── Audit log pagination + export ─────────────────────────────────────────────
+
+    /** Page of audit entries older than {@code before} (ISO created_at cursor). */
+    @GET("api/admin/audit-log")
+    Call<ApiResponse<List<AdminAuditEntry>>> getAuditLog(@Query("before") String before, @Query("limit") int limit);
+
+    /** The audit log rendered as CSV (returned in the JSON envelope). */
+    @GET("api/admin/audit-log/export")
+    Call<ApiResponse<AuditExport>> exportAuditLog();
+
+    // ── Settings: moderation policy + notification preferences ─────────────────────
+
+    @GET("api/admin/settings/moderation")
+    Call<ApiResponse<ModerationPolicy>> getModerationPolicy();
+
+    @PUT("api/admin/settings/moderation")
+    Call<ApiResponse<Void>> updateModerationPolicy(@Body ModerationPolicy policy);
+
+    @GET("api/admin/settings/notifications")
+    Call<ApiResponse<NotificationPrefs>> getNotificationPrefs();
+
+    @PUT("api/admin/settings/notifications")
+    Call<ApiResponse<Void>> updateNotificationPrefs(@Body NotificationPrefs prefs);
 }

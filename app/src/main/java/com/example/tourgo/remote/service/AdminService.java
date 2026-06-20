@@ -5,6 +5,8 @@ import android.content.Context;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.ChangeRoleRequest;
+import com.example.tourgo.models.request.InviteAdminRequest;
 import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminAuditEntry;
@@ -12,7 +14,10 @@ import com.example.tourgo.models.response.AdminReport;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.models.response.AdminTeamMember;
 import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.AuditExport;
 import com.example.tourgo.models.response.BusinessAccount;
+import com.example.tourgo.models.response.ModerationPolicy;
+import com.example.tourgo.models.response.NotificationPrefs;
 import com.example.tourgo.remote.RetrofitClient;
 
 import java.util.List;
@@ -219,6 +224,51 @@ public class AdminService {
 
     public static void getAuditLog(Context context, DataCallback<List<AdminAuditEntry>> callback) {
         enqueueData(RetrofitClient.getInstance(context).getAdminApi().getAuditLog(), callback);
+    }
+
+    // ── Team management (invite / change role / remove) ───────────────────────────
+
+    public static void inviteAdmin(Context context, String email, DataCallback<AdminTeamMember> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi()
+                .inviteAdmin(new InviteAdminRequest(email)), callback);
+    }
+
+    public static void changeAdminRole(Context context, String userId, String role, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi()
+                .changeAdminRole(userId, new ChangeRoleRequest(role)), callback);
+    }
+
+    public static void removeAdmin(Context context, String userId, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi().removeAdmin(userId), callback);
+    }
+
+    // ── Audit log pagination + export ─────────────────────────────────────────────
+
+    public static void getAuditLog(Context context, String before, int limit,
+                                   DataCallback<List<AdminAuditEntry>> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getAuditLog(before, limit), callback);
+    }
+
+    public static void exportAuditLog(Context context, DataCallback<AuditExport> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().exportAuditLog(), callback);
+    }
+
+    // ── Settings: moderation policy + notification preferences ────────────────────
+
+    public static void getModerationPolicy(Context context, DataCallback<ModerationPolicy> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getModerationPolicy(), callback);
+    }
+
+    public static void updateModerationPolicy(Context context, ModerationPolicy policy, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi().updateModerationPolicy(policy), callback);
+    }
+
+    public static void getNotificationPrefs(Context context, DataCallback<NotificationPrefs> callback) {
+        enqueueData(RetrofitClient.getInstance(context).getAdminApi().getNotificationPrefs(), callback);
+    }
+
+    public static void updateNotificationPrefs(Context context, NotificationPrefs prefs, DataCallback<Void> callback) {
+        enqueueVoid(RetrofitClient.getInstance(context).getAdminApi().updateNotificationPrefs(prefs), callback);
     }
 
     // ── Shared enqueue helpers ───────────────────────────────────────────────────
