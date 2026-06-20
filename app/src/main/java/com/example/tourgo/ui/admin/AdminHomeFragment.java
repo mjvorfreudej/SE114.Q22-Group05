@@ -85,6 +85,8 @@ public class AdminHomeFragment extends Fragment {
         loadStats();
         loadActivity();
         loadUserCount();
+        // Reflect any notifications read since we were last shown.
+        refreshBellBadge();
     }
 
     // ── Live data ─────────────────────────────────────────────────────────────
@@ -119,9 +121,6 @@ public class AdminHomeFragment extends Fragment {
                 // The live count wins over the stats aggregate when it has arrived,
                 // so the tile + subtitle always match the Users directory.
                 applyUserCount();
-
-                // Header bell badge = live items needing attention.
-                applyBellBadge(s.getPendingBusinesses() + s.getPendingListings() + s.getReports());
             }
 
             @Override
@@ -260,21 +259,22 @@ public class AdminHomeFragment extends Fragment {
 
     /**
      * Header bell → Admin notification popover (design index.html, role="admin").
-     * The badge count is driven by live stats (see {@link #applyBellBadge}); the
-     * popover content itself is still the notification module's own state.
+     * The badge mirrors the notification center's unread count and is recomputed
+     * on resume so it drops as notifications are read (and the read-state persists).
      */
     private void setupBell(View root) {
         View bell = root.findViewById(R.id.admBellBtn);
         bellBadge = root.findViewById(R.id.admBellBadge);
-        bellBadge.setVisibility(View.GONE); // hidden until live stats arrive
         bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.ADMIN));
+        refreshBellBadge();
     }
 
-    /**
-     * Number of items actually needing the admin's attention, from live stats:
-     * pending business registrations + pending listings + open reports. Replaces
-     * the old fixed count derived from mock seed data.
-     */
+    /** Bell badge = current unread admin notifications (shared, persisted state). */
+    private void refreshBellBadge() {
+        if (bellBadge == null || !isAdded()) return;
+        applyBellBadge(NotificationMockData.unreadCount(requireContext(), NotificationMockData.Role.ADMIN));
+    }
+
     private void applyBellBadge(int count) {
         if (bellBadge == null) return;
         if (count > 0) {

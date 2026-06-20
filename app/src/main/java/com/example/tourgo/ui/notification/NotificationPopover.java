@@ -83,7 +83,12 @@ public final class NotificationPopover {
         renderList(ctx, list, empty, items, popup, role);
 
         markAll.setOnClickListener(v -> {
-            for (NotificationItem n : items) n.read = true;
+            java.util.List<String> ids = new java.util.ArrayList<>();
+            for (NotificationItem n : items) {
+                n.read = true;
+                ids.add(n.id);
+            }
+            NotificationStore.markAllRead(ctx, role, ids);
             Toast.makeText(ctx, R.string.notif_toast_marked_all, Toast.LENGTH_SHORT).show();
             bindUnread(ctx, unread, markAll, items);
             renderList(ctx, list, empty, items, popup, role);

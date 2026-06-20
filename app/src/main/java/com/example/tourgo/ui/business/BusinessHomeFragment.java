@@ -20,7 +20,6 @@ import com.example.tourgo.R;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.remote.RetrofitClient;
-import com.example.tourgo.ui.notification.NotificationItem;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
@@ -30,6 +29,8 @@ import retrofit2.Response;
 
 /** Business › Home dashboard — welcome banner, 4 KPI tiles, quick actions, recent bookings. */
 public class BusinessHomeFragment extends Fragment {
+
+    private TextView bizBellBadge;
 
     @Nullable
     @Override
@@ -101,25 +102,34 @@ public class BusinessHomeFragment extends Fragment {
 
     /**
      * Header bell → Business notification popover (design index.html, role="business").
-     * The red count badge shows the initial unread tally; the popover and full center
-     * hold their own optimistic state, mirroring the prototype (no notifications API yet).
+     * The red count badge mirrors the notification center's unread count and is
+     * recomputed on resume, so it drops as notifications are read and the read-state
+     * persists across surfaces (no notifications API yet — state is local).
      */
     private void setupBell(View root) {
         View bell = root.findViewById(R.id.bizBellBtn);
-        TextView badge = root.findViewById(R.id.bizBellBadge);
-
-        int unread = 0;
-        for (NotificationItem n : NotificationMockData.seed(requireContext(), NotificationMockData.Role.BUSINESS)) {
-            if (!n.read) unread++;
-        }
-        if (unread > 0) {
-            badge.setText(unread > 9 ? "9+" : String.valueOf(unread));
-            badge.setVisibility(View.VISIBLE);
-        } else {
-            badge.setVisibility(View.GONE);
-        }
-
+        bizBellBadge = root.findViewById(R.id.bizBellBadge);
         bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.BUSINESS));
+        refreshBellBadge();
+    }
+
+    /** Bell badge = current unread business notifications (shared, persisted state). */
+    private void refreshBellBadge() {
+        if (bizBellBadge == null || !isAdded()) return;
+        int unread = NotificationMockData.unreadCount(requireContext(), NotificationMockData.Role.BUSINESS);
+        if (unread > 0) {
+            bizBellBadge.setText(unread > 9 ? "9+" : String.valueOf(unread));
+            bizBellBadge.setVisibility(View.VISIBLE);
+        } else {
+            bizBellBadge.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reflect any notifications read since we were last shown.
+        refreshBellBadge();
     }
 
     private TextView addStat(LayoutInflater inf, GridLayout grid, int index, int iconRes,

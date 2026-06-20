@@ -143,12 +143,18 @@ public class NotificationsActivity extends AppCompatActivity
     public void onClick(NotificationItem item) {
         if (item.read) return;
         item.read = true;
+        NotificationStore.markRead(this, role, item.id);
         renderFilters();
         render();
     }
 
     private void markAllRead() {
-        for (NotificationItem n : items) n.read = true;
+        List<String> ids = new ArrayList<>();
+        for (NotificationItem n : items) {
+            n.read = true;
+            ids.add(n.id);
+        }
+        NotificationStore.markAllRead(this, role, ids);
         Toast.makeText(this, R.string.notif_toast_marked_all, Toast.LENGTH_SHORT).show();
         renderFilters();
         render();
