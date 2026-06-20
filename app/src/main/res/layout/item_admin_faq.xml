@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One FAQ accordion entry: question row (rotating chevron) + collapsible answer. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/admFaqHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingVertical="13dp">
+
+        <TextView
+            android:id="@+id/admFaqQ"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:lineSpacingMultiplier="1.35"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/admFaqChevron"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_down"
+            app:tint="@color/adm_gray_400" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/admFaqA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="13dp"
+        android:lineSpacingMultiplier="1.5"
+        android:textColor="@color/adm_gray_500"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/admFaqDivider"
+        style="@style/AdmRowDivider" />
+</LinearLayout>

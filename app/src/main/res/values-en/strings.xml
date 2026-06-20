@@ -29,6 +29,10 @@
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_sign_up">Sign up</string>
     <string name="login_or_with">Or Log In With</string>
+    <string name="login_with_google">Log in with Google</string>
+    <string name="login_with_facebook">Log in with Facebook</string>
+    <string name="login_social_failed">Social sign-in failed. Please try again.</string>
+    <string name="login_fb_pending">Facebook login is coming soon.</string>
     <string name="register_or_with">Or Sign up With</string>
 
     <!-- activity_register.xml -->
@@ -373,6 +377,7 @@
     <string name="adm_stat_flagged">Flagged Users</string>
     <string name="adm_alert_title">%d items need your review</string>
     <string name="adm_alert_sub">%1$d pending listings · %2$d active reports</string>
+    <string name="adm_time_yesterday">Yesterday</string>
     <string name="adm_open">Open</string>
     <string name="adm_quick_actions">Quick Actions</string>
     <string name="adm_qa_review_listings">Review pending listings</string>
@@ -488,6 +493,147 @@
     <string name="adm_help_center">Help center</string>
     <string name="adm_logout">Log out</string>
     <string name="adm_toast_logged_out">Logged out</string>
+
+    <!-- Profile › settings sheets -->
+    <string name="adm_set_save">Save changes</string>
+    <string name="adm_policy_rules">Content rules</string>
+    <string name="adm_policy_automation">Automation</string>
+    <string name="adm_toast_policy_saved">Moderation policy saved</string>
+    <string name="adm_team_members">Team members</string>
+    <string name="adm_team_invite">Invite teammate</string>
+    <string name="adm_toast_invite_sent">Invitation sent</string>
+    <string name="adm_audit_recent">Recent activity</string>
+    <string name="adm_sec_change_password">Change password</string>
+    <string name="adm_sec_two_factor">Two-factor authentication</string>
+    <string name="adm_pwd_current_hint">Current password</string>
+    <string name="adm_pwd_new_hint">New password</string>
+    <string name="adm_pwd_confirm_hint">Confirm new password</string>
+    <string name="adm_pwd_update">Update password</string>
+    <string name="adm_2fa_label">Require a verification code</string>
+    <string name="adm_2fa_desc">Ask for a one-time code at every admin sign-in.</string>
+    <string name="adm_pwd_err_current">Enter your current password</string>
+    <string name="adm_pwd_err_short">New password must be at least 8 characters</string>
+    <string name="adm_pwd_err_match">New passwords don\'t match</string>
+    <string name="adm_toast_password_updated">Password updated</string>
+    <string name="adm_toast_2fa_enabled">Two-factor authentication enabled</string>
+    <string name="adm_toast_2fa_disabled">Two-factor authentication disabled</string>
+    <string name="adm_help_topics">Help topics</string>
+    <string name="adm_help_reach">Get in touch</string>
+    <string name="adm_help_contact">Contact support</string>
+    <string name="adm_toast_no_mail">No email app found</string>
+
+    <!-- ============================================================
+         Admin Settings — detail screens (AdminDetailActivity)
+         Source: "TourGo Admin Detail Screens.html"
+         ============================================================ -->
+    <string name="adm_detail_crumb">Account · Admin Settings</string>
+
+    <!-- 1 · Moderation policy -->
+    <string name="adm_policy_automated_rules">Automated rules</string>
+    <string name="adm_policy_autohide_title">Auto-hide reported content</string>
+    <string name="adm_policy_autohide_sub">Hide once the report threshold is met</string>
+    <string name="adm_policy_profanity_title">Profanity &amp; spam filter</string>
+    <string name="adm_policy_profanity_sub">Block listings matching restricted terms</string>
+    <string name="adm_policy_photo_title">Require photo approval</string>
+    <string name="adm_policy_photo_sub">New listing photos need manual review</string>
+    <string name="adm_policy_geo_title">Geo-restriction check</string>
+    <string name="adm_policy_geo_sub">Flag listings outside allowed regions</string>
+    <string name="adm_policy_thresholds">Thresholds</string>
+    <string name="adm_policy_autohide_after_title">Auto-hide after</string>
+    <string name="adm_policy_autohide_after_sub">Reports before content is hidden</string>
+    <string name="adm_policy_sla_title">Review SLA</string>
+    <string name="adm_policy_sla_sub">Target time to clear the queue</string>
+    <string name="adm_policy_restricted_terms">Restricted terms</string>
+    <string name="adm_policy_add_term">Add term</string>
+    <string name="adm_policy_add_term_hint">Enter a term to restrict</string>
+    <string name="adm_policy_save">Save policy</string>
+    <string name="adm_hours_suffix">h</string>
+
+    <!-- 2 · Admin team & roles -->
+    <string name="adm_team_summary">%d admins</string>
+    <string name="adm_team_summary_sub">Owners manage billing &amp; roles. Moderators clear the queue only.</string>
+    <string name="adm_team_you">You</string>
+    <string name="adm_team_change_role">Change role</string>
+    <string name="adm_team_resend">Resend invite</string>
+    <string name="adm_team_remove">Remove admin</string>
+    <string name="adm_team_edit_profile">Edit profile</string>
+    <string name="adm_team_pending">Pending invite</string>
+    <string name="adm_team_pending_meta">Invited 2 days ago · MODERATOR</string>
+    <string name="adm_team_pending_chip">PENDING</string>
+    <string name="adm_team_invite_admin">Invite admin</string>
+    <string name="adm_team_invite_hint">Email of an existing TourGo account</string>
+    <string name="adm_team_remove_confirm">Remove %s from the admin team?</string>
+    <string name="adm_toast_role_changed">Role updated</string>
+    <string name="adm_toast_admin_removed">Admin removed</string>
+    <string name="adm_audit_no_more">No earlier activity</string>
+    <string name="adm_error_generic">Something went wrong. Please try again.</string>
+
+    <!-- 3 · Audit log -->
+    <string name="adm_audit_filter_approvals">Approvals</string>
+    <string name="adm_audit_filter_locks">Locks</string>
+    <string name="adm_audit_filter_settings">Settings</string>
+    <string name="adm_audit_today">Today</string>
+    <string name="adm_audit_yesterday">Yesterday</string>
+    <string name="adm_audit_load_earlier">Load earlier activity</string>
+    <string name="adm_audit_export">Export</string>
+    <string name="adm_audit_empty">No activity to show</string>
+
+    <!-- 4 · Notifications (preferences) -->
+    <string name="adm_notif_push">Push notifications</string>
+    <string name="adm_notif_pending_title">New business pending</string>
+    <string name="adm_notif_pending_sub">When a business submits for review</string>
+    <string name="adm_notif_reported_title">Content reported</string>
+    <string name="adm_notif_reported_sub">A listing or review is flagged</string>
+    <string name="adm_notif_team_title">Team changes</string>
+    <string name="adm_notif_team_sub">An admin is added or removed</string>
+    <string name="adm_notif_sla_title">SLA breach</string>
+    <string name="adm_notif_sla_sub">Queue exceeds the review target</string>
+    <string name="adm_notif_email">Email notifications</string>
+    <string name="adm_notif_digest_title">Daily digest</string>
+    <string name="adm_notif_digest_sub">Summary of queue activity at 8am</string>
+    <string name="adm_notif_weekly_title">Weekly report</string>
+    <string name="adm_notif_weekly_sub">Moderation metrics every Monday</string>
+    <string name="adm_notif_security_title">Security alerts</string>
+    <string name="adm_notif_security_sub">New sign-ins &amp; role changes</string>
+    <string name="adm_notif_footnote">Security alerts can\'t be disabled for owners. Delivered to admin@tourgo.app.</string>
+
+    <!-- 5 · Language -->
+    <string name="adm_lang_app_language">App language</string>
+    <string name="adm_lang_english_label">English</string>
+    <string name="adm_lang_vietnamese_label">Vietnamese</string>
+    <string name="adm_lang_footnote">Changing the language updates the admin console only. Traveler-facing content keeps its original locale.</string>
+
+    <!-- 6 · Password & 2FA -->
+    <string name="adm_pwd_strength_good">Good · add a symbol for a stronger password</string>
+    <string name="adm_2fa_title">Two-factor authentication</string>
+    <string name="adm_2fa_on_sub">On · required at every sign-in</string>
+    <string name="adm_2fa_off_sub">Off · your account is less secure</string>
+    <string name="adm_2fa_authenticator_title">Authenticator app</string>
+    <string name="adm_2fa_authenticator_sub">Google Authenticator · added Jun 2025</string>
+    <string name="adm_2fa_active">ACTIVE</string>
+    <string name="adm_2fa_sms_title">SMS backup</string>
+    <string name="adm_2fa_recovery_title">Recovery codes</string>
+    <string name="adm_2fa_recovery_sub">8 unused · store them somewhere safe</string>
+
+    <!-- 7 · Help center -->
+    <string name="adm_help_search_hint">Search help articles</string>
+    <string name="adm_help_browse">Browse topics</string>
+    <string name="adm_help_articles">%d articles</string>
+    <string name="adm_help_topic_moderation">Moderation</string>
+    <string name="adm_help_topic_businesses">Businesses</string>
+    <string name="adm_help_topic_security">Security</string>
+    <string name="adm_help_topic_team">Team</string>
+    <string name="adm_help_popular">Popular questions</string>
+    <string name="adm_help_q1">How do I approve or reject a business?</string>
+    <string name="adm_help_a1">Open the Moderation tab, tap a pending business card, then use the Approve or Reject buttons. Rejections send an email with your reason attached.</string>
+    <string name="adm_help_q2">What happens when I lock an account?</string>
+    <string name="adm_help_a2">The business loses dashboard access immediately but their published listings stay visible. Unlock anytime from Account Management.</string>
+    <string name="adm_help_q3">How are auto-hide thresholds applied?</string>
+    <string name="adm_help_a3">When a listing reaches the report threshold set in Moderation policy, it is hidden automatically and queued for review.</string>
+    <string name="adm_help_q4">Can I change another admin\'s role?</string>
+    <string name="adm_help_a4">Owners can. Open Admin team &amp; roles, tap the menu beside a member, and choose Change role.</string>
+    <string name="adm_help_contact_sub">Avg. reply in under 2 hours</string>
+    <string name="adm_help_still_need">Still need help?</string>
 
     <!-- Create Tour -->
     <string name="create_tour_title">Create new tour</string>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider paths. "exports" maps to {cacheDir}/exports — where the admin
+     audit-log CSV is written before being shared. -->
+<paths>
+    <cache-path
+        name="exports"
+        path="exports/" />
+</paths>

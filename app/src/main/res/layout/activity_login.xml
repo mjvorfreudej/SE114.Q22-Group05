@@ -215,25 +215,28 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginHorizontal="12dp"
-                    android:contentDescription="@null"
+                    android:id="@+id/ivLoginFacebook"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/login_with_facebook"
+                    android:focusable="true"
+                    android:padding="8dp"
                     android:src="@drawable/ic_facebook" />
 
                 <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginHorizontal="12dp"
-                    android:contentDescription="@null"
+                    android:id="@+id/ivLoginGoogle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/login_with_google"
+                    android:focusable="true"
+                    android:padding="8dp"
                     android:src="@drawable/ic_google" />
-
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginHorizontal="12dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_apple" />
             </LinearLayout>
 
             <LinearLayout

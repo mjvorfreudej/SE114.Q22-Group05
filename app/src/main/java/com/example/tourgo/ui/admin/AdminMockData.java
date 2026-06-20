@@ -5,15 +5,13 @@ import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.BusinessAccount;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * In-memory sample data for the Admin Console, mirroring the TourGo design-system
- * prototype (ui_kits/admin). The marketplace has no admin REST API in this app yet,
- * so these screens are wired to local state with optimistic updates + toasts — exactly
- * as the HTML prototype behaves. Record content (names, emails, report text) is kept
- * verbatim from the design and is intentionally not localized.
+ * Display models + backend-mapping factories for the Admin Console. Every screen
+ * is wired to the live admin REST API (see {@link com.example.tourgo.remote.service.AdminService}
+ * and {@link com.example.tourgo.remote.service.TourService}); each model below is
+ * built from a server DTO via its {@code fromServer}/{@code fromTour} factory.
  */
 public final class AdminMockData {
 
@@ -26,20 +24,9 @@ public final class AdminMockData {
         public final int price, photoRes;
         public final List<String[]> history; // {at, note}
 
-        // Populated when the listing comes from the backend (real pending tour);
-        // null/0 for the legacy mock entries.
         public final String serverId;   // backend tour id, used by the approve API
         public final String imageUrl;   // network cover image (else use photoRes)
         public final String priceText;  // preformatted price (else "$" + price)
-
-        public PendingListing(int id, String business, String name, String cat, String city,
-                              String date, int price, int photoRes, String status, String desc,
-                              List<String[]> history) {
-            this.id = id; this.business = business; this.name = name; this.cat = cat;
-            this.city = city; this.date = date; this.price = price; this.photoRes = photoRes;
-            this.status = status; this.desc = desc; this.history = history;
-            this.serverId = null; this.imageUrl = null; this.priceText = null;
-        }
 
         private PendingListing(String serverId, String name, String city, String date,
                                String priceText, String imageUrl, String desc) {
@@ -70,32 +57,58 @@ public final class AdminMockData {
 
     // ── User reports (Moderation › Reports) ──────────────────────────────────
     public static class UserReport {
-        public final int id;
+        public final String serverId;     // backend report id (used by dismiss/resolve)
         public final String kind, reporter, target, when, body, reasoning, context, severity;
 
-        public UserReport(int id, String kind, String reporter, String target, String when,
-                          String body, String reasoning, String context, String severity) {
-            this.id = id; this.kind = kind; this.reporter = reporter; this.target = target;
-            this.when = when; this.body = body; this.reasoning = reasoning;
-            this.context = context; this.severity = severity;
+        private UserReport(String serverId, String kind, String reporter, String target, String when,
+                           String body, String reasoning, String context, String severity) {
+            this.serverId = serverId;
+            this.kind = kind != null ? kind : "";
+            this.reporter = reporter != null ? reporter : "";
+            this.target = target != null ? target : "";
+            this.when = when != null ? when : "";
+            this.body = body != null ? body : "";
+            this.reasoning = reasoning != null ? reasoning : "";
+            this.context = context != null ? context : "";
+            this.severity = severity != null ? severity : "mid";
+        }
+
+        /** Map a backend report into the moderation display model. */
+        public static UserReport fromServer(com.example.tourgo.models.response.AdminReport dto) {
+            return new UserReport(dto.getId(), dto.getType(), dto.getReporter(), dto.getTarget(),
+                    relativeShort(dto.getCreatedAt()), dto.getBody(), dto.getReasoning(),
+                    dto.getContext(), dto.getSeverity());
+        }
+    }
+
+    /** Short relative time ("now", "6h", "3d") from an ISO timestamp; "" on failure. */
+    static String relativeShort(String iso) {
+        if (iso == null || iso.length() < 19) return "";
+        try {
+            java.text.SimpleDateFormat f =
+                    new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US);
+            f.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            long then = f.parse(iso.substring(0, 19)).getTime();
+            long diff = Math.max(0, System.currentTimeMillis() - then);
+            long min = diff / 60000;
+            if (min < 1) return "now";
+            if (min < 60) return min + "m";
+            long hr = min / 60;
+            if (hr < 24) return hr + "h";
+            return (hr / 24) + "d";
+        } catch (Exception e) {
+            return "";
         }
     }
 
     // ── Business directory ───────────────────────────────────────────────────
     public static class BizAccount {
         public final int id;
-        public final String serverId;      // backend id (null for legacy mock rows)
+        public final String serverId;      // backend business id
         public final String name, owner, joined;
         public final int listings, bookings;
         public boolean suspended;
         public String status;              // "pending" | "active" | "suspended"
-
-        public BizAccount(int id, String name, String owner, int listings, int bookings,
-                          boolean suspended, String joined) {
-            this.id = id; this.serverId = null; this.name = name; this.owner = owner;
-            this.listings = listings; this.bookings = bookings; this.suspended = suspended;
-            this.joined = joined; this.status = suspended ? "suspended" : "active";
-        }
 
         private BizAccount(String serverId, String name, String owner, int listings, int bookings,
                            String status, String joined) {
@@ -122,17 +135,10 @@ public final class AdminMockData {
     // ── Users directory ──────────────────────────────────────────────────────
     public static class AdminUser {
         public final int id;
-        public final String serverId;      // backend id (null for legacy mock rows)
+        public final String serverId;      // backend user id
         public final String name, email, joined, tier, loc;
         public final int bookings, reported;
         public String status; // active | flagged | suspended
-
-        public AdminUser(int id, String name, String email, String joined, String status,
-                         int bookings, int reported, String tier, String loc) {
-            this.id = id; this.serverId = null; this.name = name; this.email = email;
-            this.joined = joined; this.status = status; this.bookings = bookings;
-            this.reported = reported; this.tier = tier; this.loc = loc;
-        }
 
         private AdminUser(String serverId, String name, String email, String joined, String status,
                           int bookings, int reported, String tier, String loc) {
@@ -157,27 +163,6 @@ public final class AdminMockData {
     static String dateOnly(String iso) {
         if (iso == null) return "";
         return iso.length() >= 10 ? iso.substring(0, 10) : iso;
-    }
-
-    public static List<UserReport> userReports() {
-        return new ArrayList<>(Arrays.asList(
-                new UserReport(1, "Toxic language", "Cedar Cove LLC", "guest_jay_88", "6h",
-                        "Worst stay ever. The staff are absolutely [redacted] and the place is a [redacted] dump.",
-                        "Comment contains profanity and personal attacks against staff. Not constructive feedback.",
-                        "Review of \"Cedar Cove Seaside Stay\"", "high"),
-                new UserReport(2, "Spam / promotion", "The Grand Orchid Resort", "travel_deals_99", "2d",
-                        "CHECK OUT MY DISCOUNT CODES at example-deals-dot-com — best prices anywhere, much cheaper.",
-                        "Posting external promotional links, repeated across multiple listings.",
-                        "Comment on listing review", "mid"),
-                new UserReport(3, "Fake review", "Riverbend Tours Co.", "definitelynotabot", "3d",
-                        "Five stars amazing tour really good fun experience would recommend",
-                        "Same user has posted nearly-identical 5-star reviews across 14 unrelated listings in 2 days.",
-                        "Multiple review submissions", "high"),
-                new UserReport(4, "Harassment", "Skyline Marina", "angryuser_42", "4d",
-                        "I know where you live, your business is going to burn",
-                        "Direct threat made via DM after a disputed booking.",
-                        "Direct message", "critical")
-        ));
     }
 
 }
