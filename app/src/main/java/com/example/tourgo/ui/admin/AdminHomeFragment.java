@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.remote.service.AdminService;
@@ -37,6 +38,8 @@ import java.util.List;
 public class AdminHomeFragment extends Fragment {
 
     private View root;
+    /** Live user total, counted from the same list the Users directory shows. */
+    private Integer userCount = null;
 
     @Nullable
     @Override
@@ -72,6 +75,7 @@ public class AdminHomeFragment extends Fragment {
 
         loadStats();
         loadActivity();
+        loadUserCount();
     }
 
     @Override
@@ -80,6 +84,7 @@ public class AdminHomeFragment extends Fragment {
         // Keep the dashboard in sync after approvals / suspensions elsewhere.
         loadStats();
         loadActivity();
+        loadUserCount();
     }
 
     // ── Live data ─────────────────────────────────────────────────────────────
@@ -110,6 +115,10 @@ public class AdminHomeFragment extends Fragment {
                 action(root, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
                         R.string.adm_qa_browse_users, getString(R.string.adm_qa_browse_users_sub, fmt(s.getUsers())),
                         0, AdminActivity.TAB_USERS);
+
+                // The live count wins over the stats aggregate when it has arrived,
+                // so the tile + subtitle always match the Users directory.
+                applyUserCount();
             }
 
             @Override
@@ -119,6 +128,36 @@ public class AdminHomeFragment extends Fragment {
                         msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * The dashboard's "total users" must match the Users directory exactly, so we
+     * count the same live list the directory loads rather than trusting the stats
+     * aggregate (which can lag behind or count a different subset).
+     */
+    private void loadUserCount() {
+        AdminService.getUsers(requireContext(), new DataCallback<List<AdminAccount>>() {
+            @Override
+            public void onSuccess(List<AdminAccount> data) {
+                if (!isAdded() || root == null) return;
+                userCount = data != null ? data.size() : 0;
+                applyUserCount();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the stats-derived value in place on failure.
+            }
+        });
+    }
+
+    /** Push the live user count onto the KPI tile + "browse users" subtitle. */
+    private void applyUserCount() {
+        if (userCount == null || !isAdded() || root == null) return;
+        String v = fmt(userCount);
+        ((TextView) root.findViewById(R.id.admStat1).findViewById(R.id.admStatValue)).setText(v);
+        ((TextView) root.findViewById(R.id.admActUsers).findViewById(R.id.admActSub))
+                .setText(getString(R.string.adm_qa_browse_users_sub, v));
     }
 
     private void loadActivity() {
