@@ -144,11 +144,12 @@
             android:paddingBottom="24dp">
 
             <TextView
+                android:id="@+id/admHomeDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/adm_home_date"
                 android:textColor="@color/adm_gray_500"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:text="Thứ Bảy, 18 Tháng 8" />
 
             <TextView
                 android:layout_width="wrap_content"

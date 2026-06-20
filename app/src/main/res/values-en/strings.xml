@@ -367,7 +367,6 @@
 
     <!-- Home -->
     <string name="adm_overview">Overview</string>
-    <string name="adm_home_date">Saturday, August 18</string>
     <string name="adm_home_glance">Marketplace at a glance</string>
     <string name="adm_stat_users">Total Users</string>
     <string name="adm_stat_biz">Businesses</string>

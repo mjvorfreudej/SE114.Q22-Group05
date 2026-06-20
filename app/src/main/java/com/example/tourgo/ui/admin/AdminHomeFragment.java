@@ -18,6 +18,7 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.ConfigurationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
@@ -31,7 +32,10 @@ import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /** Admin › Home dashboard — KPI tiles, critical alert, quick actions, recent activity (live). */
 public class AdminHomeFragment extends Fragment {
@@ -53,6 +57,7 @@ public class AdminHomeFragment extends Fragment {
         super.onViewCreated(v, savedInstanceState);
         root = v;
 
+        applyDate();
         setupBell(v);
 
         v.findViewById(R.id.admBtnOpenMod).setOnClickListener(view -> goTab(AdminActivity.TAB_MODERATION));
@@ -87,6 +92,8 @@ public class AdminHomeFragment extends Fragment {
         loadUserCount();
         // Reflect any notifications read since we were last shown.
         refreshBellBadge();
+        // Keep the date correct if we were left open past midnight.
+        applyDate();
     }
 
     // ── Live data ─────────────────────────────────────────────────────────────
@@ -255,6 +262,25 @@ public class AdminHomeFragment extends Fragment {
 
     private void goTab(int tab) {
         if (getActivity() instanceof AdminActivity) ((AdminActivity) getActivity()).goToTab(tab);
+    }
+
+    /**
+     * Header date label = today, formatted for the app's active language (was a
+     * hardcoded string). Uses a locale-best skeleton so the order matches each
+     * language: "Chủ Nhật, 21 tháng 6" (vi) / "Sunday, June 21" (en).
+     */
+    private void applyDate() {
+        if (root == null) return;
+        TextView dateView = root.findViewById(R.id.admHomeDate);
+        if (dateView == null) return;
+        Locale locale = ConfigurationCompat.getLocales(getResources().getConfiguration()).get(0);
+        if (locale == null) locale = Locale.getDefault();
+        String pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "EEEEMMMMd");
+        String text = new SimpleDateFormat(pattern, locale).format(new Date());
+        if (!text.isEmpty()) {
+            text = text.substring(0, 1).toUpperCase(locale) + text.substring(1);
+        }
+        dateView.setText(text);
     }
 
     /**

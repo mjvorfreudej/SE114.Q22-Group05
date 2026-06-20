@@ -371,7 +371,6 @@
 
     <!-- Home -->
     <string name="adm_overview">Tổng quan</string>
-    <string name="adm_home_date">Thứ Bảy, 18 Tháng 8</string>
     <string name="adm_home_glance">Toàn cảnh thị trường</string>
     <string name="adm_stat_users">Tổng người dùng</string>
     <string name="adm_stat_biz">Doanh nghiệp</string>
