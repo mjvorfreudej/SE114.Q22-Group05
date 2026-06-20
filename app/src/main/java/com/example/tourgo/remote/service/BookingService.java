@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
+import com.example.tourgo.models.request.UpdateStatusRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Booking;
 import com.example.tourgo.models.response.BookingCheckResponse;
@@ -17,7 +18,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BookingService {
-
 
     public static void createBooking(Context context, Booking booking, DataCallback<Booking> callback) {
         RetrofitClient.getInstance(context)
@@ -48,7 +48,6 @@ public class BookingService {
                 });
     }
 
-
     public static void getMyBookings(Context context, DataCallback<List<Booking>> callback) {
         RetrofitClient.getInstance(context)
                 .getBookingApi()
@@ -78,6 +77,33 @@ public class BookingService {
                 });
     }
 
+    public static void updateBookingStatus(Context context, String bookingId, String status, DataCallback<Void> callback) {
+        RetrofitClient.getInstance(context)
+                .getBookingApi()
+                .updateBookingStatus(bookingId, new UpdateStatusRequest(status))
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            if (response.body().getSuccess() != null && response.body().getSuccess()) {
+                                callback.onSuccess(null);
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
 
     public static void cancelBooking(Context context, String bookingId, DataCallback<Void> callback) {
         RetrofitClient.getInstance(context)

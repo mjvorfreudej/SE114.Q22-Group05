@@ -1,6 +1,7 @@
 package com.example.tourgo.ui.main.booking;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class BookingHistorySection {
 
     private static final String STATUS_PAID = "PAID";
     private static final String STATUS_COMPLETED = "COMPLETED";
+    private static final String STATUS_PENDING = "PENDING";
 
     private final Context context;
     private final SessionManager session;
@@ -120,6 +122,7 @@ public class BookingHistorySection {
                 setLoading(false);
                 allItems.clear();
                 applyFilter();
+                Log.e("BookingHistory", "Failed to fetch: " + msg);
             }
         });
     }
@@ -163,8 +166,17 @@ public class BookingHistorySection {
     private void applyFilter() {
         List<BookingHistoryAdapter.Item> filtered = new ArrayList<>();
         for (BookingHistoryAdapter.Item item : allItems) {
-            if (item.status != null && item.status.equalsIgnoreCase(currentStatus)) {
-                filtered.add(item);
+            String status = item.status != null ? item.status.toUpperCase() : "";
+            
+            if (currentStatus.equals(STATUS_PAID)) {
+                // Show both PAID and PENDING in the "Paid" tab for better UX
+                if (status.equals(STATUS_PAID) || status.equals(STATUS_PENDING) || status.equals("CONFIRMED")) {
+                    filtered.add(item);
+                }
+            } else if (currentStatus.equals(STATUS_COMPLETED)) {
+                if (status.equals(STATUS_COMPLETED)) {
+                    filtered.add(item);
+                }
             }
         }
         if (adapter != null) adapter.setData(filtered);

@@ -10,6 +10,7 @@ import com.example.tourgo.remote.api.BookingApi;
 import com.example.tourgo.remote.api.ReviewApi;
 import com.example.tourgo.remote.api.FavoriteApi;
 import com.example.tourgo.remote.api.HotelApi;
+import com.example.tourgo.remote.api.PaymentApi;
 import com.example.tourgo.remote.api.TourApi;
 import com.example.tourgo.remote.api.UserApi;
 import com.example.tourgo.remote.interceptor.AuthInterceptor;
@@ -75,6 +76,10 @@ public class RetrofitClient {
         return instance;
     }
 
+    public Retrofit getRetrofit() {
+        return retrofit;
+    }
+
     public AuthApi getAuthApi() {
         return retrofit.create(AuthApi.class);
     }
@@ -105,5 +110,9 @@ public class RetrofitClient {
 
     public AdminApi getAdminApi() {
         return retrofit.create(AdminApi.class);
+    }
+
+    public PaymentApi getPaymentApi() {
+        return retrofit.create(PaymentApi.class);
     }
 }
