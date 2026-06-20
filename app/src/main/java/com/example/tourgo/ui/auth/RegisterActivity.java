@@ -23,6 +23,7 @@ import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.AuthData;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.databinding.ActivityRegisterBinding;
+import com.example.tourgo.utils.ToastHelper;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -78,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     if (apiResponse.getSuccess() != null && apiResponse.getSuccess()
                                             && apiResponse.getData() != null) {
 
-                                        Toast.makeText(RegisterActivity.this, getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show();
+                                        ToastHelper.showSuccess(RegisterActivity.this, getString(R.string.msg_register_success));
                                         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                                     } else {
                                         ApiError error = ErrorHandler.parseError(response);

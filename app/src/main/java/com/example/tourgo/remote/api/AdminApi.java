@@ -28,6 +28,10 @@ public interface AdminApi {
     @GET("api/admin/businesses/pending")
     Call<ApiResponse<List<BusinessAccount>>> getPendingBusinesses();
 
+    /** Fetch approved business/partner accounts. */
+    @GET("api/admin/businesses/approved")
+    Call<ApiResponse<List<BusinessAccount>>> getApprovedBusinesses();
+
     /** Approve a pending business. */
     @PUT("api/admin/businesses/{id}/approve")
     Call<ApiResponse<Void>> approveBusiness(@Path("id") String businessId);

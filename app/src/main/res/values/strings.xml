@@ -123,9 +123,54 @@
     <string name="profile_admin_console_sub">Quản lý nền tảng &amp; kiểm duyệt</string>
     <string name="profile_business_console">Bảng doanh nghiệp</string>
     <string name="profile_business_console_sub">Quản lý tin đăng &amp; đánh giá</string>
+    <string name="profile_register_business">Đăng ký đối tác</string>
+    <string name="profile_register_business_sub">Trở thành đối tác cung cấp dịch vụ</string>
+    <string name="profile_registration_status">Tình trạng đăng ký</string>
+    <string name="profile_registration_status_pending">Đang chờ phê duyệt</string>
+    <string name="profile_registration_status_rejected">Đã bị từ chối - Chạm để xem chi tiết</string>
 
-    <!-- dialog_edit_profile.xml -->
+    <!-- Register Business -->
+    <string name="biz_reg_title">Đăng ký Đối tác</string>
+    <string name="biz_reg_subtitle">Trở thành đối tác cung cấp Tour và Khách sạn</string>
+    <string name="biz_reg_name_label">Tên doanh nghiệp</string>
+    <string name="biz_reg_name_hint">Nhập tên doanh nghiệp</string>
+    <string name="biz_reg_owner_label">Người đại diện</string>
+    <string name="biz_reg_owner_hint">Họ và tên người đại diện</string>
+    <string name="biz_reg_tax_label">Mã số thuế</string>
+    <string name="biz_reg_tax_hint">Nhập mã số thuế</string>
+    <string name="biz_reg_phone_label">Số điện thoại</string>
+    <string name="biz_reg_phone_hint">Nhập số điện thoại</string>
+    <string name="biz_reg_email_label">Email doanh nghiệp</string>
+    <string name="biz_reg_email_hint">example@company.com</string>
+    <string name="biz_reg_address_label">Địa chỉ doanh nghiệp</string>
+    <string name="biz_reg_address_hint">Địa chỉ trụ sở chính</string>
+    <string name="biz_reg_submit">Gửi đơn đăng ký</string>
+    <string name="biz_reg_cancel">Hủy bỏ</string>
+    <string name="biz_reg_already_have">Bạn đã gửi đơn đăng ký. Chạm để xem tình trạng.</string>
+
+    <!-- Business Registration Detail -->
+    <string name="biz_reg_detail_title">Chi tiết đơn đăng ký</string>
+    <string name="biz_reg_status_label">Trạng thái đơn hàng</string>
+    <string name="biz_reg_rejection_reason">Lý do từ chối</string>
+    <string name="biz_reg_biz_info">Thông tin doanh nghiệp</string>
+    <string name="biz_reg_biz_name">Tên doanh nghiệp</string>
+    <string name="biz_reg_owner">Người đại diện</string>
+    <string name="biz_reg_tax_code">Mã số thuế</string>
+    <string name="biz_reg_phone">Số điện thoại</string>
+    <string name="biz_reg_email">Email</string>
+    <string name="biz_reg_address">Địa chỉ</string>
+    <string name="biz_reg_re_register">Đăng ký lại</string>
+    <string name="biz_reg_status_rejected">Bị từ chối</string>
+    <string name="biz_reg_status_active">Đã kích hoạt</string>
+    <string name="biz_reg_no_reason">Không có lý do cụ thể.</string>
+
+    <!-- Edit Profile -->
     <string name="edprofile_title">Sửa thông tin cá nhân</string>
+    <string name="edprofile_save">Lưu</string>
+    <string name="edprofile_change_avatar">Thay đổi ảnh đại diện</string>
+    <string name="edprofile_info_note">Thông tin cá nhân được sử dụng để liên lạc khi bạn đặt tour hoặc khách sạn.</string>
+    <string name="edprofile_update_success">Cập nhật hồ sơ thành công</string>
+    <string name="edprofile_update_error">Không thể cập nhật hồ sơ</string>
 
     <!-- Auth errors -->
     <string name="err_network">Lỗi kết nối mạng, vui lòng thử lại</string>
@@ -148,11 +193,11 @@
     <string name="err_name_empty">Tên không được để trống</string>
 
     <!-- Success messages -->
-    <string name="msg_login_success">Đăng nhập thành công!</string>
-    <string name="msg_register_success">Đăng ký thành công!</string>
-    <string name="msg_reset_success">Đổi mật khẩu thành công!</string>
+    <string name="msg_login_success">Chào mừng bạn quay trở lại!</string>
+    <string name="msg_register_success">Đăng ký tài khoản thành công! Chào mừng bạn đến với TourGo.</string>
+    <string name="msg_reset_success">Thiết khẩu mật khẩu mới thành công.</string>
     <string name="msg_recovery_sent">Email khôi phục đã được gửi!\nVui lòng kiểm tra hộp thư của bạn.</string>
-    <string name="msg_login_fail">Đăng nhập thất bại</string>
+    <string name="msg_login_fail">Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.</string>
 
     <!--  Error Code  -->
     <string name="err_unauthorized">Sai email hoặc mật khẩu</string>
@@ -174,7 +219,7 @@
     <string name="payment_title">Thanh toán</string>
     <string name="payment_booking_id">Mã đặt phòng: %1$s</string>
     <string name="payment_total">Tổng tiền: %1$s</string>
-    
+
     <!-- Search -->
     <string name="search_no_results">Không tìm thấy kết quả</string>
     <string name="search_timeout">Hết thời gian chờ, vui lòng thử lại</string>
@@ -182,21 +227,6 @@
     <string name="search_recent">Tìm kiếm gần đây</string>
     <string name="search_clear">Xóa</string>
     <string name="search_recent_viewed">Đã xem gần đây</string>
-
-    <!-- Filter -->
-    <string name="filter_title">Bộ lọc</string>
-    <string name="filter_section_property_type">Loại hình</string>
-    <string name="filter_section_price_range">Khoảng giá (VNĐ)</string>
-    <string name="filter_section_amenities">Tiện nghi</string>
-    <string name="filter_section_rating">Đánh giá</string>
-    <string name="filter_price_under_500k">Dưới 500k</string>
-    <string name="filter_price_500k_2m">500k - 2tr</string>
-    <string name="filter_price_2m_5m">2tr - 5tr</string>
-    <string name="filter_price_over_5m">Trên 5tr</string>
-    <string name="filter_min_price">Tối thiểu</string>
-    <string name="filter_max_price">Tối đa</string>
-    <string name="filter_apply">Áp dụng</string>
-    <string name="filter_reset">Hủy</string>
 
     <!-- Favorites -->
     <string name="no_favorites">Chưa có mục yêu thích nào</string>
@@ -249,7 +279,7 @@
     <string name="detail_description_label">Mô tả</string>
     <string name="detail_reviews_label">Đánh giá</string>
     <string name="detail_staying_price_label">Giá phòng</string>
-    <string name="tour_price_label">Giá Tour</string>
+    <string name="tour_price_label">Giá tour</string>
     <string name="detail_book_now_button">Đặt ngay</string>
     <string name="detail_amenities_label">Tiện nghi</string>
     <string name="detail_location_label">Vị trí</string>
@@ -259,10 +289,6 @@
     <string name="amenity_pool">Hồ bơi</string>
     <string name="amenity_workplace">Khu làm việc</string>
     <string name="amenity_tour_desk">Tư vấn tour</string>
-    <string name="amenity_guide">Hướng dẫn viên</string>
-    <string name="amenity_transport">Xe đưa đón</string>
-    <string name="amenity_meals">Ăn uống</string>
-    <string name="amenity_tickets">Vé tham quan</string>
     <string name="filter_all">Tất cả</string>
     <string name="filter_with_photos">Có ảnh</string>
     <string name="filter_rating_5">5 ★</string>
@@ -270,6 +296,21 @@
     <string name="filter_rating_3">3 ★</string>
     <string name="filter_rating_2">2 ★</string>
     <string name="filter_rating_1">1 ★</string>
+
+    <!-- Filters -->
+    <string name="filter_title">Bộ lọc</string>
+    <string name="filter_section_property_type">Loại chỗ ở</string>
+    <string name="filter_section_price_range">Khoảng giá</string>
+    <string name="filter_price_under_500k">Dưới 500k</string>
+    <string name="filter_price_500k_2m">500k - 2M</string>
+    <string name="filter_price_2m_5m">2M - 5M</string>
+    <string name="filter_price_over_5m">Trên 5M</string>
+    <string name="filter_min_price">Giá tối thiểu</string>
+    <string name="filter_max_price">Giá tối đa</string>
+    <string name="filter_section_amenities">Tiện nghi</string>
+    <string name="filter_section_rating">Xếp hạng</string>
+    <string name="filter_reset">Thiết lập lại</string>
+    <string name="filter_apply">Áp dụng</string>
 
     <!-- Hotel List -->
     <string name="hotel_in_location">Khách sạn tại %s</string>
@@ -284,7 +325,6 @@
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_favorite">Yêu thích</string>
     <string name="nav_profile">Cá nhân</string>
-
 
     <!-- User Review -->
     <string name="not_book_yet">Cần đặt khách sạn này trước khi viết đánh giá.</string>
@@ -635,8 +675,7 @@
 
     <!-- ============================================================
          Traveler notifications (ui_kits/notifications/traveler.html)
-         Chrome is localized; notification record content lives in
-         NotificationMockData, kept verbatim from the design.
+         English mirror of the strings in values/strings.xml.
          ============================================================ -->
     <string name="notif_title">Thông báo</string>
     <string name="notif_unread">%d chưa đọc</string>
@@ -665,7 +704,7 @@
     <string name="notif_empty_unread_title">Bạn đã xem hết</string>
     <string name="notif_empty_unread_msg">Mọi thông báo đều đã được đọc.</string>
 
-    <!-- Notification content (sample data; localized to match the active language) -->
+    <!-- Notification content (sample data; verbatim from the design) -->
     <string name="notif_t1_title">Đặt chỗ đã xác nhận</string>
     <string name="notif_t1_body">Kỳ nghỉ của bạn tại The Grand Orchid Resort đã được xác nhận cho ngày 13–15/08.</string>
     <string name="notif_t1_when">Vừa xong</string>
@@ -704,29 +743,29 @@
     <string name="notif_t8_body">Chúng tôi đã cập nhật điều khoản hủy — chạm để xem thay đổi.</string>
     <string name="notif_t8_when">2 ngày</string>
 
-    <string name="notif_t9_title">Chuyến đi của bạn bắt đầu sau 2 ngày</string>
-    <string name="notif_t9_body">Tour đi bộ Phố cổ Kyoto của bạn bắt đầu ngày 13/08.</string>
+    <string name="notif_t9_title">Lời nhắc đặt chỗ</string>
+    <string name="notif_t9_body">Bạn chưa hoàn tất đặt chỗ tại Sunset Villa. Chạm để tiếp tục.</string>
     <string name="notif_t9_when">3 ngày</string>
-    <string name="notif_t9_action">Xem hành trình</string>
+    <string name="notif_t9_action">Tiếp tục đặt</string>
 
     <!-- ============================================================
-         Thông báo Doanh nghiệp & Quản trị (ui_kits/notifications) — Tiếng Việt
-         Mã hoá theo vai trò: business (Đơn hàng/Vận hành/Hỗ trợ/Khuyến mãi)
-         và admin (Hệ thống/Phê duyệt/Báo cáo/Cột mốc).
+         Business & Admin notifications (ui_kits/notifications) — English
+         Role-keyed: business (Orders/Operations/Support/Promotions) and
+         admin (System/Approvals/Reports/Milestones). Verbatim from the design.
          ============================================================ -->
-    <!-- Danh mục — Doanh nghiệp -->
+    <!-- Categories — Business -->
     <string name="notif_cat_orders">Đơn hàng</string>
     <string name="notif_cat_operations">Vận hành</string>
     <string name="notif_cat_support">Hỗ trợ</string>
     <string name="notif_cat_promotions">Khuyến mãi</string>
 
-    <!-- Danh mục — Quản trị -->
+    <!-- Categories — Admin -->
     <string name="notif_cat_system">Hệ thống</string>
     <string name="notif_cat_approvals">Phê duyệt</string>
     <string name="notif_cat_reports">Báo cáo</string>
     <string name="notif_cat_milestones">Cột mốc</string>
 
-    <!-- Nội dung Doanh nghiệp (dữ liệu mẫu, theo thiết kế) -->
+    <!-- Business content (sample data; verbatim from the design) -->
     <string name="notif_b1_title">Nhận được đặt chỗ mới</string>
     <string name="notif_b1_body">Amelia R. đã đặt The Grand Orchid Resort · Suite 2 cho ngày 22–25/08.</string>
     <string name="notif_b1_when">Vừa xong</string>
@@ -766,7 +805,7 @@
     <string name="notif_b8_body">TourGo Business sẽ tạm thời gián đoạn trong quá trình cập nhật.</string>
     <string name="notif_b8_when">2 ngày</string>
 
-    <!-- Nội dung Quản trị (dữ liệu mẫu, theo thiết kế) -->
+    <!-- Admin content (sample data; verbatim from the design) -->
     <string name="notif_a1_title">Đăng ký doanh nghiệp mới</string>
     <string name="notif_a1_body">Lotus Travel Co. đã gửi hồ sơ để xác minh.</string>
     <string name="notif_a1_when">Vừa xong</string>
@@ -805,11 +844,12 @@
     <string name="notif_a8_when">2 ngày</string>
 
     <!-- ============================================================
-         Bảng điều khiển Doanh nghiệp (ui_kits/business) — Tiếng Việt
-         Chỉ dịch phần giao diện; nội dung mẫu (tên, đánh giá, báo cáo)
-         giữ nguyên trong BusinessMockData như Bảng quản trị.
+         Business Dashboard (ui_kits/business) — English
+         Mirrors the TourGo design-system prototype. UI chrome only;
+         record content (names, review/report text) stays verbatim
+         in BusinessMockData, matching the Admin console convention.
          ============================================================ -->
-    <!-- Thanh điều hướng -->
+    <!-- Bottom nav -->
     <string name="biz_nav_home">Trang chủ</string>
     <string name="biz_nav_listings">Tin đăng</string>
     <string name="biz_nav_calendar">Lịch</string>
@@ -817,13 +857,13 @@
     <string name="biz_nav_profile">Cá nhân</string>
     <string name="biz_console">Bảng doanh nghiệp</string>
 
-    <!-- Chung -->
+    <!-- Common -->
     <string name="biz_view_all">Xem tất cả</string>
     <string name="biz_cancel">Hủy</string>
     <string name="biz_back">Quay lại</string>
     <string name="biz_continue">Tiếp tục</string>
 
-    <!-- Trang chủ -->
+    <!-- Home -->
     <string name="biz_role">Doanh nghiệp</string>
     <string name="biz_business_name">Orchid Hospitality</string>
     <string name="biz_verified">ĐÃ XÁC MINH</string>
@@ -843,7 +883,7 @@
     <string name="biz_book_completed">Hoàn tất</string>
     <string name="biz_book_cancelled">Đã hủy</string>
 
-    <!-- Tin đăng -->
+    <!-- Listings -->
     <string name="biz_my_listings">Tin đăng của tôi</string>
     <string name="biz_search_listings">Tìm tin đăng…</string>
     <string name="biz_tab_all">Tất cả</string>
@@ -873,7 +913,7 @@
     <string name="biz_delete_msg">Thao tác này sẽ xóa \"%s\" và toàn bộ lịch sử đặt chỗ. Không thể hoàn tác.</string>
     <string name="biz_toast_deleted">Đã xóa tin đăng</string>
 
-    <!-- Lịch -->
+    <!-- Calendar -->
     <string name="biz_calendar">Lịch</string>
     <string name="biz_calendar_month">Tháng 8, 2025</string>
     <string name="biz_cal_available">Còn trống</string>
@@ -897,7 +937,7 @@
     <string name="biz_status_checkedin">Đã nhận phòng</string>
     <string name="biz_status_checkedout">Đã trả phòng</string>
 
-    <!-- Đánh giá & Báo cáo -->
+    <!-- Reviews &amp; Reports -->
     <string name="biz_reputation">Uy tín</string>
     <string name="biz_reviews_title">Đánh giá &amp; Báo cáo</string>
     <string name="biz_tab_reviews">Đánh giá</string>
@@ -924,7 +964,7 @@
     <string name="biz_empty_reports_title">Hiện không có báo cáo nào</string>
     <string name="biz_empty_reports_msg">Khi một đánh giá bị gắn cờ, nó sẽ hiển thị ở đây để bạn xem xét.</string>
 
-    <!-- Cá nhân -->
+    <!-- Profile -->
     <string name="biz_account">Tài khoản</string>
     <string name="biz_profile">Hồ sơ</string>
     <string name="biz_owner_name">Maya Chen</string>
@@ -947,7 +987,7 @@
     <string name="biz_logout">Đăng xuất</string>
     <string name="biz_toast_logout">Đã đăng xuất</string>
 
-    <!-- Thêm tin đăng -->
+    <!-- Add Listing -->
     <string name="biz_new_listing">Tin đăng mới</string>
     <string name="biz_step_of">Bước %1$d / %2$d</string>
     <string name="biz_save_draft">Lưu nháp</string>
@@ -962,7 +1002,7 @@
     <string name="biz_discard_title">Hủy tin đăng mới?</string>
     <string name="biz_discard_msg">Mọi tiến trình của biểu mẫu sẽ bị mất. Lưu nháp thay vì hủy?</string>
     <string name="biz_discard">Hủy bỏ</string>
-    <!-- Bước 1 -->
+    <!-- Step 1 -->
     <string name="biz_s1_title">Cho chúng tôi biết thông tin cơ bản</string>
     <string name="biz_s1_sub">Chọn danh mục và đặt tên cho tin đăng của bạn.</string>
     <string name="biz_category">Danh mục</string>
@@ -977,7 +1017,7 @@
     <string name="biz_photos">Ảnh · %1$d/6</string>
     <string name="biz_upload">Tải lên</string>
     <string name="biz_cover">ẢNH BÌA</string>
-    <!-- Bước 2 -->
+    <!-- Step 2 -->
     <string name="biz_s2_title">Ở đâu &amp; có gì</string>
     <string name="biz_s2_sub">Giúp khách tìm thấy bạn và biết những gì cần mong đợi.</string>
     <string name="biz_address">Địa chỉ</string>
@@ -993,7 +1033,7 @@
     <string name="biz_am_workspace">Không gian làm việc</string>
     <string name="biz_am_ac">Máy lạnh</string>
     <string name="biz_capacity">Sức chứa (khách)</string>
-    <!-- Bước 3 -->
+    <!-- Step 3 -->
     <string name="biz_s3_title">Đặt giá của bạn</string>
     <string name="biz_s3_sub">Bạn có thể điều chỉnh giá theo mùa và phụ phí bên dưới.</string>
     <string name="biz_base_price_night">Giá cơ bản (mỗi đêm)</string>
@@ -1016,7 +1056,7 @@
     <string name="biz_fee_late_value">$35 sau 12:00</string>
     <string name="biz_fee_extra_guest">Khách thêm</string>
     <string name="biz_fee_extra_guest_value">$15 / đêm</string>
-    <!-- Bước 4 -->
+    <!-- Step 4 -->
     <string name="biz_s4_title">Chọn lịch trống</string>
     <string name="biz_s4_sub">Đánh dấu ngày mở, ngày chặn, hoặc một khoảng tùy chỉnh.</string>
     <string name="biz_date_range">Khoảng ngày</string>
@@ -1026,7 +1066,7 @@
     <string name="biz_legend_blocked">Đã chặn</string>
     <string name="biz_legend_open">Mở</string>
     <string name="biz_block_additional">Chặn thêm ngày</string>
-    <!-- Bước 5 -->
+    <!-- Step 5 -->
     <string name="biz_s5_title">Xem lại &amp; đăng</string>
     <string name="biz_s5_sub">Kiểm tra lại mọi thứ bên dưới. Bạn có thể sửa sau.</string>
     <string name="biz_preview">Xem trước</string>

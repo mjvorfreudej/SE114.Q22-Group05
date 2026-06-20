@@ -28,6 +28,23 @@ public class ErrorHandler {
             }
         }
 
+        if (response.errorBody() != null) {
+            try {
+                String errorStr = response.errorBody().string();
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                ApiResponse<?> apiResponse = gson.fromJson(errorStr, ApiResponse.class);
+                if (apiResponse != null) {
+                    String errorCode = apiResponse.getError();
+                    String message = apiResponse.getMessage();
+                    if (message != null && !message.isEmpty()) {
+                        return parseApiError(errorCode, message, httpCode);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         if (!response.isSuccessful()) {
             return parseHttpError(httpCode);
         }

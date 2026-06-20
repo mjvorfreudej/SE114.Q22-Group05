@@ -28,13 +28,19 @@ import androidx.fragment.app.Fragment;
 import com.example.tourgo.R;
 import com.example.tourgo.ui.admin.AdminTabBar;
 import com.example.tourgo.ui.admin.AdminUi;
+import com.example.tourgo.remote.RetrofitClient;
+import com.example.tourgo.remote.api.ReviewApi;
+import com.example.tourgo.models.response.ApiResponse;
+import com.example.tourgo.models.response.BusinessReview;
 import com.example.tourgo.ui.business.BusinessMockData.RatingBar;
-import com.example.tourgo.ui.business.BusinessMockData.Report;
-import com.example.tourgo.ui.business.BusinessMockData.Review;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /** Business › Reviews & Reports — rating summary, review list with replies, reports queue. */
 public class BusinessReviewsFragment extends Fragment {
@@ -42,6 +48,10 @@ public class BusinessReviewsFragment extends Fragment {
     private static final int STAR_GOLD = Color.parseColor("#FDB022");
 
     private View reviewsContent, reportsContent;
+    private LinearLayout reviewsList, reportsList;
+    private View rootView;
+    private List<BusinessReview> mReviews = new ArrayList<>();
+    private String mActiveTab = "reviews";
 
     @Nullable
     @Override
@@ -53,34 +63,113 @@ public class BusinessReviewsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
+        rootView = v;
 
         reviewsContent = v.findViewById(R.id.bizReviewsContent);
         reportsContent = v.findViewById(R.id.bizReportsContent);
+        reviewsList = v.findViewById(R.id.bizReviewsList);
+        reportsList = v.findViewById(R.id.bizReportsList);
 
+        updateTabs();
+        loadReviews();
+    }
+
+    private void updateTabs() {
+        if (!isAdded() || rootView == null) return;
         List<AdminTabBar.Tab> tabs = Arrays.asList(
-                new AdminTabBar.Tab("reviews", getString(R.string.biz_tab_reviews), BusinessMockData.TOTAL_REVIEWS),
-                new AdminTabBar.Tab("reports", getString(R.string.biz_tab_reports), BusinessMockData.reports().size())
+                new AdminTabBar.Tab("reviews", getString(R.string.biz_tab_reviews), mReviews.size()),
+                new AdminTabBar.Tab("reports", getString(R.string.biz_tab_reports), 0)
         );
-        AdminTabBar.build(v.findViewById(R.id.bizReviewTabs), tabs, "reviews", id -> {
+        AdminTabBar.build(rootView.findViewById(R.id.bizReviewTabs), tabs, mActiveTab, id -> {
+            mActiveTab = id;
             boolean reviews = "reviews".equals(id);
             BizUi.show(reviewsContent, reviews);
             BizUi.show(reportsContent, !reviews);
         });
+    }
 
-        buildSummary(v);
-        buildReviews(v.findViewById(R.id.bizReviewsList));
-        buildReports(v.findViewById(R.id.bizReportsList));
+    private void loadReviews() {
+        ReviewApi api = RetrofitClient.getInstance(requireContext()).getReviewApi();
+        api.getBusinessReviews().enqueue(new Callback<ApiResponse<List<BusinessReview>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<BusinessReview>>> call, Response<ApiResponse<List<BusinessReview>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    mReviews = response.body().getData();
+                } else {
+                    mReviews.clear();
+                }
+                updateTabs();
+                rebuildReviewsUi();
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<BusinessReview>>> call, Throwable t) {
+                mReviews.clear();
+                updateTabs();
+                rebuildReviewsUi();
+            }
+        });
+    }
+
+    private void rebuildReviewsUi() {
+        if (!isAdded() || rootView == null) return;
+
+        buildSummary(rootView);
+
+        if (reviewsList != null) {
+            reviewsList.removeAllViews();
+            buildReviews(reviewsList);
+        }
+
+        if (reportsList != null) {
+            reportsList.removeAllViews();
+        }
     }
 
     // ── Summary card ────────────────────────────────────────────────────────────
     private void buildSummary(View v) {
-        ((TextView) v.findViewById(R.id.bizSummaryRating)).setText(BusinessMockData.OVERALL_RATING);
-        addStars(v.findViewById(R.id.bizSummaryStars), 5, 11);
-        ((TextView) v.findViewById(R.id.bizSummaryCount))
-                .setText(getString(R.string.biz_reviews_count, BusinessMockData.TOTAL_REVIEWS));
+        int totalReviews = mReviews.size();
+        int sumRatings = 0;
+        int[] starCounts = new int[5]; // index 0=5star, 1=4star, 2=3star, 3=2star, 4=1star
+        for (BusinessReview r : mReviews) {
+            int rating = Math.max(1, Math.min(5, r.getRating()));
+            sumRatings += rating;
+            starCounts[5 - rating]++;
+        }
+
+        double overallVal = totalReviews > 0 ? (double) sumRatings / totalReviews : 0.0;
+        String overallStr = String.format(Locale.getDefault(), "%.1f", overallVal);
+
+        TextView sumRatingTv = v.findViewById(R.id.bizSummaryRating);
+        if (sumRatingTv != null) {
+            sumRatingTv.setText(overallStr);
+        }
+
+        LinearLayout sumStarsContainer = v.findViewById(R.id.bizSummaryStars);
+        if (sumStarsContainer != null) {
+            sumStarsContainer.removeAllViews();
+            addStars(sumStarsContainer, (int) Math.round(overallVal), 11);
+        }
+
+        TextView sumCountTv = v.findViewById(R.id.bizSummaryCount);
+        if (sumCountTv != null) {
+            sumCountTv.setText(getString(R.string.biz_reviews_count, totalReviews));
+        }
 
         LinearLayout bars = v.findViewById(R.id.bizRatingBars);
-        for (RatingBar rb : BusinessMockData.ratingDistribution()) bars.addView(buildBar(rb));
+        if (bars != null) {
+            bars.removeAllViews();
+            int maxCount = 0;
+            for (int count : starCounts) {
+                if (count > maxCount) maxCount = count;
+            }
+            for (int i = 0; i < 5; i++) {
+                int stars = 5 - i;
+                int count = starCounts[i];
+                float pct = maxCount > 0 ? (float) count / maxCount : 0f;
+                bars.addView(buildBar(new RatingBar(stars, count, pct)));
+            }
+        }
     }
 
     private View buildBar(RatingBar rb) {
@@ -142,85 +231,48 @@ public class BusinessReviewsFragment extends Fragment {
     // ── Reviews list ────────────────────────────────────────────────────────────
     private void buildReviews(LinearLayout list) {
         LayoutInflater inf = LayoutInflater.from(requireContext());
-        for (Review r : BusinessMockData.reviews()) {
+        for (BusinessReview r : mReviews) {
             View card = inf.inflate(R.layout.item_biz_review, list, false);
-            AdminUi.avatar(card.findViewById(R.id.bizReviewAvatar), r.name);
-            ((TextView) card.findViewById(R.id.bizReviewName)).setText(r.name);
-            ((TextView) card.findViewById(R.id.bizReviewMeta)).setText(r.listing + " · " + r.when);
-            ((TextView) card.findViewById(R.id.bizReviewBody)).setText(r.body);
-            addStars(card.findViewById(R.id.bizReviewStars), r.rating, 11);
+            AdminUi.avatar(card.findViewById(R.id.bizReviewAvatar), r.getName());
+            ((TextView) card.findViewById(R.id.bizReviewName)).setText(r.getName());
+            
+            String timeStr = r.getCreatedAt();
+            if (timeStr != null && timeStr.length() >= 10) {
+                timeStr = timeStr.substring(0, 10);
+            } else {
+                timeStr = "";
+            }
+            String listingName = r.getListing() != null ? r.getListing() : "Dịch vụ";
+            
+            ((TextView) card.findViewById(R.id.bizReviewMeta)).setText(listingName + " · " + timeStr);
+            ((TextView) card.findViewById(R.id.bizReviewBody)).setText(r.getBody());
+            addStars(card.findViewById(R.id.bizReviewStars), r.getRating(), 11);
 
             View replyBox = card.findViewById(R.id.bizReviewReplyBox);
             View replyBtn = card.findViewById(R.id.bizReviewReplyBtn);
-            if (r.replied) {
-                replyBox.setVisibility(View.VISIBLE);
-                ((TextView) card.findViewById(R.id.bizReviewReplyText)).setText(r.replyText);
-            } else {
-                replyBtn.setVisibility(View.VISIBLE);
-                replyBtn.setOnClickListener(view -> openReply(r));
-            }
+            
+            replyBox.setVisibility(View.GONE);
+            replyBtn.setVisibility(View.VISIBLE);
+            replyBtn.setOnClickListener(view -> openReply(r));
+            
             list.addView(card);
         }
-    }
-
-    // ── Reports list ────────────────────────────────────────────────────────────
-    private void buildReports(LinearLayout list) {
-        LayoutInflater inf = LayoutInflater.from(requireContext());
-        for (Report r : BusinessMockData.reports()) {
-            View card = inf.inflate(R.layout.item_biz_report, list, false);
-            ((TextView) card.findViewById(R.id.bizReportKind)).setText(r.kind);
-            ((TextView) card.findViewById(R.id.bizReportWhen)).setText(r.when);
-            String snippet = r.body.length() > 90 ? r.body.substring(0, 90) + "…" : r.body;
-            ((TextView) card.findViewById(R.id.bizReportBody)).setText("\"" + snippet + "\"");
-            ((TextView) card.findViewById(R.id.bizReportBy)).setText(byUser(r.targetUser));
-            card.setOnClickListener(view -> openReport(r));
-            list.addView(card);
-        }
-    }
-
-    private CharSequence byUser(String user) {
-        SpannableStringBuilder sb = new SpannableStringBuilder("by ");
-        int start = sb.length();
-        sb.append(user);
-        sb.setSpan(new StyleSpan(Typeface.BOLD), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new ForegroundColorSpan(color(R.color.adm_gray_900)), start, sb.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return sb;
     }
 
     // ── Sheets ────────────────────────────────────────────────────────────────
-    private void openReply(Review r) {
+    private void openReply(BusinessReview r) {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View sheet = LayoutInflater.from(requireContext()).inflate(R.layout.sheet_biz_reply, null, false);
-        AdminUi.avatar(sheet.findViewById(R.id.bizReplyAvatar), r.name);
-        ((TextView) sheet.findViewById(R.id.bizReplyName)).setText(r.name);
-        ((TextView) sheet.findViewById(R.id.bizReplyBody)).setText(r.body);
-        addStars(sheet.findViewById(R.id.bizReplyStars), r.rating, 11);
+        AdminUi.avatar(sheet.findViewById(R.id.bizReplyAvatar), r.getName());
+        ((TextView) sheet.findViewById(R.id.bizReplyName)).setText(r.getName());
+        ((TextView) sheet.findViewById(R.id.bizReplyBody)).setText(r.getBody());
+        addStars(sheet.findViewById(R.id.bizReplyStars), r.getRating(), 11);
 
         sheet.findViewById(R.id.bizReplyClose).setOnClickListener(view -> dialog.dismiss());
         sheet.findViewById(R.id.bizReplyCancel).setOnClickListener(view -> dialog.dismiss());
         sheet.findViewById(R.id.bizReplyPost).setOnClickListener(view -> {
             dialog.dismiss();
             toast(getString(R.string.biz_toast_reply));
-        });
-        dialog.setContentView(sheet);
-        dialog.show();
-    }
-
-    private void openReport(Report r) {
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View sheet = LayoutInflater.from(requireContext()).inflate(R.layout.sheet_biz_report, null, false);
-        ((TextView) sheet.findViewById(R.id.bizReportSheetKind)).setText(r.kind);
-        ((TextView) sheet.findViewById(R.id.bizReportSheetReporter))
-                .setText(getString(R.string.biz_reported_by, r.reporter, r.when));
-        ((TextView) sheet.findViewById(R.id.bizReportSheetBody)).setText("\"" + r.body + "\"");
-        ((TextView) sheet.findViewById(R.id.bizReportSheetReasoning)).setText(r.reasoning);
-
-        sheet.findViewById(R.id.bizReportClose).setOnClickListener(view -> dialog.dismiss());
-        sheet.findViewById(R.id.bizReportDismiss).setOnClickListener(view -> dialog.dismiss());
-        sheet.findViewById(R.id.bizReportApprove).setOnClickListener(view -> {
-            dialog.dismiss();
-            toast(getString(R.string.biz_toast_banned));
         });
         dialog.setContentView(sheet);
         dialog.show();

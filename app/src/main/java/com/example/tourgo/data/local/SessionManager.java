@@ -40,6 +40,7 @@ public class SessionManager {
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_USER_NAME = "user_name";
+    private static final String KEY_USER_ROLE = "user_role";
 
     // App settings
     private static final String KEY_REMEMBER_ME = "remember_me";
@@ -90,11 +91,18 @@ public class SessionManager {
     }
 
     public void saveUserInfo(String userId, String email, String name) {
-        sharedPreferences.edit()
+        saveUserInfo(userId, email, name, null);
+    }
+
+    public void saveUserInfo(String userId, String email, String name, String role) {
+        SharedPreferences.Editor editor = sharedPreferences.edit()
                 .putString(KEY_USER_ID, userId)
                 .putString(KEY_USER_EMAIL, email)
-                .putString(KEY_USER_NAME, name)
-                .apply();
+                .putString(KEY_USER_NAME, name);
+        if (role != null) {
+            editor.putString(KEY_USER_ROLE, role);
+        }
+        editor.apply();
     }
 
     public String getEmail() {
@@ -138,6 +146,9 @@ public class SessionManager {
      * Returns false when no email is stored.
      */
     public boolean isAdmin() {
+        String role = sharedPreferences.getString(KEY_USER_ROLE, null);
+        if ("admin".equalsIgnoreCase(role)) return true;
+
         String email = getEmail();
         if (email == null) return false;
         email = email.trim().toLowerCase(Locale.ROOT);
@@ -164,6 +175,9 @@ public class SessionManager {
      * precedence (an admin email is never treated as a business).
      */
     public boolean isBusiness() {
+        String role = sharedPreferences.getString(KEY_USER_ROLE, null);
+        if ("business".equalsIgnoreCase(role)) return true;
+
         if (isAdmin()) return false;
         String email = getEmail();
         if (email == null) return false;

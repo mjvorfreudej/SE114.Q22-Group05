@@ -124,9 +124,54 @@
     <string name="profile_admin_console_sub">Manage the marketplace</string>
     <string name="profile_business_console">Business Console</string>
     <string name="profile_business_console_sub">Manage listings &amp; reviews</string>
+    <string name="profile_register_business">Register as Partner</string>
+    <string name="profile_register_business_sub">Become a service provider partner</string>
+    <string name="profile_registration_status">Registration Status</string>
+    <string name="profile_registration_status_pending">Awaiting Approval</string>
+    <string name="profile_registration_status_rejected">Rejected - Tap to view details</string>
 
-    <!-- dialog_edit_profile.xml -->
+    <!-- Register Business -->
+    <string name="biz_reg_title">Partner Registration</string>
+    <string name="biz_reg_subtitle">Become a partner to provide Tours and Hotels</string>
+    <string name="biz_reg_name_label">Business Name</string>
+    <string name="biz_reg_name_hint">Enter business name</string>
+    <string name="biz_reg_owner_label">Representative</string>
+    <string name="biz_reg_owner_hint">Full name of representative</string>
+    <string name="biz_reg_tax_label">Tax Code</string>
+    <string name="biz_reg_tax_hint">Enter tax code</string>
+    <string name="biz_reg_phone_label">Phone Number</string>
+    <string name="biz_reg_phone_hint">Enter phone number</string>
+    <string name="biz_reg_email_label">Business Email</string>
+    <string name="biz_reg_email_hint">example@company.com</string>
+    <string name="biz_reg_address_label">Business Address</string>
+    <string name="biz_reg_address_hint">Headquarters address</string>
+    <string name="biz_reg_submit">Submit Registration</string>
+    <string name="biz_reg_cancel">Cancel</string>
+    <string name="biz_reg_already_have">You have already submitted a registration. Tap to view status.</string>
+
+    <!-- Business Registration Detail -->
+    <string name="biz_reg_detail_title">Registration Details</string>
+    <string name="biz_reg_status_label">Order Status</string>
+    <string name="biz_reg_rejection_reason">Rejection Reason</string>
+    <string name="biz_reg_biz_info">Business Information</string>
+    <string name="biz_reg_biz_name">Business Name</string>
+    <string name="biz_reg_owner">Representative</string>
+    <string name="biz_reg_tax_code">Tax Code</string>
+    <string name="biz_reg_phone">Phone Number</string>
+    <string name="biz_reg_email">Email</string>
+    <string name="biz_reg_address">Address</string>
+    <string name="biz_reg_re_register">Re-register</string>
+    <string name="biz_reg_status_rejected">Rejected</string>
+    <string name="biz_reg_status_active">Activated</string>
+    <string name="biz_reg_no_reason">No specific reason provided.</string>
+
+    <!-- Edit Profile -->
     <string name="edprofile_title">Edit profile</string>
+    <string name="edprofile_save">Save</string>
+    <string name="edprofile_change_avatar">Change avatar</string>
+    <string name="edprofile_info_note">Personal information is used to contact you when you book a tour or hotel.</string>
+    <string name="edprofile_update_success">Profile updated successfully</string>
+    <string name="edprofile_update_error">Could not update profile</string>
 
     <!-- Auth errors -->
     <string name="err_network">Network error, please try again</string>
@@ -149,11 +194,11 @@
     <string name="err_name_empty">Name cannot be empty</string>
 
     <!-- Success messages -->
-    <string name="msg_login_success">Signed in successfully!</string>
-    <string name="msg_register_success">Account created!</string>
-    <string name="msg_reset_success">Password updated!</string>
+    <string name="msg_login_success">Welcome back! Signed in successfully.</string>
+    <string name="msg_register_success">Account registered successfully! Welcome to TourGo.</string>
+    <string name="msg_reset_success">Password updated successfully.</string>
     <string name="msg_recovery_sent">Recovery email sent!\nPlease check your inbox.</string>
-    <string name="msg_login_fail">Login failed</string>
+    <string name="msg_login_fail">Login failed. Please check your credentials.</string>
 
     <!--  Error Code  -->
     <string name="err_unauthorized">Invalid email or password</string>
@@ -235,6 +280,7 @@
     <string name="detail_description_label">Description</string>
     <string name="detail_reviews_label">Reviews</string>
     <string name="detail_staying_price_label">Staying Price</string>
+    <string name="tour_price_label">Tour Price</string>
     <string name="detail_book_now_button">Book Now</string>
     <string name="detail_amenities_label">Amenities</string>
     <string name="detail_location_label">Location</string>
@@ -251,6 +297,21 @@
     <string name="filter_rating_3">3 ★</string>
     <string name="filter_rating_2">2 ★</string>
     <string name="filter_rating_1">1 ★</string>
+
+    <!-- Filters -->
+    <string name="filter_title">Filters</string>
+    <string name="filter_section_property_type">Property Type</string>
+    <string name="filter_section_price_range">Price Range</string>
+    <string name="filter_price_under_500k">Under 500k</string>
+    <string name="filter_price_500k_2m">500k - 2M</string>
+    <string name="filter_price_2m_5m">2M - 5M</string>
+    <string name="filter_price_over_5m">Over 5M</string>
+    <string name="filter_min_price">Min Price</string>
+    <string name="filter_max_price">Max Price</string>
+    <string name="filter_section_amenities">Amenities</string>
+    <string name="filter_section_rating">Rating</string>
+    <string name="filter_reset">Reset</string>
+    <string name="filter_apply">Apply</string>
 
     <!-- Hotel List -->
     <string name="hotel_in_location">Hotels in %s</string>
@@ -286,12 +347,7 @@
     <string name="review_delete_success">Review deleted</string>
     <string name="review_delete_error">Can not delete review</string>
 
-    <string name="review_pick_images">Add photos</string>
-    <string name="review_pick_images_title">Choose review photos</string>
-    <string name="review_selected_images_count">%d photos selected</string>
-    <string name="review_image_upload_partial_error">Review saved, but some photos could not be uploaded</string>
-
-    <!--  API Error  -->
+    <!-- API errors -->
     <string name="err_no_internet">No internet connection</string>
     <string name="err_timeout">Connection timeout</string>
 
@@ -775,7 +831,7 @@
     <string name="notif_a6_body">Platform GMV crossed $1.0M this month — a new record.</string>
     <string name="notif_a6_when">Yesterday</string>
 
-    <string name="notif_a7_title">10,000 weekly active travelers</string>
+    <string name="notif_a7_title">10.000 weekly active travelers</string>
     <string name="notif_a7_body">Active travelers up 18% week over week.</string>
     <string name="notif_a7_when">Yesterday</string>
 
@@ -787,7 +843,7 @@
          Business Dashboard (ui_kits/business) — English
          Mirrors the TourGo design-system prototype. UI chrome only;
          record content (names, review/report text) stays verbatim
-         in BusinessMockData, matching the Admin console convention.
+         (Review/Report content follows the Admin console pattern).
          ============================================================ -->
     <!-- Bottom nav -->
     <string name="biz_nav_home">Home</string>

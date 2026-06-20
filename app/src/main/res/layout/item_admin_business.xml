@@ -161,5 +161,46 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- Action Buttons (Shown only for pending businesses) -->
+        <LinearLayout
+            android:id="@+id/layoutPendingActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApproveBiz"
+                style="@style/Widget.Material3.Button.UnelevatedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/adm_green_500"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Phê duyệt"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRejectBiz"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Từ chối"
+                android:textColor="@color/adm_red_500"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp"
+                app:strokeColor="@color/adm_red_100" />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

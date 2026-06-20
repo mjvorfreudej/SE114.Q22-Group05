@@ -24,6 +24,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.remote.service.AdminService;
 import com.example.tourgo.ui.admin.AdminMockData.BizAccount;
+import com.example.tourgo.utils.ToastHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,10 @@ import java.util.Locale;
 /** Admin › Pending businesses — fetched from the backend; approve via the API. */
 public class AdminBusinessesFragment extends Fragment {
 
-    // Pending businesses are loaded live from the server, never from mock data.
-    private final List<BizAccount> all = new ArrayList<>();
+    private final List<BizAccount> mPendingList = new ArrayList<>();
+    private final List<BizAccount> mApprovedList = new ArrayList<>();
     private String query = "";
+    private String mActiveTab = "pending";
 
     private BusinessAdapter adapter;
     private LinearLayout tabs, empty;
@@ -85,43 +87,90 @@ public class AdminBusinessesFragment extends Fragment {
 
     private void loadBusinesses() {
         setLoading(true);
+        final int[] pendingLoaded = {0};
+        final int[] approvedLoaded = {0};
+        
         AdminService.getPendingBusinesses(requireContext(), new DataCallback<List<BusinessAccount>>() {
             @Override
             public void onSuccess(List<BusinessAccount> data) {
                 if (!isAdded()) return;
-                setLoading(false);
-                all.clear();
+                mPendingList.clear();
                 if (data != null) {
-                    for (BusinessAccount dto : data) all.add(BizAccount.fromServer(dto));
+                    for (BusinessAccount dto : data) mPendingList.add(BizAccount.fromServer(dto));
                 }
-                buildTabs();
-                applyFilter();
+                pendingLoaded[0] = 1;
+                if (approvedLoaded[0] == 1) {
+                    setLoading(false);
+                    rebuildUi();
+                }
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
                 if (!isAdded()) return;
-                setLoading(false);
-                all.clear();
-                buildTabs();
-                applyFilter();
-                Toast.makeText(requireContext(),
-                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                mPendingList.clear();
+                pendingLoaded[0] = 1;
+                if (approvedLoaded[0] == 1) {
+                    setLoading(false);
+                    rebuildUi();
+                }
+                ToastHelper.showError(requireContext(), "Lỗi tải danh sách chờ duyệt: " + msg);
+            }
+        });
+
+        AdminService.getApprovedBusinesses(requireContext(), new DataCallback<List<BusinessAccount>>() {
+            @Override
+            public void onSuccess(List<BusinessAccount> data) {
+                if (!isAdded()) return;
+                mApprovedList.clear();
+                if (data != null) {
+                    for (BusinessAccount dto : data) mApprovedList.add(BizAccount.fromServer(dto));
+                }
+                approvedLoaded[0] = 1;
+                if (pendingLoaded[0] == 1) {
+                    setLoading(false);
+                    rebuildUi();
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                mApprovedList.clear();
+                approvedLoaded[0] = 1;
+                if (pendingLoaded[0] == 1) {
+                    setLoading(false);
+                    rebuildUi();
+                }
+                ToastHelper.showError(requireContext(), "Lỗi tải danh sách đã duyệt: " + msg);
             }
         });
     }
 
+    private void rebuildUi() {
+        buildTabs();
+        applyFilter();
+    }
+
     private void buildTabs() {
-        title.setText(getString(R.string.adm_biz_title, all.size()));
+        int currentCount = "pending".equals(mActiveTab) ? mPendingList.size() : mApprovedList.size();
+        title.setText(getString(R.string.adm_biz_title, currentCount));
         List<AdminTabBar.Tab> tabList = new ArrayList<>();
-        tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_status_pending), all.size()));
-        AdminTabBar.build(tabs, tabList, "pending", id -> applyFilter());
+        tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_status_pending), mPendingList.size()));
+        tabList.add(new AdminTabBar.Tab("approved", "Đã duyệt", mApprovedList.size()));
+        AdminTabBar.build(tabs, tabList, mActiveTab, id -> {
+            mActiveTab = id;
+            int count = "pending".equals(mActiveTab) ? mPendingList.size() : mApprovedList.size();
+            title.setText(getString(R.string.adm_biz_title, count));
+            applyFilter();
+        });
     }
 
     private void applyFilter() {
         String q = query.trim().toLowerCase(Locale.getDefault());
+        List<BizAccount> source = "pending".equals(mActiveTab) ? mPendingList : mApprovedList;
         List<BizAccount> visible = new ArrayList<>();
-        for (BizAccount b : all) {
+        for (BizAccount b : source) {
             boolean queryOk = q.isEmpty()
                     || b.name.toLowerCase(Locale.getDefault()).contains(q)
                     || b.owner.toLowerCase(Locale.getDefault()).contains(q);
@@ -144,6 +193,8 @@ public class AdminBusinessesFragment extends Fragment {
     private void onAction(BizAccount biz, String action) {
         if (BusinessAdapter.ACTION_APPROVE.equals(action)) {
             approve(biz);
+        } else if (BusinessAdapter.ACTION_REJECT.equals(action)) {
+            reject(biz);
         }
     }
 
@@ -155,9 +206,27 @@ public class AdminBusinessesFragment extends Fragment {
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(),
                         getString(R.string.adm_toast_biz_approved, biz.name), Toast.LENGTH_SHORT).show();
-                all.remove(biz);
-                buildTabs();
-                applyFilter();
+                loadBusinesses();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void reject(BizAccount biz) {
+        if (biz.serverId == null) return;
+        AdminService.rejectBusiness(requireContext(), biz.serverId, new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                if (!isAdded()) return;
+                Toast.makeText(requireContext(),
+                        "Đã từ chối đơn đăng ký của " + biz.name, Toast.LENGTH_SHORT).show();
+                loadBusinesses();
             }
 
             @Override

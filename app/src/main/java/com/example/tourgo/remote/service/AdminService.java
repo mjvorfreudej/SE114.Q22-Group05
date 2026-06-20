@@ -56,10 +56,68 @@ public class AdminService {
                 });
     }
 
+    public static void getApprovedBusinesses(Context context, DataCallback<List<BusinessAccount>> callback) {
+        RetrofitClient.getInstance(context)
+                .getAdminApi()
+                .getApprovedBusinesses()
+                .enqueue(new Callback<ApiResponse<List<BusinessAccount>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<BusinessAccount>>> call, Response<ApiResponse<List<BusinessAccount>>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<List<BusinessAccount>> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<BusinessAccount>>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
     public static void approveBusiness(Context context, String businessId, DataCallback<Void> callback) {
         RetrofitClient.getInstance(context)
                 .getAdminApi()
                 .approveBusiness(businessId)
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Void> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
+                                callback.onSuccess(null);
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    public static void rejectBusiness(Context context, String businessId, DataCallback<Void> callback) {
+        RetrofitClient.getInstance(context)
+                .getAdminApi()
+                .rejectBusiness(businessId)
                 .enqueue(new Callback<ApiResponse<Void>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {

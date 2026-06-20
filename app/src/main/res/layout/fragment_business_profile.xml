@@ -78,6 +78,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/bizProfileOwnerName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/biz_owner_name"
@@ -86,6 +87,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/bizProfileOrgName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
@@ -113,6 +115,7 @@
                             app:tint="@color/adm_green_700" />
 
                         <TextView
+                            android:id="@+id/bizProfileStatusText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/biz_verified_business"
@@ -152,7 +155,10 @@
                     style="@style/BizMiniStat"
                     android:layout_marginEnd="4dp">
 
-                    <TextView style="@style/BizMiniStatValue" android:text="12"
+                    <TextView
+                        android:id="@+id/bizProfileListingsVal"
+                        style="@style/BizMiniStatValue"
+                        android:text="12"
                         tools:ignore="HardcodedText" />
 
                     <TextView style="@style/BizMiniStatLabel" android:text="@string/biz_stat_listings_short" />
@@ -163,7 +169,10 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp">
 
-                    <TextView style="@style/BizMiniStatValue" android:text="286"
+                    <TextView
+                        android:id="@+id/bizProfileBookingsVal"
+                        style="@style/BizMiniStatValue"
+                        android:text="286"
                         tools:ignore="HardcodedText" />
 
                     <TextView style="@style/BizMiniStatLabel" android:text="@string/biz_stat_bookings_short" />
@@ -173,7 +182,10 @@
                     style="@style/BizMiniStat"
                     android:layout_marginStart="4dp">
 
-                    <TextView style="@style/BizMiniStatValue" android:text="4.8"
+                    <TextView
+                        android:id="@+id/bizProfileRatingVal"
+                        style="@style/BizMiniStatValue"
+                        android:text="4.8"
                         tools:ignore="HardcodedText" />
 
                     <TextView style="@style/BizMiniStatLabel" android:text="@string/biz_stat_rating_short" />
