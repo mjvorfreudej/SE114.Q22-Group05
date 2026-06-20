@@ -73,12 +73,15 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
         int bgColor;
         int textColor;
         if ("COMPLETED".equalsIgnoreCase(status)) {
-            bgColor = R.color.adm_blue_50;
-            textColor = R.color.adm_blue_700;
-        } else if ("PAID".equalsIgnoreCase(status)) {
+            // Completed trip = Green
             bgColor = R.color.adm_green_100;
             textColor = R.color.adm_green_700;
+        } else if ("PAID".equalsIgnoreCase(status)) {
+            // Just paid = Blue (Confirmed)
+            bgColor = R.color.adm_blue_50;
+            textColor = R.color.adm_blue_700;
         } else {
+            // Pending or other = Amber
             bgColor = R.color.adm_amber_100;
             textColor = R.color.adm_amber_700;
         }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TourGo</string>
 
@@ -224,9 +225,12 @@
     <string name="search_no_results">Không tìm thấy kết quả</string>
     <string name="search_timeout">Hết thời gian chờ, vui lòng thử lại</string>
     <string name="search_hint">Tìm kiếm tour</string>
+    <string name="search_hint_hotel">Tìm kiếm khách sạn</string>
+    <string name="search_hint_tour">Tìm kiếm tour</string>
     <string name="search_recent">Tìm kiếm gần đây</string>
     <string name="search_clear">Xóa</string>
     <string name="search_recent_viewed">Đã xem gần đây</string>
+    <string name="search_results_for_format">Kết quả %1$s cho \"%2$s\"</string>
 
     <!-- Favorites -->
     <string name="no_favorites">Chưa có mục yêu thích nào</string>
@@ -679,10 +683,7 @@
     <string name="adm_toast_biz_approved">Đã duyệt %s</string>
     <string name="adm_users_empty">Không có người dùng</string>
 
-    <!-- ============================================================
-         Traveler notifications (ui_kits/notifications/traveler.html)
-         English mirror of the strings in values/strings.xml.
-         ============================================================ -->
+    <!-- ===================== Traveler notifications (ui_kits/notifications/traveler.html) ===================== -->
     <string name="notif_title">Thông báo</string>
     <string name="notif_unread">%d chưa đọc</string>
     <string name="notif_mark_all_read">Đánh dấu tất cả đã đọc</string>
