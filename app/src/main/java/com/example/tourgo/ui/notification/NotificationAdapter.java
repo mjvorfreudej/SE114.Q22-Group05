@@ -253,15 +253,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             b.setGravity(Gravity.CENTER);
             int padH = dp(ctx, 12), padV = dp(ctx, 8);
             b.setPadding(padH, padV, padH, padV);
+            b.setMinWidth(dp(ctx, 96));
 
-            if (a.primary) {
-                b.setBackgroundResource(R.drawable.bg_adm_pill);
-                b.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.adm_gray_900)));
-                b.setTextColor(ContextCompat.getColor(ctx, R.color.white));
-            } else {
-                b.setBackgroundResource(R.drawable.bg_notif_action_secondary);
-                b.setTextColor(ContextCompat.getColor(ctx, R.color.adm_gray_700));
-            }
+            // All quick actions share one look: dark fill + white text (the
+            // "Xem báo cáo" primary style), so the row reads evenly.
+            b.setBackgroundResource(R.drawable.bg_adm_pill);
+            b.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.adm_gray_900)));
+            b.setTextColor(ContextCompat.getColor(ctx, R.color.white));
 
             LinearLayout.LayoutParams lp =
                     new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
