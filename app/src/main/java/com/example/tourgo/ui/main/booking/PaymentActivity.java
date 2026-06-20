@@ -61,6 +61,7 @@ public class PaymentActivity extends AppCompatActivity {
             if (isFinishing()) return;
             
             // After mock payment succeeds, update status on server
+            // Using "COMPLETED" as requested for backend sync (means Paid)
             updateBookingStatusToPaid();
         }, 2000);
     }
@@ -68,19 +69,22 @@ public class PaymentActivity extends AppCompatActivity {
     private void updateBookingStatusToPaid() {
         if (bookingId == null) {
             pbPayment.setVisibility(View.GONE);
-            showSuccessDialog(); // Fallback if no ID
+            showSuccessDialog(); 
             return;
         }
 
-        BookingService.updateBookingStatus(this, bookingId, "PAID", new DataCallback<Void>() {
+        // According to requirement: Backend "COMPLETED" status means the order is PAID
+        BookingService.updateBookingStatus(this, bookingId, "COMPLETED", new DataCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
+                if (isFinishing()) return;
                 pbPayment.setVisibility(View.GONE);
                 showSuccessDialog();
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
+                if (isFinishing()) return;
                 pbPayment.setVisibility(View.GONE);
                 layoutPaymentInfo.setVisibility(View.VISIBLE);
                 Toast.makeText(PaymentActivity.this, "Payment failed to sync: " + msg, Toast.LENGTH_LONG).show();
@@ -94,7 +98,6 @@ public class PaymentActivity extends AppCompatActivity {
                 .setMessage(R.string.booking_success_msg)
                 .setCancelable(false)
                 .setPositiveButton(R.string.booking_back_home, (dialog, which) -> {
-                    // Navigate to MainActivity and clear all previous activities from the stack
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

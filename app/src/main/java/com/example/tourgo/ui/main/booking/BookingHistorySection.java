@@ -26,16 +26,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wires the "Booking history" section (status tabs + list) shared by the
- * profile screen and fragment. Bookings come from the {@code bookings} table
- * via the API; tour/hotel name, price and image are joined from the cached
- * repositories. Tabs filter the list by status (PAID / COMPLETED).
+ * Wires the "Booking history" section.
+ * UI Logic Mapping:
+ * - Tab PAID: Shows backend status "COMPLETED" (which means paid).
+ * - Tab COMPLETED: Shows backend status "FINISHED" or "DONE" (trip ended).
+ * - Displays max 2 items by default, toggles expand/collapse via "View All".
+ * - PENDING items are strictly excluded from the PAID tab.
  */
 public class BookingHistorySection {
 
-    private static final String STATUS_PAID = "PAID";
-    private static final String STATUS_COMPLETED = "COMPLETED";
-    private static final String STATUS_PENDING = "PENDING";
+    private static final String UI_STATUS_PAID = "PAID";
+    private static final String UI_STATUS_COMPLETED = "COMPLETED";
 
     private final Context context;
     private final SessionManager session;
@@ -43,22 +44,24 @@ public class BookingHistorySection {
     private RecyclerView recyclerView;
     private ChipGroup filterChips;
     private TextView emptyView;
+    private TextView viewAllBtn;
     private ProgressBar progressBar;
     private BookingHistoryAdapter adapter;
 
     private final List<BookingHistoryAdapter.Item> allItems = new ArrayList<>();
-    private String currentStatus = STATUS_PAID;
+    private String currentTab = UI_STATUS_PAID;
+    private boolean isExpanded = false;
 
     public BookingHistorySection(Context context) {
         this.context = context;
         this.session = new SessionManager(context);
     }
 
-    /** Find and wire the section views inside {@code root}, then load data. */
     public void bind(View root) {
         recyclerView = root.findViewById(R.id.rvMyBookings);
         filterChips = root.findViewById(R.id.chipGroupBookingFilter);
         emptyView = root.findViewById(R.id.tvBookingEmpty);
+        viewAllBtn = root.findViewById(R.id.tvBookingViewAll);
         progressBar = root.findViewById(R.id.progressBookings);
         if (recyclerView == null) return;
 
@@ -69,8 +72,16 @@ public class BookingHistorySection {
 
         if (filterChips != null) {
             filterChips.setOnCheckedStateChangeListener((group, checkedIds) -> {
-                currentStatus = checkedIds.contains(R.id.chipBookingCompleted)
-                        ? STATUS_COMPLETED : STATUS_PAID;
+                currentTab = checkedIds.contains(R.id.chipBookingCompleted)
+                        ? UI_STATUS_COMPLETED : UI_STATUS_PAID;
+                isExpanded = false; // Collapse when switching tabs
+                applyFilter();
+            });
+        }
+
+        if (viewAllBtn != null) {
+            viewAllBtn.setOnClickListener(v -> {
+                isExpanded = !isExpanded;
                 applyFilter();
             });
         }
@@ -88,8 +99,6 @@ public class BookingHistorySection {
         String userId = session.getUserId();
         String token = session.getAccessToken();
 
-        // Warm the tour/hotel caches first so bookings can be enriched, then
-        // fetch the bookings themselves.
         TourRepository.getInstance().loadTours(context, userId, token, new DataCallback<List<Tour>>() {
             @Override public void onSuccess(List<Tour> data) { loadHotelsThenBookings(userId, token); }
             @Override public void onError(ApiErrorCode code, String msg) { loadHotelsThenBookings(userId, token); }
@@ -122,7 +131,6 @@ public class BookingHistorySection {
                 setLoading(false);
                 allItems.clear();
                 applyFilter();
-                Log.e("BookingHistory", "Failed to fetch: " + msg);
             }
         });
     }
@@ -154,11 +162,21 @@ public class BookingHistorySection {
             title = context.getString(R.string.booking_history_title);
         }
 
+        // Map Backend Status to UI Status
+        String backendStatus = booking.getStatus() != null ? booking.getStatus().toUpperCase() : "PENDING";
+        String uiStatus = backendStatus;
+
+        if (backendStatus.equals("COMPLETED")) {
+            uiStatus = UI_STATUS_PAID; // Backend COMPLETED means UI PAID
+        } else if (backendStatus.equals("FINISHED") || backendStatus.equals("DONE")) {
+            uiStatus = UI_STATUS_COMPLETED; // Trip ended
+        }
+
         return new BookingHistoryAdapter.Item(
                 title,
                 formatDate(booking.getBookingDate()),
                 priceText,
-                booking.getStatus(),
+                uiStatus,
                 imageUrl
         );
     }
@@ -166,19 +184,26 @@ public class BookingHistorySection {
     private void applyFilter() {
         List<BookingHistoryAdapter.Item> filtered = new ArrayList<>();
         for (BookingHistoryAdapter.Item item : allItems) {
-            String status = item.status != null ? item.status.toUpperCase() : "";
-            
-            if (currentStatus.equals(STATUS_PAID)) {
-                // Show both PAID and PENDING in the "Paid" tab for better UX
-                if (status.equals(STATUS_PAID) || status.equals(STATUS_PENDING) || status.equals("CONFIRMED")) {
-                    filtered.add(item);
-                }
-            } else if (currentStatus.equals(STATUS_COMPLETED)) {
-                if (status.equals(STATUS_COMPLETED)) {
-                    filtered.add(item);
-                }
+            // Strictly filter by mapped UI status. 
+            // PENDING items will be ignored as they don't match PAID or COMPLETED tabs.
+            if (currentTab.equals(item.status)) {
+                filtered.add(item);
             }
         }
+
+        // Toggle logic: show max 2 or show all
+        if (filtered.size() > 2) {
+            if (viewAllBtn != null) {
+                viewAllBtn.setVisibility(View.VISIBLE);
+                viewAllBtn.setText(isExpanded ? "Thu gọn" : "Xem tất cả");
+            }
+            if (!isExpanded) {
+                filtered = filtered.subList(0, 2);
+            }
+        } else {
+            if (viewAllBtn != null) viewAllBtn.setVisibility(View.GONE);
+        }
+
         if (adapter != null) adapter.setData(filtered);
         showEmpty(filtered.isEmpty());
     }
@@ -186,6 +211,7 @@ public class BookingHistorySection {
     private void setLoading(boolean loading) {
         if (progressBar != null) progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
         if (loading && emptyView != null) emptyView.setVisibility(View.GONE);
+        if (loading && viewAllBtn != null) viewAllBtn.setVisibility(View.GONE);
     }
 
     private void showEmpty(boolean empty) {
@@ -194,7 +220,6 @@ public class BookingHistorySection {
 
     private static String formatDate(String raw) {
         if (raw == null || raw.isEmpty()) return "";
-        // bookingDate is an ISO timestamp; show just the date portion.
         return raw.length() >= 10 ? raw.substring(0, 10) : raw;
     }
 }
