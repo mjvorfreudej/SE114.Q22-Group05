@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.example.tourgo.adapters.HotelSearchAdapter;
 import com.example.tourgo.adapters.PopularHotelAdapter;
 import com.example.tourgo.adapters.TourAdapter;
 import com.example.tourgo.data.repository.HotelRepository;
+import com.example.tourgo.data.repository.TourRepository;
 import com.example.tourgo.databinding.ActivitySearchBinding;
 import com.example.tourgo.databinding.LayoutFilterBottomSheetBinding;
 import com.example.tourgo.interfaces.ApiErrorCode;
@@ -82,6 +84,7 @@ public class SearchFragment extends Fragment {
 
         binding.btnFilterSearch.setOnClickListener(v -> showFilterBottomSheet());
         
+        setupCategorySelector();
         setupRecentSearches();
         setupRecentViewed();
         setupSearchLogic();
@@ -98,22 +101,53 @@ public class SearchFragment extends Fragment {
         ViewCompat.requestApplyInsets(root);
     }
 
+    private void setupCategorySelector() {
+        // Mặc định là Tour
+        binding.etSearchQuery.setHint(R.string.search_hint_tour);
+        
+        binding.cgSearchCategory.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+            
+            int id = checkedIds.get(0);
+            if (id == R.id.chipSearchHotels) {
+                selectedPropertyTypeId = R.id.chipHotels;
+                binding.etSearchQuery.setHint(R.string.search_hint_hotel);
+            } else {
+                selectedPropertyTypeId = R.id.chipTours;
+                binding.etSearchQuery.setHint(R.string.search_hint_tour);
+            }
+            
+            String query = binding.etSearchQuery.getText().toString().trim();
+            if (!query.isEmpty()) {
+                performSearch(query);
+            }
+        });
+    }
+
     private void setupSearchLogic() {
+        // Xử lý khi nhấn nút Search trên bàn phím
+        binding.etSearchQuery.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = binding.etSearchQuery.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    performSearch(query);
+                    // Ẩn bàn phím sau khi search
+                    v.clearFocus();
+                }
+                return true;
+            }
+            return false;
+        });
+
         binding.etSearchQuery.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
-                if (searchRunnable != null) searchHandler.removeCallbacks(searchRunnable);
-
                 if (query.isEmpty()) {
                     showRecentContent();
-                    return;
                 }
-
-                searchRunnable = () -> performSearch(query);
-                searchHandler.postDelayed(searchRunnable, SEARCH_DELAY_MS);
             }
         });
     }
@@ -122,13 +156,26 @@ public class SearchFragment extends Fragment {
         if (binding == null) return;
         binding.layoutRecentContent.setVisibility(View.VISIBLE);
         binding.layoutSearchResults.setVisibility(View.GONE);
+        setupRecentSearches(); // Refresh recent searches list
+        loadRecentHotels(); // Refresh recent viewed list
     }
 
     private void performSearch(String query) {
         if (binding == null) return;
+        
+        boolean isTour = (selectedPropertyTypeId == R.id.chipTours);
+        
+        // Chỉ lưu vào lịch sử khi thực hiện tìm kiếm (nhấn nút Search)
+        session.addRecentSearch(query, isTour);
+        
         binding.layoutRecentContent.setVisibility(View.GONE);
         binding.layoutSearchResults.setVisibility(View.VISIBLE);
         binding.tvNoResults.setVisibility(View.GONE);
+        
+        // Cập nhật tiêu đề kết quả
+        String type = isTour ? "Tour" : "Khách sạn";
+        binding.tvResultsHeader.setText(getString(R.string.search_results_for_format, type, query));
+
         showLoading(true);
 
         Double min = parseDouble(minPriceStr);
@@ -210,12 +257,20 @@ public class SearchFragment extends Fragment {
             sheet.btnCancelFilter.setOnClickListener(v -> {
                 resetFilters();
                 dialog.dismiss();
+                // Sync main category selector when resetting filter
+                binding.cgSearchCategory.check(R.id.chipSearchTours);
                 performSearch(binding.etSearchQuery.getText().toString());
             });
 
             sheet.btnApplyFilter.setOnClickListener(v -> {
                 saveFilterState(sheet);
                 dialog.dismiss();
+                // Sync main category selector when applying filter
+                if (selectedPropertyTypeId == R.id.chipHotels) {
+                    binding.cgSearchCategory.check(R.id.chipSearchHotels);
+                } else {
+                    binding.cgSearchCategory.check(R.id.chipSearchTours);
+                }
                 performSearch(binding.etSearchQuery.getText().toString());
             });
 
@@ -308,14 +363,50 @@ public class SearchFragment extends Fragment {
 
     private void setupRecentSearches() {
         binding.llRecentSearches.removeAllViews();
-        String[] cities = {"Hạ Long", "Đà Nẵng", "Phú Quốc"};
-        for (String city : cities) {
-            View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_recent_search, binding.llRecentSearches, false);
-            ((TextView)itemView.findViewById(R.id.tvRecentCity)).setText(city);
-            itemView.setOnClickListener(v -> binding.etSearchQuery.setText(city));
-            binding.llRecentSearches.addView(itemView);
+        List<SessionManager.RecentSearchItem> recentSearches = session.getRecentSearches();
+        
+        if (recentSearches.isEmpty()) {
+            binding.tvRecentSearchTitle.setVisibility(View.GONE);
+            binding.btnClearRecent.setVisibility(View.GONE);
+        } else {
+            binding.tvRecentSearchTitle.setVisibility(View.VISIBLE);
+            binding.btnClearRecent.setVisibility(View.VISIBLE);
+            
+            // Chỉ hiển thị tối đa 4 lịch sử tìm kiếm gần nhất
+            int count = 0;
+            for (SessionManager.RecentSearchItem item : recentSearches) {
+                if (count >= 4) break;
+                
+                View itemView = LayoutInflater.from(getContext()).inflate(R.layout.item_recent_search, binding.llRecentSearches, false);
+                ((TextView)itemView.findViewById(R.id.tvRecentCity)).setText(item.query);
+                
+                String typeStr = item.isTour ? "Tour" : "Khách sạn";
+                ((TextView)itemView.findViewById(R.id.tvRecentType)).setText("Tìm kiếm trong: " + typeStr);
+                
+                itemView.setOnClickListener(v -> {
+                    // Cập nhật chip lựa chọn trên UI trước khi search
+                    if (item.isTour) {
+                        binding.cgSearchCategory.check(R.id.chipSearchTours);
+                        selectedPropertyTypeId = R.id.chipTours;
+                    } else {
+                        binding.cgSearchCategory.check(R.id.chipSearchHotels);
+                        selectedPropertyTypeId = R.id.chipHotels;
+                    }
+                    
+                    binding.etSearchQuery.setText(item.query);
+                    performSearch(item.query); // Tìm kiếm ngay khi click vào lịch sử
+                });
+                binding.llRecentSearches.addView(itemView);
+                count++;
+            }
         }
-        binding.btnClearRecent.setOnClickListener(v -> binding.llRecentSearches.removeAllViews());
+        
+        binding.btnClearRecent.setOnClickListener(v -> {
+            session.clearRecentSearches();
+            binding.llRecentSearches.removeAllViews();
+            binding.tvRecentSearchTitle.setVisibility(View.GONE);
+            binding.btnClearRecent.setVisibility(View.GONE);
+        });
     }
 
     private void setupRecentViewed() {
@@ -327,17 +418,47 @@ public class SearchFragment extends Fragment {
     private void loadRecentHotels() {
         String userId = session.getUserId();
         String token = session.getAccessToken();
+        
+        // Ensure hotels and tours are loaded in repositories first
         HotelRepository.getInstance().loadHotels(getContext(), userId, token, new DataCallback<List<Hotel>>() {
             @Override
-            public void onSuccess(List<Hotel> data) {
-                if (binding == null) return;
-                requireActivity().runOnUiThread(() -> {
-                    if (data != null && !data.isEmpty()) {
-                        recentViewedAdapter.setData(data.size() > 5 ? data.subList(0, 5) : data);
+            public void onSuccess(List<Hotel> hotels) {
+                TourRepository.getInstance().loadTours(getContext(), userId, token, new DataCallback<List<Tour>>() {
+                    @Override
+                    public void onSuccess(List<Tour> tours) {
+                        resolveRecentlyViewedItems();
                     }
+                    @Override public void onError(ApiErrorCode code, String msg) { resolveRecentlyViewedItems(); }
                 });
             }
             @Override public void onError(ApiErrorCode code, String msg) {}
+        });
+    }
+
+    private void resolveRecentlyViewedItems() {
+        List<SessionManager.RecentlyViewedItem> recentItems = session.getRecentlyViewed();
+        List<Hotel> displayList = new ArrayList<>();
+
+        for (SessionManager.RecentlyViewedItem item : recentItems) {
+            if (item.isTour) {
+                Tour t = TourRepository.getInstance().findTourById(item.id);
+                if (t != null) displayList.add(t.toHotel());
+            } else {
+                Hotel h = HotelRepository.getInstance().findHotelById(item.id);
+                if (h != null) displayList.add(h);
+            }
+        }
+
+        if (binding == null) return;
+        requireActivity().runOnUiThread(() -> {
+            if (!displayList.isEmpty()) {
+                binding.tvRecentViewedTitle.setVisibility(View.VISIBLE);
+                binding.rvRecentViewed.setVisibility(View.VISIBLE);
+                recentViewedAdapter.setData(displayList);
+            } else {
+                binding.tvRecentViewedTitle.setVisibility(View.GONE);
+                binding.rvRecentViewed.setVisibility(View.GONE);
+            }
         });
     }
 

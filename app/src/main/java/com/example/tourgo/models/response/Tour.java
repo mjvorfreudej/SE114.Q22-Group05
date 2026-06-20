@@ -177,4 +177,28 @@ public class Tour implements Serializable {
         return amenities.toString();
     }
     public void setAmenities(Object amenities) { this.amenities = amenities; }
+
+    /** Helper to convert Tour to Hotel model for UI consistency in Recently Viewed lists. */
+    public Hotel toHotel() {
+        Hotel h = new Hotel();
+        h.setId(this.id);
+        h.setName(this.name);
+        h.setAddress(this.destination);
+        h.setDescription(this.description);
+        h.setPricePerNight(this.price);
+        h.setRating(this.rating);
+        h.setReviewCount(this.reviewCount);
+        h.setFavorite(this.isFavorite);
+        
+        List<Hotel.HotelImage> hotelImages = new ArrayList<>();
+        if (this.tourImages != null) {
+            for (TourImage ti : this.tourImages) {
+                Hotel.HotelImage hi = new Hotel.HotelImage();
+                hi.setImageUrl(ti.getImageUrl());
+                hotelImages.add(hi);
+            }
+        }
+        h.setHotelImages(hotelImages);
+        return h;
+    }
 }

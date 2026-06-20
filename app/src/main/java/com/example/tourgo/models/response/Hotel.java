@@ -43,6 +43,10 @@ public class Hotel implements Serializable {
         public String getImageUrl() {
             return imageUrl;
         }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
     }
 
     public Hotel() {
@@ -106,13 +110,19 @@ public class Hotel implements Serializable {
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }
     public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
     public double getPricePerNight() { return pricePerNight; }
+    public void setPricePerNight(double pricePerNight) { this.pricePerNight = pricePerNight; }
     public float getRating() { return rating; }
+    public void setRating(float rating) { this.rating = rating; }
     public int getReviewCount() { return reviewCount; }
+    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
     public int getImageResId() { return imageResId; }
     public double getLatitude() { return latitude; }
     public double getLongitude() { return longitude; }
@@ -120,5 +130,13 @@ public class Hotel implements Serializable {
     public void setAmenities(String amenities) { this.amenities = amenities; }
     public boolean hasCoordinates() {
         return !(latitude == 0 && longitude == 0);
+    }
+
+    public List<HotelImage> getHotelImages() {
+        return hotelImages;
+    }
+
+    public void setHotelImages(List<HotelImage> hotelImages) {
+        this.hotelImages = hotelImages;
     }
 }
