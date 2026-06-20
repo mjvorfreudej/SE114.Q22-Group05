@@ -27,7 +27,6 @@ import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.remote.service.AdminService;
-import com.example.tourgo.ui.notification.NotificationItem;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
@@ -40,6 +39,7 @@ public class AdminHomeFragment extends Fragment {
     private View root;
     /** Live user total, counted from the same list the Users directory shows. */
     private Integer userCount = null;
+    private TextView bellBadge;
 
     @Nullable
     @Override
@@ -119,6 +119,9 @@ public class AdminHomeFragment extends Fragment {
                 // The live count wins over the stats aggregate when it has arrived,
                 // so the tile + subtitle always match the Users directory.
                 applyUserCount();
+
+                // Header bell badge = live items needing attention.
+                applyBellBadge(s.getPendingBusinesses() + s.getPendingListings() + s.getReports());
             }
 
             @Override
@@ -257,24 +260,29 @@ public class AdminHomeFragment extends Fragment {
 
     /**
      * Header bell → Admin notification popover (design index.html, role="admin").
-     * Notifications are a separate module and remain on their own optimistic state.
+     * The badge count is driven by live stats (see {@link #applyBellBadge}); the
+     * popover content itself is still the notification module's own state.
      */
     private void setupBell(View root) {
         View bell = root.findViewById(R.id.admBellBtn);
-        TextView badge = root.findViewById(R.id.admBellBadge);
-
-        int unread = 0;
-        for (NotificationItem n : NotificationMockData.seed(requireContext(), NotificationMockData.Role.ADMIN)) {
-            if (!n.read) unread++;
-        }
-        if (unread > 0) {
-            badge.setText(unread > 9 ? "9+" : String.valueOf(unread));
-            badge.setVisibility(View.VISIBLE);
-        } else {
-            badge.setVisibility(View.GONE);
-        }
-
+        bellBadge = root.findViewById(R.id.admBellBadge);
+        bellBadge.setVisibility(View.GONE); // hidden until live stats arrive
         bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.ADMIN));
+    }
+
+    /**
+     * Number of items actually needing the admin's attention, from live stats:
+     * pending business registrations + pending listings + open reports. Replaces
+     * the old fixed count derived from mock seed data.
+     */
+    private void applyBellBadge(int count) {
+        if (bellBadge == null) return;
+        if (count > 0) {
+            bellBadge.setText(count > 9 ? "9+" : String.valueOf(count));
+            bellBadge.setVisibility(View.VISIBLE);
+        } else {
+            bellBadge.setVisibility(View.GONE);
+        }
     }
 
     private void stat(View root, int id, int iconRes, @ColorRes int accent, @ColorRes int soft,
