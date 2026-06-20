@@ -211,10 +211,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private View buildCategoryTag(Context ctx, NotificationMockData.Category cat) {
             LinearLayout tag = new LinearLayout(ctx);
             tag.setOrientation(LinearLayout.HORIZONTAL);
-            tag.setGravity(Gravity.CENTER_VERTICAL);
+            tag.setGravity(Gravity.CENTER);
             tag.setBackgroundResource(R.drawable.bg_adm_pill);
             tag.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.bgColor)));
-            tag.setPadding(dp(ctx, 8), dp(ctx, 3), dp(ctx, 8), dp(ctx, 3));
+            tag.setPadding(dp(ctx, 12), 0, dp(ctx, 12), 0);
 
             View dot = new View(ctx);
             dot.setBackgroundResource(R.drawable.bg_adm_circle);
@@ -231,6 +231,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             label.setIncludeFontPadding(false);
             label.setTextColor(ContextCompat.getColor(ctx, cat.inkColor));
             tag.addView(label);
+
+            // Match the action-pill height (36dp) so the tag and quick actions sit
+            // on one even row instead of a short tag beside a taller button.
+            LinearLayout.LayoutParams lp =
+                    new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            dp(ctx, 36));
+            lp.gravity = Gravity.CENTER_VERTICAL;
+            tag.setLayoutParams(lp);
 
             return tag;
         }
@@ -257,7 +265,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             LinearLayout.LayoutParams lp =
                     new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                            dp(ctx, 36));
             lp.gravity = Gravity.CENTER_VERTICAL;
             if (leadingGap) lp.setMarginStart(dp(ctx, 7));
             b.setLayoutParams(lp);
