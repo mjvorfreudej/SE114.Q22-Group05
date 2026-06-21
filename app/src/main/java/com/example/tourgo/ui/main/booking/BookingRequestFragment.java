@@ -38,6 +38,8 @@ public class BookingRequestFragment extends Fragment {
     
     private Calendar startDate;
     private Calendar endDate;
+    private Calendar dialogStartDate;
+    private Calendar dialogEndDate;
     private Calendar calendarDisplay; 
     private SessionManager session;
 
@@ -150,7 +152,10 @@ public class BookingRequestFragment extends Fragment {
         View view = getLayoutInflater().inflate(R.layout.dialog_select_date, null);
         dialog.setContentView(view);
 
-        calendarDisplay = (Calendar) startDate.clone();
+        dialogStartDate = startDate != null ? (Calendar) startDate.clone() : null;
+        dialogEndDate = endDate != null ? (Calendar) endDate.clone() : null;
+
+        calendarDisplay = (Calendar) (dialogStartDate != null ? dialogStartDate : Calendar.getInstance()).clone();
         calendarDisplay.set(Calendar.DAY_OF_MONTH, 1);
 
         TextView tvMonthYear = view.findViewById(R.id.tvMonthYear);
@@ -170,6 +175,8 @@ public class BookingRequestFragment extends Fragment {
 
         view.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
         view.findViewById(R.id.btnConfirmDate).setOnClickListener(v -> {
+            startDate = dialogStartDate != null ? (Calendar) dialogStartDate.clone() : null;
+            endDate = dialogEndDate != null ? (Calendar) dialogEndDate.clone() : null;
             updateDateUI();
             dialog.dismiss();
         });
@@ -230,16 +237,16 @@ public class BookingRequestFragment extends Fragment {
                         tv.setTextColor(Color.BLACK);
                         highlightDate(tv, currentCellDate);
                         tv.setOnClickListener(v -> {
-                            if (startDate != null && endDate == null) {
-                                if (currentCellDate.after(startDate)) {
-                                    endDate = (Calendar) currentCellDate.clone();
+                            if (dialogStartDate != null && dialogEndDate == null) {
+                                if (currentCellDate.after(dialogStartDate)) {
+                                    dialogEndDate = (Calendar) currentCellDate.clone();
                                 } else {
-                                    startDate = (Calendar) currentCellDate.clone();
-                                    endDate = null;
+                                    dialogStartDate = (Calendar) currentCellDate.clone();
+                                    dialogEndDate = null;
                                 }
                             } else {
-                                startDate = (Calendar) currentCellDate.clone();
-                                endDate = null;
+                                dialogStartDate = (Calendar) currentCellDate.clone();
+                                dialogEndDate = null;
                             }
                             renderCalendar(table, tvMonthYear);
                         });
@@ -254,13 +261,13 @@ public class BookingRequestFragment extends Fragment {
     }
 
     private void highlightDate(TextView tv, Calendar date) {
-        if (startDate != null && isSameDay(date, startDate)) {
-            tv.setBackgroundResource(endDate != null ? R.drawable.bg_date_selected_left : R.drawable.bg_circle_blue);
+        if (dialogStartDate != null && isSameDay(date, dialogStartDate)) {
+            tv.setBackgroundResource(dialogEndDate != null ? R.drawable.bg_date_selected_left : R.drawable.bg_circle_blue);
             tv.setTextColor(Color.WHITE);
-        } else if (endDate != null && isSameDay(date, endDate)) {
+        } else if (dialogEndDate != null && isSameDay(date, dialogEndDate)) {
             tv.setBackgroundResource(R.drawable.bg_date_selected_right);
             tv.setTextColor(Color.WHITE);
-        } else if (startDate != null && endDate != null && date.after(startDate) && date.before(endDate)) {
+        } else if (dialogStartDate != null && dialogEndDate != null && date.after(dialogStartDate) && date.before(dialogEndDate)) {
             tv.setBackgroundColor(Color.parseColor("#E8F0FE"));
         }
     }

@@ -106,6 +106,9 @@ public class BookingActivity extends AppCompatActivity {
         String checkOut = formatDate(checkOutMillis);
 
         Booking booking = new Booking(userId, tourId, hotelId);
+        booking.setBookingDate(checkIn);
+        booking.setCheckIn(checkIn);
+        booking.setCheckOut(checkOut);
 
         showLoading(true);
         BookingService.createBooking(this, booking, new DataCallback<Booking>() {

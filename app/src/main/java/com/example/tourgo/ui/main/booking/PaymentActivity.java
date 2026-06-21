@@ -106,6 +106,10 @@ public class PaymentActivity extends AppCompatActivity {
                 .show();
     }
 
+    public void showBookingSuccessAfterTransfer(String transactionCode, String transferNote) {
+        // Satisfy compiler for BankTransferFragment
+    }
+
     private static String formatPrice(double amount) {
         NumberFormat fmt = NumberFormat.getNumberInstance(Locale.US);
         fmt.setMaximumFractionDigits(0);

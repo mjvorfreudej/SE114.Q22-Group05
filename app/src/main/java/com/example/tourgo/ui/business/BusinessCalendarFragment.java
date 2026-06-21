@@ -33,9 +33,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import com.example.tourgo.remote.api.BookingApi;
+import com.example.tourgo.data.local.SessionManager;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Set;
+import java.util.HashSet;
 
 /** Business › Calendar — monthly occupancy grid, today's bookings, timeline view, detail sheet. */
 public class BusinessCalendarFragment extends Fragment {
@@ -50,6 +53,13 @@ public class BusinessCalendarFragment extends Fragment {
     private int mStartBlank;
     private int mDays;
     private List<CalBooking> mBookings = new ArrayList<>();
+
+    private TextView todayDateText;
+    private TextView blockDatesBtn;
+    private int mSelectedDay;
+    private String mMonthYearKey;
+    private Set<String> mBlockedDays = new HashSet<>();
+    private SessionManager mSessionManager;
 
     @Nullable
     @Override
@@ -73,13 +83,23 @@ public class BusinessCalendarFragment extends Fragment {
         todayBookingsList = v.findViewById(R.id.bizTodayBookings);
         timelineRows = v.findViewById(R.id.bizTimelineRows);
 
+        todayDateText = v.findViewById(R.id.bizCalTodayText);
+        blockDatesBtn = v.findViewById(R.id.bizBlockDatesBtn);
+
         toggleMonth.setOnClickListener(view -> setView(true));
         toggleTimeline.setOnClickListener(view -> setView(false));
 
         // Compute current month parameters
         Calendar calendar = Calendar.getInstance();
         mTodayDay = calendar.get(Calendar.DAY_OF_MONTH);
-        
+        mSelectedDay = mTodayDay;
+        mSessionManager = new SessionManager(requireContext());
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH); // 0-based
+        mMonthYearKey = year + "_" + month;
+        mBlockedDays = mSessionManager.getBlockedDates(mMonthYearKey);
+
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
         if (monthTitleText != null) {
             monthTitleText.setText(sdf.format(calendar.getTime()));
@@ -90,11 +110,46 @@ public class BusinessCalendarFragment extends Fragment {
         mStartBlank = dayOfWeek - 1;
         mDays = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
+        if (blockDatesBtn != null) {
+            blockDatesBtn.setOnClickListener(view -> {
+                String dayStr = String.valueOf(mSelectedDay);
+                if (mBlockedDays.contains(dayStr)) {
+                    mBlockedDays.remove(dayStr);
+                } else {
+                    mBlockedDays.add(dayStr);
+                }
+                mSessionManager.saveBlockedDates(mMonthYearKey, mBlockedDays);
+                updateDateLabel();
+                rebuildCalendar();
+            });
+        }
+
+        updateDateLabel();
         buildLegend(v.findViewById(R.id.bizCalLegend));
         buildWeekdays(v.findViewById(R.id.bizWeekdays));
 
         setView(true);
         loadBookings();
+    }
+
+    private void updateDateLabel() {
+        if (todayDateText == null) return;
+        Calendar cal = Calendar.getInstance();
+        int currentMonth = cal.get(Calendar.MONTH) + 1; // 1-based
+
+        if (mSelectedDay == mTodayDay) {
+            todayDateText.setText("Hôm nay · " + mTodayDay + "/" + currentMonth);
+        } else {
+            todayDateText.setText("Ngày " + mSelectedDay + "/" + currentMonth);
+        }
+
+        if (blockDatesBtn != null) {
+            if (mBlockedDays.contains(String.valueOf(mSelectedDay))) {
+                blockDatesBtn.setText("Bỏ chặn");
+            } else {
+                blockDatesBtn.setText(R.string.biz_block_dates);
+            }
+        }
     }
 
     private void loadBookings() {
@@ -132,7 +187,8 @@ public class BusinessCalendarFragment extends Fragment {
             
             String room = "Dịch vụ";
             if (b.getHotelInfo() != null && b.getHotelInfo().getName() != null) {
-                room = b.getHotelInfo().getName();
+                int roomNum = Math.abs(id % 20) + 1;
+                room = b.getHotelInfo().getName() + " · Phòng " + roomNum;
             } else if (b.getTourInfo() != null && b.getTourInfo().getName() != null) {
                 room = b.getTourInfo().getName();
             }
@@ -144,6 +200,17 @@ public class BusinessCalendarFragment extends Fragment {
             String dateStr = b.getBookingDate();
             if (dateStr != null && dateStr.length() >= 10) {
                 try {
+                    int bYear = Integer.parseInt(dateStr.substring(0, 4));
+                    int bMonth = Integer.parseInt(dateStr.substring(5, 7));
+                    
+                    Calendar displayedCal = Calendar.getInstance();
+                    int dispYear = displayedCal.get(Calendar.YEAR);
+                    int dispMonth = displayedCal.get(Calendar.MONTH) + 1; // 1-based
+                    
+                    if (bYear != dispYear || bMonth != dispMonth) {
+                        continue;
+                    }
+                    
                     day = Integer.parseInt(dateStr.substring(8, 10));
                     if (dateStr.length() >= 16) {
                         inTime = dateStr.substring(11, 16);
@@ -151,6 +218,8 @@ public class BusinessCalendarFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            } else {
+                continue;
             }
             
             String status = b.getStatus() != null ? b.getStatus().toLowerCase() : "pending";
@@ -274,12 +343,13 @@ public class BusinessCalendarFragment extends Fragment {
     private View buildDayCell(int day) {
         String occ = getDynamicOccupancy(day);
         boolean today = day == mTodayDay;
+        boolean selected = day == mSelectedDay;
         int bg, fg, dot;
         boolean border = false;
         switch (occ) {
+            case "blocked": bg = R.color.adm_gray_200;  fg = R.color.adm_gray_600;  dot = R.color.adm_gray_400;  break;
             case "partial": bg = R.color.adm_amber_100; fg = R.color.adm_amber_700; dot = R.color.adm_amber_500; break;
             case "full":    bg = R.color.adm_red_100;   fg = R.color.adm_red_700;   dot = R.color.adm_red_500;   break;
-            case "blocked": bg = R.color.adm_gray_200;  fg = R.color.adm_gray_600;  dot = R.color.adm_gray_400;  break;
             case "free":
             default:        bg = R.color.white;         fg = R.color.adm_gray_900;  dot = R.color.adm_green_500; border = true; break;
         }
@@ -292,8 +362,14 @@ public class BusinessCalendarFragment extends Fragment {
         g.setShape(GradientDrawable.RECTANGLE);
         g.setCornerRadius(BizUi.dp(requireContext(), 6));
         g.setColor(color(bg));
-        if (today) g.setStroke(BizUi.dp(requireContext(), 2), color(R.color.adm_gray_900));
-        else if (border) g.setStroke(BizUi.dp(requireContext(), 1), color(R.color.adm_gray_200));
+        
+        if (selected) {
+            g.setStroke(BizUi.dp(requireContext(), 2), color(R.color.adm_gray_900));
+        } else if (today) {
+            g.setStroke(BizUi.dp(requireContext(), 1.5f), color(R.color.adm_gray_400));
+        } else if (border) {
+            g.setStroke(BizUi.dp(requireContext(), 1), color(R.color.adm_gray_200));
+        }
         cell.setBackground(g);
 
         TextView num = new TextView(requireContext());
@@ -318,6 +394,12 @@ public class BusinessCalendarFragment extends Fragment {
                 BizUi.dp(requireContext(), 5), BizUi.dp(requireContext(), 5)));
         cell.addView(dotRow, dotRowLp);
 
+        cell.setOnClickListener(view -> {
+            mSelectedDay = day;
+            updateDateLabel();
+            rebuildCalendar();
+        });
+
         return cell;
     }
 
@@ -325,7 +407,7 @@ public class BusinessCalendarFragment extends Fragment {
     private void buildTodayBookings(LinearLayout list) {
         LayoutInflater inf = LayoutInflater.from(requireContext());
         for (CalBooking b : mBookings) {
-            if (b.day != mTodayDay) continue;
+            if (b.day != mSelectedDay) continue;
             View row = inf.inflate(R.layout.item_biz_today_booking, list, false);
             AdminUi.avatar(row.findViewById(R.id.bizTodayAvatar), b.guest);
             ((TextView) row.findViewById(R.id.bizTodayGuest)).setText(b.guest);
@@ -411,6 +493,9 @@ public class BusinessCalendarFragment extends Fragment {
     }
 
     private String getDynamicOccupancy(int day) {
+        if (mBlockedDays.contains(String.valueOf(day))) {
+            return "blocked";
+        }
         int count = 0;
         for (CalBooking b : mBookings) {
             if (b.day == day) {

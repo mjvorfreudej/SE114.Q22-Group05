@@ -16,6 +16,12 @@ public class Booking {
     private String bookingDate;
     private String status;
 
+    @SerializedName("check_in")
+    private String checkIn;
+
+    @SerializedName("check_out")
+    private String checkOut;
+
     @SerializedName("users")
     private GuestInfo guestInfo;
 
@@ -103,4 +109,10 @@ public class Booking {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getCheckIn() { return checkIn; }
+    public void setCheckIn(String checkIn) { this.checkIn = checkIn; }
+
+    public String getCheckOut() { return checkOut; }
+    public void setCheckOut(String checkOut) { this.checkOut = checkOut; }
 }

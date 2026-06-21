@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="back">Quay lại</string>
     <string name="app_name">TourGo</string>
 
     <string name="profile_language">Ngôn ngữ</string>
@@ -1094,5 +1095,46 @@
     <string name="biz_summary_pricing">Giá</string>
     <string name="biz_summary_pricing_value">Theo mùa · 3 phụ phí</string>
     <string name="biz_terms">Tôi đồng ý với Điều khoản Chủ nhà của TourGo và xác nhận tin đăng này tuân thủ quy định địa phương.</string>
+
+    <!-- ===================== Payment ===================== -->
+    <string name="payment_method_title">Phương thức thanh toán</string>
+    <string name="total_amount">Tổng tiền</string>
+    <string name="select_payment_method">Chọn phương thức thanh toán</string>
+    <string name="payment_vnpay" translatable="false">VNPay</string>
+    <string name="payment_momo" translatable="false">Momo</string>
+    <string name="payment_cod" translatable="false">COD</string>
+    <string name="select_bank">Chọn ngân hàng</string>
+    <string name="bank_all">Cổng thanh toán chung</string>
+    <string name="bank_ncb" translatable="false">NCB</string>
+    <string name="bank_vietcombank" translatable="false">Vietcombank</string>
+    <string name="bank_vietinbank" translatable="false">Vietinbank</string>
+    <string name="proceed_payment">Tiếp tục thanh toán</string>
+    <string name="payment_processing">Đang xử lý thanh toán…</string>
+    <string name="payment_success">Thanh toán thành công</string>
+    <string name="payment_failed">Thanh toán thất bại</string>
+    <string name="payment_cancelled">Đã hủy thanh toán</string>
+    <string name="payment_error">Lỗi thanh toán. Vui lòng thử lại.</string>
+    <string name="payment_redirect">Đang chuyển đến cổng thanh toán…</string>
+    <string name="payment_note">Hệ thống sẽ tự động xác nhận sau khi nhận được tiền</string>
+    <string name="already_pay">Tôi đã chuyển khoản</string>
+    <string name="payment_require">Vui lòng chuyển khoản ĐÚNG số tiền và nội dung để hệ thống tự động xác nhận thanh toán.</string>
+    <string name="note">Lưu ý</string>
+    <string name="copy">Sao chép</string>
+    <string name="transfer_detail">Nội dung chuyển khoản</string>
+    <string name="payment_amout">Số tiền</string>
+    <string name="account_holder">Chủ tài khoản</string>
+    <string name="account_number">Số tài khoản</string>
+    <string name="transfer_information">Thông tin chuyển khoản</string>
+    <string name="qr_scan">Quét mã QR để chuyển khoản</string>
+    <string name="bank_transfer">Chuyển khoản ngân hàng</string>
+    <string name="qr_transaction_code">Mã QR giao dịch</string>
+    <string name="scan_qr_to_verify">Quét để xác minh giao dịch</string>
+    <string name="not_paid">Chưa thanh toán</string>
+    <string name="error_create_transfer_information">Lỗi tạo thông tin chuyển khoản: </string>
+    <string name="not_get_transfer_information">Không nhận được thông tin chuyển khoản</string>
+    <string name="create_transfer_information">Đang tạo thông tin chuyển khoản...</string>
+    <string name="COD_error">Lỗi thanh toán COD: </string>
+    <string name="processing">Đang xử lý...</string>
+    <string name="payment_method_not_support">Phương thức thanh toán không hỗ trợ</string>
 
 </resources>

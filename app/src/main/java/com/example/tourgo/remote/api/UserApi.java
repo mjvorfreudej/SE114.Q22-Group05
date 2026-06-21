@@ -11,10 +11,12 @@ import com.example.tourgo.models.response.User;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -26,6 +28,22 @@ public interface UserApi {
 
     @PUT("api/users/me")
     Call<ApiResponse<User>> updateProfile(@Body UpdateProfileRequest request);
+
+    @Multipart
+    @PUT("api/users/me")
+    Call<ApiResponse<User>> updateProfileMultipart(
+            @Header("Authorization")
+            String token,
+
+            @Part("name")
+            RequestBody name,
+
+            @Part("phone")
+            RequestBody phone,
+
+            @Part
+            MultipartBody.Part file
+    );
 
     @Multipart
     @POST("api/users/me/avatar")
@@ -49,6 +67,17 @@ public interface UserApi {
     /** User sửa Business Profile. */
     @PUT("api/users/businesses/me")
     Call<ApiResponse<BusinessAccount>> updateBusinesses(@Body BusinessRequest request);
+
+    @Multipart
+    @PUT("api/users/businesses/me")
+    Call<ApiResponse<BusinessAccount>> updateBusinessesMultipart(
+            @Part("name") RequestBody name,
+            @Part("owner") RequestBody owner,
+            @Part("taxCode") RequestBody taxCode,
+            @Part("address") RequestBody address,
+            @Part("phone") RequestBody phone,
+            @Part("email") RequestBody email
+    );
 
     /** User hủy Business. */
     @DELETE("api/users/businesses/me")
