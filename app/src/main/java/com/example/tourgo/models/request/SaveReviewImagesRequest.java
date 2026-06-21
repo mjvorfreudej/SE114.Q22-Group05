@@ -2,18 +2,16 @@ package com.example.tourgo.models.request;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class SaveReviewImagesRequest {
     @SerializedName("review_id")
     private String reviewId;
 
-    @SerializedName("image_urls")
-    private List<String> imageUrls;
+    @SerializedName("image_url")
+    private String imageUrl;
 
-    public SaveReviewImagesRequest(String reviewId, List<String> imageUrls) {
+    public SaveReviewImagesRequest(String reviewId, String imageUrl) {
         this.reviewId = reviewId;
-        this.imageUrls = imageUrls;
+        this.imageUrl = imageUrl;
     }
 
     public String getReviewId() {
@@ -24,11 +22,11 @@ public class SaveReviewImagesRequest {
         this.reviewId = reviewId;
     }
 
-    public List<String> getImageUrls() {
-        return imageUrls;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageUrls(List<String> imageUrls) {
-        this.imageUrls = imageUrls;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

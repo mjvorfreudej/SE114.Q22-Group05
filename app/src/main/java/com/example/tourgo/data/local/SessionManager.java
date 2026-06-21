@@ -48,6 +48,7 @@ public class SessionManager {
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_USER_ROLE = "user_role";
+    private static final String KEY_USER_AVATAR = "user_avatar";
 
     // App settings
     private static final String KEY_REMEMBER_ME = "remember_me";
@@ -156,16 +157,23 @@ public class SessionManager {
     }
 
     public void saveUserInfo(String userId, String email, String name) {
-        saveUserInfo(userId, email, name, null);
+        saveUserInfo(userId, email, name, null, null);
     }
 
     public void saveUserInfo(String userId, String email, String name, String role) {
+        saveUserInfo(userId, email, name, role, null);
+    }
+
+    public void saveUserInfo(String userId, String email, String name, String role, String avatar) {
         SharedPreferences.Editor editor = sharedPreferences.edit()
                 .putString(KEY_USER_ID, userId)
                 .putString(KEY_USER_EMAIL, email)
                 .putString(KEY_USER_NAME, name);
         if (role != null) {
             editor.putString(KEY_USER_ROLE, role);
+        }
+        if (avatar != null) {
+            editor.putString(KEY_USER_AVATAR, avatar);
         }
         editor.apply();
     }
@@ -180,6 +188,10 @@ public class SessionManager {
 
     public String getUserName() {
         return sharedPreferences.getString(KEY_USER_NAME, null);
+    }
+
+    public String getAvatar() {
+        return sharedPreferences.getString(KEY_USER_AVATAR, null);
     }
 
     public String getAccessToken() {

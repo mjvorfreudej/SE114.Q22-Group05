@@ -135,6 +135,12 @@
             android:name=".ui.notification.NotificationsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.main.detail.ImageDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+
         <!-- Shares exported files (e.g. the admin audit-log CSV) via content:// URIs. -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -145,6 +151,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 
 </manifest>
