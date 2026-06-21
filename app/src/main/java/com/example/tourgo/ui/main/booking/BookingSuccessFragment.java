@@ -23,7 +23,13 @@ import com.example.tourgo.R;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Random;
+
 public class BookingSuccessFragment extends Fragment {
+    private static final String CONFIRMATION_CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int CONFIRMATION_LENGTH = 10;
 
     @Nullable
     @Override
@@ -42,6 +48,7 @@ public class BookingSuccessFragment extends Fragment {
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
+        TextView tvConfirmationNumber = view.findViewById(R.id.tvConfirmationNumber);
         Button btnViewBooking = view.findViewById(R.id.btnViewBooking);
         Button btnBackHome = view.findViewById(R.id.btnBackHome);
 
@@ -72,24 +79,22 @@ public class BookingSuccessFragment extends Fragment {
             }
         }
 
-        // Nhận và hiển thị dữ liệu từ arguments
         if (getArguments() != null) {
             double total = getArguments().getDouble("total_price", 0.0);
             String bookingDate = getArguments().getString("check_in_out", "");
             String guestInfo = getArguments().getString("guest_info", "");
 
-            if (hotel != null) {
-                tvTotalCost.setText(hotel.formatPrice(requireContext(), total));
-            } else if (tour != null) {
-                tvTotalCost.setText(tour.formatPrice(requireContext(), total));
-            }
-            
+            tvTotalCost.setText(formatCurrency(total));
             tvBookingDate.setText(bookingDate);
             tvGuestInfo.setText(guestInfo);
+        } else {
+            tvTotalCost.setText(formatCurrency(0.0));
         }
 
+        tvConfirmationNumber.setText(generateConfirmationNumber());
+
         btnBack.setOnClickListener(v -> requireActivity().finish());
-        
+
         btnViewBooking.setOnClickListener(v -> {
             requireActivity().finish();
         });
@@ -100,6 +105,24 @@ public class BookingSuccessFragment extends Fragment {
             startActivity(intent);
             requireActivity().finish();
         });
+    }
+
+    private String formatCurrency(double amount) {
+        String currency = new com.example.tourgo.data.local.SessionManager(requireContext()).getCurrency();
+        if ("USD".equalsIgnoreCase(currency)) {
+            return String.format(Locale.getDefault(), "$ %,.0f", amount);
+        }
+        return String.format(Locale.getDefault(), "%,.0f₫", amount);
+    }
+
+    private String generateConfirmationNumber() {
+        Random random = new Random();
+        StringBuilder builder = new StringBuilder(CONFIRMATION_LENGTH);
+        for (int i = 0; i < CONFIRMATION_LENGTH; i++) {
+            int index = random.nextInt(CONFIRMATION_CHARSET.length());
+            builder.append(CONFIRMATION_CHARSET.charAt(index));
+        }
+        return builder.toString();
     }
 
     private void applyTopInset(View root) {

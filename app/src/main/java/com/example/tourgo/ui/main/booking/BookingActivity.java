@@ -170,6 +170,13 @@ public class BookingActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PaymentActivity.class);
         intent.putExtra(PaymentActivity.EXTRA_BOOKING_ID, bookingId);
         intent.putExtra(PaymentActivity.EXTRA_TOTAL_PRICE, totalPrice);
+        Fragment current = getSupportFragmentManager().findFragmentById(R.id.booking_container);
+        if (current != null && current.getArguments() != null) {
+            intent.putExtra(PaymentActivity.EXTRA_CHECK_IN_OUT,
+                    current.getArguments().getString("check_in_out", ""));
+            intent.putExtra(PaymentActivity.EXTRA_GUEST_INFO,
+                    current.getArguments().getString("guest_info", ""));
+        }
         startActivity(intent);
     }
 
@@ -188,3 +195,4 @@ public class BookingActivity extends AppCompatActivity {
         return c.getTimeInMillis();
     }
 }
+
