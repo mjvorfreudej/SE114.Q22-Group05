@@ -343,10 +343,10 @@ public class AdminModerationFragment extends Fragment {
         });
     }
 
-    /** Nudge the host to recompute its moderation-queue badge after an action. */
+    /** Nudge the host to recompute its bottom-nav badges after an action. */
     private void refreshHostBadge() {
         if (getActivity() instanceof AdminActivity) {
-            ((AdminActivity) getActivity()).refreshModerationBadge();
+            ((AdminActivity) getActivity()).refreshNavBadges();
         }
     }
 

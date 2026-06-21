@@ -38,6 +38,7 @@ public class AdminActivity extends AppCompatActivity {
     private TextView[] labels;
     private View[] tabs;
     private TextView moderateBadge;
+    private TextView businessBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public class AdminActivity extends AppCompatActivity {
                 findViewById(R.id.admLabelBusiness), findViewById(R.id.admLabelUsers),
                 findViewById(R.id.admLabelProfile)};
         moderateBadge = findViewById(R.id.admBadgeModerate);
+        businessBadge = findViewById(R.id.admBadgeBusiness);
 
         for (int i = 0; i < tabs.length; i++) {
             final int idx = i;
@@ -104,28 +106,24 @@ public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshModerationBadge();
+        refreshNavBadges();
     }
 
     /**
-     * Refresh the moderation-queue badge from live stats (pending listings + open
-     * reports). Called on resume and by the Moderation tab after an approve/resolve
-     * so the count tracks the backend instead of a baked-in number. Fragments can
-     * trigger it via {@code ((AdminActivity) getActivity()).refreshModerationBadge()}.
+     * Refresh the bottom-nav badges from live stats: the Moderation badge (pending
+     * listings + open reports) and the Business badge (businesses awaiting approval).
+     * Called on resume and by the Moderation / Business tabs after an approve/resolve
+     * so the counts track the backend instead of a baked-in number. Fragments can
+     * trigger it via {@code ((AdminActivity) getActivity()).refreshNavBadges()}.
      */
-    public void refreshModerationBadge() {
-        if (moderateBadge == null) return;
+    public void refreshNavBadges() {
+        if (moderateBadge == null && businessBadge == null) return;
         AdminService.getStats(this, new DataCallback<AdminStats>() {
             @Override
             public void onSuccess(AdminStats s) {
-                if (moderateBadge == null || s == null) return;
-                int queue = s.getQueueTotal();
-                if (queue > 0) {
-                    moderateBadge.setText(queue > 99 ? "99+" : String.valueOf(queue));
-                    moderateBadge.setVisibility(View.VISIBLE);
-                } else {
-                    moderateBadge.setVisibility(View.GONE);
-                }
+                if (s == null) return;
+                setBadge(moderateBadge, s.getQueueTotal());
+                setBadge(businessBadge, s.getPendingBusinesses());
             }
 
             @Override
@@ -133,6 +131,16 @@ public class AdminActivity extends AppCompatActivity {
                 // Leave the last known badge state on failure.
             }
         });
+    }
+
+    private void setBadge(TextView badge, int count) {
+        if (badge == null) return;
+        if (count > 0) {
+            badge.setText(count > 99 ? "99+" : String.valueOf(count));
+            badge.setVisibility(View.VISIBLE);
+        } else {
+            badge.setVisibility(View.GONE);
+        }
     }
 
     private void selectTab(int tab) {
