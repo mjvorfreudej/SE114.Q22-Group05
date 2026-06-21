@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Admin › Language detail screen. Single-select list (the app ships en/vi);
+     selecting a row switches the console locale via LocaleHelper. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_canvas"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_admin_detail_bar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_lang_app_language" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp">
+
+                    <!-- English -->
+                    <LinearLayout
+                        android:id="@+id/admLangEn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="13dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/admLangEnLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/adm_lang_english_label"
+                                android:textColor="@color/adm_gray_900"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="English"
+                                android:textColor="@color/adm_gray_400"
+                                android:textSize="11sp"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="22dp"
+                            android:layout_height="22dp">
+
+                            <View
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:background="@drawable/bg_adm_ring" />
+
+                            <FrameLayout
+                                android:id="@+id/admLangEnDisc"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:background="@drawable/bg_adm_circle"
+                                android:backgroundTint="@color/adm_blue_500">
+
+                                <ImageView
+                                    android:layout_width="13dp"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic_check"
+                                    app:tint="@color/white" />
+                            </FrameLayout>
+                        </FrameLayout>
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Vietnamese -->
+                    <LinearLayout
+                        android:id="@+id/admLangVi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="13dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/admLangViLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/adm_lang_vietnamese_label"
+                                android:textColor="@color/adm_gray_900"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Tiếng Việt"
+                                android:textColor="@color/adm_gray_400"
+                                android:textSize="11sp"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+
+                        <FrameLayout
+                            android:layout_width="22dp"
+                            android:layout_height="22dp">
+
+                            <View
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:background="@drawable/bg_adm_ring" />
+
+                            <FrameLayout
+                                android:id="@+id/admLangViDisc"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:background="@drawable/bg_adm_circle"
+                                android:backgroundTint="@color/adm_blue_500">
+
+                                <ImageView
+                                    android:layout_width="13dp"
+                                    android:layout_height="13dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/ic_check"
+                                    app:tint="@color/white" />
+                            </FrameLayout>
+                        </FrameLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginTop="14dp"
+                android:lineSpacingMultiplier="1.45"
+                android:text="@string/adm_lang_footnote"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

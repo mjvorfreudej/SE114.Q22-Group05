@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_adm_sheet"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_adm_pill"
+        android:backgroundTint="@color/adm_gray_200" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/biz_reply_title"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/bizReplyClose"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_gray_100"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/biz_cancel"
+                android:src="@drawable/ic_close"
+                app:tint="@color/adm_gray_600" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Quoted review -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/bg_biz_gray_box"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/bizReplyAvatar"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:gravity="center"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/bizReplyName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/bizReplyStars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/bizReplyBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingMultiplier="1.5"
+            android:textColor="@color/adm_gray_700"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/biz_your_response"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/bizReplyInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_biz_input"
+        android:gravity="top"
+        android:hint="@string/biz_reply_hint"
+        android:inputType="textMultiLine"
+        android:minLines="4"
+        android:padding="12dp"
+        android:textColor="@color/adm_gray_900"
+        android:textColorHint="@color/adm_gray_400"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="20dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bizReplyCancel"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:text="@string/biz_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/adm_gray_900"
+            app:cornerRadius="999dp"
+            app:strokeColor="@color/adm_gray_300" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bizReplyPost"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/adm_gray_900"
+            android:text="@string/biz_post_reply"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:cornerRadius="999dp"
+            app:icon="@drawable/ic_send"
+            app:iconGravity="textStart"
+            app:iconSize="15dp"
+            app:iconTint="@color/white" />
+    </LinearLayout>
+</LinearLayout>

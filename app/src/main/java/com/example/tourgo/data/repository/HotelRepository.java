@@ -1,0 +1,118 @@
+package com.example.tourgo.data.repository;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.Favorite;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.remote.service.HotelService;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class HotelRepository {
+    private static HotelRepository instance;
+    private List<Hotel> cachedHotels;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private HotelRepository() {}
+
+    public static HotelRepository getInstance() {
+        if (instance == null) instance = new HotelRepository();
+        return instance;
+    }
+
+    public void loadHotels(Context context, String userId, String token, DataCallback<List<Hotel>> callback) {
+        if (cachedHotels != null) {
+            if (userId != null && token != null) {
+                syncFavorites(context, userId, token, new DataCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                    }
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) {
+                        mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                    }
+                });
+            } else {
+                callback.onSuccess(cachedHotels);
+            }
+            return;
+        }
+
+        HotelService.getHotels(context, new DataCallback<List<Hotel>>() {
+            @Override
+            public void onSuccess(List<Hotel> hotels) {
+                cachedHotels = hotels;
+                if (userId != null && token != null) {
+                    syncFavorites(context, userId, token, new DataCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void data) {
+                            mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                        }
+                        @Override
+                        public void onError(ApiErrorCode code, String msg) {
+                            mainHandler.post(() -> callback.onSuccess(cachedHotels));
+                        }
+                    });
+                } else {
+                    mainHandler.post(() -> callback.onSuccess(hotels));
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                mainHandler.post(() -> callback.onError(code, msg));
+            }
+        });
+    }
+
+    public void syncFavorites(Context context, String userId, String token) {
+        syncFavorites(context, userId, token, null);
+    }
+
+    public void syncFavorites(Context context, String userId, String token, DataCallback<Void> callback) {
+        if (userId == null || token == null || cachedHotels == null) {
+            if (callback != null) callback.onSuccess(null);
+            return;
+        }
+
+        FavoriteRepository.getInstance().loadFavorites(context, false, new DataCallback<List<Favorite>>() {
+            @Override
+            public void onSuccess(List<Favorite> favorites) {
+                Set<String> favHotelIds = new HashSet<>();
+                for (Favorite f : favorites) {
+                    if (f.getHotelId() != null) favHotelIds.add(f.getHotelId());
+                }
+
+                for (Hotel h : cachedHotels) {
+                    h.setFavorite(favHotelIds.contains(h.getId()));
+                }
+                if (callback != null) callback.onSuccess(null);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (callback != null) callback.onError(code, msg);
+            }
+        });
+    }
+
+    public void clearCache() {
+        cachedHotels = null;
+    }
+
+    /** Look up a cached hotel by id, or {@code null} if not loaded/found. */
+    public Hotel findHotelById(String hotelId) {
+        if (hotelId == null || cachedHotels == null) return null;
+        for (Hotel h : cachedHotels) {
+            if (hotelId.equals(h.getId())) return h;
+        }
+        return null;
+    }
+}

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_adm_sheet"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_adm_pill"
+        android:backgroundTint="@color/adm_gray_200" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/biz_report_title"
+            android:textColor="@color/adm_gray_900"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/bizReportClose"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_gray_100"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/biz_cancel"
+                android:src="@drawable/ic_close"
+                app:tint="@color/adm_gray_600" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Red flag header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/bg_adm_rounded_12"
+        android:backgroundTint="@color/adm_red_100"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_flag"
+            app:tint="@color/adm_red_700" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bizReportSheetKind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/adm_red_700"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/bizReportSheetReporter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/adm_gray_600"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/biz_original_comment"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/bizReportSheetBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_biz_gray_box"
+        android:lineSpacingMultiplier="1.5"
+        android:padding="12dp"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="12sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/biz_reporter_reasoning"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/bizReportSheetReasoning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_biz_gray_box"
+        android:lineSpacingMultiplier="1.5"
+        android:padding="12dp"
+        android:textColor="@color/adm_gray_700"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bizReportDismiss"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:text="@string/biz_dismiss"
+            android:textAllCaps="false"
+            android:textColor="@color/adm_gray_900"
+            app:cornerRadius="999dp"
+            app:strokeColor="@color/adm_gray_300" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bizReportApprove"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/adm_red_500"
+            android:text="@string/biz_approve_report"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:cornerRadius="999dp"
+            app:icon="@drawable/ic_ban"
+            app:iconGravity="textStart"
+            app:iconSize="15dp"
+            app:iconTint="@color/white" />
+    </LinearLayout>
+</LinearLayout>

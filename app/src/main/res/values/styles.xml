@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Business Console form field label -->
+    <style name="BizFieldLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:textColor">@color/adm_gray_700</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BizInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">46dp</item>
+        <item name="android:background">@drawable/bg_biz_input</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingHorizontal">14dp</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textColorHint">@color/adm_gray_400</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="BizStepHeading">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BizStepSub">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColor">@color/adm_gray_500</item>
+        <item name="android:textSize">12.5sp</item>
+    </style>
+
+    <!-- Business Console profile mini-stat -->
+    <style name="BizMiniStat">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_adm_rounded_12</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingVertical">10dp</item>
+    </style>
+
+    <style name="BizMiniStatValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="BizMiniStatLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColor">@color/adm_gray_500</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="BizProfileSection">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Business Console category filter chip (toggled in BusinessListingsFragment) -->
+    <style name="BizCatChip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_biz_chip_idle</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingVertical">6dp</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/urbanist</item>
+    </style>
+
+    <style name="bg_circle_gray">
+        <item name="android:background">@drawable/bg_circle_gray_res</item>
+    </style>
+
+    <!-- ============================================================
+         Admin Settings detail screens (AdminDetailActivity).
+         White r20 shadow-md cards, icon-tile rows, SwitchCompat toggles,
+         steppers and one black primary CTA — see AdminDetail.jsx.
+         ============================================================ -->
+
+    <!-- Grouped white card: r20, medium elevation, no stroke. -->
+    <style name="AdmDetailCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">3dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- A row inside a card: leading icon tile + text + trailing control. -->
+    <style name="AdmToggleRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingVertical">12dp</item>
+    </style>
+
+    <!-- The title/sub text column between the tile and the trailing control. -->
+    <style name="AdmRowText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="AdmRowTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AdmRowSub">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <!-- 1px hairline between rows inside a card. -->
+    <style name="AdmRowDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/adm_gray_100</item>
+    </style>
+
+    <!-- SwitchCompat: green track ON / gray-300 OFF, white thumb. -->
+    <style name="AdmSwitch">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="thumbTint">@color/adm_switch_thumb</item>
+        <item name="trackTint">@color/adm_switch_track</item>
+    </style>
+
+    <!-- Stepper +/- button: 30dp white tile with a gray-300 hairline. -->
+    <style name="AdmStepperBtn">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:background">@drawable/bg_adm_stepper_btn</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:contentDescription">@null</item>
+    </style>
+
+    <style name="AdmStepperValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginHorizontal">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Help-center 2-up topic tile card. -->
+    <style name="AdmTopicCard">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="cardCornerRadius">14dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <!-- Audit-log segmented filter chip (toggled in AdminDetailActivity). -->
+    <style name="AdmFilterChip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/bg_adm_pill</item>
+        <item name="android:backgroundTint">@color/adm_gray_100</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingHorizontal">14dp</item>
+        <item name="android:paddingVertical">7dp</item>
+        <item name="android:textColor">@color/adm_gray_500</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- One black pill CTA per screen (Save policy / Invite admin / …). -->
+    <style name="AdmPrimaryButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">13.5sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="backgroundTint">@color/adm_gray_900</item>
+        <item name="cornerRadius">999dp</item>
+    </style>
+</resources>

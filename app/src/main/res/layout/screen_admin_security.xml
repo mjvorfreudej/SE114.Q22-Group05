@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Admin › Password & 2FA detail screen. Change-password form (eye toggle +
+     strength meter) then a 2FA master switch that reveals managed factor rows. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_canvas"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_admin_detail_bar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_sec_change_password" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <!-- Current password (with show/hide eye) -->
+                    <TextView
+                        style="@style/BizFieldLabel"
+                        android:text="@string/adm_pwd_current_hint" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_adm_rounded_12"
+                        android:backgroundTint="@color/adm_gray_100"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp">
+
+                        <EditText
+                            android:id="@+id/admPwdCurrent"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:fontFamily="@font/urbanist"
+                            android:importantForAutofill="no"
+                            android:inputType="textPassword"
+                            android:textColor="@color/adm_gray_900"
+                            android:textSize="14sp"
+                            tools:ignore="LabelFor" />
+
+                        <ImageView
+                            android:id="@+id/admPwdEye"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:clickable="true"
+                            android:contentDescription="@null"
+                            android:focusable="true"
+                            android:src="@drawable/ic_eye_open"
+                            app:tint="@color/adm_gray_500" />
+                    </LinearLayout>
+
+                    <!-- New password + strength meter -->
+                    <TextView
+                        style="@style/BizFieldLabel"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/adm_pwd_new_hint" />
+
+                    <EditText
+                        android:id="@+id/admPwdNew"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_adm_rounded_12"
+                        android:backgroundTint="@color/adm_gray_100"
+                        android:fontFamily="@font/urbanist"
+                        android:importantForAutofill="no"
+                        android:inputType="textPassword"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="@color/adm_gray_900"
+                        android:textSize="14sp"
+                        tools:ignore="LabelFor" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_adm_pill"
+                            android:backgroundTint="@color/adm_green_500" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="4dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_adm_pill"
+                            android:backgroundTint="@color/adm_green_500" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="4dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_adm_pill"
+                            android:backgroundTint="@color/adm_amber_500" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="4dp"
+                            android:layout_marginStart="4dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_adm_pill"
+                            android:backgroundTint="@color/adm_gray_200" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/adm_pwd_strength_good"
+                        android:textColor="@color/adm_amber_700"
+                        android:textSize="10.5sp" />
+
+                    <!-- Confirm new password -->
+                    <TextView
+                        style="@style/BizFieldLabel"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/adm_pwd_confirm_hint" />
+
+                    <EditText
+                        android:id="@+id/admPwdConfirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_adm_rounded_12"
+                        android:backgroundTint="@color/adm_gray_100"
+                        android:fontFamily="@font/urbanist"
+                        android:importantForAutofill="no"
+                        android:inputType="textPassword"
+                        android:paddingHorizontal="14dp"
+                        android:textColor="@color/adm_gray_900"
+                        android:textSize="14sp"
+                        tools:ignore="LabelFor" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/admPwdUpdate"
+                        style="@style/AdmPrimaryButton"
+                        android:layout_marginTop="14dp"
+                        android:text="@string/adm_pwd_update" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_sec_two_factor" />
+
+            <!-- 2FA master toggle -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp">
+
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:id="@+id/admTfaTile"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_green_100">
+
+                            <ImageView
+                                android:id="@+id/admTfaIcon"
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_shield_check"
+                                app:tint="@color/adm_green_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_2fa_title" />
+
+                            <TextView
+                                android:id="@+id/admTfaSub"
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_2fa_on_sub" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/admTfaSwitch"
+                            style="@style/AdmSwitch"
+                            android:checked="true" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Managed factors (revealed when 2FA is ON) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/admTfaFactors"
+                style="@style/AdmDetailCard"
+                android:layout_marginTop="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp">
+
+                    <!-- Authenticator app -->
+                    <LinearLayout style="@style/AdmToggleRow">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_blue_50">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_smartphone"
+                                app:tint="@color/adm_blue_500" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_2fa_authenticator_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_2fa_authenticator_sub" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_adm_pill"
+                            android:backgroundTint="@color/adm_green_100"
+                            android:paddingHorizontal="9dp"
+                            android:paddingVertical="4dp"
+                            android:text="@string/adm_2fa_active"
+                            android:textColor="@color/adm_green_700"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- SMS backup -->
+                    <LinearLayout
+                        android:id="@+id/admTfaSms"
+                        style="@style/AdmToggleRow"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_gray_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_phone"
+                                app:tint="@color/adm_gray_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_2fa_sms_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="••• ••• 4471"
+                                tools:ignore="HardcodedText" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right_24"
+                            app:tint="@color/adm_gray_400" />
+                    </LinearLayout>
+
+                    <View style="@style/AdmRowDivider" />
+
+                    <!-- Recovery codes -->
+                    <LinearLayout
+                        android:id="@+id/admTfaRecovery"
+                        style="@style/AdmToggleRow"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_adm_rounded_8"
+                            android:backgroundTint="@color/adm_gray_100">
+
+                            <ImageView
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_copy"
+                                app:tint="@color/adm_gray_700" />
+                        </FrameLayout>
+
+                        <LinearLayout style="@style/AdmRowText">
+
+                            <TextView
+                                style="@style/AdmRowTitle"
+                                android:text="@string/adm_2fa_recovery_title" />
+
+                            <TextView
+                                style="@style/AdmRowSub"
+                                android:text="@string/adm_2fa_recovery_sub" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right_24"
+                            app:tint="@color/adm_gray_400" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

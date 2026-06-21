@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_gray_100">
+
+    <FrameLayout
+        android:id="@+id/adm_fragment_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/admBottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Floating Bottom Navigation (matches the user app's pill style) -->
+    <LinearLayout
+        android:id="@+id/admBottomNav"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Home -->
+        <LinearLayout
+            android:id="@+id/admTabHome"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/admIconHome"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/adm_nav_home"
+                android:src="@drawable/ic_home_24"
+                app:tint="@color/adm_gray_400" />
+
+            <TextView
+                android:id="@+id/admLabelHome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/adm_nav_home"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Moderate (with badge) -->
+        <LinearLayout
+            android:id="@+id/admTabModerate"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/admIconModerate"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/adm_nav_moderate"
+                    android:src="@drawable/ic_gavel"
+                    app:tint="@color/adm_gray_400" />
+
+                <TextView
+                    android:id="@+id/admBadgeModerate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_adm_pill"
+                    android:backgroundTint="@color/adm_red_500"
+                    android:gravity="center"
+                    android:minWidth="16dp"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="1dp"
+                    android:text="23"
+                    android:textColor="@color/white"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/admLabelModerate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/adm_nav_moderate"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Business -->
+        <LinearLayout
+            android:id="@+id/admTabBusiness"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/admIconBusiness"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/adm_nav_business"
+                android:src="@drawable/ic_building"
+                app:tint="@color/adm_gray_400" />
+
+            <TextView
+                android:id="@+id/admLabelBusiness"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/adm_nav_business"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Users -->
+        <LinearLayout
+            android:id="@+id/admTabUsers"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/admIconUsers"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/adm_nav_users"
+                android:src="@drawable/ic_users"
+                app:tint="@color/adm_gray_400" />
+
+            <TextView
+                android:id="@+id/admLabelUsers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/adm_nav_users"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Profile -->
+        <LinearLayout
+            android:id="@+id/admTabProfile"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <ImageView
+                android:id="@+id/admIconProfile"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/adm_nav_profile"
+                android:src="@drawable/ic_person_24"
+                app:tint="@color/adm_gray_400" />
+
+            <TextView
+                android:id="@+id/admLabelProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/adm_nav_profile"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

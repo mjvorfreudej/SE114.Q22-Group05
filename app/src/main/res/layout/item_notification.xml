@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Single notification row (design TravelerRow, "center" variant):
+  category disc · title + right-aligned timestamp · 2-line body · quick actions,
+  with an unread blue dot top-right and a hairline bottom divider. The row
+  background (unread tint vs. transparent) and title weight are set in the adapter.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notifRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp">
+
+        <!-- Category icon disc -->
+        <FrameLayout
+            android:id="@+id/notifIconDisc"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_adm_rounded_12">
+
+            <ImageView
+                android:id="@+id/ivNotifIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Title + timestamp -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="true"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvNotifTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/adm_gray_900"
+                    android:textSize="14sp"
+                    tools:text="Booking confirmed" />
+
+                <TextView
+                    android:id="@+id/tvNotifWhen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="14dp"
+                    android:textColor="@color/adm_gray_400"
+                    android:textSize="11sp"
+                    tools:text="Just now" />
+            </LinearLayout>
+
+            <!-- Body (up to 2 lines) -->
+            <TextView
+                android:id="@+id/tvNotifBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:lineSpacingMultiplier="1.1"
+                android:maxLines="2"
+                android:textColor="@color/adm_gray_500"
+                android:textSize="12.5sp"
+                tools:text="Your stay at The Grand Orchid Resort is confirmed for Aug 13 – 15." />
+
+            <!-- Quick-action pills (added in the adapter) -->
+            <LinearLayout
+                android:id="@+id/notifActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Unread indicator dot -->
+    <View
+        android:id="@+id/notifUnreadDot"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="14dp"
+        android:background="@drawable/bg_notif_dot_blue" />
+
+    <!-- Hairline divider -->
+    <View
+        android:id="@+id/notifDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@color/adm_gray_100" />
+</FrameLayout>

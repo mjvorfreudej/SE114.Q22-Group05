@@ -1,0 +1,146 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.TourGo" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/light_gray</item>
+        <item name="android:fontFamily">@font/urbanist</item>
+        <item name="fontFamily">@font/urbanist</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="colorControlActivated">@color/black</item>
+        <item name="android:colorControlActivated">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+        <item name="android:colorControlNormal">@color/black</item>
+
+        <!-- Áp dụng hiệu ứng chuyển cảnh Activity -->
+        <item name="android:windowAnimationStyle">@style/Animation.App.Activity</item>
+    </style>
+
+    <style name="Theme.TourGo" parent="Base.Theme.TourGo" />
+
+    <!-- Style cho hiệu ứng chuyển cảnh Activity -->
+    <style name="Animation.App.Activity" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <!-- Style cho Filter Chips -->
+    <style name="Widget.Material3.Chip.Filter" parent="Widget.Material3.Chip.Suggestion">
+        <item name="chipBackgroundColor">@color/chip_bg_filter</item>
+        <item name="chipStrokeColor">@color/adm_gray_200</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">28dp</item>
+        <item name="android:textColor">@color/chip_text_color_filter</item>
+        <item name="chipIconTint">@color/chip_icon_tint_filter</item>
+        <item name="android:fontFamily">@font/urbanist</item>
+        <item name="chipMinHeight">44dp</item>
+        <item name="android:checkable">true</item>
+        <item name="chipIconVisible">true</item>
+    </style>
+
+    <!-- Bottom Sheet Material 3 Style -->
+    <style name="BottomSheetDialogTheme" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">@android:color/white</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.App.Corner24</item>
+    </style>
+
+    <style name="ProfileSettingRow">
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">@dimen/screen_margin_horizontal</item>
+        <item name="android:paddingVertical">14dp</item>
+    </style>
+
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.App.Corner24" parent="">
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.App.RoundedBottom" parent="">
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomLeft">24dp</item>
+        <item name="cornerSizeBottomRight">24dp</item>
+    </style>
+
+    <!-- Business Console rounded-image overlays -->
+    <style name="ShapeAppearanceOverlay.Biz.Corner10" parent="">
+        <item name="cornerSize">10dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Biz.Corner12" parent="">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Biz.TopCorner16" parent="">
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="AdmSectionLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="AdmDetailNavRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:background">@drawable/bg_adm_rounded_10</item>
+        <item name="android:backgroundTint">@color/adm_gray_50</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:paddingVertical">11dp</item>
+    </style>
+
+    <style name="AdmDetailNavLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:textColor">@color/adm_gray_900</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AdmDetailNavTrailing">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/adm_gray_400</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="AdmDetailNavChevron">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_marginStart">6dp</item>
+        <item name="android:contentDescription">@null</item>
+        <item name="tint">@color/adm_gray_400</item>
+    </style>
+</resources>
