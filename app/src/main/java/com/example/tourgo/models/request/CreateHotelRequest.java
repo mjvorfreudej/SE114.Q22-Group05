@@ -11,6 +11,13 @@ public class CreateHotelRequest {
     private List<String> amenities;
     private String status;
 
+    @com.google.gson.annotations.SerializedName("open_from")
+    private String openFrom;
+    @com.google.gson.annotations.SerializedName("open_until")
+    private String openUntil;
+    @com.google.gson.annotations.SerializedName("blocked_dates")
+    private List<String> blockedDates;
+
     public CreateHotelRequest(String name, String description, double price, String city, String address, List<String> amenities, String status) {
         this.name = name;
         this.description = description;
@@ -19,6 +26,14 @@ public class CreateHotelRequest {
         this.address = address;
         this.amenities = amenities;
         this.status = status;
+    }
+
+    public CreateHotelRequest(String name, String description, double price, String city, String address, List<String> amenities, String status,
+                              String openFrom, String openUntil, List<String> blockedDates) {
+        this(name, description, price, city, address, amenities, status);
+        this.openFrom = openFrom;
+        this.openUntil = openUntil;
+        this.blockedDates = blockedDates;
     }
 
     public String getName() { return name; }

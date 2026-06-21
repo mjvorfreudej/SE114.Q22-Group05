@@ -60,6 +60,14 @@ public class AddListingActivity extends AppCompatActivity {
     private double listingPrice = 0.0;
     private java.util.List<String> selectedAmenities = new java.util.ArrayList<>();
 
+    // Availability Calendar states
+    private String openFromDate = null; // yyyy-MM-dd
+    private String openUntilDate = null; // yyyy-MM-dd
+    private final java.util.Set<String> blockedDates = new java.util.HashSet<>();
+    private final java.util.Calendar currentCalendarView = java.util.Calendar.getInstance();
+    private final java.text.SimpleDateFormat dateParser = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
+    private final java.text.SimpleDateFormat dateDisplayFormat = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+
     private LinearLayout stepperRow, stepperLabels;
     private FrameLayout content;
     private TextView stepLabel;
@@ -211,7 +219,10 @@ public class AddListingActivity extends AppCompatActivity {
                             listingAddress,
                             listingCity,
                             "3 days",
-                            "PENDING"
+                            "PENDING",
+                            openFromDate,
+                            openUntilDate,
+                            blockedDates != null ? new java.util.ArrayList<>(blockedDates) : null
                     );
 
             com.example.tourgo.remote.RetrofitClient.getInstance(this)
@@ -243,7 +254,10 @@ public class AddListingActivity extends AppCompatActivity {
                             listingCity,
                             listingAddress,
                             selectedAmenities,
-                            "PENDING"
+                            "PENDING",
+                            openFromDate,
+                            openUntilDate,
+                            blockedDates != null ? new java.util.ArrayList<>(blockedDates) : null
                     );
 
             com.example.tourgo.remote.RetrofitClient.getInstance(this)
@@ -710,7 +724,121 @@ public class AddListingActivity extends AppCompatActivity {
 
     // ── Step 4 ──────────────────────────────────────────────────────────────────
     private void bindAvailability() {
+        View btnOpenFrom = content.findViewById(R.id.btnOpenFrom);
+        TextView tvOpenFrom = content.findViewById(R.id.tvOpenFrom);
+        View btnOpenUntil = content.findViewById(R.id.btnOpenUntil);
+        TextView tvOpenUntil = content.findViewById(R.id.tvOpenUntil);
+        View btnPrevMonth = content.findViewById(R.id.btnPrevMonth);
+        View btnNextMonth = content.findViewById(R.id.btnNextMonth);
+        View btnBlockDate = content.findViewById(R.id.btnBlockDate);
+
+        if (btnOpenFrom != null && tvOpenFrom != null) {
+            if (openFromDate != null) {
+                try {
+                    tvOpenFrom.setText(dateDisplayFormat.format(dateParser.parse(openFromDate)));
+                    tvOpenFrom.setTextColor(color(R.color.adm_gray_900));
+                } catch (Exception ignored) {}
+            }
+            btnOpenFrom.setOnClickListener(v -> showDatePicker(tvOpenFrom, true));
+        }
+
+        if (btnOpenUntil != null && tvOpenUntil != null) {
+            if (openUntilDate != null) {
+                try {
+                    tvOpenUntil.setText(dateDisplayFormat.format(dateParser.parse(openUntilDate)));
+                    tvOpenUntil.setTextColor(color(R.color.adm_gray_900));
+                } catch (Exception ignored) {}
+            }
+            btnOpenUntil.setOnClickListener(v -> showDatePicker(tvOpenUntil, false));
+        }
+
+        if (btnPrevMonth != null) {
+            btnPrevMonth.setOnClickListener(v -> {
+                currentCalendarView.add(java.util.Calendar.MONTH, -1);
+                refreshCalendarGrid();
+            });
+        }
+
+        if (btnNextMonth != null) {
+            btnNextMonth.setOnClickListener(v -> {
+                currentCalendarView.add(java.util.Calendar.MONTH, 1);
+                refreshCalendarGrid();
+            });
+        }
+
+        if (btnBlockDate != null) {
+            btnBlockDate.setOnClickListener(v -> {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                android.app.DatePickerDialog dpd = new android.app.DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                    java.util.Calendar selectedCal = java.util.Calendar.getInstance();
+                    selectedCal.set(year, month, dayOfMonth);
+                    String dateStr = dateParser.format(selectedCal.getTime());
+                    
+                    if (openFromDate != null && openUntilDate != null) {
+                        if (dateStr.compareTo(openFromDate) < 0 || dateStr.compareTo(openUntilDate) > 0) {
+                            toast("Ngày chặn phải nằm trong khoảng hoạt động!");
+                            return;
+                        }
+                    }
+                    blockedDates.add(dateStr);
+                    refreshCalendarGrid();
+                }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH));
+                dpd.show();
+            });
+        }
+
+        refreshCalendarGrid();
+    }
+
+    private void showDatePicker(TextView tvTarget, boolean isOpenFrom) {
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        if (isOpenFrom && openFromDate != null) {
+            try {
+                cal.setTime(dateParser.parse(openFromDate));
+            } catch (Exception ignored) {}
+        } else if (!isOpenFrom && openUntilDate != null) {
+            try {
+                cal.setTime(dateParser.parse(openUntilDate));
+            } catch (Exception ignored) {}
+        }
+
+        android.app.DatePickerDialog dpd = new android.app.DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            java.util.Calendar selectedCal = java.util.Calendar.getInstance();
+            selectedCal.set(year, month, dayOfMonth);
+            String dateStr = dateParser.format(selectedCal.getTime());
+            String displayStr = dateDisplayFormat.format(selectedCal.getTime());
+
+            if (isOpenFrom) {
+                if (openUntilDate != null && dateStr.compareTo(openUntilDate) > 0) {
+                    toast("Ngày mở từ không thể sau ngày mở đến!");
+                    return;
+                }
+                openFromDate = dateStr;
+                tvTarget.setText(displayStr);
+                tvTarget.setTextColor(color(R.color.adm_gray_900));
+            } else {
+                if (openFromDate != null && dateStr.compareTo(openFromDate) < 0) {
+                    toast("Ngày mở đến không thể trước ngày mở từ!");
+                    return;
+                }
+                openUntilDate = dateStr;
+                tvTarget.setText(displayStr);
+                tvTarget.setTextColor(color(R.color.adm_gray_900));
+            }
+            refreshCalendarGrid();
+        }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH));
+        dpd.show();
+    }
+
+    private void refreshCalendarGrid() {
         LinearLayout weekdays = content.findViewById(R.id.bizMiniWeekdays);
+        LinearLayout grid = content.findViewById(R.id.bizMiniGrid);
+        TextView tvMonthTitle = content.findViewById(R.id.tvMonthTitle);
+
+        if (weekdays == null || grid == null || tvMonthTitle == null) return;
+
+        weekdays.removeAllViews();
+        grid.removeAllViews();
 
         for (String d : new String[]{"S", "M", "T", "W", "T", "F", "S"}) {
             TextView tv = new TextView(this);
@@ -730,17 +858,25 @@ public class AddListingActivity extends AppCompatActivity {
             );
         }
 
-        java.util.Set<Integer> blocked =
-                new java.util.HashSet<>(java.util.Arrays.asList(7, 8, 21, 22));
+        // Set month title
+        java.text.SimpleDateFormat monthYearFormat = new java.text.SimpleDateFormat("MMMM yyyy", java.util.Locale.getDefault());
+        String monthTitle = monthYearFormat.format(currentCalendarView.getTime());
+        // Capitalize first letter
+        if (monthTitle.length() > 0) {
+            monthTitle = monthTitle.substring(0, 1).toUpperCase() + monthTitle.substring(1);
+        }
+        tvMonthTitle.setText(monthTitle);
 
-        java.util.Set<Integer> selected =
-                new java.util.HashSet<>(java.util.Arrays.asList(13, 14, 15, 16));
+        java.util.Calendar cal = (java.util.Calendar) currentCalendarView.clone();
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        int firstDayOfWeek = cal.get(java.util.Calendar.DAY_OF_WEEK); // Sunday = 1, Monday = 2...
+        int offset = firstDayOfWeek - 1;
+        int maxDays = cal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH);
 
-        LinearLayout grid = content.findViewById(R.id.bizMiniGrid);
         int gap = dp(2);
         int idx = 0;
 
-        for (int w = 0; w < 5; w++) {
+        for (int w = 0; w < 6; w++) {
             LinearLayout week = new LinearLayout(this);
             week.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -753,13 +889,28 @@ public class AddListingActivity extends AppCompatActivity {
             );
 
             for (int c = 0; c < 7; c++, idx++) {
-                int day = idx - 2;
-                boolean valid = day > 0 && day <= 31;
+                int dayNumber = idx - offset + 1;
+                boolean valid = dayNumber > 0 && dayNumber <= maxDays;
+
+                String dayStr = "";
+                boolean isBlocked = false;
+                boolean isOpenRange = false;
+
+                if (valid) {
+                    dayStr = String.format(java.util.Locale.US, "%04d-%02d-%02d",
+                            currentCalendarView.get(java.util.Calendar.YEAR),
+                            currentCalendarView.get(java.util.Calendar.MONTH) + 1,
+                            dayNumber);
+                    isBlocked = blockedDates.contains(dayStr);
+                    isOpenRange = (openFromDate != null && openUntilDate != null &&
+                            dayStr.compareTo(openFromDate) >= 0 && dayStr.compareTo(openUntilDate) <= 0);
+                }
 
                 View cell = buildMiniCell(
-                        valid ? day : 0,
-                        valid && blocked.contains(day),
-                        valid && selected.contains(day)
+                        valid ? dayNumber : 0,
+                        dayStr,
+                        isBlocked,
+                        isOpenRange
                 );
 
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(30), 1f);
@@ -786,12 +937,15 @@ public class AddListingActivity extends AppCompatActivity {
         });
 
         LinearLayout legend = content.findViewById(R.id.bizMiniLegend);
-        miniLegend(legend, R.color.adm_gray_900, R.string.biz_legend_selected, false);
-        miniLegend(legend, R.color.adm_red_500, R.string.biz_legend_blocked, false);
-        miniLegend(legend, android.R.color.transparent, R.string.biz_legend_open, true);
+        if (legend != null) {
+            legend.removeAllViews();
+            miniLegend(legend, R.color.adm_gray_900, R.string.biz_legend_selected, false);
+            miniLegend(legend, R.color.adm_red_500, R.string.biz_legend_blocked, false);
+            miniLegend(legend, android.R.color.transparent, R.string.biz_legend_open, true);
+        }
     }
 
-    private View buildMiniCell(int day, boolean blocked, boolean selected) {
+    private View buildMiniCell(int day, String dayStr, boolean blocked, boolean selected) {
         TextView cell = new TextView(this);
         cell.setGravity(Gravity.CENTER);
         cell.setTextSize(11f);
@@ -807,7 +961,7 @@ public class AddListingActivity extends AppCompatActivity {
         g.setShape(GradientDrawable.RECTANGLE);
         g.setCornerRadius(dp(6));
 
-        if (selected) {
+        if (selected && !blocked) {
             g.setColor(color(R.color.adm_gray_900));
             cell.setTextColor(color(R.color.white));
             cell.setTypeface(cell.getTypeface(), Typeface.BOLD);
@@ -823,6 +977,21 @@ public class AddListingActivity extends AppCompatActivity {
 
         int m = dp(1);
         cell.setPadding(m, m, m, m);
+
+        cell.setOnClickListener(v -> {
+            if (openFromDate == null || openUntilDate == null ||
+                    dayStr.compareTo(openFromDate) < 0 || dayStr.compareTo(openUntilDate) > 0) {
+                toast("Ngày này nằm ngoài khoảng hoạt động!");
+                return;
+            }
+
+            if (blockedDates.contains(dayStr)) {
+                blockedDates.remove(dayStr);
+            } else {
+                blockedDates.add(dayStr);
+            }
+            refreshCalendarGrid();
+        });
 
         return cell;
     }

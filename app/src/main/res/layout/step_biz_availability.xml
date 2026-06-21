@@ -18,11 +18,14 @@
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/btnOpenFrom"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:background="@drawable/bg_biz_input"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="14dp">
@@ -36,6 +39,7 @@
                 app:tint="@color/adm_gray_400" />
 
             <TextView
+                android:id="@+id/tvOpenFrom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/biz_open_from"
@@ -44,11 +48,14 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/btnOpenUntil"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@drawable/bg_biz_input"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="14dp">
@@ -62,6 +69,7 @@
                 app:tint="@color/adm_gray_400" />
 
             <TextView
+                android:id="@+id/tvOpenUntil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/biz_open_until"
@@ -87,10 +95,13 @@
             android:orientation="horizontal">
 
             <FrameLayout
+                android:id="@+id/btnPrevMonth"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:background="@drawable/bg_adm_circle"
-                android:backgroundTint="@color/adm_gray_100">
+                android:backgroundTint="@color/adm_gray_100"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="12dp"
@@ -102,6 +113,7 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/tvMonthTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -112,10 +124,13 @@
                 android:textStyle="bold" />
 
             <FrameLayout
+                android:id="@+id/btnNextMonth"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
                 android:background="@drawable/bg_adm_circle"
-                android:backgroundTint="@color/adm_gray_100">
+                android:backgroundTint="@color/adm_gray_100"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="12dp"
@@ -150,6 +165,7 @@
 
     <!-- Block additional dates -->
     <LinearLayout
+        android:id="@+id/btnBlockDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"

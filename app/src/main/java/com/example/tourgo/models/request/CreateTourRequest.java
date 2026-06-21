@@ -15,6 +15,13 @@ public class CreateTourRequest {
     private String duration;
     private String status;
 
+    @com.google.gson.annotations.SerializedName("open_from")
+    private String openFrom;
+    @com.google.gson.annotations.SerializedName("open_until")
+    private String openUntil;
+    @com.google.gson.annotations.SerializedName("blocked_dates")
+    private java.util.List<String> blockedDates;
+
     public CreateTourRequest(String name, String description, double price,
                              String destination, String region, String duration, String status) {
         this.name = name;
@@ -24,6 +31,15 @@ public class CreateTourRequest {
         this.region = region;
         this.duration = duration;
         this.status = status;
+    }
+
+    public CreateTourRequest(String name, String description, double price,
+                             String destination, String region, String duration, String status,
+                             String openFrom, String openUntil, java.util.List<String> blockedDates) {
+        this(name, description, price, destination, region, duration, status);
+        this.openFrom = openFrom;
+        this.openUntil = openUntil;
+        this.blockedDates = blockedDates;
     }
 
     public String getName() { return name; }
