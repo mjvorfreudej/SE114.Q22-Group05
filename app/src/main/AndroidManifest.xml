@@ -117,6 +117,10 @@
         <activity
             android:name=".ui.notification.NotificationsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.main.detail.ImageDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
     </application>
 
 </manifest>

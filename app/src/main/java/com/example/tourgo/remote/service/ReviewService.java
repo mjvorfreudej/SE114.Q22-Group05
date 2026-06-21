@@ -3,6 +3,7 @@ package com.example.tourgo.remote.service;
 import android.content.Context;
 import android.net.Uri;
 
+import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
@@ -188,34 +189,50 @@ public class ReviewService {
     }
 
     public static void saveReviewImages(Context context, String type, String reviewId, List<String> imageUrls, DataCallback<Void> callback) {
-        SaveReviewImagesRequest request = new SaveReviewImagesRequest(reviewId, imageUrls);
+        if (imageUrls == null || imageUrls.isEmpty()) {
+            callback.onSuccess(null);
+            return;
+        }
 
-        RetrofitClient.getInstance(context)
-                .getReviewApi()
-                .saveReviewImages(type, request)
-                .enqueue(new Callback<ApiResponse<Void>>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            ApiResponse<Void> apiResponse = response.body();
-                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
-                                callback.onSuccess(null);
-                            } else {
-                                ApiError error = ErrorHandler.parseError(response);
-                                callback.onError(error.getCode(), error.getMessage());
+        final int total = imageUrls.size();
+        final int[] completed = {0};
+        final int[] successCount = {0};
+
+        for (String url : imageUrls) {
+            SaveReviewImagesRequest request = new SaveReviewImagesRequest(reviewId, url);
+
+            RetrofitClient.getInstance(context)
+                    .getReviewApi()
+                    .saveReviewImages(type, request)
+                    .enqueue(new Callback<ApiResponse<Void>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                            synchronized (completed) {
+                                completed[0]++;
+                                if (response.isSuccessful()) successCount[0]++;
+                                
+                                if (completed[0] == total) {
+                                    if (successCount[0] > 0) {
+                                        callback.onSuccess(null);
+                                    } else {
+                                        callback.onError(ApiErrorCode.SERVER_ERROR, "Failed to save images");
+                                    }
+                                }
                             }
-                        } else {
-                            ApiError error = ErrorHandler.parseError(response);
-                            callback.onError(error.getCode(), error.getMessage());
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                        ApiError error = ErrorHandler.parseError(t);
-                        callback.onError(error.getCode(), error.getMessage());
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                            synchronized (completed) {
+                                completed[0]++;
+                                if (completed[0] == total) {
+                                    if (successCount[0] > 0) callback.onSuccess(null);
+                                    else callback.onError(ApiErrorCode.SERVER_ERROR, t.getMessage());
+                                }
+                            }
+                        }
+                    });
+        }
     }
 
     public static void uploadReviewImage(Context context, Uri imageUri, String reviewId, DataCallback<String> callback) {
@@ -256,7 +273,7 @@ public class ReviewService {
                         }
                     });
         } catch (Exception e) {
-            callback.onError(com.example.tourgo.interfaces.ApiErrorCode.UNKNOWN, e.getMessage());
+            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
         }
     }
 

@@ -1,8 +1,10 @@
 package com.example.tourgo.adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -15,9 +17,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tourgo.R;
 import com.example.tourgo.models.response.Review;
+import com.example.tourgo.ui.main.detail.ImageDetailActivity;
 import com.example.tourgo.utils.ImageLoader;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -51,7 +55,7 @@ public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentView
                 public boolean areContentsTheSame(@NonNull Review oldItem, @NonNull Review newItem) {
                     return oldItem.getContent().equals(newItem.getContent())
                             && oldItem.getRating() == newItem.getRating()
-                            && oldItem.getImageUrls().equals(newItem.getImageUrls());
+                            && (oldItem.getImageUrls() != null ? oldItem.getImageUrls().equals(newItem.getImageUrls()) : newItem.getImageUrls() == null);
                 }
             };
 
@@ -72,106 +76,87 @@ public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentView
         holder.tvUserName.setText(review.getUserName());
         holder.tvCommentDate.setText(formatReviewDate(review.getDate()));
         holder.tvCommentContent.setText(review.getContent());
-        // Sử dụng Locale mặc định để đồng bộ với định dạng hệ thống
         holder.tvUserRating.setText(String.format(Locale.getDefault(), "★ %.1f", review.getRating()));
         
         holder.layoutCommentImages.removeAllViews();
         if (review.hasImages()) {
             holder.scrollCommentImages.setVisibility(View.VISIBLE);
-            for (String imageUrl : review.getImageUrls()) {
+            float density = holder.itemView.getContext().getResources().getDisplayMetrics().density;
+            int size = (int) (100 * density);
+            int margin = (int) (8 * density);
+            
+            for (int i = 0; i < review.getImageUrls().size(); i++) {
+                String imageUrl = review.getImageUrls().get(i);
+                final int finalI = i;
                 ImageView iv = new ImageView(holder.itemView.getContext());
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(160, 160);
-                params.setMargins(0, 0, 12, 0);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+                params.setMargins(0, 0, margin, 0);
                 iv.setLayoutParams(params);
                 iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 ImageLoader.loadThumbnail(iv, imageUrl);
                 iv.setClipToOutline(true);
                 iv.setBackgroundResource(R.drawable.bg_amenity_card);
+                
+                iv.setOnClickListener(v -> {
+                    Intent intent = new Intent(v.getContext(), ImageDetailActivity.class);
+                    intent.putStringArrayListExtra(ImageDetailActivity.EXTRA_IMAGES, new ArrayList<>(review.getImageUrls()));
+                    intent.putExtra(ImageDetailActivity.EXTRA_POSITION, finalI);
+                    v.getContext().startActivity(intent);
+                });
+
                 holder.layoutCommentImages.addView(iv);
             }
         } else {
             holder.scrollCommentImages.setVisibility(View.GONE);
         }
 
-        boolean isOwner = currentUserId != null && currentUserId.equals(review.getUserId());
-
+        // Kiểm tra quyền chủ sở hữu để hiện nút menu
+        boolean isOwner = currentUserId != null && review.getUserId() != null && currentUserId.equals(review.getUserId());
         holder.btnReviewMenu.setVisibility(isOwner ? View.VISIBLE : View.GONE);
 
-        holder.btnReviewMenu.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(v.getContext(), v);
-            popup.inflate(R.menu.menu_review_options);
-
-            popup.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-
-                if (id == R.id.action_delete_review) {
-                    if (listener != null) {
-                        listener.onDelete(review);
+        if (isOwner) {
+            holder.btnReviewMenu.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(v.getContext(), v);
+                popup.inflate(R.menu.menu_review_options);
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.action_delete_review) {
+                        if (listener != null) {
+                            listener.onDelete(review);
+                        }
+                        return true;
                     }
-                    return true;
-                }
-
-                return false;
+                    return false;
+                });
+                popup.show();
             });
-
-            popup.show();
-        });
+        }
     }
 
-    /**
-     * Định dạng ngày giờ bình luận.
-     * Xử lý triệt để các định dạng ISO 8601 (có mili giây, múi giờ) hoặc Timestamp.
-     */
     private String formatReviewDate(String rawDate) {
         if (rawDate == null || rawDate.isEmpty()) return "";
-        
         try {
-            // 1. Xử lý định dạng ISO 8601 bằng Regex để lấy chính xác phần cần thiết
-            // Mẫu: 2025-02-18T09:15:35.336154Z hoặc 2025-02-18 09:15:35+07:00
             Pattern pattern = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})[T ](\\d{2}:\\d{2}:\\d{2})");
             Matcher matcher = pattern.matcher(rawDate);
-            
             if (matcher.find()) {
                 String cleanDate = matcher.group(1) + " " + matcher.group(2);
                 SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-                
-                // Giả định Server trả về UTC nếu có Z hoặc +
                 if (rawDate.contains("Z") || rawDate.contains("+")) {
                     inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 }
-                
                 Date date = inputFormat.parse(cleanDate);
                 if (date != null) {
-                    // Định dạng hiển thị gọn gàng cho người dùng
                     SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
                     return outputFormat.format(date);
                 }
             }
-            
-            // 2. Xử lý nếu rawDate là một số (Unix Timestamp)
             if (rawDate.matches("\\d+")) {
                 long ts = Long.parseLong(rawDate);
-                // Nếu timestamp tính bằng giây (10 chữ số), đổi sang mili giây
                 if (ts < 10000000000L) ts *= 1000;
-                Date date = new Date(ts);
-                return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(date);
+                return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(ts));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
-        // 3. Fallback: Nếu mọi cách trên thất bại, thử cắt chuỗi cơ bản
-        if (rawDate.length() >= 16) {
-            try {
-                // Giả định định dạng yyyy-MM-dd...
-                String y = rawDate.substring(0, 4);
-                String m = rawDate.substring(5, 7);
-                String d = rawDate.substring(8, 10);
-                String time = rawDate.substring(11, 16);
-                return d + "/" + m + "/" + y + " " + time;
-            } catch (Exception ignored) {}
-        }
-
         return rawDate;
     }
 
@@ -179,7 +164,7 @@ public class ReviewAdapter extends ListAdapter<Review, ReviewAdapter.CommentView
         TextView tvUserName, tvCommentDate, tvCommentContent, tvUserRating;
         LinearLayout layoutCommentImages;
         View scrollCommentImages;
-        ImageView btnReviewMenu;
+        ImageButton btnReviewMenu;
 
         public CommentViewHolder(@NonNull View itemView) {
             super(itemView);
