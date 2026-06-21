@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main.booking;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +21,20 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.remote.service.HotelService;
 import com.example.tourgo.data.local.SessionManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class BookingRequestFragment extends Fragment {
 
@@ -46,6 +53,15 @@ public class BookingRequestFragment extends Fragment {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
     private final SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
     private final SimpleDateFormat summaryFormat = new SimpleDateFormat("dd MMM", Locale.getDefault());
+
+    // Nights the hotel is sold out (yyyy-MM-dd), fetched from the backend so the
+    // date-picker can disable them. Matches the backend's date-key format.
+    private final SimpleDateFormat keyFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final Set<String> unavailableDates = new HashSet<>();
+    // Live references to the open date dialog so we can re-render once the
+    // unavailable dates arrive (the fetch may finish after the dialog opens).
+    private TableLayout dialogTable;
+    private TextView dialogMonthYear;
 
     @Nullable
     @Override
@@ -100,6 +116,10 @@ public class BookingRequestFragment extends Fragment {
                 Toast.makeText(requireContext(), R.string.booking_error_checkout_after_checkin, Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (rangeHasBlockedNight(startDate, endDate)) {
+                Toast.makeText(requireContext(), R.string.booking_error_range_sold_out, Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             long diff = endDate.getTimeInMillis() - startDate.getTimeInMillis();
             int nights = (int) (diff / (24 * 60 * 60 * 1000));
@@ -135,6 +155,33 @@ public class BookingRequestFragment extends Fragment {
 
         updateCounterUI();
         updateDateUI();
+
+        loadUnavailableDates();
+    }
+
+    /** Fetch the hotel's sold-out nights so the picker can disable them (hotels only). */
+    private void loadUnavailableDates() {
+        if (!(getActivity() instanceof BookingActivity)) return;
+        Hotel hotel = ((BookingActivity) getActivity()).getHotel();
+        if (hotel == null || hotel.getId() == null) return;
+
+        HotelService.getUnavailableDates(requireContext(), hotel.getId(), new DataCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> dates) {
+                if (!isAdded()) return;
+                unavailableDates.clear();
+                if (dates != null) unavailableDates.addAll(dates);
+                // If the date dialog is already open, re-render to grey out the new dates.
+                if (dialogTable != null && dialogMonthYear != null) {
+                    renderCalendar(dialogTable, dialogMonthYear);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                // Fail open: if we can't load sold-out dates, leave all dates selectable.
+            }
+        });
     }
 
     private void applyTopInset(View root) {
@@ -160,6 +207,9 @@ public class BookingRequestFragment extends Fragment {
 
         TextView tvMonthYear = view.findViewById(R.id.tvMonthYear);
         TableLayout tableCalendar = view.findViewById(R.id.tableCalendar);
+        dialogTable = tableCalendar;
+        dialogMonthYear = tvMonthYear;
+        dialog.setOnDismissListener(d -> { dialogTable = null; dialogMonthYear = null; });
 
         view.findViewById(R.id.btnPrevMonth).setOnClickListener(v -> {
             calendarDisplay.add(Calendar.MONTH, -1);
@@ -233,12 +283,21 @@ public class BookingRequestFragment extends Fragment {
 
                     if (isBeforeToday(currentCellDate)) {
                         tv.setTextColor(Color.parseColor("#E0E0E0"));
+                    } else if (unavailableDates.contains(keyFormat.format(currentCellDate.getTime()))) {
+                        // Sold out — show greyed + struck through and make it unselectable.
+                        tv.setTextColor(Color.parseColor("#C0C0C0"));
+                        tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     } else {
                         tv.setTextColor(Color.BLACK);
                         highlightDate(tv, currentCellDate);
                         tv.setOnClickListener(v -> {
                             if (dialogStartDate != null && dialogEndDate == null) {
                                 if (currentCellDate.after(dialogStartDate)) {
+                                    // Reject a stay that would cover a sold-out night.
+                                    if (rangeHasBlockedNight(dialogStartDate, currentCellDate)) {
+                                        Toast.makeText(requireContext(), R.string.booking_error_range_sold_out, Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
                                     dialogEndDate = (Calendar) currentCellDate.clone();
                                 } else {
                                     dialogStartDate = (Calendar) currentCellDate.clone();
@@ -276,6 +335,20 @@ public class BookingRequestFragment extends Fragment {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH) &&
                cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * True if any night in the stay [start, end) is sold out. A hotel stay
+     * occupies check-in (inclusive) through the night before check-out.
+     */
+    private boolean rangeHasBlockedNight(Calendar start, Calendar end) {
+        if (unavailableDates.isEmpty()) return false;
+        Calendar cursor = (Calendar) start.clone();
+        while (cursor.before(end)) {
+            if (unavailableDates.contains(keyFormat.format(cursor.getTime()))) return true;
+            cursor.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        return false;
     }
 
     private boolean isBeforeToday(Calendar date) {

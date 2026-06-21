@@ -211,10 +211,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         private View buildCategoryTag(Context ctx, NotificationMockData.Category cat) {
             LinearLayout tag = new LinearLayout(ctx);
             tag.setOrientation(LinearLayout.HORIZONTAL);
-            tag.setGravity(Gravity.CENTER_VERTICAL);
+            tag.setGravity(Gravity.CENTER);
             tag.setBackgroundResource(R.drawable.bg_adm_pill);
             tag.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, cat.bgColor)));
-            tag.setPadding(dp(ctx, 8), dp(ctx, 3), dp(ctx, 8), dp(ctx, 3));
+            tag.setPadding(dp(ctx, 12), 0, dp(ctx, 12), 0);
 
             View dot = new View(ctx);
             dot.setBackgroundResource(R.drawable.bg_adm_circle);
@@ -232,6 +232,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             label.setTextColor(ContextCompat.getColor(ctx, cat.inkColor));
             tag.addView(label);
 
+            // Match the action-pill height (36dp) so the tag and quick actions sit
+            // on one even row instead of a short tag beside a taller button.
+            LinearLayout.LayoutParams lp =
+                    new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            dp(ctx, 36));
+            lp.gravity = Gravity.CENTER_VERTICAL;
+            tag.setLayoutParams(lp);
+
             return tag;
         }
 
@@ -245,19 +253,17 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             b.setGravity(Gravity.CENTER);
             int padH = dp(ctx, 12), padV = dp(ctx, 8);
             b.setPadding(padH, padV, padH, padV);
+            b.setMinWidth(dp(ctx, 96));
 
-            if (a.primary) {
-                b.setBackgroundResource(R.drawable.bg_adm_pill);
-                b.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.adm_gray_900)));
-                b.setTextColor(ContextCompat.getColor(ctx, R.color.white));
-            } else {
-                b.setBackgroundResource(R.drawable.bg_notif_action_secondary);
-                b.setTextColor(ContextCompat.getColor(ctx, R.color.adm_gray_700));
-            }
+            // All quick actions share one look: dark fill + white text (the
+            // "Xem báo cáo" primary style), so the row reads evenly.
+            b.setBackgroundResource(R.drawable.bg_adm_pill);
+            b.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(ctx, R.color.adm_gray_900)));
+            b.setTextColor(ContextCompat.getColor(ctx, R.color.white));
 
             LinearLayout.LayoutParams lp =
                     new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                            dp(ctx, 36));
             lp.gravity = Gravity.CENTER_VERTICAL;
             if (leadingGap) lp.setMarginStart(dp(ctx, 7));
             b.setLayoutParams(lp);

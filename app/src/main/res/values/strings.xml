@@ -214,6 +214,7 @@
     <string name="booking_error_dates_required">Vui lòng chọn ngày nhận và trả phòng</string>
     <string name="booking_error_checkin_past">Ngày nhận phòng không được ở quá khứ</string>
     <string name="booking_error_checkout_after_checkin">Ngày trả phòng phải sau ngày nhận phòng</string>
+    <string name="booking_error_range_sold_out">Khoảng ngày đã chọn có ngày hết phòng</string>
     <string name="booking_error_guests_invalid">Số khách phải lớn hơn 0</string>
     <string name="booking_error_not_logged_in">Vui lòng đăng nhập để đặt phòng</string>
     <string name="booking_error_missing_target">Không xác định được khách sạn hoặc tour</string>
@@ -376,7 +377,6 @@
 
     <!-- Home -->
     <string name="adm_overview">Tổng quan</string>
-    <string name="adm_home_date">Thứ Bảy, 18 Tháng 8</string>
     <string name="adm_home_glance">Toàn cảnh thị trường</string>
     <string name="adm_stat_users">Tổng người dùng</string>
     <string name="adm_stat_biz">Doanh nghiệp</string>
@@ -385,12 +385,14 @@
     <string name="adm_stat_reports">Báo cáo chờ xử lý</string>
     <string name="adm_stat_flagged">Người dùng bị gắn cờ</string>
     <string name="adm_alert_title">%d mục cần bạn duyệt</string>
-    <string name="adm_alert_sub">%1$d tin chờ duyệt · %2$d báo cáo đang mở</string>
+    <string name="adm_alert_sub">%1$d tin chờ duyệt · %2$d doanh nghiệp · %3$d báo cáo đang mở</string>
     <string name="adm_time_yesterday">Hôm qua</string>
     <string name="adm_open">Mở</string>
     <string name="adm_quick_actions">Thao tác nhanh</string>
     <string name="adm_qa_review_listings">Duyệt tin đăng chờ</string>
     <string name="adm_qa_review_listings_sub">%d đang chờ kiểm duyệt</string>
+    <string name="adm_qa_review_biz">Duyệt doanh nghiệp</string>
+    <string name="adm_qa_review_biz_sub">%d doanh nghiệp chờ phê duyệt</string>
     <string name="adm_qa_review_reports">Xem báo cáo</string>
     <string name="adm_qa_review_reports_sub">%d báo cáo spam/độc hại</string>
     <string name="adm_qa_browse_users">Xem người dùng</string>
@@ -707,6 +709,14 @@
     <string name="notif_group_today">Hôm nay</string>
     <string name="notif_group_yesterday">Hôm qua</string>
     <string name="notif_group_earlier">Trước đó</string>
+
+    <!-- Relative timestamps (live feed) -->
+    <string name="notif_when_now">Vừa xong</string>
+    <string name="notif_when_minutes">%d phút</string>
+    <string name="notif_when_hours">%d giờ</string>
+    <string name="notif_when_days">%d ngày</string>
+    <string name="notif_load_error">Không tải được thông báo</string>
+    <string name="notif_loading">Đang tải…</string>
 
     <!-- Empty states -->
     <string name="notif_empty_all_title">Chưa có thông báo</string>

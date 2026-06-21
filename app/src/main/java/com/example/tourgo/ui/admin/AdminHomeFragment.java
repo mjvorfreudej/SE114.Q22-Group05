@@ -18,25 +18,33 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.ConfigurationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.remote.service.AdminService;
-import com.example.tourgo.ui.notification.NotificationItem;
+import com.example.tourgo.remote.service.NotificationService;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /** Admin › Home dashboard — KPI tiles, critical alert, quick actions, recent activity (live). */
 public class AdminHomeFragment extends Fragment {
 
     private View root;
+    /** Live user total, counted from the same list the Users directory shows. */
+    private Integer userCount = null;
+    private TextView bellBadge;
 
     @Nullable
     @Override
@@ -50,6 +58,7 @@ public class AdminHomeFragment extends Fragment {
         super.onViewCreated(v, savedInstanceState);
         root = v;
 
+        applyDate();
         setupBell(v);
 
         v.findViewById(R.id.admBtnOpenMod).setOnClickListener(view -> goTab(AdminActivity.TAB_MODERATION));
@@ -65,6 +74,8 @@ public class AdminHomeFragment extends Fragment {
         // Quick actions chrome (subtitle + badge fill in from stats).
         action(v, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
                 R.string.adm_qa_review_listings, "", 0, AdminActivity.TAB_MODERATION);
+        action(v, R.id.admActBusiness, R.drawable.ic_building, R.color.adm_blue_50, R.color.adm_blue_500,
+                R.string.adm_qa_review_biz, "", 0, AdminActivity.TAB_BUSINESS);
         action(v, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                 R.string.adm_qa_review_reports, "", 0, AdminActivity.TAB_MODERATION);
         action(v, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
@@ -72,6 +83,7 @@ public class AdminHomeFragment extends Fragment {
 
         loadStats();
         loadActivity();
+        loadUserCount();
     }
 
     @Override
@@ -80,6 +92,11 @@ public class AdminHomeFragment extends Fragment {
         // Keep the dashboard in sync after approvals / suspensions elsewhere.
         loadStats();
         loadActivity();
+        loadUserCount();
+        // Reflect any notifications read since we were last shown.
+        refreshBellBadge();
+        // Keep the date correct if we were left open past midnight.
+        applyDate();
     }
 
     // ── Live data ─────────────────────────────────────────────────────────────
@@ -96,20 +113,31 @@ public class AdminHomeFragment extends Fragment {
                 stat(root, R.id.admStat5, R.drawable.ic_flag, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getReports()), R.string.adm_stat_reports);
                 stat(root, R.id.admStat6, R.drawable.ic_shield_x, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getFlaggedUsers()), R.string.adm_stat_flagged);
 
+                // The "needs review" tally spans every approval queue the admin owns:
+                // pending listings, pending business registrations and open reports.
+                int queueTotal = s.getQueueTotal() + s.getPendingBusinesses();
                 ((TextView) root.findViewById(R.id.admAlertTitle))
-                        .setText(getString(R.string.adm_alert_title, s.getQueueTotal()));
+                        .setText(getString(R.string.adm_alert_title, queueTotal));
                 ((TextView) root.findViewById(R.id.admAlertSub))
-                        .setText(getString(R.string.adm_alert_sub, s.getPendingListings(), s.getReports()));
+                        .setText(getString(R.string.adm_alert_sub,
+                                s.getPendingListings(), s.getPendingBusinesses(), s.getReports()));
 
                 action(root, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
                         R.string.adm_qa_review_listings, getString(R.string.adm_qa_review_listings_sub, s.getPendingListings()),
                         s.getPendingListings(), AdminActivity.TAB_MODERATION);
+                action(root, R.id.admActBusiness, R.drawable.ic_building, R.color.adm_blue_50, R.color.adm_blue_500,
+                        R.string.adm_qa_review_biz, getString(R.string.adm_qa_review_biz_sub, s.getPendingBusinesses()),
+                        s.getPendingBusinesses(), AdminActivity.TAB_BUSINESS);
                 action(root, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                         R.string.adm_qa_review_reports, getString(R.string.adm_qa_review_reports_sub, s.getReports()),
                         s.getReports(), AdminActivity.TAB_MODERATION);
                 action(root, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
                         R.string.adm_qa_browse_users, getString(R.string.adm_qa_browse_users_sub, fmt(s.getUsers())),
                         0, AdminActivity.TAB_USERS);
+
+                // The live count wins over the stats aggregate when it has arrived,
+                // so the tile + subtitle always match the Users directory.
+                applyUserCount();
             }
 
             @Override
@@ -119,6 +147,36 @@ public class AdminHomeFragment extends Fragment {
                         msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /**
+     * The dashboard's "total users" must match the Users directory exactly, so we
+     * count the same live list the directory loads rather than trusting the stats
+     * aggregate (which can lag behind or count a different subset).
+     */
+    private void loadUserCount() {
+        AdminService.getUsers(requireContext(), new DataCallback<List<AdminAccount>>() {
+            @Override
+            public void onSuccess(List<AdminAccount> data) {
+                if (!isAdded() || root == null) return;
+                userCount = data != null ? data.size() : 0;
+                applyUserCount();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the stats-derived value in place on failure.
+            }
+        });
+    }
+
+    /** Push the live user count onto the KPI tile + "browse users" subtitle. */
+    private void applyUserCount() {
+        if (userCount == null || !isAdded() || root == null) return;
+        String v = fmt(userCount);
+        ((TextView) root.findViewById(R.id.admStat1).findViewById(R.id.admStatValue)).setText(v);
+        ((TextView) root.findViewById(R.id.admActUsers).findViewById(R.id.admActSub))
+                .setText(getString(R.string.adm_qa_browse_users_sub, v));
     }
 
     private void loadActivity() {
@@ -217,25 +275,61 @@ public class AdminHomeFragment extends Fragment {
     }
 
     /**
+     * Header date label = today, formatted for the app's active language (was a
+     * hardcoded string). Uses a locale-best skeleton so the order matches each
+     * language: "Chủ Nhật, 21 tháng 6" (vi) / "Sunday, June 21" (en).
+     */
+    private void applyDate() {
+        if (root == null) return;
+        TextView dateView = root.findViewById(R.id.admHomeDate);
+        if (dateView == null) return;
+        Locale locale = ConfigurationCompat.getLocales(getResources().getConfiguration()).get(0);
+        if (locale == null) locale = Locale.getDefault();
+        String pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "EEEEMMMMd");
+        String text = new SimpleDateFormat(pattern, locale).format(new Date());
+        if (!text.isEmpty()) {
+            text = text.substring(0, 1).toUpperCase(locale) + text.substring(1);
+        }
+        dateView.setText(text);
+    }
+
+    /**
      * Header bell → Admin notification popover (design index.html, role="admin").
-     * Notifications are a separate module and remain on their own optimistic state.
+     * The badge mirrors the notification center's unread count and is recomputed
+     * on resume so it drops as notifications are read (and the read-state persists).
      */
     private void setupBell(View root) {
         View bell = root.findViewById(R.id.admBellBtn);
-        TextView badge = root.findViewById(R.id.admBellBadge);
-
-        int unread = 0;
-        for (NotificationItem n : NotificationMockData.seed(requireContext(), NotificationMockData.Role.ADMIN)) {
-            if (!n.read) unread++;
-        }
-        if (unread > 0) {
-            badge.setText(unread > 9 ? "9+" : String.valueOf(unread));
-            badge.setVisibility(View.VISIBLE);
-        } else {
-            badge.setVisibility(View.GONE);
-        }
-
+        bellBadge = root.findViewById(R.id.admBellBadge);
         bell.setOnClickListener(v -> NotificationPopover.show(v, NotificationMockData.Role.ADMIN));
+        refreshBellBadge();
+    }
+
+    /** Bell badge = current unread admin notifications, pulled live from the server. */
+    private void refreshBellBadge() {
+        if (bellBadge == null || !isAdded()) return;
+        NotificationService.unreadCount(requireContext(), NotificationMockData.Role.ADMIN,
+                new DataCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer unread) {
+                        applyBellBadge(unread != null ? unread : 0);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        applyBellBadge(0);
+                    }
+                });
+    }
+
+    private void applyBellBadge(int count) {
+        if (bellBadge == null) return;
+        if (count > 0) {
+            bellBadge.setText(count > 9 ? "9+" : String.valueOf(count));
+            bellBadge.setVisibility(View.VISIBLE);
+        } else {
+            bellBadge.setVisibility(View.GONE);
+        }
     }
 
     private void stat(View root, int id, int iconRes, @ColorRes int accent, @ColorRes int soft,

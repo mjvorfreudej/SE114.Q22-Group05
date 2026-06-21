@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * In-memory sample data for the notification surfaces, mirroring the TourGo
@@ -159,11 +160,30 @@ public final class NotificationMockData {
     // ── Seed data (design NOTIF_DATA) ────────────────────────────────────────
     // Text is resolved from string resources so it matches the active language.
     public static List<NotificationItem> seed(Context ctx, Role role) {
+        List<NotificationItem> list;
         switch (role) {
-            case BUSINESS: return seedBusiness(ctx);
-            case ADMIN:    return seedAdmin(ctx);
-            default:       return seedTraveler(ctx);
+            case BUSINESS: list = seedBusiness(ctx); break;
+            case ADMIN:    list = seedAdmin(ctx); break;
+            default:       list = seedTraveler(ctx); break;
         }
+        // Overlay the persisted read-state so every surface (bell badge, popover,
+        // full center) agrees and a read notification stays read across reopens.
+        Set<String> read = NotificationStore.readIds(ctx, role);
+        if (!read.isEmpty()) {
+            for (NotificationItem n : list) {
+                if (read.contains(n.id)) n.read = true;
+            }
+        }
+        return list;
+    }
+
+    /** Live unread tally for a role, used to drive the home bell badge. */
+    public static int unreadCount(Context ctx, Role role) {
+        int unread = 0;
+        for (NotificationItem n : seed(ctx, role)) {
+            if (!n.read) unread++;
+        }
+        return unread;
     }
 
     private static List<NotificationItem> seedTraveler(Context ctx) {

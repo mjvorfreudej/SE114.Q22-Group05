@@ -422,6 +422,7 @@ public class AdminModerationFragment extends Fragment {
                 reportAdapter.setItems(reports);
                 buildTabs();
                 updateEmptyState();
+                refreshHostBadge();
                 toast(toastRes);
             }
 
@@ -515,6 +516,7 @@ public class AdminModerationFragment extends Fragment {
                 listingAdapter.setItems(listings);
                 updateEmptyState();
                 buildTabs();
+                refreshHostBadge();
                 toast(R.string.adm_toast_listing_rejected);
             }
 
@@ -530,6 +532,13 @@ public class AdminModerationFragment extends Fragment {
             HotelService.rejectHotel(requireContext(), it.serverId, cb);
         } else {
             TourService.rejectTour(requireContext(), it.serverId, cb);
+        }
+    }
+
+    /** Nudge the host to recompute its bottom-nav badges after an action. */
+    private void refreshHostBadge() {
+        if (getActivity() instanceof AdminActivity) {
+            ((AdminActivity) getActivity()).refreshNavBadges();
         }
     }
 

@@ -19,7 +19,11 @@ import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.remote.service.NotificationService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +57,8 @@ public final class NotificationPopover {
         LayoutInflater inf = LayoutInflater.from(ctx);
         View content = inf.inflate(R.layout.popup_notifications, null, false);
 
-        final List<NotificationItem> items = NotificationMockData.seed(ctx, role);
+        // Populated asynchronously from the live feed (or mock for ADMIN).
+        final List<NotificationItem> items = new ArrayList<>();
 
         TextView headerTitle = content.findViewById(R.id.tvNotifPopHeaderTitle);
         TextView unread = content.findViewById(R.id.tvNotifPopUnread);
@@ -78,12 +83,20 @@ public final class NotificationPopover {
         popup.setOutsideTouchable(true);
         popup.setElevation(dp(ctx, 16));
 
-        // First render.
-        bindUnread(ctx, unread, markAll, items);
-        renderList(ctx, list, empty, items, popup, role);
+        // Initial loading state — the panel opens immediately, the feed fills in.
+        unread.setVisibility(View.GONE);
+        markAll.setVisibility(View.GONE);
+        list.setVisibility(View.GONE);
+        empty.setVisibility(View.VISIBLE);
+        empty.setText(R.string.notif_loading);
 
         markAll.setOnClickListener(v -> {
-            for (NotificationItem n : items) n.read = true;
+            java.util.List<String> ids = new java.util.ArrayList<>();
+            for (NotificationItem n : items) {
+                n.read = true;
+                ids.add(n.id);
+            }
+            NotificationService.markAllRead(ctx, role, ids, null);
             Toast.makeText(ctx, R.string.notif_toast_marked_all, Toast.LENGTH_SHORT).show();
             bindUnread(ctx, unread, markAll, items);
             renderList(ctx, list, empty, items, popup, role);
@@ -97,6 +110,25 @@ public final class NotificationPopover {
 
         // Drop below the bell, right edge aligned to the anchor.
         popup.showAsDropDown(anchor, 0, dp(ctx, 6), Gravity.END);
+
+        // Fetch the live feed and render when it arrives.
+        NotificationService.load(ctx, role, new DataCallback<List<NotificationItem>>() {
+            @Override
+            public void onSuccess(List<NotificationItem> data) {
+                items.clear();
+                items.addAll(data);
+                empty.setText(R.string.notif_empty_all_title);
+                bindUnread(ctx, unread, markAll, items);
+                renderList(ctx, list, empty, items, popup, role);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                list.setVisibility(View.GONE);
+                empty.setVisibility(View.VISIBLE);
+                empty.setText(R.string.notif_load_error);
+            }
+        });
     }
 
     // ── Header ──────────────────────────────────────────────────────────────

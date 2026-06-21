@@ -107,11 +107,13 @@
                     android:minWidth="16dp"
                     android:paddingHorizontal="4dp"
                     android:paddingVertical="1dp"
-                    android:text="23"
                     android:textColor="@color/white"
                     android:textSize="8sp"
                     android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText"
+                    tools:text="23"
+                    tools:visibility="visible" />
             </FrameLayout>
 
             <TextView
@@ -141,13 +143,39 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp">
 
-            <ImageView
-                android:id="@+id/admIconBusiness"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@string/adm_nav_business"
-                android:src="@drawable/ic_building"
-                app:tint="@color/adm_gray_400" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/admIconBusiness"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:contentDescription="@string/adm_nav_business"
+                    android:src="@drawable/ic_building"
+                    app:tint="@color/adm_gray_400" />
+
+                <TextView
+                    android:id="@+id/admBadgeBusiness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_adm_pill"
+                    android:backgroundTint="@color/adm_red_500"
+                    android:gravity="center"
+                    android:minWidth="16dp"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="1dp"
+                    android:textColor="@color/white"
+                    android:textSize="8sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText"
+                    tools:text="1"
+                    tools:visibility="visible" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/admLabelBusiness"
