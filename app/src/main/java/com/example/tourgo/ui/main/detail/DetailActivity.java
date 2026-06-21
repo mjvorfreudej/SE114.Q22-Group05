@@ -265,24 +265,28 @@ public class DetailActivity extends AppCompatActivity {
             googleMap.getUiSettings().setMapToolbarEnabled(true);
             googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-            LatLng target = resolveLatLng();
-            String title = isTourMode ? tour.getName() : hotel.getName();
-            googleMap.addMarker(new MarkerOptions().position(target).title(title));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 15f));
+            new Thread(() -> {
+                LatLng target = resolveLatLng();
+                runOnUiThread(() -> {
+                    String title = isTourMode ? tour.getName() : hotel.getName();
+                    googleMap.addMarker(new MarkerOptions().position(target).title(title));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(target, 15f));
 
-            googleMap.setOnMapClickListener(latLng -> {
-                String address = isTourMode ? tour.getDestination() : hotel.getAddress();
-                Uri gmmIntentUri = Uri.parse("geo:" + target.latitude + "," + target.longitude + "?q=" + Uri.encode(address));
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                } else {
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW, 
-                        Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(address)));
-                    startActivity(webIntent);
-                }
-            });
+                    googleMap.setOnMapClickListener(latLng -> {
+                        String address = isTourMode ? tour.getDestination() : hotel.getAddress();
+                        Uri gmmIntentUri = Uri.parse("geo:" + target.latitude + "," + target.longitude + "?q=" + Uri.encode(address));
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(mapIntent);
+                        } else {
+                            Intent webIntent = new Intent(Intent.ACTION_VIEW, 
+                                Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(address)));
+                            startActivity(webIntent);
+                        }
+                    });
+                });
+            }).start();
         });
     }
 
