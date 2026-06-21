@@ -213,6 +213,7 @@
     <string name="booking_error_dates_required">Please select check-in and check-out dates</string>
     <string name="booking_error_checkin_past">Check-in date cannot be in the past</string>
     <string name="booking_error_checkout_after_checkin">Check-out date must be after check-in date</string>
+    <string name="booking_error_range_sold_out">Selected date range includes sold-out nights</string>
     <string name="booking_error_guests_invalid">Number of guests must be greater than 0</string>
     <string name="booking_error_not_logged_in">Please login to book a room</string>
     <string name="booking_error_missing_target">Could not identify hotel or tour</string>

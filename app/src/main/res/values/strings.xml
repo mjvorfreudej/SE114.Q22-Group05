@@ -214,6 +214,7 @@
     <string name="booking_error_dates_required">Vui lòng chọn ngày nhận và trả phòng</string>
     <string name="booking_error_checkin_past">Ngày nhận phòng không được ở quá khứ</string>
     <string name="booking_error_checkout_after_checkin">Ngày trả phòng phải sau ngày nhận phòng</string>
+    <string name="booking_error_range_sold_out">Khoảng ngày đã chọn có ngày hết phòng</string>
     <string name="booking_error_guests_invalid">Số khách phải lớn hơn 0</string>
     <string name="booking_error_not_logged_in">Vui lòng đăng nhập để đặt phòng</string>
     <string name="booking_error_missing_target">Không xác định được khách sạn hoặc tour</string>
