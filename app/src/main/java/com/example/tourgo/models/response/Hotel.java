@@ -139,4 +139,7 @@ public class Hotel implements Serializable {
     public void setHotelImages(List<HotelImage> hotelImages) {
         this.hotelImages = hotelImages;
     }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 }

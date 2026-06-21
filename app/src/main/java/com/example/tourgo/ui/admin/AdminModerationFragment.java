@@ -22,6 +22,7 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.AdminReport;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.remote.service.AdminService;
+import com.example.tourgo.remote.service.HotelService;
 import com.example.tourgo.remote.service.TourService;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
 import com.example.tourgo.ui.admin.AdminMockData.UserReport;
@@ -74,7 +75,7 @@ public class AdminModerationFragment extends Fragment {
         buildTabs();
 
         showTab();
-        loadPendingTours();
+        loadPendingListings();
         loadReports();
     }
 
@@ -82,7 +83,7 @@ public class AdminModerationFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // Refresh so newly submitted tours / filed reports stay in sync.
-        loadPendingTours();
+        loadPendingListings();
         loadReports();
     }
 
@@ -103,34 +104,94 @@ public class AdminModerationFragment extends Fragment {
         updateEmptyState();
     }
 
-    private void loadPendingTours() {
+    private void loadPendingListings() {
         if ("pending".equals(tab)) setLoading(true);
+        
+        // Fetch tours first
         TourService.getPendingTours(requireContext(), new DataCallback<List<Tour>>() {
             @Override
             public void onSuccess(List<Tour> tours) {
                 if (!isAdded()) return;
-                if ("pending".equals(tab)) setLoading(false);
-                listings.clear();
-                if (tours != null) {
-                    for (Tour tour : tours) {
-                        listings.add(PendingListing.fromTour(requireContext(), tour));
+                
+                // Nest hotel fetch
+                HotelService.getPendingHotels(requireContext(), new DataCallback<List<com.example.tourgo.models.response.Hotel>>() {
+                    @Override
+                    public void onSuccess(List<com.example.tourgo.models.response.Hotel> hotels) {
+                        if (!isAdded()) return;
+                        if ("pending".equals(tab)) setLoading(false);
+                        
+                        listings.clear();
+                        if (tours != null) {
+                            for (Tour t : tours) {
+                                listings.add(PendingListing.fromTour(requireContext(), t));
+                            }
+                        }
+                        if (hotels != null) {
+                            for (com.example.tourgo.models.response.Hotel h : hotels) {
+                                listings.add(PendingListing.fromHotel(requireContext(), h));
+                            }
+                        }
+                        // Sort by date descending
+                        listings.sort((a, b) -> b.date.compareTo(a.date));
+                        
+                        listingAdapter.setItems(listings);
+                        buildTabs();
+                        updateEmptyState();
                     }
-                }
-                listingAdapter.setItems(listings);
-                buildTabs();
-                updateEmptyState();
+
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) {
+                        if (!isAdded()) return;
+                        if ("pending".equals(tab)) setLoading(false);
+                        
+                        // If hotels query fails, still display tours
+                        listings.clear();
+                        if (tours != null) {
+                            for (Tour t : tours) {
+                                listings.add(PendingListing.fromTour(requireContext(), t));
+                            }
+                        }
+                        listingAdapter.setItems(listings);
+                        buildTabs();
+                        updateEmptyState();
+                    }
+                });
             }
 
             @Override
             public void onError(ApiErrorCode code, String msg) {
                 if (!isAdded()) return;
-                if ("pending".equals(tab)) setLoading(false);
-                listings.clear();
-                listingAdapter.setItems(listings);
-                buildTabs();
-                updateEmptyState();
-                Toast.makeText(requireContext(),
-                        msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                
+                // If tours query fails, try hotels anyway
+                HotelService.getPendingHotels(requireContext(), new DataCallback<List<com.example.tourgo.models.response.Hotel>>() {
+                    @Override
+                    public void onSuccess(List<com.example.tourgo.models.response.Hotel> hotels) {
+                        if (!isAdded()) return;
+                        if ("pending".equals(tab)) setLoading(false);
+                        
+                        listings.clear();
+                        if (hotels != null) {
+                            for (com.example.tourgo.models.response.Hotel h : hotels) {
+                                listings.add(PendingListing.fromHotel(requireContext(), h));
+                            }
+                        }
+                        listingAdapter.setItems(listings);
+                        buildTabs();
+                        updateEmptyState();
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code2, String msg2) {
+                        if (!isAdded()) return;
+                        if ("pending".equals(tab)) setLoading(false);
+                        listings.clear();
+                        listingAdapter.setItems(listings);
+                        buildTabs();
+                        updateEmptyState();
+                        Toast.makeText(requireContext(),
+                                msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
@@ -221,7 +282,7 @@ public class AdminModerationFragment extends Fragment {
                         getString(R.string.adm_reject_listing_title),
                         getString(R.string.adm_reject_listing_msg),
                         getString(R.string.adm_reject), true,
-                        () -> { dialog.dismiss(); toast(R.string.adm_toast_listing_rejected); }));
+                        () -> reject(it, dialog)));
         sheet.findViewById(R.id.admBtnRevision).setOnClickListener(view ->
                 AdminUi.confirm(requireContext(),
                         getString(R.string.adm_request_revision_title),
@@ -309,27 +370,73 @@ public class AdminModerationFragment extends Fragment {
         });
     }
 
-    /**
-     * Approve a pending tour via the backend (PUT /api/tours/{id}/approve). On
-     * success the server flips its status to APPROVED — it then disappears from
-     * this list and shows up on the User Home screen.
-     */
     private void approve(PendingListing it, BottomSheetDialog dialog) {
         if (it.serverId == null) {
-            // Legacy mock entry with no backend id — optimistic toast only.
             dialog.dismiss();
             toast(R.string.adm_toast_listing_approved);
             return;
         }
-        TourService.approveTour(requireContext(), it.serverId, new DataCallback<Tour>() {
+
+        if ("hotel".equals(it.cat)) {
+            HotelService.approveHotel(requireContext(), it.serverId, new DataCallback<com.example.tourgo.models.response.Hotel>() {
+                @Override
+                public void onSuccess(com.example.tourgo.models.response.Hotel hotel) {
+                    if (!isAdded()) return;
+                    dialog.dismiss();
+                    listings.remove(it);
+                    listingAdapter.setItems(listings);
+                    updateEmptyState();
+                    buildTabs();
+                    toast(R.string.adm_toast_listing_approved);
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    if (!isAdded()) return;
+                    Toast.makeText(requireContext(),
+                            msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            TourService.approveTour(requireContext(), it.serverId, new DataCallback<Tour>() {
+                @Override
+                public void onSuccess(Tour tour) {
+                    if (!isAdded()) return;
+                    dialog.dismiss();
+                    listings.remove(it);
+                    listingAdapter.setItems(listings);
+                    updateEmptyState();
+                    buildTabs();
+                    toast(R.string.adm_toast_listing_approved);
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    if (!isAdded()) return;
+                    Toast.makeText(requireContext(),
+                            msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void reject(PendingListing it, BottomSheetDialog dialog) {
+        if (it.serverId == null) {
+            dialog.dismiss();
+            toast(R.string.adm_toast_listing_rejected);
+            return;
+        }
+
+        DataCallback<Void> cb = new DataCallback<Void>() {
             @Override
-            public void onSuccess(Tour tour) {
+            public void onSuccess(Void result) {
                 if (!isAdded()) return;
                 dialog.dismiss();
                 listings.remove(it);
                 listingAdapter.setItems(listings);
                 updateEmptyState();
-                toast(R.string.adm_toast_listing_approved);
+                buildTabs();
+                toast(R.string.adm_toast_listing_rejected);
             }
 
             @Override
@@ -338,7 +445,13 @@ public class AdminModerationFragment extends Fragment {
                 Toast.makeText(requireContext(),
                         msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        if ("hotel".equals(it.cat)) {
+            HotelService.rejectHotel(requireContext(), it.serverId, cb);
+        } else {
+            TourService.rejectTour(requireContext(), it.serverId, cb);
+        }
     }
 
     private void toast(int res) {

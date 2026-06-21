@@ -29,8 +29,8 @@ public final class AdminMockData {
         public final String priceText;  // preformatted price (else "$" + price)
 
         private PendingListing(String serverId, String name, String city, String date,
-                               String priceText, String imageUrl, String desc) {
-            this.id = 0; this.business = ""; this.name = name; this.cat = "tour";
+                               String priceText, String imageUrl, String desc, String cat) {
+            this.id = 0; this.business = ""; this.name = name; this.cat = cat;
             this.city = city; this.date = date; this.price = 0; this.photoRes = R.drawable.hotel_1;
             this.status = "pending"; this.desc = desc; this.history = new ArrayList<>();
             this.serverId = serverId; this.imageUrl = imageUrl; this.priceText = priceText;
@@ -51,7 +51,34 @@ public final class AdminMockData {
                     date,
                     tour.getPriceString(ctx),
                     img,
-                    tour.getDescription() != null ? tour.getDescription() : "");
+                    tour.getDescription() != null ? tour.getDescription() : "",
+                    "tour");
+        }
+
+        /** Map a backend hotel into the moderation display model. */
+        public static PendingListing fromHotel(android.content.Context ctx,
+                                               com.example.tourgo.models.response.Hotel hotel) {
+            String img = null;
+            if (hotel.getHotelImages() != null && !hotel.getHotelImages().isEmpty()) {
+                img = hotel.getHotelImages().get(0).getImageUrl();
+            }
+            String address = hotel.getAddress() != null ? hotel.getAddress() : "";
+            String city = address;
+            if (address.contains(",")) {
+                city = address.substring(address.lastIndexOf(",") + 1).trim();
+            }
+            String created = hotel.getCreatedAt();
+            String date = (created != null && created.length() >= 10) ? created.substring(0, 10) : "";
+            String priceText = String.format(java.util.Locale.getDefault(), "%,.0f đ", hotel.getPricePerNight());
+            return new PendingListing(
+                    hotel.getId(),
+                    hotel.getName(),
+                    city,
+                    date,
+                    priceText,
+                    img,
+                    hotel.getDescription() != null ? hotel.getDescription() : "",
+                    "hotel");
         }
     }
 
