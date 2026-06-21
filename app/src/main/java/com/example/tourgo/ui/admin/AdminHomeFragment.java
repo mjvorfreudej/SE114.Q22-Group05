@@ -28,6 +28,7 @@ import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.remote.service.AdminService;
+import com.example.tourgo.remote.service.NotificationService;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
@@ -304,10 +305,21 @@ public class AdminHomeFragment extends Fragment {
         refreshBellBadge();
     }
 
-    /** Bell badge = current unread admin notifications (shared, persisted state). */
+    /** Bell badge = current unread admin notifications, pulled live from the server. */
     private void refreshBellBadge() {
         if (bellBadge == null || !isAdded()) return;
-        applyBellBadge(NotificationMockData.unreadCount(requireContext(), NotificationMockData.Role.ADMIN));
+        NotificationService.unreadCount(requireContext(), NotificationMockData.Role.ADMIN,
+                new DataCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer unread) {
+                        applyBellBadge(unread != null ? unread : 0);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        applyBellBadge(0);
+                    }
+                });
     }
 
     private void applyBellBadge(int count) {
