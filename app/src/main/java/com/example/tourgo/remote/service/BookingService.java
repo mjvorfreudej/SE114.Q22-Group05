@@ -191,4 +191,33 @@ public class BookingService {
                     }
                 });
     }
+
+    public static void getBookingById(Context context, String bookingId, DataCallback<Booking> callback) {
+        RetrofitClient.getInstance(context)
+                .getBookingApi()
+                .getBookingById(bookingId)
+                .enqueue(new Callback<ApiResponse<Booking>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Booking>> call, Response<ApiResponse<Booking>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Booking> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Booking>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
 }
