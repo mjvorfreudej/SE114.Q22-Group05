@@ -34,19 +34,24 @@
     <color name="adm_green_500">#12B76A</color>
     <color name="adm_green_100">#D1FADF</color>
     <color name="adm_green_700">#027A48</color>
-    <color name="adm_amber_500">#F79009</color>
-    <color name="adm_amber_100">#FEF0C7</color>
     <color name="adm_amber_700">#B54708</color>
-    <color name="adm_red_500">#FF4B4B</color>
-    <color name="adm_red_100">#FEE4E2</color>
-    <color name="adm_red_700">#B42318</color>
+    <color name="adm_amber_500">#F79009</color>
+    <color name="adm_amber_200">#FEDF89</color>
+    <color name="adm_amber_100">#FEF0C7</color>
+    <color name="adm_amber_50">#FFFAEB</color>
     <color name="adm_red_900">#7A1414</color>
+    <color name="adm_red_700">#B42318</color>
+    <color name="adm_red_500">#FF4B4B</color>
+    <color name="adm_red_200">#FECDCA</color>
+    <color name="adm_red_100">#FEE4E2</color>
+    <color name="adm_red_50">#FEF3F2</color>
 
     <!-- Category accents -->
     <color name="adm_teal_ink">#0B6E6D</color>
-    <color name="adm_teal_50">#F0FDFA</color>
-    <color name="adm_teal_100">#CCFBF1</color>
     <color name="adm_teal_500">#0EA5A4</color>
+    <color name="adm_teal_200">#99F6E4</color>
+    <color name="adm_teal_100">#CCFBF1</color>
+    <color name="adm_teal_50">#F0FDFA</color>
     <color name="adm_purple_ink">#5B21B6</color>
     <color name="adm_purple_50">#FAF8FF</color>
     <!-- Notification "Support" category disc/tag background (design data.js: #F4F0FF) -->

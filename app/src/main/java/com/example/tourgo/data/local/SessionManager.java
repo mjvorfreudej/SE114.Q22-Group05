@@ -6,6 +6,13 @@ import android.content.SharedPreferences;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class SessionManager {
@@ -45,7 +52,65 @@ public class SessionManager {
     // App settings
     private static final String KEY_REMEMBER_ME = "remember_me";
     private static final String KEY_CURRENCY = "currency";
+    
+    // Recent Search & Viewed keys
+    private static final String KEY_RECENT_SEARCHES = "recent_searches_v2";
+    private static final String KEY_RECENTLY_VIEWED = "recently_viewed";
+    
     private SharedPreferences sharedPreferences;
+    private final Gson gson = new Gson();
+
+    public static class RecentlyViewedItem {
+        public String id;
+        public boolean isTour;
+        public long timestamp;
+
+        public RecentlyViewedItem(String id, boolean isTour) {
+            this.id = id;
+            this.isTour = isTour;
+            this.timestamp = System.currentTimeMillis();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            RecentlyViewedItem that = (RecentlyViewedItem) o;
+            return isTour == that.isTour && id.equals(that.id);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id.hashCode();
+            result = 31 * result + (isTour ? 1 : 0);
+            return result;
+        }
+    }
+
+    public static class RecentSearchItem {
+        public String query;
+        public boolean isTour;
+
+        public RecentSearchItem(String query, boolean isTour) {
+            this.query = query;
+            this.isTour = isTour;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            RecentSearchItem that = (RecentSearchItem) o;
+            return isTour == that.isTour && query.equals(that.query);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = query.hashCode();
+            result = 31 * result + (isTour ? 1 : 0);
+            return result;
+        }
+    }
 
     public SessionManager(Context context) {
         try {
@@ -138,13 +203,6 @@ public class SessionManager {
         return getAccessToken() != null && !isTokenExpired();
     }
 
-    /**
-     * Returns true when the logged-in user is an admin, based on the
-     * "email suffix + predefined whitelist" strategy:
-     *  - email ends with {@link #ADMIN_EMAIL_DOMAIN} (e.g. admin@tourgo.com), OR
-     *  - email is listed in {@link #ADMIN_EMAIL_WHITELIST}.
-     * Returns false when no email is stored.
-     */
     public boolean isAdmin() {
         String role = sharedPreferences.getString(KEY_USER_ROLE, null);
         if ("admin".equalsIgnoreCase(role)) return true;
@@ -154,9 +212,6 @@ public class SessionManager {
         email = email.trim().toLowerCase(Locale.ROOT);
         if (email.isEmpty()) return false;
 
-        // Business whitelist takes precedence over the admin domain match,
-        // because emails like business@tourgo.com end with @tourgo.com but
-        // should be routed to the Business Console, not the Admin Console.
         for (String biz : BUSINESS_EMAIL_WHITELIST) {
             if (biz != null && email.equals(biz.trim().toLowerCase(Locale.ROOT))) return false;
         }
@@ -169,11 +224,6 @@ public class SessionManager {
         return false;
     }
 
-    /**
-     * Returns true when the logged-in user is a business/partner account, using the
-     * same "email suffix + whitelist" strategy as {@link #isAdmin()}. Admins take
-     * precedence (an admin email is never treated as a business).
-     */
     public boolean isBusiness() {
         String role = sharedPreferences.getString(KEY_USER_ROLE, null);
         if ("business".equalsIgnoreCase(role)) return true;
@@ -203,7 +253,6 @@ public class SessionManager {
     }
 
     public String getCurrency() {
-        // Mặc định là VND nếu chưa chọn
         return sharedPreferences.getString(KEY_CURRENCY, "VND");
     }
 
@@ -211,9 +260,6 @@ public class SessionManager {
         sharedPreferences.edit().clear().apply();
     }
 
-    /**
-     * Lấy 2 chữ cuối của tên (thường là Họ và Tên ở VN, hoặc Tên chính)
-     */
     public String getShortName() {
         String fullName = getUserName();
         if (fullName == null || fullName.trim().isEmpty()) return "User";
@@ -222,8 +268,47 @@ public class SessionManager {
         if (parts.length <= 2) {
             return fullName;
         } else {
-            // Lấy 2 từ cuối
             return parts[parts.length - 2] + " " + parts[parts.length - 1];
         }
+    }
+
+    // ── Recent Search Logic ──────────────────────────────────────────────────
+    public void addRecentSearch(String query, boolean isTour) {
+        if (query == null || query.trim().isEmpty()) return;
+        List<RecentSearchItem> searches = getRecentSearches();
+        RecentSearchItem newItem = new RecentSearchItem(query, isTour);
+        searches.remove(newItem);
+        searches.add(0, newItem);
+        if (searches.size() > 10) searches = searches.subList(0, 10);
+        sharedPreferences.edit().putString(KEY_RECENT_SEARCHES, gson.toJson(searches)).apply();
+    }
+
+    public List<RecentSearchItem> getRecentSearches() {
+        String json = sharedPreferences.getString(KEY_RECENT_SEARCHES, null);
+        if (json == null) return new ArrayList<>();
+        Type type = new TypeToken<List<RecentSearchItem>>(){}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public void clearRecentSearches() {
+        sharedPreferences.edit().remove(KEY_RECENT_SEARCHES).apply();
+    }
+
+    // ── Recently Viewed Logic ───────────────────────────────────────────────
+    public void addRecentlyViewed(String id, boolean isTour) {
+        if (id == null) return;
+        List<RecentlyViewedItem> items = getRecentlyViewed();
+        RecentlyViewedItem newItem = new RecentlyViewedItem(id, isTour);
+        items.remove(newItem);
+        items.add(0, newItem);
+        if (items.size() > 10) items = items.subList(0, 10);
+        sharedPreferences.edit().putString(KEY_RECENTLY_VIEWED, gson.toJson(items)).apply();
+    }
+
+    public List<RecentlyViewedItem> getRecentlyViewed() {
+        String json = sharedPreferences.getString(KEY_RECENTLY_VIEWED, null);
+        if (json == null) return new ArrayList<>();
+        Type type = new TypeToken<List<RecentlyViewedItem>>(){}.getType();
+        return gson.fromJson(json, type);
     }
 }

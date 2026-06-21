@@ -89,9 +89,11 @@ public class DetailActivity extends AppCompatActivity {
         if (data instanceof Tour) {
             tour = (Tour) data;
             isTourMode = true;
+            session.addRecentlyViewed(tour.getId(), true);
         } else if (data instanceof Hotel) {
             hotel = (Hotel) data;
             isTourMode = false;
+            session.addRecentlyViewed(hotel.getId(), false);
         }
 
         setupImagePicker();

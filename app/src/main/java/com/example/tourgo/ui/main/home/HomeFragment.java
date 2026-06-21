@@ -1,6 +1,5 @@
 package com.example.tourgo.ui.main.home;
 import com.example.tourgo.ui.main.detail.DetailActivity;
-import com.example.tourgo.ui.main.tour.CreateTourActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -121,9 +120,6 @@ public class HomeFragment extends Fragment {
         binding.chipOfferHotel.setOnClickListener(v -> setFilter(OfferFilter.HOTEL));
         binding.chipOfferTour.setOnClickListener(v -> setFilter(OfferFilter.TOUR));
 
-        binding.fabAddTour.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), CreateTourActivity.class)));
-
         // Bell opens the compact popover first; "View all notifications" inside it
         // then opens the full NotificationsActivity center.
         binding.btnNotification.setOnClickListener(NotificationPopover::show);
@@ -142,9 +138,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void setFilter(OfferFilter filter) {
+        currentTab(filter); // Re-using logic or just apply direct
         currentFilter = filter;
         applyChipStyles();
         refreshOffersList();
+    }
+
+    private void currentTab(OfferFilter filter) {
+        // Method for logic consistency if needed
     }
 
     private void applyChipStyles() {

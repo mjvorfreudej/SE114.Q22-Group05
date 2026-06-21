@@ -1,5 +1,6 @@
 package com.example.tourgo.remote.api;
 
+import com.example.tourgo.models.request.UpdateStatusRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Booking;
 import com.example.tourgo.models.response.BookingCheckResponse;
@@ -35,4 +36,10 @@ public interface BookingApi {
 
     @PATCH("api/bookings/{bookingId}/cancel")
     Call<ApiResponse<Void>> cancelBooking(@Path("bookingId") String bookingId);
+
+    @PATCH("api/bookings/{bookingId}/status")
+    Call<ApiResponse<Void>> updateBookingStatus(
+            @Path("bookingId") String bookingId,
+            @Body UpdateStatusRequest status
+    );
 }

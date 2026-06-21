@@ -69,7 +69,7 @@
             android:layout_height="52dp"
             android:layout_weight="1"
             android:background="@drawable/bg_amenity_card"
-            android:hint="@string/search_hint"
+            android:hint="@string/search_hint_tour"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:textSize="14sp"
@@ -96,43 +96,103 @@
             app:tint="@color/black" />
     </LinearLayout>
 
+    <!-- Category Selector Label -->
+    <TextView
+        android:id="@+id/tvSearchCatLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/urbanist"
+        android:text="Bạn đang tìm kiếm:"
+        android:textColor="@color/dark_gray"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/llSearchBar" />
+
+    <!-- Category Selector (Tours / Hotels) -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/cgSearchCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:layout_constraintTop_toBottomOf="@id/tvSearchCatLabel">
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSearchTours"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_category_tour"
+            android:checked="true"
+            app:chipIcon="@drawable/ic_tour" />
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSearchHotels"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_category_hotel"
+            app:chipIcon="@drawable/ic_hotel" />
+    </com.google.android.material.chip.ChipGroup>
+
     <!-- Khu vực hiển thị kết quả -->
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/layoutSearchResults"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llSearchBar">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvSearchResults"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp"
-            android:clipToPadding="false" />
-
-        <ProgressBar
-            android:id="@+id/pbSearchLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@id/cgSearchCategory">
 
         <TextView
-            android:id="@+id/tvNoResults"
+            android:id="@+id/tvResultsHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp"
             android:fontFamily="@font/urbanist"
-            android:text="@string/search_no_results"
-            android:textColor="@color/dark_gray"
-            android:textSize="16sp"
-            android:visibility="gone" />
-    </FrameLayout>
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="Kết quả tìm kiếm cho Tour" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSearchResults"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="16dp"
+                android:clipToPadding="false" />
+
+            <ProgressBar
+                android:id="@+id/pbSearchLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvNoResults"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/urbanist"
+                android:text="@string/search_no_results"
+                android:textColor="@color/dark_gray"
+                android:textSize="16sp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
 
     <!-- Khu vực nội dung gần đây -->
     <androidx.core.widget.NestedScrollView
@@ -142,7 +202,7 @@
         android:layout_marginTop="8dp"
         android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/llSearchBar">
+        app:layout_constraintTop_toBottomOf="@id/cgSearchCategory">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -156,6 +216,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
+                    android:id="@+id/tvRecentSearchTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/urbanist"
@@ -184,6 +245,7 @@
                 android:layout_marginTop="12dp" />
 
             <TextView
+                android:id="@+id/tvRecentViewedTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"

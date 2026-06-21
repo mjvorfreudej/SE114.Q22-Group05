@@ -41,6 +41,11 @@ public class ProfileActivity extends AppCompatActivity {
         View btnBack = findViewById(R.id.btnProfileBack);
         if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
+        View btnEdit = findViewById(R.id.btnProfileEdit);
+        if (btnEdit != null) {
+            btnEdit.setOnClickListener(v -> startActivity(new Intent(this, EditProfileActivity.class)));
+        }
+
         setupBookings();
         setupLogout();
         setupLanguage();
