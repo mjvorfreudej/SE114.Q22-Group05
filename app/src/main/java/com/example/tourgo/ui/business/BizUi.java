@@ -55,6 +55,8 @@ public final class BizUi {
                 return new Pill(R.color.adm_blue_50, R.color.adm_blue_700, R.color.adm_blue_500, R.string.biz_status_confirmed);
             case "pending":
                 return new Pill(R.color.adm_amber_100, R.color.adm_amber_700, R.color.adm_amber_500, R.string.biz_status_pending);
+            case "rejected":
+                return new Pill(R.color.adm_red_100, R.color.adm_red_700, R.color.adm_red_500, R.string.biz_status_rejected);
             case "checked-in":
                 return new Pill(R.color.adm_green_100, R.color.adm_green_700, R.color.adm_green_500, R.string.biz_status_checkedin);
             case "checked-out":

@@ -13,6 +13,10 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Multipart;
+import retrofit2.http.Part;
+import okhttp3.MultipartBody;
+import com.example.tourgo.models.response.UploadImageResponse;
 
 public interface HotelApi {
     @GET("api/hotels")
@@ -34,6 +38,11 @@ public interface HotelApi {
 
     @POST("api/hotels")
     Call<ApiResponse<Hotel>> createHotel(@Body CreateHotelRequest request);
+
+    @Multipart
+    @POST("api/hotels/{id}/images")
+    Call<ApiResponse<UploadImageResponse>> uploadHotelImage(@Path("id") String hotelId,
+                                                           @Part MultipartBody.Part image);
 
     @GET("api/hotels/pending")
     Call<ApiResponse<List<Hotel>>> getPendingHotels();

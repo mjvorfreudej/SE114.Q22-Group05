@@ -32,6 +32,7 @@ public class Hotel implements Serializable {
     private List<HotelImage> hotelImages;
     private double latitude;
     private double longitude;
+    private String status;
 
     public static class HotelImage implements Serializable {
         private String id;
@@ -142,4 +143,7 @@ public class Hotel implements Serializable {
 
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

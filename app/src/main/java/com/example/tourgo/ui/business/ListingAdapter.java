@@ -31,6 +31,7 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.VH> {
 
     public interface Listener {
         void onEdit(Listing l);
+        void onView(Listing l);
         void onDelete(Listing l);
         void onSelectionChanged(int count);
     }
@@ -106,6 +107,10 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.VH> {
             if (listener != null) listener.onSelectionChanged(selected.size());
         });
 
+        h.card.setOnClickListener(v -> {
+            if (listener != null) listener.onView(l);
+        });
+
         h.menu.setOnClickListener(this::popup);
         h.menu.setTag(l);
     }
@@ -121,8 +126,9 @@ public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.VH> {
             if (listener == null) return false;
             switch (item.getItemId()) {
                 case 1: listener.onEdit(l); return true;
+                case 2: listener.onView(l); return true;
                 case 4: listener.onDelete(l); return true;
-                default: return true; // View / Duplicate — no-op in the mock
+                default: return true;
             }
         });
         menu.show();

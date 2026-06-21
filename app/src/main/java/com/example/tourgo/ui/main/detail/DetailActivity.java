@@ -52,6 +52,7 @@ import com.example.tourgo.remote.service.TourService;
 import com.example.tourgo.remote.service.ReviewService;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.BookingService;
+import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,6 +65,8 @@ public class DetailActivity extends AppCompatActivity {
     private Hotel hotel;
     private Tour tour;
     private boolean isTourMode = false;
+    private boolean isAdminMode = false;
+    private PendingListing pendingListing;
     
     private final Handler sliderHandler = new Handler(Looper.getMainLooper());
     private Runnable sliderRunnable;
@@ -85,15 +88,22 @@ public class DetailActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         
+        isAdminMode = getIntent().getBooleanExtra("is_admin_mode", false);
+        pendingListing = (PendingListing) getIntent().getSerializableExtra("pending_listing_item");
+
         Serializable data = getIntent().getSerializableExtra("hotel_object");
         if (data instanceof Tour) {
             tour = (Tour) data;
             isTourMode = true;
-            session.addRecentlyViewed(tour.getId(), true);
+            if (!isAdminMode) {
+                session.addRecentlyViewed(tour.getId(), true);
+            }
         } else if (data instanceof Hotel) {
             hotel = (Hotel) data;
             isTourMode = false;
-            session.addRecentlyViewed(hotel.getId(), false);
+            if (!isAdminMode) {
+                session.addRecentlyViewed(hotel.getId(), false);
+            }
         }
 
         setupImagePicker();
@@ -107,6 +117,31 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnFavoriteDetail.setOnClickListener(v -> toggleFavorite());
+
+        if (isAdminMode) {
+            binding.layoutBookingActions.setVisibility(View.GONE);
+            binding.btnFavoriteDetail.setVisibility(View.GONE);
+            binding.btnShare.setVisibility(View.GONE);
+
+            boolean isApproved = false;
+            if (isTourMode && tour != null && "APPROVED".equalsIgnoreCase(tour.getStatus())) {
+                isApproved = true;
+            } else if (!isTourMode && hotel != null && "APPROVED".equalsIgnoreCase(hotel.getStatus())) {
+                isApproved = true;
+            }
+
+            if (isApproved) {
+                binding.layoutAdminActions.setVisibility(View.GONE);
+            } else {
+                binding.layoutAdminActions.setVisibility(View.VISIBLE);
+                binding.btnAdminApprove.setOnClickListener(v -> approvePending());
+                binding.btnAdminReject.setOnClickListener(v -> confirmReject());
+                binding.btnAdminRevision.setOnClickListener(v -> confirmRevision());
+            }
+        } else {
+            binding.layoutBookingActions.setVisibility(View.VISIBLE);
+            binding.layoutAdminActions.setVisibility(View.GONE);
+        }
 
         binding.btnBookNow.setOnClickListener(v -> {
             Intent intent = new Intent(this, BookingActivity.class);
@@ -680,6 +715,99 @@ public class DetailActivity extends AppCompatActivity {
                         @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> Toast.makeText(DetailActivity.this, R.string.review_delete_error, Toast.LENGTH_SHORT).show()); }
                     });
                 }).show();
+    }
+
+    private void approvePending() {
+        if (pendingListing == null || pendingListing.serverId == null) {
+            Toast.makeText(this, R.string.adm_toast_listing_approved, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        DataCallback<Object> callback = new DataCallback<Object>() {
+            @Override
+            public void onSuccess(Object result) {
+                Toast.makeText(DetailActivity.this, R.string.adm_toast_listing_approved, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                Toast.makeText(DetailActivity.this, msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if ("hotel".equals(pendingListing.cat)) {
+            HotelService.approveHotel(this, pendingListing.serverId, new DataCallback<Hotel>() {
+                @Override
+                public void onSuccess(Hotel h) {
+                    callback.onSuccess(h);
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    callback.onError(code, msg);
+                }
+            });
+        } else {
+            TourService.approveTour(this, pendingListing.serverId, new DataCallback<Tour>() {
+                @Override
+                public void onSuccess(Tour t) {
+                    callback.onSuccess(t);
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    callback.onError(code, msg);
+                }
+            });
+        }
+    }
+
+    private void confirmReject() {
+        com.example.tourgo.ui.admin.AdminUi.confirm(this,
+                getString(R.string.adm_reject_listing_title),
+                getString(R.string.adm_reject_listing_msg),
+                getString(R.string.adm_reject), true,
+                this::rejectPending);
+    }
+
+    private void rejectPending() {
+        if (pendingListing == null || pendingListing.serverId == null) {
+            Toast.makeText(this, R.string.adm_toast_listing_rejected, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        DataCallback<Void> callback = new DataCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(DetailActivity.this, R.string.adm_toast_listing_rejected, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                Toast.makeText(DetailActivity.this, msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if ("hotel".equals(pendingListing.cat)) {
+            HotelService.rejectHotel(this, pendingListing.serverId, callback);
+        } else {
+            TourService.rejectTour(this, pendingListing.serverId, callback);
+        }
+    }
+
+    private void confirmRevision() {
+        com.example.tourgo.ui.admin.AdminUi.confirm(this,
+                getString(R.string.adm_request_revision_title),
+                getString(R.string.adm_request_revision_msg),
+                getString(R.string.adm_send_request), false,
+                () -> {
+                    Toast.makeText(DetailActivity.this, R.string.adm_toast_revision_requested, Toast.LENGTH_SHORT).show();
+                    finish();
+                });
     }
 
     @Override protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }

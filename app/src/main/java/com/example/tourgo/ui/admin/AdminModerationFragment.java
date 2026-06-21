@@ -41,6 +41,7 @@ public class AdminModerationFragment extends Fragment {
     //   user reports   → GET /api/admin/reports
     private final List<PendingListing> listings = new ArrayList<>();
     private final List<UserReport> reports = new ArrayList<>();
+    private final List<PendingListing> approvedListings = new ArrayList<>();
 
     private PendingListingAdapter listingAdapter;
     private ReportAdapter reportAdapter;
@@ -76,6 +77,7 @@ public class AdminModerationFragment extends Fragment {
 
         showTab();
         loadPendingListings();
+        loadApprovedListings();
         loadReports();
     }
 
@@ -84,6 +86,7 @@ public class AdminModerationFragment extends Fragment {
         super.onResume();
         // Refresh so newly submitted tours / filed reports stay in sync.
         loadPendingListings();
+        loadApprovedListings();
         loadReports();
     }
 
@@ -92,6 +95,7 @@ public class AdminModerationFragment extends Fragment {
         if (tabsContainer == null) return;
         List<AdminTabBar.Tab> tabList = new ArrayList<>();
         tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_tab_pending_listings), listings.size()));
+        tabList.add(new AdminTabBar.Tab("approved", getString(R.string.adm_tab_approved_listings), approvedListings.size()));
         tabList.add(new AdminTabBar.Tab("reports", getString(R.string.adm_tab_user_reports), reports.size()));
         AdminTabBar.build(tabsContainer, tabList, tab, id -> {
             tab = id;
@@ -100,7 +104,16 @@ public class AdminModerationFragment extends Fragment {
     }
 
     private void showTab() {
-        rv.setAdapter("pending".equals(tab) ? listingAdapter : reportAdapter);
+        if ("pending".equals(tab)) {
+            rv.setAdapter(listingAdapter);
+            listingAdapter.setItems(listings);
+        } else if ("approved".equals(tab)) {
+            rv.setAdapter(listingAdapter);
+            listingAdapter.setItems(approvedListings);
+        } else {
+            rv.setAdapter(reportAdapter);
+            reportAdapter.setItems(reports);
+        }
         updateEmptyState();
     }
 
@@ -196,6 +209,108 @@ public class AdminModerationFragment extends Fragment {
         });
     }
 
+    private void loadApprovedListings() {
+        if ("approved".equals(tab)) setLoading(true);
+        
+        TourService.getTours(requireContext(), new DataCallback<List<Tour>>() {
+            @Override
+            public void onSuccess(List<Tour> tours) {
+                if (!isAdded()) return;
+                
+                HotelService.getHotels(requireContext(), new DataCallback<List<com.example.tourgo.models.response.Hotel>>() {
+                    @Override
+                    public void onSuccess(List<com.example.tourgo.models.response.Hotel> hotels) {
+                        if (!isAdded()) return;
+                        if ("approved".equals(tab)) setLoading(false);
+                        
+                        approvedListings.clear();
+                        if (tours != null) {
+                            for (Tour t : tours) {
+                                // Set status to APPROVED since they are loaded from getTours (approved list)
+                                t.setStatus("APPROVED");
+                                approvedListings.add(PendingListing.fromTour(requireContext(), t));
+                            }
+                        }
+                        if (hotels != null) {
+                            for (com.example.tourgo.models.response.Hotel h : hotels) {
+                                // Set status to APPROVED since they are loaded from getHotels (approved list)
+                                h.setStatus("APPROVED");
+                                approvedListings.add(PendingListing.fromHotel(requireContext(), h));
+                            }
+                        }
+                        // Sort by date descending
+                        approvedListings.sort((a, b) -> b.date.compareTo(a.date));
+                        
+                        if ("approved".equals(tab)) {
+                            listingAdapter.setItems(approvedListings);
+                        }
+                        buildTabs();
+                        updateEmptyState();
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) {
+                        if (!isAdded()) return;
+                        if ("approved".equals(tab)) setLoading(false);
+                        
+                        approvedListings.clear();
+                        if (tours != null) {
+                            for (Tour t : tours) {
+                                t.setStatus("APPROVED");
+                                approvedListings.add(PendingListing.fromTour(requireContext(), t));
+                            }
+                        }
+                        if ("approved".equals(tab)) {
+                            listingAdapter.setItems(approvedListings);
+                        }
+                        buildTabs();
+                        updateEmptyState();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (!isAdded()) return;
+                
+                HotelService.getHotels(requireContext(), new DataCallback<List<com.example.tourgo.models.response.Hotel>>() {
+                    @Override
+                    public void onSuccess(List<com.example.tourgo.models.response.Hotel> hotels) {
+                        if (!isAdded()) return;
+                        if ("approved".equals(tab)) setLoading(false);
+                        
+                        approvedListings.clear();
+                        if (hotels != null) {
+                            for (com.example.tourgo.models.response.Hotel h : hotels) {
+                                h.setStatus("APPROVED");
+                                approvedListings.add(PendingListing.fromHotel(requireContext(), h));
+                            }
+                        }
+                        if ("approved".equals(tab)) {
+                            listingAdapter.setItems(approvedListings);
+                        }
+                        buildTabs();
+                        updateEmptyState();
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code2, String msg2) {
+                        if (!isAdded()) return;
+                        if ("approved".equals(tab)) setLoading(false);
+                        approvedListings.clear();
+                        if ("approved".equals(tab)) {
+                            listingAdapter.setItems(approvedListings);
+                        }
+                        buildTabs();
+                        updateEmptyState();
+                        Toast.makeText(requireContext(),
+                                msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
     private void loadReports() {
         if ("reports".equals(tab)) setLoading(true);
         AdminService.getReports(requireContext(), new DataCallback<List<AdminReport>>() {
@@ -232,65 +347,29 @@ public class AdminModerationFragment extends Fragment {
 
     private void updateEmptyState() {
         if (empty == null) return;
-        boolean listEmpty = "pending".equals(tab) ? listings.isEmpty() : reports.isEmpty();
+        boolean listEmpty;
+        if ("pending".equals(tab)) {
+            listEmpty = listings.isEmpty();
+        } else if ("approved".equals(tab)) {
+            listEmpty = approvedListings.isEmpty();
+        } else {
+            listEmpty = reports.isEmpty();
+        }
         boolean showEmpty = listEmpty && progress != null && progress.getVisibility() != View.VISIBLE;
         empty.setVisibility(showEmpty ? View.VISIBLE : View.GONE);
     }
 
-    // ── Listing review sheet ─────────────────────────────────────────────────
+    // ── Listing review screen ─────────────────────────────────────────────────
     private void openListing(PendingListing it) {
-        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
-        View sheet = LayoutInflater.from(requireContext()).inflate(R.layout.sheet_admin_listing, null);
-        dialog.setContentView(sheet);
-        expandFull(dialog, sheet);
-
-        ImageView photo = sheet.findViewById(R.id.admListingPhoto);
-        if (it.imageUrl != null && !it.imageUrl.isEmpty()) {
-            ImageLoader.loadThumbnail(photo, it.imageUrl);
+        android.content.Intent intent = new android.content.Intent(requireContext(), com.example.tourgo.ui.main.detail.DetailActivity.class);
+        if ("hotel".equals(it.cat)) {
+            intent.putExtra("hotel_object", it.originalHotel);
         } else {
-            photo.setImageResource(it.photoRes);
+            intent.putExtra("hotel_object", it.originalTour);
         }
-        AdminUi.catChip(requireContext(), sheet.findViewById(R.id.admListingCat),
-                sheet.findViewById(R.id.admListingCatDot), sheet.findViewById(R.id.admListingCatLabel), it.cat);
-        ((TextView) sheet.findViewById(R.id.admListingName)).setText(it.name);
-        ((TextView) sheet.findViewById(R.id.admListingCity)).setText(it.city);
-        String unit = "hotel".equals(it.cat) ? " / night" : " / person";
-        String priceLabel = it.priceText != null ? it.priceText + unit : "$" + it.price + unit;
-        ((TextView) sheet.findViewById(R.id.admListingPrice)).setText(priceLabel);
-        ((TextView) sheet.findViewById(R.id.admListingSubmitted)).setText(getString(R.string.adm_submitted, it.date));
-        ((TextView) sheet.findViewById(R.id.admListingDesc)).setText(it.desc);
-        ((TextView) sheet.findViewById(R.id.admListingBusiness)).setText(it.business);
-
-        // Status history
-        if (!it.history.isEmpty()) {
-            sheet.findViewById(R.id.admListingHistorySection).setVisibility(View.VISIBLE);
-            LinearLayout hist = sheet.findViewById(R.id.admListingHistory);
-            LayoutInflater inf = LayoutInflater.from(requireContext());
-            for (String[] h : it.history) {
-                View row = inf.inflate(R.layout.item_admin_history, hist, false);
-                ((TextView) row.findViewById(R.id.admHistoryAt)).setText(h[0]);
-                ((TextView) row.findViewById(R.id.admHistoryNote)).setText(h[1]);
-                hist.addView(row);
-            }
-        }
-
-        sheet.findViewById(R.id.admListingClose).setOnClickListener(view -> dialog.dismiss());
-
-        sheet.findViewById(R.id.admBtnApprove).setOnClickListener(view -> approve(it, dialog));
-        sheet.findViewById(R.id.admBtnReject).setOnClickListener(view ->
-                AdminUi.confirm(requireContext(),
-                        getString(R.string.adm_reject_listing_title),
-                        getString(R.string.adm_reject_listing_msg),
-                        getString(R.string.adm_reject), true,
-                        () -> reject(it, dialog)));
-        sheet.findViewById(R.id.admBtnRevision).setOnClickListener(view ->
-                AdminUi.confirm(requireContext(),
-                        getString(R.string.adm_request_revision_title),
-                        getString(R.string.adm_request_revision_msg),
-                        getString(R.string.adm_send_request), false,
-                        () -> { dialog.dismiss(); toast(R.string.adm_toast_revision_requested); }));
-
-        dialog.show();
+        intent.putExtra("is_admin_mode", true);
+        intent.putExtra("pending_listing_item", it);
+        startActivity(intent);
     }
 
     // ── Report review sheet ──────────────────────────────────────────────────

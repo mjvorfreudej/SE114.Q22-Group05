@@ -18,7 +18,7 @@ public final class AdminMockData {
     private AdminMockData() {}
 
     // ── Pending listings (Moderation › Pending) ──────────────────────────────
-    public static class PendingListing {
+    public static class PendingListing implements java.io.Serializable {
         public final int id;
         public final String business, name, cat, city, date, status, desc;
         public final int price, photoRes;
@@ -27,6 +27,9 @@ public final class AdminMockData {
         public final String serverId;   // backend tour id, used by the approve API
         public final String imageUrl;   // network cover image (else use photoRes)
         public final String priceText;  // preformatted price (else "$" + price)
+
+        public com.example.tourgo.models.response.Tour originalTour;
+        public com.example.tourgo.models.response.Hotel originalHotel;
 
         private PendingListing(String serverId, String name, String city, String date,
                                String priceText, String imageUrl, String desc, String cat) {
@@ -44,7 +47,7 @@ public final class AdminMockData {
             String city = tour.getLocation() != null ? tour.getLocation() : "";
             String created = tour.getCreatedAt();
             String date = (created != null && created.length() >= 10) ? created.substring(0, 10) : "";
-            return new PendingListing(
+            PendingListing pl = new PendingListing(
                     tour.getId(),
                     tour.getName(),
                     city,
@@ -53,6 +56,8 @@ public final class AdminMockData {
                     img,
                     tour.getDescription() != null ? tour.getDescription() : "",
                     "tour");
+            pl.originalTour = tour;
+            return pl;
         }
 
         /** Map a backend hotel into the moderation display model. */
@@ -70,7 +75,7 @@ public final class AdminMockData {
             String created = hotel.getCreatedAt();
             String date = (created != null && created.length() >= 10) ? created.substring(0, 10) : "";
             String priceText = String.format(java.util.Locale.getDefault(), "%,.0f đ", hotel.getPricePerNight());
-            return new PendingListing(
+            PendingListing pl = new PendingListing(
                     hotel.getId(),
                     hotel.getName(),
                     city,
@@ -79,6 +84,8 @@ public final class AdminMockData {
                     img,
                     hotel.getDescription() != null ? hotel.getDescription() : "",
                     "hotel");
+            pl.originalHotel = hotel;
+            return pl;
         }
     }
 

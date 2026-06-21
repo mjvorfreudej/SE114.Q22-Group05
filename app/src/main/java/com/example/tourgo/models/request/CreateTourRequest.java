@@ -22,6 +22,12 @@ public class CreateTourRequest {
     @com.google.gson.annotations.SerializedName("blocked_dates")
     private java.util.List<String> blockedDates;
 
+    private java.util.List<String> amenities;
+
+    public void setAmenities(java.util.List<String> amenities) {
+        this.amenities = amenities;
+    }
+
     public CreateTourRequest(String name, String description, double price,
                              String destination, String region, String duration, String status) {
         this.name = name;

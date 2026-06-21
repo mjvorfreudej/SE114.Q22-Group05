@@ -28,6 +28,16 @@ import com.example.tourgo.R;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import com.bumptech.glide.Glide;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.remote.service.TourService;
+import com.example.tourgo.remote.service.HotelService;
 
 /**
  * Business → Add Listing — the 5-step listing creation flow from the design-system
@@ -50,6 +60,14 @@ public class AddListingActivity extends AppCompatActivity {
     private int step = 1;
     private String kind = "hotel";
     private boolean agreed = false;
+    private Uri selectedImageUri = null;
+    private final ActivityResultLauncher<String> pickImageLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    selectedImageUri = uri;
+                    showSelectedImagePreview(uri);
+                }
+            });
 
     // Data for listing form
     private String listingName = "";
@@ -225,6 +243,18 @@ public class AddListingActivity extends AppCompatActivity {
                             blockedDates != null ? new java.util.ArrayList<>(blockedDates) : null
                     );
 
+            String rawAmenities = android.text.TextUtils.join(", ", selectedAmenities);
+            if (!rawAmenities.isEmpty()) {
+                java.util.List<String> amenitiesList = new java.util.ArrayList<>();
+                for (String item : rawAmenities.split(",")) {
+                    String trimmed = item.trim();
+                    if (!trimmed.isEmpty()) {
+                        amenitiesList.add(trimmed);
+                    }
+                }
+                request.setAmenities(amenitiesList);
+            }
+
             com.example.tourgo.remote.RetrofitClient.getInstance(this)
                     .getTourApi()
                     .createTour(request)
@@ -234,7 +264,12 @@ public class AddListingActivity extends AppCompatActivity {
                                 retrofit2.Call<com.example.tourgo.models.response.ApiResponse<com.example.tourgo.models.response.Tour>> call,
                                 retrofit2.Response<com.example.tourgo.models.response.ApiResponse<com.example.tourgo.models.response.Tour>> response
                         ) {
-                            handleResponse(response.isSuccessful());
+                            if (response.isSuccessful() && response.body() != null && response.body().getData() != null && selectedImageUri != null) {
+                                com.example.tourgo.models.response.Tour createdTour = response.body().getData();
+                                uploadTourImageThenFinish(createdTour.getId());
+                            } else {
+                                handleResponse(response.isSuccessful());
+                            }
                         }
 
                         @Override
@@ -269,7 +304,12 @@ public class AddListingActivity extends AppCompatActivity {
                                 retrofit2.Call<com.example.tourgo.models.response.ApiResponse<com.example.tourgo.models.response.Hotel>> call,
                                 retrofit2.Response<com.example.tourgo.models.response.ApiResponse<com.example.tourgo.models.response.Hotel>> response
                         ) {
-                            handleResponse(response.isSuccessful());
+                            if (response.isSuccessful() && response.body() != null && response.body().getData() != null && selectedImageUri != null) {
+                                com.example.tourgo.models.response.Hotel createdHotel = response.body().getData();
+                                uploadHotelImageThenFinish(createdHotel.getId());
+                            } else {
+                                handleResponse(response.isSuccessful());
+                            }
                         }
 
                         @Override
@@ -281,6 +321,36 @@ public class AddListingActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    private void uploadTourImageThenFinish(String tourId) {
+        nextBtn.setText("Uploading image...");
+        TourService.uploadTourImage(this, selectedImageUri, tourId, new DataCallback<String>() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                handleResponse(true);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                handleResponse(true);
+            }
+        });
+    }
+
+    private void uploadHotelImageThenFinish(String hotelId) {
+        nextBtn.setText("Uploading image...");
+        HotelService.uploadHotelImage(this, selectedImageUri, hotelId, new DataCallback<String>() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                handleResponse(true);
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                handleResponse(true);
+            }
+        });
     }
 
     private void setLoading(boolean loading) {
@@ -500,8 +570,20 @@ public class AddListingActivity extends AppCompatActivity {
         ((TextView) content.findViewById(R.id.bizPhotosLabel))
                 .setText(getString(R.string.biz_photos, 3));
 
+        ImageView ivPreview = content.findViewById(R.id.bizListingPhotoPreview);
+        if (ivPreview != null && selectedImageUri != null) {
+            Glide.with(this).load(selectedImageUri).centerCrop().into(ivPreview);
+        }
+
         content.findViewById(R.id.bizPhotoUpload).setOnClickListener(v ->
-                toast(getString(R.string.biz_upload)));
+                pickImageLauncher.launch("image/*"));
+    }
+
+    private void showSelectedImagePreview(Uri uri) {
+        ImageView ivPreview = findViewById(R.id.bizListingPhotoPreview);
+        if (ivPreview != null) {
+            Glide.with(this).load(uri).centerCrop().into(ivPreview);
+        }
     }
 
     private void styleCatCards(View hotel, View tour) {
