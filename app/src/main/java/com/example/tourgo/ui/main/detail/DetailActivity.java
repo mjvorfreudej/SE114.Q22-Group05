@@ -579,6 +579,12 @@ public class DetailActivity extends AppCompatActivity {
         else BookingService.hasBookedHotel(this, id, callback);
     }
 
+    private void setReviewLoading(boolean isLoading) {
+        binding.btnSubmitReview.setEnabled(!isLoading);
+        binding.btnSubmitReview.setText(isLoading ? "" : (myReview == null ? getString(R.string.review_submit_button) : getString(R.string.review_update_button)));
+        binding.progressSubmitReview.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+    }
+
     private void submitReview() {
         String id = isTourMode ? tour.getId() : hotel.getId();
         if (id == null || !session.isLoggedIn()) return;
@@ -595,19 +601,19 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        binding.btnSubmitReview.setEnabled(false);
+        setReviewLoading(true);
 
         if (myReview != null && myReview.getId() != null) {
             ReviewService.updateReview(this, myReview.getId(), isTourMode ? "tour" : "hotel", reviewText, stars, new DataCallback<Void>() {
                 @Override public void onSuccess(Void data) { uploadSelectedReviewImages(myReview.getId(), R.string.review_update_success); }
-                @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { binding.btnSubmitReview.setEnabled(true); Toast.makeText(DetailActivity.this, R.string.review_update_error, Toast.LENGTH_SHORT).show(); }); }
+                @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { setReviewLoading(false); Toast.makeText(DetailActivity.this, R.string.review_update_error, Toast.LENGTH_SHORT).show(); }); }
             });
             return;
         }
 
         ReviewService.createReview(this, isTourMode ? null : id, isTourMode ? id : null, reviewText, stars, new DataCallback<String>() {
             @Override public void onSuccess(String reviewId) { uploadSelectedReviewImages(reviewId, R.string.review_submit_success); }
-            @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { binding.btnSubmitReview.setEnabled(true); Toast.makeText(DetailActivity.this, R.string.review_submit_error, Toast.LENGTH_SHORT).show(); }); }
+            @Override public void onError(ApiErrorCode code, String msg) { runOnUiThread(() -> { setReviewLoading(false); Toast.makeText(DetailActivity.this, R.string.review_submit_error, Toast.LENGTH_SHORT).show(); }); }
         });
     }
 
@@ -640,7 +646,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void completeReviewSave(int messageRes) {
-        binding.btnSubmitReview.setEnabled(true);
+        setReviewLoading(false);
         selectedImageUris.clear();
         updateSelectedImagesText();
         Toast.makeText(DetailActivity.this, messageRes, Toast.LENGTH_SHORT).show();

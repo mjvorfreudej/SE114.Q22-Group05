@@ -2,6 +2,7 @@ package com.example.tourgo.remote.service;
 
 import android.content.Context;
 
+import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.error.ApiError;
 import com.example.tourgo.models.error.ErrorHandler;
@@ -12,6 +13,7 @@ import com.example.tourgo.models.response.User;
 import com.example.tourgo.remote.RetrofitClient;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -53,6 +55,43 @@ public class UserService {
         RetrofitClient.getInstance(context)
                 .getUserApi()
                 .updateProfile(request)
+                .enqueue(new Callback<ApiResponse<User>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<User> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<User>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    public static void updateProfileMultipart(Context context, RequestBody name, RequestBody phone, MultipartBody.Part file, DataCallback<User> callback) {
+        SessionManager sessionManager = new SessionManager(context);
+        String token = "Bearer " + sessionManager.getAccessToken();
+
+        RetrofitClient.getInstance(context)
+                .getUserApi()
+                .updateProfileMultipart(
+                        token,
+                        name,
+                        phone,
+                        file
+                )
                 .enqueue(new Callback<ApiResponse<User>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<User>> call, Response<ApiResponse<User>> response) {

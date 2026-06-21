@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.data.repository.FavoriteRepository;
@@ -97,7 +98,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserProfile() {
-        UserRepository.getInstance().getCurrentUser(requireContext(), false, new DataCallback<User>() {
+        UserRepository.getInstance().getCurrentUser(requireContext(), true, new DataCallback<User>() {
             @Override
             public void onSuccess(User user) {
                 if (!isAdded()) return;
@@ -105,8 +106,22 @@ public class ProfileFragment extends Fragment {
                     if (tvProfileName != null) tvProfileName.setText(user.getName());
                     if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
 
-                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole());
-                    
+                    // Trong hàm loadUserProfile của ProfileFragment
+                    if (ivProfileAvatar != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                        Glide.with(ProfileFragment.this) // Dùng ProfileFragment.this để gắn với lifecycle của Fragment
+                                .load(user.getAvatar())
+                                .circleCrop()
+                                // THÊM ĐOẠN NÀY ĐỂ BUỘC GLIDE LOAD ẢNH MỚI
+                                .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                // ----------------------------------------
+                                .placeholder(R.drawable.ic_person_24)
+                                .error(R.drawable.ic_person_24) // Load lỗi thì hiện icon mặc định
+                                .into(ivProfileAvatar);
+                    }
+
+                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
+                    Log.d("DEBUG_AVATAR", "Avatar từ API: " + user.getAvatar());
                     if (getView() != null) {
                         setupSettings(getView());
                     }
@@ -118,6 +133,16 @@ public class ProfileFragment extends Fragment {
                 if (!isAdded()) return;
                 if (tvProfileName != null) tvProfileName.setText(session.getShortName());
                 if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
+
+                String avatarUrl = session.getAvatar();
+
+                if (ivProfileAvatar != null && avatarUrl != null && !avatarUrl.isEmpty()) {
+                    Glide.with(ProfileFragment.this)
+                            .load(avatarUrl)
+                            .circleCrop()
+                            .placeholder(R.drawable.ic_person_24)
+                            .into(ivProfileAvatar);
+                }
             }
         });
     }
@@ -257,28 +282,16 @@ public class ProfileFragment extends Fragment {
                                 Type type = new TypeToken<ApiResponse<BusinessAccount>>(){}.getType();
                                 body = new Gson().fromJson(errorJson, type);
                             } catch (Exception e) {
-                                Log.e(TAG, "Failed to parse error body", e);
+                                Log.e(TAG, "Error parsing error body", e);
                             }
                         }
 
-                        if (body != null) {
-                            String status = (body.getData() != null) ? body.getData().getStatus() : null;
-                            if (status == null && "BUSINESS_NOT_APPROVED".equals(body.getError())) {
-                                status = "pending";
-                            }
-                            
-                            if (status != null && (status.equalsIgnoreCase("pending") 
-                                    || status.equalsIgnoreCase("rejected")
-                                    || status.equalsIgnoreCase("not approved yet"))) {
-                                showStatusRow(status);
-                                return;
-                            } else if (status != null && status.equalsIgnoreCase("active")) {
-                                hideRegistrationRows();
-                                return;
-                            }
+                        if (body != null && body.getData() != null) {
+                            BusinessAccount biz = body.getData();
+                            showBusinessStatus(biz);
+                        } else {
+                            showRegisterRow();
                         }
-                        
-                        showRegisterRow();
                     }
 
                     @Override
@@ -289,28 +302,32 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
-    private void showStatusRow(String status) {
+    private void showBusinessStatus(BusinessAccount biz) {
+        if (rowRegisterBusiness != null) rowRegisterBusiness.setVisibility(View.GONE);
         if (rowBusinessStatus != null) {
             rowBusinessStatus.setVisibility(View.VISIBLE);
-            rowBusinessStatus.setOnClickListener(v -> 
-                startActivity(new Intent(requireContext(), BusinessRegistrationDetailActivity.class)));
-        }
-        if (rowRegisterBusiness != null) rowRegisterBusiness.setVisibility(View.GONE);
-
-        if (tvBusinessStatusSub != null) {
-            tvBusinessStatusSub.setText(status.equalsIgnoreCase("rejected") 
-                ? R.string.profile_registration_status_rejected 
-                : R.string.profile_registration_status_pending);
+            if (tvBusinessStatusSub != null) {
+                String status = biz.getStatus();
+                if ("pending".equals(status)) {
+                    tvBusinessStatusSub.setText(R.string.profile_registration_status_pending);
+                } else if ("rejected".equals(status)) {
+                    tvBusinessStatusSub.setText(R.string.profile_registration_status_rejected);
+                }
+            }
+            rowBusinessStatus.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), BusinessRegistrationDetailActivity.class);
+                intent.putExtra("business_account", biz);
+                startActivity(intent);
+            });
         }
     }
 
     private void showRegisterRow() {
+        if (rowBusinessStatus != null) rowBusinessStatus.setVisibility(View.GONE);
         if (rowRegisterBusiness != null) {
             rowRegisterBusiness.setVisibility(View.VISIBLE);
-            rowRegisterBusiness.setOnClickListener(v ->
-                    startActivity(new Intent(requireContext(), RegisterBusinessActivity.class)));
+            rowRegisterBusiness.setOnClickListener(v -> startActivity(new Intent(requireContext(), RegisterBusinessActivity.class)));
         }
-        if (rowBusinessStatus != null) rowBusinessStatus.setVisibility(View.GONE);
     }
 
     private void hideRegistrationRows() {
@@ -319,22 +336,16 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showLogoutDialog() {
-        AdminUi.confirm(requireContext(),
-                getString(R.string.profile_logout_title),
-                getString(R.string.profile_logout_confirm),
-                getString(R.string.profile_logout_title),
-                true, this::logout);
-    }
-
-    private void logout() {
-        session.clear();
-        UserRepository.getInstance().clearCache();
-        FavoriteRepository.getInstance().clearCache();
-        HotelRepository.getInstance().clearCache();
-        TourRepository.getInstance().clearCache();
-
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.profile_logout)
+                .setMessage(R.string.profile_logout_confirm)
+                .setPositiveButton(R.string.profile_logout, (dialog, which) -> {
+                    session.clear();
+                    Intent intent = new Intent(requireContext(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton(R.string.action_cancel, null)
+                .show();
     }
 }

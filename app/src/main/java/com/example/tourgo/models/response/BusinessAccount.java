@@ -1,13 +1,14 @@
 package com.example.tourgo.models.response;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  * A business/partner account as returned by the admin backend
  * ({@code GET /api/admin/businesses/pending}). The client never derives this
  * from the database — it only renders what the Node.js server sends.
  */
-public class BusinessAccount {
+public class BusinessAccount implements Serializable {
     @SerializedName("id")
     private String id;
 

@@ -2,7 +2,10 @@ package com.example.tourgo.ui.main.profile;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -21,22 +24,18 @@ import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.data.repository.UserRepository;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.models.response.ApiResponse;
-import com.example.tourgo.models.response.UploadImageResponse;
 import com.example.tourgo.models.response.User;
-import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.remote.service.UserService;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class EditProfileActivity extends AppCompatActivity {
 
@@ -46,11 +45,14 @@ public class EditProfileActivity extends AppCompatActivity {
     private Uri selectedImageUri;
     private SessionManager session;
     private User currentUser;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     selectedImageUri = uri;
+                    ivEditAvatar.setImageTintList(null); // Clear placeholder tint
                     Glide.with(this).load(uri).circleCrop().into(ivEditAvatar);
                 }
             });
@@ -61,7 +63,6 @@ public class EditProfileActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_edit_profile);
 
-        // Handle System Bar Insets to prevent the Save button from being hidden
         View root = findViewById(R.id.editProfileRoot);
         if (root != null) {
             ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
@@ -84,13 +85,18 @@ public class EditProfileActivity extends AppCompatActivity {
         findViewById(R.id.btnSaveProfile).setOnClickListener(v -> attemptSave());
 
         if (currentUser != null) {
-            etEditName.setText(currentUser.getName());
-            etEditPhone.setText(currentUser.getPhone());
-            if (currentUser.getAvatar() != null && !currentUser.getAvatar().isEmpty()) {
-                Glide.with(this).load(currentUser.getAvatar()).circleCrop().into(ivEditAvatar);
-            }
+            bindUserData(currentUser);
         } else {
             loadUserProfile();
+        }
+    }
+
+    private void bindUserData(User user) {
+        etEditName.setText(user.getName());
+        etEditPhone.setText(user.getPhone());
+        if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+            ivEditAvatar.setImageTintList(null);
+            Glide.with(this).load(user.getAvatar()).circleCrop().into(ivEditAvatar);
         }
     }
 
@@ -102,11 +108,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 setLoading(false);
                 currentUser = user;
                 UserRepository.getInstance().updateCachedUser(user);
-                etEditName.setText(user.getName());
-                etEditPhone.setText(user.getPhone());
-                if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-                    Glide.with(EditProfileActivity.this).load(user.getAvatar()).circleCrop().into(ivEditAvatar);
-                }
+                bindUserData(user);
+                session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
             }
 
             @Override
@@ -129,54 +132,73 @@ public class EditProfileActivity extends AppCompatActivity {
         setLoading(true);
 
         if (selectedImageUri != null) {
-            uploadAvatarThenUpdateProfile(name, phone);
+            updateProfileMultipart(name, phone);
         } else {
             updateProfile(name, phone, currentUser != null ? currentUser.getAvatar() : null);
         }
     }
 
-    private void uploadAvatarThenUpdateProfile(String name, String phone) {
-        try {
-            InputStream is = getContentResolver().openInputStream(selectedImageUri);
-            if (is == null) {
-                setLoading(false);
-                return;
-            }
-
-            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = is.read(buffer)) != -1) {
-                byteBuffer.write(buffer, 0, len);
-            }
-            byte[] bytes = byteBuffer.toByteArray();
-            is.close();
-
-            RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(selectedImageUri)), bytes);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("image", "avatar.jpg", requestFile);
-
-            RetrofitClient.getInstance(this).getUserApi().uploadAvatar(body).enqueue(new Callback<ApiResponse<UploadImageResponse>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<UploadImageResponse>> call, Response<ApiResponse<UploadImageResponse>> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                        String imageUrl = response.body().getData().getImageUrl();
-                        updateProfile(name, phone, imageUrl);
-                    } else {
+    private void updateProfileMultipart(String name, String phone) {
+        executor.execute(() -> {
+            try {
+                InputStream is = getContentResolver().openInputStream(selectedImageUri);
+                if (is == null) {
+                    mainHandler.post(() -> {
                         setLoading(false);
-                        Toast.makeText(EditProfileActivity.this, R.string.edprofile_update_error, Toast.LENGTH_SHORT).show();
-                    }
+                        Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                    });
+                    return;
                 }
 
-                @Override
-                public void onFailure(Call<ApiResponse<UploadImageResponse>> call, Throwable t) {
-                    setLoading(false);
-                    Toast.makeText(EditProfileActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int len;
+                while ((len = is.read(buffer)) != -1) {
+                    byteBuffer.write(buffer, 0, len);
                 }
-            });
-        } catch (Exception e) {
-            setLoading(false);
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+                byte[] bytes = byteBuffer.toByteArray();
+                is.close();
+
+                String mimeType = getContentResolver().getType(selectedImageUri);
+                if (mimeType == null) mimeType = "image/jpeg";
+
+                // RequestBody.create(content, contentType) for OkHttp 4.x
+                RequestBody imageBody = RequestBody.create(bytes, MediaType.parse(mimeType));
+                // Field name MUST be "file" to match backend upload.single('file')
+                MultipartBody.Part file = MultipartBody.Part.createFormData("avatar", "profile_image.jpg", imageBody);
+
+                // Use MultipartBody.FORM for text parts as requested
+                RequestBody namePart = RequestBody.create(name, MultipartBody.FORM);
+                RequestBody phonePart = RequestBody.create(phone, MultipartBody.FORM);
+
+                // Debug: Check headers to confirm name="file"
+                Log.d("IMG", file.headers().toString());
+
+                mainHandler.post(() -> {
+                    UserService.updateProfileMultipart(this, namePart, phonePart, file, new DataCallback<User>() {
+                        @Override
+                        public void onSuccess(User user) {
+                            setLoading(false);
+                            UserRepository.getInstance().updateCachedUser(user);
+                            session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
+                            Toast.makeText(EditProfileActivity.this, R.string.edprofile_update_success, Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+
+                        @Override
+                        public void onError(ApiErrorCode code, String message) {
+                            setLoading(false);
+                            Toast.makeText(EditProfileActivity.this, message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+            } catch (Exception e) {
+                mainHandler.post(() -> {
+                    setLoading(false);
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     private void updateProfile(String name, String phone, String avatar) {
@@ -185,7 +207,7 @@ public class EditProfileActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 setLoading(false);
                 UserRepository.getInstance().updateCachedUser(user);
-                session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole());
+                session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
                 Toast.makeText(EditProfileActivity.this, R.string.edprofile_update_success, Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -200,5 +222,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void setLoading(boolean loading) {
         loadingOverlay.setVisibility(loading ? View.VISIBLE : View.GONE);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executor.shutdown();
     }
 }

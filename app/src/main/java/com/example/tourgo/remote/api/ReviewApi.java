@@ -9,6 +9,7 @@ import com.example.tourgo.models.response.HotelReview;
 import com.example.tourgo.models.response.UploadImageResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
