@@ -213,6 +213,7 @@
     <string name="booking_error_dates_required">Please select check-in and check-out dates</string>
     <string name="booking_error_checkin_past">Check-in date cannot be in the past</string>
     <string name="booking_error_checkout_after_checkin">Check-out date must be after check-in date</string>
+    <string name="booking_error_range_sold_out">Selected date range includes sold-out nights</string>
     <string name="booking_error_guests_invalid">Number of guests must be greater than 0</string>
     <string name="booking_error_not_logged_in">Please login to book a room</string>
     <string name="booking_error_missing_target">Could not identify hotel or tour</string>
@@ -370,7 +371,6 @@
 
     <!-- Home -->
     <string name="adm_overview">Overview</string>
-    <string name="adm_home_date">Saturday, August 18</string>
     <string name="adm_home_glance">Marketplace at a glance</string>
     <string name="adm_stat_users">Total Users</string>
     <string name="adm_stat_biz">Businesses</string>
@@ -702,6 +702,14 @@
     <string name="notif_group_today">Today</string>
     <string name="notif_group_yesterday">Yesterday</string>
     <string name="notif_group_earlier">Earlier</string>
+
+    <!-- Relative timestamps (live feed) -->
+    <string name="notif_when_now">Just now</string>
+    <string name="notif_when_minutes">%dm</string>
+    <string name="notif_when_hours">%dh</string>
+    <string name="notif_when_days">%dd</string>
+    <string name="notif_load_error">Couldn\'t load notifications</string>
+    <string name="notif_loading">Loading…</string>
 
     <!-- Empty states -->
     <string name="notif_empty_all_title">No notifications yet</string>

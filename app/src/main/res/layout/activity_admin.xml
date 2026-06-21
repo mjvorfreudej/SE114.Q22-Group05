@@ -107,11 +107,13 @@
                     android:minWidth="16dp"
                     android:paddingHorizontal="4dp"
                     android:paddingVertical="1dp"
-                    android:text="23"
                     android:textColor="@color/white"
                     android:textSize="8sp"
                     android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText"
+                    tools:text="23"
+                    tools:visibility="visible" />
             </FrameLayout>
 
             <TextView

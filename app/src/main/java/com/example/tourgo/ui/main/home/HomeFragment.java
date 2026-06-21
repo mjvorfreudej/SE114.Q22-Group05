@@ -29,6 +29,8 @@ import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 import com.example.tourgo.models.response.User;
+import com.example.tourgo.remote.service.NotificationService;
+import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 import com.example.tourgo.utils.ImageLoader;
 import com.example.tourgo.data.local.SessionManager;
@@ -67,6 +69,27 @@ public class HomeFragment extends Fragment {
         updateUserName();
         setupClickListeners();
         loadOffers();
+        refreshNotificationDot();
+    }
+
+    /** Show the bell dot only when the traveler has unread notifications (live). */
+    private void refreshNotificationDot() {
+        if (binding == null) return;
+        NotificationService.unreadCount(requireContext(), NotificationMockData.Role.TRAVELER,
+                new DataCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer unread) {
+                        if (binding == null) return;
+                        binding.dotNotification.setVisibility(
+                                unread != null && unread > 0 ? View.VISIBLE : View.GONE);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        if (binding == null) return;
+                        binding.dotNotification.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void applyStatusBarInset() {
@@ -291,6 +314,7 @@ public class HomeFragment extends Fragment {
         super.onResume();
         updateUserName();
         applyChipStyles();
+        refreshNotificationDot();
         if (offersHotelAdapter != null) offersHotelAdapter.notifyDataSetChanged();
         if (offersTourAdapter != null) offersTourAdapter.notifyDataSetChanged();
     }

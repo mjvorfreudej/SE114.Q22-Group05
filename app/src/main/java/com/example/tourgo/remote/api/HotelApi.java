@@ -3,6 +3,7 @@ package com.example.tourgo.remote.api;
 import com.example.tourgo.models.request.CreateHotelRequest;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.UnavailableDatesResponse;
 
 import java.util.List;
 
@@ -19,6 +20,9 @@ public interface HotelApi {
 
     @GET("api/hotels/{id}")
     Call<ApiResponse<Hotel>> getHotelById(@Path("id") String id);
+
+    @GET("api/hotels/{id}/unavailable-dates")
+    Call<ApiResponse<UnavailableDatesResponse>> getUnavailableDates(@Path("id") String id);
 
     @GET("api/hotels/search")
     Call<ApiResponse<List<Hotel>>> searchHotels(

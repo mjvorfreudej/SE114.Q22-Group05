@@ -27,9 +27,8 @@ import com.example.tourgo.utils.LocaleHelper;
  * Admin › Profile / Settings — account card, moderation & preferences rows, log out.
  *
  * <p>Each settings row opens its full detail screen in {@link AdminDetailActivity}
- * (the "TourGo Admin Detail Screens" hand-off). The notification <em>centre</em>
- * is still reached from the admin home bell; the Notifications row here opens the
- * push/email <em>preferences</em> screen.
+ * (the "TourGo Admin Detail Screens" hand-off). The notification centre is reached
+ * from the admin home bell, not from here.
  */
 public class AdminProfileFragment extends Fragment {
 
@@ -50,8 +49,6 @@ public class AdminProfileFragment extends Fragment {
                 () -> openDetail(AdminDetailActivity.SCREEN_TEAM));
         row(v, R.id.rowAuditLog, R.drawable.ic_history, R.string.adm_audit_log, 0,
                 () -> openDetail(AdminDetailActivity.SCREEN_AUDIT));
-        row(v, R.id.rowNotifications, R.drawable.ic_bell_20, R.string.adm_notifications, 0,
-                () -> openDetail(AdminDetailActivity.SCREEN_NOTIFICATIONS));
         row(v, R.id.rowLanguage, R.drawable.ic_globe_24, R.string.adm_language, 0,
                 () -> openDetail(AdminDetailActivity.SCREEN_LANGUAGE));
         row(v, R.id.rowPassword, R.drawable.ic_lock_24, R.string.adm_password_2fa, 0,

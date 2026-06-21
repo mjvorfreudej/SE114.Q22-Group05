@@ -282,6 +282,7 @@ public class AdminModerationFragment extends Fragment {
                 reportAdapter.setItems(reports);
                 buildTabs();
                 updateEmptyState();
+                refreshHostBadge();
                 toast(toastRes);
             }
 
@@ -329,6 +330,7 @@ public class AdminModerationFragment extends Fragment {
                 listings.remove(it);
                 listingAdapter.setItems(listings);
                 updateEmptyState();
+                refreshHostBadge();
                 toast(R.string.adm_toast_listing_approved);
             }
 
@@ -339,6 +341,13 @@ public class AdminModerationFragment extends Fragment {
                         msg != null ? msg : getString(R.string.err_unknown), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    /** Nudge the host to recompute its moderation-queue badge after an action. */
+    private void refreshHostBadge() {
+        if (getActivity() instanceof AdminActivity) {
+            ((AdminActivity) getActivity()).refreshModerationBadge();
+        }
     }
 
     private void toast(int res) {

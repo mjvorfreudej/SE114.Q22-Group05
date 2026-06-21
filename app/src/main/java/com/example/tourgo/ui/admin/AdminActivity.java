@@ -18,6 +18,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.models.response.AdminStats;
+import com.example.tourgo.remote.service.AdminService;
 
 /**
  * Admin Console host. Mirrors {@link com.example.tourgo.ui.main.home.MainActivity}'s pattern
@@ -33,6 +37,7 @@ public class AdminActivity extends AppCompatActivity {
     private ImageView[] icons;
     private TextView[] labels;
     private View[] tabs;
+    private TextView moderateBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class AdminActivity extends AppCompatActivity {
                 findViewById(R.id.admLabelHome), findViewById(R.id.admLabelModerate),
                 findViewById(R.id.admLabelBusiness), findViewById(R.id.admLabelUsers),
                 findViewById(R.id.admLabelProfile)};
+        moderateBadge = findViewById(R.id.admBadgeModerate);
 
         for (int i = 0; i < tabs.length; i++) {
             final int idx = i;
@@ -93,6 +99,40 @@ public class AdminActivity extends AppCompatActivity {
     /** Allow a fragment (e.g. Home quick actions) to jump to another tab. */
     public void goToTab(int tab) {
         selectTab(tab);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshModerationBadge();
+    }
+
+    /**
+     * Refresh the moderation-queue badge from live stats (pending listings + open
+     * reports). Called on resume and by the Moderation tab after an approve/resolve
+     * so the count tracks the backend instead of a baked-in number. Fragments can
+     * trigger it via {@code ((AdminActivity) getActivity()).refreshModerationBadge()}.
+     */
+    public void refreshModerationBadge() {
+        if (moderateBadge == null) return;
+        AdminService.getStats(this, new DataCallback<AdminStats>() {
+            @Override
+            public void onSuccess(AdminStats s) {
+                if (moderateBadge == null || s == null) return;
+                int queue = s.getQueueTotal();
+                if (queue > 0) {
+                    moderateBadge.setText(queue > 99 ? "99+" : String.valueOf(queue));
+                    moderateBadge.setVisibility(View.VISIBLE);
+                } else {
+                    moderateBadge.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                // Leave the last known badge state on failure.
+            }
+        });
     }
 
     private void selectTab(int tab) {

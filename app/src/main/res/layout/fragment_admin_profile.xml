@@ -151,8 +151,6 @@
                 android:text="@string/adm_sec_preferences" />
 
             <include layout="@layout/item_admin_profile_row"
-                android:id="@+id/rowNotifications" />
-            <include layout="@layout/item_admin_profile_row"
                 android:id="@+id/rowLanguage" />
             <include layout="@layout/item_admin_profile_row"
                 android:id="@+id/rowPassword" />
