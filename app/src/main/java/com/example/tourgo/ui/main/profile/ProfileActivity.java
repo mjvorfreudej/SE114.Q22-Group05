@@ -4,11 +4,13 @@ import com.example.tourgo.ui.main.booking.BookingHistorySection;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -23,6 +25,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 public class ProfileActivity extends AppCompatActivity {
 
     private TextView tvProfileName, tvProfileEmail;
+    private ImageView ivProfileAvatar;
     private SessionManager session;
 
     @Override
@@ -34,6 +37,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         tvProfileName = findViewById(R.id.tvProfileName);
         tvProfileEmail = findViewById(R.id.tvProfileEmail);
+        ivProfileAvatar = findViewById(R.id.ivProfileAvatar);
 
         // Load user profile from server
         loadUserProfile();
@@ -52,6 +56,12 @@ public class ProfileActivity extends AppCompatActivity {
         setupCurrency();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadUserProfile();
+    }
+
     private void loadUserProfile() {
         if (!session.isLoggedIn()) {
             return;
@@ -63,8 +73,17 @@ public class ProfileActivity extends AppCompatActivity {
                 if (user != null) {
                     if (tvProfileName != null) tvProfileName.setText(user.getName());
                     if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
+                    
+                    if (ivProfileAvatar != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                        ivProfileAvatar.setImageTintList(null);
+                        Glide.with(ProfileActivity.this)
+                                .load(user.getAvatar())
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_person_24)
+                                .into(ivProfileAvatar);
+                    }
 
-                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName());
+                    session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
                 }
             }
 
@@ -72,6 +91,16 @@ public class ProfileActivity extends AppCompatActivity {
             public void onError(ApiErrorCode code, String message) {
                 if (tvProfileName != null) tvProfileName.setText(session.getShortName());
                 if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
+                
+                String avatarUrl = session.getAvatar();
+                if (ivProfileAvatar != null && avatarUrl != null && !avatarUrl.isEmpty()) {
+                    ivProfileAvatar.setImageTintList(null);
+                    Glide.with(ProfileActivity.this)
+                            .load(avatarUrl)
+                            .circleCrop()
+                            .placeholder(R.drawable.ic_person_24)
+                            .into(ivProfileAvatar);
+                }
 
                 Toast.makeText(ProfileActivity.this, "Failed to load profile: " + message, Toast.LENGTH_SHORT).show();
             }

@@ -2,6 +2,8 @@ package com.example.tourgo.remote.service;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
@@ -21,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -30,6 +34,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ReviewService {
+
+    private static final ExecutorService executor = Executors.newFixedThreadPool(4);
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public static void getReviewsByHotelId(Context context, String hotelId, DataCallback<List<Review>> callback) {
         RetrofitClient.getInstance(context)
@@ -236,45 +243,47 @@ public class ReviewService {
     }
 
     public static void uploadReviewImage(Context context, Uri imageUri, String reviewId, DataCallback<String> callback) {
-        try {
-            String mimeType = context.getContentResolver().getType(imageUri);
-            if (mimeType == null || mimeType.isEmpty()) {
-                mimeType = "image/jpeg";
-            }
+        executor.execute(() -> {
+            try {
+                String mimeType = context.getContentResolver().getType(imageUri);
+                if (mimeType == null || mimeType.isEmpty()) {
+                    mimeType = "image/jpeg";
+                }
 
-            byte[] imageBytes = readBytesFromUri(context, imageUri);
-            RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), imageBytes);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
+                byte[] imageBytes = readBytesFromUri(context, imageUri);
+                RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), imageBytes);
+                MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
 
-            RetrofitClient.getInstance(context)
-                    .getReviewApi()
-                    .uploadReviewImage(reviewId, body)
-                    .enqueue(new Callback<ApiResponse<UploadImageResponse>>() {
-                        @Override
-                        public void onResponse(Call<ApiResponse<UploadImageResponse>> call, Response<ApiResponse<UploadImageResponse>> response) {
-                            if (response.isSuccessful() && response.body() != null) {
-                                ApiResponse<UploadImageResponse> apiResponse = response.body();
-                                if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
-                                    callback.onSuccess(apiResponse.getData().getImageUrl());
+                RetrofitClient.getInstance(context)
+                        .getReviewApi()
+                        .uploadReviewImage(reviewId, body)
+                        .enqueue(new Callback<ApiResponse<UploadImageResponse>>() {
+                            @Override
+                            public void onResponse(Call<ApiResponse<UploadImageResponse>> call, Response<ApiResponse<UploadImageResponse>> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    ApiResponse<UploadImageResponse> apiResponse = response.body();
+                                    if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                        mainHandler.post(() -> callback.onSuccess(apiResponse.getData().getImageUrl()));
+                                    } else {
+                                        ApiError error = ErrorHandler.parseError(response);
+                                        mainHandler.post(() -> callback.onError(error.getCode(), error.getMessage()));
+                                    }
                                 } else {
                                     ApiError error = ErrorHandler.parseError(response);
-                                    callback.onError(error.getCode(), error.getMessage());
+                                    mainHandler.post(() -> callback.onError(error.getCode(), error.getMessage()));
                                 }
-                            } else {
-                                ApiError error = ErrorHandler.parseError(response);
-                                callback.onError(error.getCode(), error.getMessage());
                             }
-                        }
 
-                        @Override
-                        public void onFailure(Call<ApiResponse<UploadImageResponse>> call, Throwable t) {
-                            ApiError error = ErrorHandler.parseError(t);
-                            callback.onError(error.getCode(), error.getMessage());
-                        }
-                    });
-        } catch (Exception e) {
-            callback.onError(ApiErrorCode.UNKNOWN, e.getMessage());
-        }
+                            @Override
+                            public void onFailure(Call<ApiResponse<UploadImageResponse>> call, Throwable t) {
+                                ApiError error = ErrorHandler.parseError(t);
+                                mainHandler.post(() -> callback.onError(error.getCode(), error.getMessage()));
+                            }
+                        });
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onError(ApiErrorCode.UNKNOWN, e.getMessage()));
+            }
+        });
     }
 
     private static byte[] readBytesFromUri(Context context, Uri uri) throws IOException {
