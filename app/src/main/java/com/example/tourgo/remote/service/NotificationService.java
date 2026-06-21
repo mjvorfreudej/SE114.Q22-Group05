@@ -36,9 +36,9 @@ import retrofit2.Response;
  * Traveler and Business consoles by reading from {@code GET /api/notifications}
  * and writing read-state back to the server.
  *
- * <p>Role gating: ADMIN has no server-side feed wired yet, so it keeps using the
- * local mock seed + {@link NotificationStore} read-state. Callers don't need to
- * know — they always go through this service, which routes by role.
+ * <p>All three roles (Traveler, Business, Admin) are now served by the backend
+ * feed; the local {@link NotificationMockData} seed only survives as the design
+ * fallback. Callers don't need to know — they always go through this service.
  */
 public final class NotificationService {
 
@@ -46,7 +46,8 @@ public final class NotificationService {
 
     private static boolean isApiBacked(NotificationMockData.Role role) {
         return role == NotificationMockData.Role.TRAVELER
-                || role == NotificationMockData.Role.BUSINESS;
+                || role == NotificationMockData.Role.BUSINESS
+                || role == NotificationMockData.Role.ADMIN;
     }
 
     // ── Load ──────────────────────────────────────────────────────────────────

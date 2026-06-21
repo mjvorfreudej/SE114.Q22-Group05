@@ -150,6 +150,10 @@ public class AdminBusinessesFragment extends Fragment {
     private void rebuildUi() {
         buildTabs();
         applyFilter();
+        // Keep the bottom-nav Business badge in sync with the pending list.
+        if (getActivity() instanceof AdminActivity) {
+            ((AdminActivity) getActivity()).refreshNavBadges();
+        }
     }
 
     private void buildTabs() {

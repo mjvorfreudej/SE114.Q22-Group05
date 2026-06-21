@@ -336,16 +336,17 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showLogoutDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle(R.string.profile_logout)
-                .setMessage(R.string.profile_logout_confirm)
-                .setPositiveButton(R.string.profile_logout, (dialog, which) -> {
+        // Shared centered confirm popup (warning icon + red danger button) — same
+        // across Traveler / Business / Admin.
+        AdminUi.confirm(requireContext(),
+                getString(R.string.profile_logout_title),
+                getString(R.string.profile_logout_confirm),
+                getString(R.string.profile_logout_title),
+                true, () -> {
                     session.clear();
                     Intent intent = new Intent(requireContext(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                })
-                .setNegativeButton(R.string.action_cancel, null)
-                .show();
+                });
     }
 }

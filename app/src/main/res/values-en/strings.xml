@@ -379,12 +379,14 @@
     <string name="adm_stat_reports">Reports Waiting</string>
     <string name="adm_stat_flagged">Flagged Users</string>
     <string name="adm_alert_title">%d items need your review</string>
-    <string name="adm_alert_sub">%1$d pending listings · %2$d active reports</string>
+    <string name="adm_alert_sub">%1$d pending listings · %2$d businesses · %3$d active reports</string>
     <string name="adm_time_yesterday">Yesterday</string>
     <string name="adm_open">Open</string>
     <string name="adm_quick_actions">Quick Actions</string>
     <string name="adm_qa_review_listings">Review pending listings</string>
     <string name="adm_qa_review_listings_sub">%d awaiting moderation</string>
+    <string name="adm_qa_review_biz">Review businesses</string>
+    <string name="adm_qa_review_biz_sub">%d businesses awaiting approval</string>
     <string name="adm_qa_review_reports">Review reports</string>
     <string name="adm_qa_review_reports_sub">%d toxic/spam reports</string>
     <string name="adm_qa_browse_users">Browse users</string>

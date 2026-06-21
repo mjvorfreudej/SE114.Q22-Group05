@@ -28,6 +28,7 @@ import com.example.tourgo.models.response.AdminAccount;
 import com.example.tourgo.models.response.AdminActivityItem;
 import com.example.tourgo.models.response.AdminStats;
 import com.example.tourgo.remote.service.AdminService;
+import com.example.tourgo.remote.service.NotificationService;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
@@ -73,6 +74,8 @@ public class AdminHomeFragment extends Fragment {
         // Quick actions chrome (subtitle + badge fill in from stats).
         action(v, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
                 R.string.adm_qa_review_listings, "", 0, AdminActivity.TAB_MODERATION);
+        action(v, R.id.admActBusiness, R.drawable.ic_building, R.color.adm_blue_50, R.color.adm_blue_500,
+                R.string.adm_qa_review_biz, "", 0, AdminActivity.TAB_BUSINESS);
         action(v, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                 R.string.adm_qa_review_reports, "", 0, AdminActivity.TAB_MODERATION);
         action(v, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
@@ -110,14 +113,21 @@ public class AdminHomeFragment extends Fragment {
                 stat(root, R.id.admStat5, R.drawable.ic_flag, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getReports()), R.string.adm_stat_reports);
                 stat(root, R.id.admStat6, R.drawable.ic_shield_x, R.color.adm_red_700, R.color.adm_red_100, fmt(s.getFlaggedUsers()), R.string.adm_stat_flagged);
 
+                // The "needs review" tally spans every approval queue the admin owns:
+                // pending listings, pending business registrations and open reports.
+                int queueTotal = s.getQueueTotal() + s.getPendingBusinesses();
                 ((TextView) root.findViewById(R.id.admAlertTitle))
-                        .setText(getString(R.string.adm_alert_title, s.getQueueTotal()));
+                        .setText(getString(R.string.adm_alert_title, queueTotal));
                 ((TextView) root.findViewById(R.id.admAlertSub))
-                        .setText(getString(R.string.adm_alert_sub, s.getPendingListings(), s.getReports()));
+                        .setText(getString(R.string.adm_alert_sub,
+                                s.getPendingListings(), s.getPendingBusinesses(), s.getReports()));
 
                 action(root, R.id.admActListings, R.drawable.ic_gavel, R.color.adm_amber_100, R.color.adm_amber_500,
                         R.string.adm_qa_review_listings, getString(R.string.adm_qa_review_listings_sub, s.getPendingListings()),
                         s.getPendingListings(), AdminActivity.TAB_MODERATION);
+                action(root, R.id.admActBusiness, R.drawable.ic_building, R.color.adm_blue_50, R.color.adm_blue_500,
+                        R.string.adm_qa_review_biz, getString(R.string.adm_qa_review_biz_sub, s.getPendingBusinesses()),
+                        s.getPendingBusinesses(), AdminActivity.TAB_BUSINESS);
                 action(root, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                         R.string.adm_qa_review_reports, getString(R.string.adm_qa_review_reports_sub, s.getReports()),
                         s.getReports(), AdminActivity.TAB_MODERATION);
@@ -295,10 +305,21 @@ public class AdminHomeFragment extends Fragment {
         refreshBellBadge();
     }
 
-    /** Bell badge = current unread admin notifications (shared, persisted state). */
+    /** Bell badge = current unread admin notifications, pulled live from the server. */
     private void refreshBellBadge() {
         if (bellBadge == null || !isAdded()) return;
-        applyBellBadge(NotificationMockData.unreadCount(requireContext(), NotificationMockData.Role.ADMIN));
+        NotificationService.unreadCount(requireContext(), NotificationMockData.Role.ADMIN,
+                new DataCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer unread) {
+                        applyBellBadge(unread != null ? unread : 0);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        applyBellBadge(0);
+                    }
+                });
     }
 
     private void applyBellBadge(int count) {
