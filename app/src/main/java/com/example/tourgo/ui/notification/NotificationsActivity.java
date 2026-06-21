@@ -27,6 +27,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.tourgo.R;
 import com.example.tourgo.databinding.ActivityNotificationsBinding;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.example.tourgo.remote.service.NotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +56,6 @@ public class NotificationsActivity extends AppCompatActivity
     public static final String EXTRA_ROLE = "notif_role";
 
     private static final int SKELETON_ROWS = 6;
-    private static final long SIMULATED_LOAD_MS = 500L;
     /** Count-badge fill when a chip is selected: 20% white over the dark pill. */
     private static final int CHIP_COUNT_SELECTED_BG = 0x33FFFFFF;
 
@@ -78,9 +80,6 @@ public class NotificationsActivity extends AppCompatActivity
         applyLightStatusBar();
         applyStaticFonts();
 
-        items.clear();
-        items.addAll(NotificationMockData.seed(this, role));
-
         adapter = new NotificationAdapter(this, role);
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(this));
         binding.rvNotifications.setAdapter(adapter);
@@ -90,14 +89,33 @@ public class NotificationsActivity extends AppCompatActivity
 
         buildSkeleton();
         renderFilters();
-        render();
+        render(); // shows the loading skeleton until the feed arrives
 
-        // Brief skeleton pass so the loading state is visible (no real API yet).
-        handler.postDelayed(() -> {
-            if (binding == null) return;
-            loading = false;
-            render();
-        }, SIMULATED_LOAD_MS);
+        loadNotifications();
+    }
+
+    /** Pull the live feed for this role (TRAVELER/BUSINESS from server, ADMIN from mock). */
+    private void loadNotifications() {
+        NotificationService.load(this, role, new DataCallback<List<NotificationItem>>() {
+            @Override
+            public void onSuccess(List<NotificationItem> data) {
+                if (binding == null) return;
+                items.clear();
+                items.addAll(data);
+                loading = false;
+                renderFilters();
+                render();
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                if (binding == null) return;
+                loading = false;
+                renderFilters();
+                render();
+                Toast.makeText(NotificationsActivity.this, R.string.notif_load_error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // ── System bars ──────────────────────────────────────────────────────────
@@ -142,8 +160,8 @@ public class NotificationsActivity extends AppCompatActivity
     @Override
     public void onClick(NotificationItem item) {
         if (item.read) return;
-        item.read = true;
-        NotificationStore.markRead(this, role, item.id);
+        item.read = true; // optimistic; server is updated in the background
+        NotificationService.markRead(this, role, item.id, null);
         renderFilters();
         render();
     }
@@ -154,7 +172,7 @@ public class NotificationsActivity extends AppCompatActivity
             n.read = true;
             ids.add(n.id);
         }
-        NotificationStore.markAllRead(this, role, ids);
+        NotificationService.markAllRead(this, role, ids, null);
         Toast.makeText(this, R.string.notif_toast_marked_all, Toast.LENGTH_SHORT).show();
         renderFilters();
         render();

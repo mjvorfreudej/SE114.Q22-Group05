@@ -704,6 +704,14 @@
     <string name="notif_group_yesterday">Hôm qua</string>
     <string name="notif_group_earlier">Trước đó</string>
 
+    <!-- Relative timestamps (live feed) -->
+    <string name="notif_when_now">Vừa xong</string>
+    <string name="notif_when_minutes">%d phút</string>
+    <string name="notif_when_hours">%d giờ</string>
+    <string name="notif_when_days">%d ngày</string>
+    <string name="notif_load_error">Không tải được thông báo</string>
+    <string name="notif_loading">Đang tải…</string>
+
     <!-- Empty states -->
     <string name="notif_empty_all_title">Chưa có thông báo</string>
     <string name="notif_empty_all_msg">Cập nhật đặt chỗ, ưu đãi và nhắc nhở sẽ xuất hiện ở đây.</string>

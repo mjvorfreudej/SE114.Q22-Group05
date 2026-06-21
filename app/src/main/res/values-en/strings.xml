@@ -702,6 +702,14 @@
     <string name="notif_group_yesterday">Yesterday</string>
     <string name="notif_group_earlier">Earlier</string>
 
+    <!-- Relative timestamps (live feed) -->
+    <string name="notif_when_now">Just now</string>
+    <string name="notif_when_minutes">%dm</string>
+    <string name="notif_when_hours">%dh</string>
+    <string name="notif_when_days">%dd</string>
+    <string name="notif_load_error">Couldn\'t load notifications</string>
+    <string name="notif_loading">Loading…</string>
+
     <!-- Empty states -->
     <string name="notif_empty_all_title">No notifications yet</string>
     <string name="notif_empty_all_msg">Booking updates, offers and reminders will show up here.</string>

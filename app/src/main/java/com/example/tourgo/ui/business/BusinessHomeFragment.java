@@ -17,9 +17,12 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.tourgo.R;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.BusinessAccount;
 import com.example.tourgo.remote.RetrofitClient;
+import com.example.tourgo.remote.service.NotificationService;
 import com.example.tourgo.ui.notification.NotificationMockData;
 import com.example.tourgo.ui.notification.NotificationPopover;
 
@@ -113,10 +116,25 @@ public class BusinessHomeFragment extends Fragment {
         refreshBellBadge();
     }
 
-    /** Bell badge = current unread business notifications (shared, persisted state). */
+    /** Bell badge = current unread business notifications, pulled live from the server. */
     private void refreshBellBadge() {
         if (bizBellBadge == null || !isAdded()) return;
-        int unread = NotificationMockData.unreadCount(requireContext(), NotificationMockData.Role.BUSINESS);
+        NotificationService.unreadCount(requireContext(), NotificationMockData.Role.BUSINESS,
+                new DataCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer unread) {
+                        applyBellBadge(unread != null ? unread : 0);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String rawMessage) {
+                        applyBellBadge(0);
+                    }
+                });
+    }
+
+    private void applyBellBadge(int unread) {
+        if (bizBellBadge == null || !isAdded()) return;
         if (unread > 0) {
             bizBellBadge.setText(unread > 9 ? "9+" : String.valueOf(unread));
             bizBellBadge.setVisibility(View.VISIBLE);

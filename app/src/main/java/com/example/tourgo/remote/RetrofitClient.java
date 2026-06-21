@@ -10,6 +10,7 @@ import com.example.tourgo.remote.api.BookingApi;
 import com.example.tourgo.remote.api.ReviewApi;
 import com.example.tourgo.remote.api.FavoriteApi;
 import com.example.tourgo.remote.api.HotelApi;
+import com.example.tourgo.remote.api.NotificationApi;
 import com.example.tourgo.remote.api.PaymentApi;
 import com.example.tourgo.remote.api.TourApi;
 import com.example.tourgo.remote.api.UserApi;
@@ -114,5 +115,9 @@ public class RetrofitClient {
 
     public PaymentApi getPaymentApi() {
         return retrofit.create(PaymentApi.class);
+    }
+
+    public NotificationApi getNotificationApi() {
+        return retrofit.create(NotificationApi.class);
     }
 }
