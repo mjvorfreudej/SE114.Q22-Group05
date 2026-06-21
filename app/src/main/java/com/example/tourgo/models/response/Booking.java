@@ -14,6 +14,10 @@ public class Booking {
     private String hotelId;
     @SerializedName("booking_date")
     private String bookingDate;
+    @SerializedName("check_in")
+    private String checkIn;
+    @SerializedName("check_out")
+    private String checkOut;
     private String status;
 
     @SerializedName("users")
@@ -55,6 +59,15 @@ public class Booking {
         this.status = "PENDING";
     }
 
+    public Booking(String userId, String tourId, String hotelId, String checkIn, String checkOut) {
+        this.userId = userId;
+        this.tourId = tourId;
+        this.hotelId = hotelId;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.status = "PENDING";
+    }
+
     public static Booking fromJson(JSONObject json) {
         Booking b = new Booking();
         b.id = json.optString("id", null);
@@ -79,6 +92,14 @@ public class Booking {
                 json.put("hotel_id", hotelId);
             }
 
+            if (checkIn != null) {
+                json.put("check_in", checkIn);
+            }
+
+            if (checkOut != null) {
+                json.put("check_out", checkOut);
+            }
+
             json.put("status", status != null ? status : "PENDING");
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,6 +121,12 @@ public class Booking {
 
     public String getBookingDate() { return bookingDate; }
     public void setBookingDate(String bookingDate) { this.bookingDate = bookingDate; }
+
+    public String getCheckIn() { return checkIn; }
+    public void setCheckIn(String checkIn) { this.checkIn = checkIn; }
+
+    public String getCheckOut() { return checkOut; }
+    public void setCheckOut(String checkOut) { this.checkOut = checkOut; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

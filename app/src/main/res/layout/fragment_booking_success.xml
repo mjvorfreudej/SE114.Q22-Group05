@@ -215,10 +215,50 @@
                         android:id="@+id/tvConfirmationNumber"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ABC123XYZ"
+                        android:text="TG1719056789ABCD12"
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/qr_transaction_code"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="12dp" />
+
+                        <ImageView
+                            android:id="@+id/ivTransactionQR"
+                            android:layout_width="180dp"
+                            android:layout_height="180dp"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="@string/qr_transaction_code" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text=""
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 

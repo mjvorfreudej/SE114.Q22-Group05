@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main.booking;
 import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,14 +23,16 @@ import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Random;
 
 public class BookingSuccessFragment extends Fragment {
-    private static final String CONFIRMATION_CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final int CONFIRMATION_LENGTH = 10;
 
     @Nullable
     @Override
@@ -45,6 +48,7 @@ public class BookingSuccessFragment extends Fragment {
 
         ImageButton btnBack = view.findViewById(R.id.btnBack);
         ImageView ivHotel = view.findViewById(R.id.ivHotel);
+        ImageView ivTransactionQR = view.findViewById(R.id.ivTransactionQR);
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
@@ -79,10 +83,14 @@ public class BookingSuccessFragment extends Fragment {
             }
         }
 
+        String transactionCode = null;
         if (getArguments() != null) {
             double total = getArguments().getDouble("total_price", 0.0);
             String bookingDate = getArguments().getString("check_in_out", "");
             String guestInfo = getArguments().getString("guest_info", "");
+            // Theo y?u c?u: transaction_code = transfer_note
+            String transferNote = getArguments().getString("transfer_note", null);
+            transactionCode = transferNote;
 
             tvTotalCost.setText(formatCurrency(total));
             tvBookingDate.setText(bookingDate);
@@ -91,7 +99,12 @@ public class BookingSuccessFragment extends Fragment {
             tvTotalCost.setText(formatCurrency(0.0));
         }
 
-        tvConfirmationNumber.setText(generateConfirmationNumber());
+        if (transactionCode != null && !transactionCode.isEmpty()) {
+            tvConfirmationNumber.setText(transactionCode);
+            generateQRCode(transactionCode, ivTransactionQR);
+        } else {
+            tvConfirmationNumber.setText("N/A");
+        }
 
         btnBack.setOnClickListener(v -> requireActivity().finish());
 
@@ -115,14 +128,24 @@ public class BookingSuccessFragment extends Fragment {
         return String.format(Locale.getDefault(), "%,.0f₫", amount);
     }
 
-    private String generateConfirmationNumber() {
-        Random random = new Random();
-        StringBuilder builder = new StringBuilder(CONFIRMATION_LENGTH);
-        for (int i = 0; i < CONFIRMATION_LENGTH; i++) {
-            int index = random.nextInt(CONFIRMATION_CHARSET.length());
-            builder.append(CONFIRMATION_CHARSET.charAt(index));
+    private void generateQRCode(String content, ImageView imageView) {
+        try {
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+
+            imageView.setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            e.printStackTrace();
         }
-        return builder.toString();
     }
 
     private void applyTopInset(View root) {
