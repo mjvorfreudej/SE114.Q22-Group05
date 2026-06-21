@@ -1,13 +1,6 @@
 package com.example.tourgo.ui.main.booking;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -16,19 +9,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
-import com.example.tourgo.remote.service.BookingService;
-import com.example.tourgo.ui.main.home.MainActivity;
-
-import java.text.NumberFormat;
-import java.util.Locale;
+import com.example.tourgo.models.response.PaymentResponse;
+import com.example.tourgo.remote.service.PaymentService;
 
 public class PaymentActivity extends AppCompatActivity {
     public static final String EXTRA_BOOKING_ID = "booking_id";
     public static final String EXTRA_TOTAL_PRICE = "total_price";
+    public static final String EXTRA_CHECK_IN_OUT = "check_in_out";
+    public static final String EXTRA_GUEST_INFO = "guest_info";
+    public static final String EXTRA_PAYMENT_METHOD = "payment_method";
 
-    private View layoutPaymentInfo;
-    private ProgressBar pbPayment;
     private String bookingId;
+    private double totalPrice;
+    private String checkInOut;
+    private String guestInfo;
+    private String paymentMethod;
+    private String transactionCode;
+    private AlertDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,79 +33,137 @@ public class PaymentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_payment);
 
         bookingId = getIntent().getStringExtra(EXTRA_BOOKING_ID);
-        double totalPrice = getIntent().getDoubleExtra(EXTRA_TOTAL_PRICE, 0.0);
+        totalPrice = getIntent().getDoubleExtra(EXTRA_TOTAL_PRICE, 0.0);
+        checkInOut = getIntent().getStringExtra(EXTRA_CHECK_IN_OUT);
+        guestInfo = getIntent().getStringExtra(EXTRA_GUEST_INFO);
+        paymentMethod = getIntent().getStringExtra(EXTRA_PAYMENT_METHOD);
 
-        layoutPaymentInfo = findViewById(R.id.layoutPaymentInfo);
-        pbPayment = findViewById(R.id.pbPayment);
-        TextView tvBookingId = findViewById(R.id.tvPaymentBookingId);
-        TextView tvTotal = findViewById(R.id.tvPaymentTotal);
-        Button btnMockPay = findViewById(R.id.btnMockPay);
-
-        tvBookingId.setText(getString(R.string.payment_booking_id,
-                bookingId != null ? bookingId : "-"));
-        tvTotal.setText(getString(R.string.payment_total, formatPrice(totalPrice)));
-
-        btnMockPay.setOnClickListener(v -> startMockPayment());
-    }
-
-    private void startMockPayment() {
-        // Show loading state
-        layoutPaymentInfo.setVisibility(View.GONE);
-        pbPayment.setVisibility(View.VISIBLE);
-
-        // Simulate network delay of 2 seconds
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (isFinishing()) return;
-            
-            // After mock payment succeeds, update status on server
-            // Using "COMPLETED" as requested for backend sync (means Paid)
-            updateBookingStatusToPaid();
-        }, 2000);
-    }
-
-    private void updateBookingStatusToPaid() {
-        if (bookingId == null) {
-            pbPayment.setVisibility(View.GONE);
-            showSuccessDialog(); 
-            return;
+        if (paymentMethod == null) {
+            paymentMethod = "cod";
         }
 
-        // According to requirement: Backend "COMPLETED" status means the order is PAID
-        BookingService.updateBookingStatus(this, bookingId, "COMPLETED", new DataCallback<Void>() {
+        if (savedInstanceState == null) {
+            processPayment();
+        }
+    }
+
+    private void processPayment() {
+        if ("cod".equals(paymentMethod)) {
+            processCODPayment();
+        } else if ("bank_transfer".equals(paymentMethod)) {
+            processBankTransferPayment();
+        } else {
+            Toast.makeText(this, getString(R.string.payment_method_not_support), Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+
+    private void processCODPayment() {
+        showLoading(getString(R.string.processing));
+
+        PaymentService.createPayment(this, bookingId, totalPrice, "cod", new DataCallback<PaymentResponse>() {
             @Override
-            public void onSuccess(Void data) {
-                if (isFinishing()) return;
-                pbPayment.setVisibility(View.GONE);
-                showSuccessDialog();
+            public void onSuccess(PaymentResponse response) {
+                hideLoading();
+                transactionCode = response.getTransactionCode();
+                showBookingSuccess(null, null);
             }
 
             @Override
-            public void onError(ApiErrorCode code, String msg) {
-                if (isFinishing()) return;
-                pbPayment.setVisibility(View.GONE);
-                layoutPaymentInfo.setVisibility(View.VISIBLE);
-                Toast.makeText(PaymentActivity.this, "Payment failed to sync: " + msg, Toast.LENGTH_LONG).show();
+            public void onError(ApiErrorCode code, String message) {
+                hideLoading();
+                Toast.makeText(PaymentActivity.this,
+                        getString(R.string.COD_error) + message,
+                        Toast.LENGTH_LONG).show();
+                finish();
             }
         });
     }
 
-    private void showSuccessDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.booking_success_title)
-                .setMessage(R.string.booking_success_msg)
-                .setCancelable(false)
-                .setPositiveButton(R.string.booking_back_home, (dialog, which) -> {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+    private void processBankTransferPayment() {
+        showLoading(getString(R.string.create_transfer_information));
+
+        PaymentService.createPayment(this, bookingId, totalPrice, "bank_transfer", new DataCallback<PaymentResponse>() {
+            @Override
+            public void onSuccess(PaymentResponse response) {
+                hideLoading();
+                transactionCode = response.getTransactionCode();
+                if (response.getBankInfo() != null) {
+                    showBankTransferInfo(response);
+                } else {
+                    Toast.makeText(PaymentActivity.this,
+                            "Error: " + getString(R.string.not_get_transfer_information),
+                            Toast.LENGTH_LONG).show();
                     finish();
-                })
-                .show();
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String message) {
+                hideLoading();
+                Toast.makeText(PaymentActivity.this,
+                        getString(R.string.error_create_transfer_information) + message,
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
-    private static String formatPrice(double amount) {
-        NumberFormat fmt = NumberFormat.getNumberInstance(Locale.US);
-        fmt.setMaximumFractionDigits(0);
-        return fmt.format(amount) + "₫";
+    private void showBankTransferInfo(PaymentResponse response) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_BOOKING_ID, bookingId);
+        args.putDouble("bank_amount", response.getBankInfo().getAmount());
+        args.putString("bank_name", response.getBankInfo().getBankName());
+        args.putString("account_number", response.getBankInfo().getAccountNumber());
+        args.putString("account_holder", response.getBankInfo().getAccountHolder());
+        args.putString("transfer_note", response.getBankInfo().getTransferNote());
+        args.putString("transaction_code", response.getTransactionCode());
+
+        BankTransferFragment fragment = new BankTransferFragment();
+        fragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.payment_container, fragment)
+                .commit();
+    }
+
+    private void showBookingSuccess(String transactionCode, String transferNote) {
+        Bundle args = new Bundle();
+        args.putString(EXTRA_BOOKING_ID, bookingId);
+        args.putDouble("total_price", totalPrice);
+        args.putString("check_in_out", checkInOut);
+        args.putString("guest_info", guestInfo);
+        args.putString("transfer_note", transferNote);
+        args.putString("transaction_code", transactionCode);
+
+        BookingSuccessFragment fragment = new BookingSuccessFragment();
+        fragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.payment_container, fragment)
+                .commit();
+    }
+
+    public void showBookingSuccessAfterTransfer(String transactionCode, String transferNote) {
+        showBookingSuccess(transactionCode, transferNote);
+    }
+
+    private void showLoading(String message) {
+        if (loadingDialog == null) {
+            loadingDialog = new AlertDialog.Builder(this)
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .create();
+        }
+        loadingDialog.setMessage(message);
+        if (!loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    private void hideLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 }

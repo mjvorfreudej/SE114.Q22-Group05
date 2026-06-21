@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TourGo</string>
+    <string name="back">Back</string>
 
     <string name="profile_language">Language</string>
     <string name="profile_currency">Currency</string>
@@ -351,6 +352,7 @@
     <string name="review_delete_error">Can not delete review</string>
 
     <!-- API errors -->
+    <string name="review_image_upload_partial_error">The review has been submitted, but some photos haven\'t been uploaded yet.</string>
     <string name="err_no_internet">No internet connection</string>
     <string name="err_timeout">Connection timeout</string>
 
@@ -1085,5 +1087,41 @@
     <string name="biz_summary_pricing">Pricing</string>
     <string name="biz_summary_pricing_value">Seasonal · 3 fees</string>
     <string name="biz_terms">I agree to TourGo\'s Host Terms and confirm this listing complies with local regulations.</string>
+    <string name="review_pick_images">Add picture</string>
+    <string name="review_pick_images_title">Select a review image</string>
+    <string name="review_selected_images_count">%d image selected</string>
+    <string name="payment_method_title">Payment methods</string>
+    <string name="total_amount">Total amount</string>
+    <string name="select_payment_method">Choose a payment method</string>
+    <string name="select_bank">Choose a bank</string>
+    <string name="bank_all">General payment gateway</string>
+    <string name="proceed_payment">Continue payment</string>
+    <string name="payment_processing">Payment is being processed…</string>
+    <string name="payment_success">Payment successful</string>
+    <string name="payment_failed">Payment failed</string>
+    <string name="payment_cancelled">Payment cancelled</string>
+    <string name="payment_error">Payment error. Please try again.</string>
+    <string name="payment_redirect">Going to the payment gateway…</string>
+    <string name="transfer_detail">Transfer details</string>
+    <string name="payment_amout">Amount</string>
+    <string name="account_holder">Account holder</string>
+    <string name="payment_note">The system will automatically confirm after receiving the money.</string>
+    <string name="already_pay">I have transferred.</string>
+    <string name="payment_require">Please transfer the EXACT amount and with the correct transaction details so that the system can automatically confirm the payment.</string>
+    <string name="note">Note</string>
+    <string name="copy">Copy</string>
+    <string name="account_number">Account number</string>
+    <string name="transfer_information">Transfer information</string>
+    <string name="qr_scan">Scan the QR code to make a transfer.</string>
+    <string name="bank_transfer">Bank transfer</string>
+    <string name="qr_transaction_code">Transaction Code QR</string>
+    <string name="scan_qr_to_verify">Scan to verify transaction</string>
+    <string name="not_paid">Unpaid</string>
+    <string name="error_create_transfer_information">Error creating transfer information:</string>
+    <string name="not_get_transfer_information">No transfer confirmation received.</string>
+    <string name="create_transfer_information">Creating transfer information...</string>
+    <string name="COD_error">Cash on Delivery (COD) payment error:</string>
+    <string name="processing">Processing...</string>
+    <string name="payment_method_not_support">Payment methods not supported</string>
 
 </resources>

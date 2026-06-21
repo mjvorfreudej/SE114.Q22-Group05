@@ -124,7 +124,7 @@
         <activity
             android:name=".ui.main.booking.BookingActivity"
             android:exported="false" />
-        <activity
+<activity
             android:name=".ui.main.booking.PaymentActivity"
             android:exported="false" />
         <activity

@@ -25,20 +25,17 @@ import com.example.tourgo.models.response.Tour;
 
 public class BookingConfirmFragment extends Fragment {
 
-    private static final int CATEGORY_WALLET = 0;
-    private static final int CATEGORY_BANK = 1;
-    private static final int CATEGORY_CARD = 2;
+    private static final int CATEGORY_BANK = 0;
+    private static final int CATEGORY_COD = 1;
 
-    private LinearLayout btnWallet, btnBank, btnCard;
-    private ImageView ivWallet, ivBank, ivCard;
-    private TextView tvWallet, tvBank, tvCard, tvTotalPrice;
+    private LinearLayout btnBank, btnCOD;
+    private ImageView ivBank, ivCOD;
+    private TextView tvBank, tvCOD, tvTotalPrice;
     private TextView tvNights, tvRoomPrice, tvTaxes, tvServiceCharge;
-    private View layoutPaymentMethods, layoutCardMethods;
-    private TextView tvAddMethod;
-    private RadioButton rbMomo, rbZaloPay, rbPayPal, rbVisa, rbMastercard;
     private double totalPrice = 0.0;
     private Hotel hotel;
     private Tour tour;
+    private int selectedCategory = CATEGORY_BANK;
 
     private final int COLOR_BLUE = Color.parseColor("#4285F4");
     private final int COLOR_BLACK = Color.BLACK;
@@ -68,23 +65,12 @@ public class BookingConfirmFragment extends Fragment {
         tvTaxes = view.findViewById(R.id.tvTaxes);
         tvServiceCharge = view.findViewById(R.id.tvServiceCharge);
         tvTotalPrice = view.findViewById(R.id.tvTotalPrice);
-        btnWallet = view.findViewById(R.id.btnWallet);
         btnBank = view.findViewById(R.id.btnBank);
-        btnCard = view.findViewById(R.id.btnCard);
-        ivWallet = view.findViewById(R.id.ivWalletIcon);
-        tvWallet = view.findViewById(R.id.tvWalletLabel);
         ivBank = view.findViewById(R.id.ivBankIcon);
         tvBank = view.findViewById(R.id.tvBankLabel);
-        ivCard = view.findViewById(R.id.ivCardIcon);
-        tvCard = view.findViewById(R.id.tvCardLabel);
-        layoutPaymentMethods = view.findViewById(R.id.layoutPaymentMethods);
-        layoutCardMethods = view.findViewById(R.id.layoutCardMethods);
-        tvAddMethod = view.findViewById(R.id.btnAddMethod);
-        rbMomo = view.findViewById(R.id.rbMomo);
-        rbZaloPay = view.findViewById(R.id.rbZaloPay);
-        rbPayPal = view.findViewById(R.id.rbPayPal);
-        rbVisa = view.findViewById(R.id.rbVisa);
-        rbMastercard = view.findViewById(R.id.rbMastercard);
+        btnCOD = view.findViewById(R.id.btnCOD);
+        ivCOD = view.findViewById(R.id.ivCODIcon);
+        tvCOD = view.findViewById(R.id.tvCODLabel);
 
         if (getArguments() != null && (hotel != null || tour != null)) {
             int nights = getArguments().getInt("num_nights", 0);
@@ -107,34 +93,27 @@ public class BookingConfirmFragment extends Fragment {
 
         view.findViewById(R.id.btnBack).setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
 
-        btnWallet.setOnClickListener(v -> selectPaymentCategory(CATEGORY_WALLET));
-        btnBank.setOnClickListener(v -> selectPaymentCategory(CATEGORY_BANK));
-        btnCard.setOnClickListener(v -> selectPaymentCategory(CATEGORY_CARD));
-
-        View.OnClickListener radioClick = v -> {
-            int id = v.getId();
-            rbMomo.setChecked(id == R.id.rbMomo);
-            rbZaloPay.setChecked(id == R.id.rbZaloPay);
-            rbPayPal.setChecked(id == R.id.rbPayPal);
-            rbVisa.setChecked(id == R.id.rbVisa);
-            rbMastercard.setChecked(id == R.id.rbMastercard);
-        };
-        rbMomo.setOnClickListener(radioClick);
-        rbZaloPay.setOnClickListener(radioClick);
-        rbPayPal.setOnClickListener(radioClick);
-        rbVisa.setOnClickListener(radioClick);
-        rbMastercard.setOnClickListener(radioClick);
+        if (btnBank != null) {
+            btnBank.setOnClickListener(v -> selectPaymentCategory(CATEGORY_BANK));
+        }
+        if (btnCOD != null) {
+            btnCOD.setOnClickListener(v -> selectPaymentCategory(CATEGORY_COD));
+        }
 
         view.findViewById(R.id.btnConfirmPayment).setOnClickListener(v -> {
             if (getActivity() instanceof BookingActivity && getArguments() != null) {
                 long checkIn = getArguments().getLong("check_in_millis", 0L);
                 long checkOut = getArguments().getLong("check_out_millis", 0L);
                 int guests = getArguments().getInt("guests", 0);
+
+                String selectedMethod = getSelectedPaymentMethod();
+                getArguments().putString("payment_method", selectedMethod);
+
                 ((BookingActivity) getActivity()).submitBooking(checkIn, checkOut, guests, totalPrice);
             }
         });
 
-        selectPaymentCategory(CATEGORY_WALLET);
+        selectPaymentCategory(CATEGORY_BANK);
     }
 
     private String formatPrice(double amount) {
@@ -144,44 +123,12 @@ public class BookingConfirmFragment extends Fragment {
     }
 
     private void selectPaymentCategory(int category) {
-        applyTabState(btnWallet, ivWallet, tvWallet, category == CATEGORY_WALLET);
-        applyTabState(btnBank, ivBank, tvBank, category == CATEGORY_BANK);
-        applyTabState(btnCard, ivCard, tvCard, category == CATEGORY_CARD);
-
-        if (layoutPaymentMethods != null) {
-            layoutPaymentMethods.setVisibility(category == CATEGORY_WALLET ? View.VISIBLE : View.GONE);
+        selectedCategory = category;
+        if (btnBank != null && ivBank != null && tvBank != null) {
+            applyTabState(btnBank, ivBank, tvBank, category == CATEGORY_BANK);
         }
-        if (layoutCardMethods != null) {
-            layoutCardMethods.setVisibility(category == CATEGORY_CARD ? View.VISIBLE : View.GONE);
-        }
-        if (tvAddMethod != null) {
-            int labelRes;
-            switch (category) {
-                case CATEGORY_BANK:
-                    labelRes = R.string.booking_add_bank;
-                    break;
-                case CATEGORY_CARD:
-                    labelRes = R.string.booking_add_card;
-                    break;
-                case CATEGORY_WALLET:
-                default:
-                    labelRes = R.string.booking_add_wallet;
-                    break;
-            }
-            tvAddMethod.setText(getString(labelRes));
-        }
-
-        clearAllRadios();
-        switch (category) {
-            case CATEGORY_WALLET:
-                rbZaloPay.setChecked(true);
-                break;
-            case CATEGORY_CARD:
-                rbVisa.setChecked(true);
-                break;
-            case CATEGORY_BANK:
-            default:
-                break;
+        if (btnCOD != null && ivCOD != null && tvCOD != null) {
+            applyTabState(btnCOD, ivCOD, tvCOD, category == CATEGORY_COD);
         }
     }
 
@@ -192,12 +139,17 @@ public class BookingConfirmFragment extends Fragment {
         label.setTypeface(null, active ? Typeface.BOLD : Typeface.NORMAL);
     }
 
-    private void clearAllRadios() {
-        rbMomo.setChecked(false);
-        rbZaloPay.setChecked(false);
-        rbPayPal.setChecked(false);
-        rbVisa.setChecked(false);
-        rbMastercard.setChecked(false);
+    /**
+     * Xác định phương thức thanh toán user đã chọn.
+     * - Bank Transfer → bank_transfer (chuyển khoản Casso, cần webhook xác nhận)
+     * - COD → cod (thanh toán khi nhận hàng, chuyển thẳng sang success)
+     */
+    private String getSelectedPaymentMethod() {
+        if (selectedCategory == CATEGORY_COD) {
+            return "cod";
+        } else {
+            return "bank_transfer";
+        }
     }
 
     private void applyTopInset(View root) {

@@ -72,13 +72,13 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Register the Google sign-in launcher up front — registerForActivityResult
+        // Register the Google sign-in launcher up front - registerForActivityResult
         // must run before the Activity reaches STARTED.
         setupGoogleSignIn();
 
         // Auto-login: if a remembered session exists, route to the correct home
         // (admins -> AdminActivity, travelers -> MainActivity). Deferred with
-        // post() so the Activity finishes initialising before finish() runs —
+        // post() so the Activity finishes initialising before finish() runs -
         // calling finish() during onCreate() crashes on API 35+ with
         // "Activity client record must not be null ... TopResumedActivityChangeItem".
         if (session.isLoggedIn() && session.isRememberMe()) {
@@ -164,13 +164,29 @@ public class LoginActivity extends AppCompatActivity {
 
     // ── Google sign-in ────────────────────────────────────────────────────────
     private void setupGoogleSignIn() {
+        String webClientId = getString(R.string.default_web_client_id).trim();
+        if (webClientId.isEmpty()) {
+            googleClient = null;
+            googleLauncher = null;
+            if (binding != null && binding.ivLoginGoogle != null) {
+                binding.ivLoginGoogle.setEnabled(false);
+                binding.ivLoginGoogle.setAlpha(0.5f);
+            }
+            return;
+        }
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 // Request an ID token (audience = our Web client ID) so the backend
                 // can verify it with Supabase signInWithIdToken.
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(webClientId)
                 .requestEmail()
                 .build();
         googleClient = GoogleSignIn.getClient(this, gso);
+
+        if (binding != null && binding.ivLoginGoogle != null) {
+            binding.ivLoginGoogle.setEnabled(true);
+            binding.ivLoginGoogle.setAlpha(1f);
+        }
 
         googleLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -188,7 +204,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } catch (ApiException e) {
                         setLoading(false);
-                        // 12501 = user cancelled the chooser — stay silent.
+                        // 12501 = user cancelled the chooser - stay silent.
                         if (e.getStatusCode() != GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
                             Toast.makeText(this, R.string.login_social_failed, Toast.LENGTH_SHORT).show();
                         }
@@ -197,6 +213,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startGoogleSignIn() {
+        if (googleClient == null || googleLauncher == null) {
+            Toast.makeText(this, R.string.login_social_failed, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         setLoading(true);
         // Sign out first so the account chooser always appears (instead of silently
         // reusing the last account).
