@@ -105,17 +105,23 @@ public class ProfileFragment extends Fragment {
                 if (user != null) {
                     if (tvProfileName != null) tvProfileName.setText(user.getName());
                     if (tvProfileEmail != null) tvProfileEmail.setText(user.getEmail());
-                    
+
+                    // Trong hàm loadUserProfile của ProfileFragment
                     if (ivProfileAvatar != null && user.getAvatar() != null && !user.getAvatar().isEmpty()) {
-                        Glide.with(ProfileFragment.this)
+                        Glide.with(ProfileFragment.this) // Dùng ProfileFragment.this để gắn với lifecycle của Fragment
                                 .load(user.getAvatar())
                                 .circleCrop()
+                                // THÊM ĐOẠN NÀY ĐỂ BUỘC GLIDE LOAD ẢNH MỚI
+                                .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.NONE)
+                                .skipMemoryCache(true)
+                                // ----------------------------------------
                                 .placeholder(R.drawable.ic_person_24)
+                                .error(R.drawable.ic_person_24) // Load lỗi thì hiện icon mặc định
                                 .into(ivProfileAvatar);
                     }
 
                     session.saveUserInfo(user.getId(), user.getEmail(), user.getName(), user.getRole(), user.getAvatar());
-                    
+                    Log.d("DEBUG_AVATAR", "Avatar từ API: " + user.getAvatar());
                     if (getView() != null) {
                         setupSettings(getView());
                     }
@@ -127,8 +133,9 @@ public class ProfileFragment extends Fragment {
                 if (!isAdded()) return;
                 if (tvProfileName != null) tvProfileName.setText(session.getShortName());
                 if (tvProfileEmail != null) tvProfileEmail.setText(session.getEmail());
-                
+
                 String avatarUrl = session.getAvatar();
+
                 if (ivProfileAvatar != null && avatarUrl != null && !avatarUrl.isEmpty()) {
                     Glide.with(ProfileFragment.this)
                             .load(avatarUrl)
