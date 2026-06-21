@@ -732,23 +732,13 @@ public class AddListingActivity extends AppCompatActivity {
         View btnNextMonth = content.findViewById(R.id.btnNextMonth);
         View btnBlockDate = content.findViewById(R.id.btnBlockDate);
 
+        updateDateInputs();
+
         if (btnOpenFrom != null && tvOpenFrom != null) {
-            if (openFromDate != null) {
-                try {
-                    tvOpenFrom.setText(dateDisplayFormat.format(dateParser.parse(openFromDate)));
-                    tvOpenFrom.setTextColor(color(R.color.adm_gray_900));
-                } catch (Exception ignored) {}
-            }
             btnOpenFrom.setOnClickListener(v -> showDatePicker(tvOpenFrom, true));
         }
 
         if (btnOpenUntil != null && tvOpenUntil != null) {
-            if (openUntilDate != null) {
-                try {
-                    tvOpenUntil.setText(dateDisplayFormat.format(dateParser.parse(openUntilDate)));
-                    tvOpenUntil.setTextColor(color(R.color.adm_gray_900));
-                } catch (Exception ignored) {}
-            }
             btnOpenUntil.setOnClickListener(v -> showDatePicker(tvOpenUntil, false));
         }
 
@@ -790,6 +780,33 @@ public class AddListingActivity extends AppCompatActivity {
         refreshCalendarGrid();
     }
 
+    private void updateDateInputs() {
+        TextView tvOpenFrom = content.findViewById(R.id.tvOpenFrom);
+        TextView tvOpenUntil = content.findViewById(R.id.tvOpenUntil);
+        if (tvOpenFrom != null) {
+            if (openFromDate != null) {
+                try {
+                    tvOpenFrom.setText(dateDisplayFormat.format(dateParser.parse(openFromDate)));
+                    tvOpenFrom.setTextColor(color(R.color.adm_gray_900));
+                } catch (Exception ignored) {}
+            } else {
+                tvOpenFrom.setText(R.string.biz_open_from);
+                tvOpenFrom.setTextColor(color(R.color.adm_gray_400));
+            }
+        }
+        if (tvOpenUntil != null) {
+            if (openUntilDate != null) {
+                try {
+                    tvOpenUntil.setText(dateDisplayFormat.format(dateParser.parse(openUntilDate)));
+                    tvOpenUntil.setTextColor(color(R.color.adm_gray_900));
+                } catch (Exception ignored) {}
+            } else {
+                tvOpenUntil.setText(R.string.biz_open_until);
+                tvOpenUntil.setTextColor(color(R.color.adm_gray_400));
+            }
+        }
+    }
+
     private void showDatePicker(TextView tvTarget, boolean isOpenFrom) {
         java.util.Calendar cal = java.util.Calendar.getInstance();
         if (isOpenFrom && openFromDate != null) {
@@ -806,7 +823,6 @@ public class AddListingActivity extends AppCompatActivity {
             java.util.Calendar selectedCal = java.util.Calendar.getInstance();
             selectedCal.set(year, month, dayOfMonth);
             String dateStr = dateParser.format(selectedCal.getTime());
-            String displayStr = dateDisplayFormat.format(selectedCal.getTime());
 
             if (isOpenFrom) {
                 if (openUntilDate != null && dateStr.compareTo(openUntilDate) > 0) {
@@ -814,17 +830,14 @@ public class AddListingActivity extends AppCompatActivity {
                     return;
                 }
                 openFromDate = dateStr;
-                tvTarget.setText(displayStr);
-                tvTarget.setTextColor(color(R.color.adm_gray_900));
             } else {
                 if (openFromDate != null && dateStr.compareTo(openFromDate) < 0) {
                     toast("Ngày mở đến không thể trước ngày mở từ!");
                     return;
                 }
                 openUntilDate = dateStr;
-                tvTarget.setText(displayStr);
-                tvTarget.setTextColor(color(R.color.adm_gray_900));
             }
+            updateDateInputs();
             refreshCalendarGrid();
         }, cal.get(java.util.Calendar.YEAR), cal.get(java.util.Calendar.MONTH), cal.get(java.util.Calendar.DAY_OF_MONTH));
         dpd.show();
@@ -979,17 +992,47 @@ public class AddListingActivity extends AppCompatActivity {
         cell.setPadding(m, m, m, m);
 
         cell.setOnClickListener(v -> {
-            if (openFromDate == null || openUntilDate == null ||
-                    dayStr.compareTo(openFromDate) < 0 || dayStr.compareTo(openUntilDate) > 0) {
-                toast("Ngày này nằm ngoài khoảng hoạt động!");
-                return;
+            java.util.Calendar cellCal = java.util.Calendar.getInstance();
+            try {
+                cellCal.setTime(dateParser.parse(dayStr));
+            } catch (Exception ignored) {}
+
+            if (openFromDate != null && openUntilDate != null) {
+                // Both are set -> Check if click is inside range
+                if (dayStr.compareTo(openFromDate) >= 0 && dayStr.compareTo(openUntilDate) <= 0) {
+                    // Inside range -> toggle blocked state
+                    if (blockedDates.contains(dayStr)) {
+                        blockedDates.remove(dayStr);
+                    } else {
+                        blockedDates.add(dayStr);
+                    }
+                } else {
+                    // Outside range -> reset and start new selection
+                    openFromDate = dayStr;
+                    openUntilDate = null;
+                    blockedDates.clear();
+                    toast("Đã chọn ngày bắt đầu: " + dateDisplayFormat.format(cellCal.getTime()));
+                }
+            } else {
+                // One or both are null
+                if (openFromDate == null) {
+                    openFromDate = dayStr;
+                    openUntilDate = null;
+                    blockedDates.clear();
+                    toast("Đã chọn ngày bắt đầu: " + dateDisplayFormat.format(cellCal.getTime()));
+                } else {
+                    // openFromDate is set, openUntilDate is null
+                    if (dayStr.compareTo(openFromDate) < 0) {
+                        openFromDate = dayStr;
+                        toast("Đã chọn lại ngày bắt đầu: " + dateDisplayFormat.format(cellCal.getTime()));
+                    } else {
+                        openUntilDate = dayStr;
+                        toast("Đã chọn ngày kết thúc: " + dateDisplayFormat.format(cellCal.getTime()));
+                    }
+                }
             }
 
-            if (blockedDates.contains(dayStr)) {
-                blockedDates.remove(dayStr);
-            } else {
-                blockedDates.add(dayStr);
-            }
+            updateDateInputs();
             refreshCalendarGrid();
         });
 
