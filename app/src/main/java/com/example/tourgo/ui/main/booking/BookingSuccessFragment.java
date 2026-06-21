@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main.booking;
 import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,14 @@ import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Random;
 
 public class BookingSuccessFragment extends Fragment {
 
@@ -39,9 +48,11 @@ public class BookingSuccessFragment extends Fragment {
 
         ImageButton btnBack = view.findViewById(R.id.btnBack);
         ImageView ivHotel = view.findViewById(R.id.ivHotel);
+        ImageView ivTransactionQR = view.findViewById(R.id.ivTransactionQR);
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
+        TextView tvConfirmationNumber = view.findViewById(R.id.tvConfirmationNumber);
         Button btnViewBooking = view.findViewById(R.id.btnViewBooking);
         Button btnBackHome = view.findViewById(R.id.btnBackHome);
 
@@ -72,24 +83,31 @@ public class BookingSuccessFragment extends Fragment {
             }
         }
 
-        // Nhận và hiển thị dữ liệu từ arguments
+        String transactionCode = null;
         if (getArguments() != null) {
             double total = getArguments().getDouble("total_price", 0.0);
             String bookingDate = getArguments().getString("check_in_out", "");
             String guestInfo = getArguments().getString("guest_info", "");
+            // Theo y?u c?u: transaction_code = transfer_note
+            String transferNote = getArguments().getString("transfer_note", null);
+            transactionCode = transferNote;
 
-            if (hotel != null) {
-                tvTotalCost.setText(hotel.formatPrice(requireContext(), total));
-            } else if (tour != null) {
-                tvTotalCost.setText(tour.formatPrice(requireContext(), total));
-            }
-            
+            tvTotalCost.setText(formatCurrency(total));
             tvBookingDate.setText(bookingDate);
             tvGuestInfo.setText(guestInfo);
+        } else {
+            tvTotalCost.setText(formatCurrency(0.0));
+        }
+
+        if (transactionCode != null && !transactionCode.isEmpty()) {
+            tvConfirmationNumber.setText(transactionCode);
+            generateQRCode(transactionCode, ivTransactionQR);
+        } else {
+            tvConfirmationNumber.setText("N/A");
         }
 
         btnBack.setOnClickListener(v -> requireActivity().finish());
-        
+
         btnViewBooking.setOnClickListener(v -> {
             requireActivity().finish();
         });
@@ -100,6 +118,34 @@ public class BookingSuccessFragment extends Fragment {
             startActivity(intent);
             requireActivity().finish();
         });
+    }
+
+    private String formatCurrency(double amount) {
+        String currency = new com.example.tourgo.data.local.SessionManager(requireContext()).getCurrency();
+        if ("USD".equalsIgnoreCase(currency)) {
+            return String.format(Locale.getDefault(), "$ %,.0f", amount);
+        }
+        return String.format(Locale.getDefault(), "%,.0f₫", amount);
+    }
+
+    private void generateQRCode(String content, ImageView imageView) {
+        try {
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 512, 512);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+
+            imageView.setImageBitmap(bitmap);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
     }
 
     private void applyTopInset(View root) {

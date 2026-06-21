@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SwitchCompat thumb: always white (matches the design's black-shadowed white knob). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/white" />
+</selector>

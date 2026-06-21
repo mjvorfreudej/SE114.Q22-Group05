@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TourGo</string>
+    <string name="back">Quay lại</string>
 
     <string name="profile_language">Ngôn ngữ</string>
     <string name="profile_currency">Tiền tệ</string>
@@ -29,6 +30,10 @@
     <string name="login_no_account">Chưa có tài khoản?</string>
     <string name="login_sign_up">Đăng ký</string>
     <string name="login_or_with">Hoặc đăng nhập với</string>
+    <string name="login_with_google">Đăng nhập bằng Google</string>
+    <string name="login_with_facebook">Đăng nhập bằng Facebook</string>
+    <string name="login_social_failed">Đăng nhập mạng xã hội thất bại. Vui lòng thử lại.</string>
+    <string name="login_fb_pending">Đăng nhập Facebook sẽ sớm được bật.</string>
     <string name="register_or_with">Hoặc đăng ký với</string>
 
     <!-- activity_register.xml -->
@@ -381,6 +386,7 @@
     <string name="adm_stat_flagged">Người dùng bị gắn cờ</string>
     <string name="adm_alert_title">%d mục cần bạn duyệt</string>
     <string name="adm_alert_sub">%1$d tin chờ duyệt · %2$d báo cáo đang mở</string>
+    <string name="adm_time_yesterday">Hôm qua</string>
     <string name="adm_open">Mở</string>
     <string name="adm_quick_actions">Thao tác nhanh</string>
     <string name="adm_qa_review_listings">Duyệt tin đăng chờ</string>
@@ -496,6 +502,147 @@
     <string name="adm_help_center">Trung tâm trợ giúp</string>
     <string name="adm_logout">Đăng xuất</string>
     <string name="adm_toast_logged_out">Đã đăng xuất</string>
+
+    <!-- Profile › settings sheets -->
+    <string name="adm_set_save">Lưu thay đổi</string>
+    <string name="adm_policy_rules">Quy tắc nội dung</string>
+    <string name="adm_policy_automation">Tự động hóa</string>
+    <string name="adm_toast_policy_saved">Đã lưu chính sách kiểm duyệt</string>
+    <string name="adm_team_members">Thành viên</string>
+    <string name="adm_team_invite">Mời thành viên</string>
+    <string name="adm_toast_invite_sent">Đã gửi lời mời</string>
+    <string name="adm_audit_recent">Hoạt động gần đây</string>
+    <string name="adm_sec_change_password">Đổi mật khẩu</string>
+    <string name="adm_sec_two_factor">Xác thực hai lớp</string>
+    <string name="adm_pwd_current_hint">Mật khẩu hiện tại</string>
+    <string name="adm_pwd_new_hint">Mật khẩu mới</string>
+    <string name="adm_pwd_confirm_hint">Nhập lại mật khẩu mới</string>
+    <string name="adm_pwd_update">Cập nhật mật khẩu</string>
+    <string name="adm_2fa_label">Yêu cầu mã xác minh</string>
+    <string name="adm_2fa_desc">Yêu cầu mã dùng một lần mỗi khi admin đăng nhập.</string>
+    <string name="adm_pwd_err_current">Nhập mật khẩu hiện tại</string>
+    <string name="adm_pwd_err_short">Mật khẩu mới phải có ít nhất 8 ký tự</string>
+    <string name="adm_pwd_err_match">Mật khẩu mới không khớp</string>
+    <string name="adm_toast_password_updated">Đã cập nhật mật khẩu</string>
+    <string name="adm_toast_2fa_enabled">Đã bật xác thực hai lớp</string>
+    <string name="adm_toast_2fa_disabled">Đã tắt xác thực hai lớp</string>
+    <string name="adm_help_topics">Chủ đề trợ giúp</string>
+    <string name="adm_help_reach">Liên hệ</string>
+    <string name="adm_help_contact">Liên hệ hỗ trợ</string>
+    <string name="adm_toast_no_mail">Không tìm thấy ứng dụng email</string>
+
+    <!-- ============================================================
+         Cài đặt Admin — màn hình chi tiết (AdminDetailActivity)
+         Nguồn: "TourGo Admin Detail Screens.html"
+         ============================================================ -->
+    <string name="adm_detail_crumb">Tài khoản · Cài đặt Admin</string>
+
+    <!-- 1 · Chính sách kiểm duyệt -->
+    <string name="adm_policy_automated_rules">Quy tắc tự động</string>
+    <string name="adm_policy_autohide_title">Tự ẩn nội dung bị báo cáo</string>
+    <string name="adm_policy_autohide_sub">Ẩn khi đạt ngưỡng báo cáo</string>
+    <string name="adm_policy_profanity_title">Lọc từ ngữ &amp; spam</string>
+    <string name="adm_policy_profanity_sub">Chặn tin đăng chứa từ bị hạn chế</string>
+    <string name="adm_policy_photo_title">Yêu cầu duyệt ảnh</string>
+    <string name="adm_policy_photo_sub">Ảnh tin đăng mới cần duyệt thủ công</string>
+    <string name="adm_policy_geo_title">Kiểm tra giới hạn khu vực</string>
+    <string name="adm_policy_geo_sub">Gắn cờ tin ngoài khu vực cho phép</string>
+    <string name="adm_policy_thresholds">Ngưỡng</string>
+    <string name="adm_policy_autohide_after_title">Tự ẩn sau</string>
+    <string name="adm_policy_autohide_after_sub">Số báo cáo trước khi ẩn nội dung</string>
+    <string name="adm_policy_sla_title">SLA xử lý</string>
+    <string name="adm_policy_sla_sub">Thời gian mục tiêu xử lý hàng đợi</string>
+    <string name="adm_policy_restricted_terms">Từ bị hạn chế</string>
+    <string name="adm_policy_add_term">Thêm từ</string>
+    <string name="adm_policy_add_term_hint">Nhập từ cần hạn chế</string>
+    <string name="adm_policy_save">Lưu chính sách</string>
+    <string name="adm_hours_suffix">g</string>
+
+    <!-- 2 · Đội ngũ admin & vai trò -->
+    <string name="adm_team_summary">%d admin</string>
+    <string name="adm_team_summary_sub">Chủ sở hữu quản lý thanh toán &amp; vai trò. Người kiểm duyệt chỉ xử lý hàng đợi.</string>
+    <string name="adm_team_you">Bạn</string>
+    <string name="adm_team_change_role">Đổi vai trò</string>
+    <string name="adm_team_resend">Gửi lại lời mời</string>
+    <string name="adm_team_remove">Gỡ admin</string>
+    <string name="adm_team_edit_profile">Sửa hồ sơ</string>
+    <string name="adm_team_pending">Lời mời đang chờ</string>
+    <string name="adm_team_pending_meta">Đã mời 2 ngày trước · MODERATOR</string>
+    <string name="adm_team_pending_chip">ĐANG CHỜ</string>
+    <string name="adm_team_invite_admin">Mời admin</string>
+    <string name="adm_team_invite_hint">Email của tài khoản TourGo hiện có</string>
+    <string name="adm_team_remove_confirm">Gỡ %s khỏi đội ngũ admin?</string>
+    <string name="adm_toast_role_changed">Đã cập nhật vai trò</string>
+    <string name="adm_toast_admin_removed">Đã gỡ admin</string>
+    <string name="adm_audit_no_more">Không còn hoạt động cũ hơn</string>
+    <string name="adm_error_generic">Đã xảy ra lỗi. Vui lòng thử lại.</string>
+
+    <!-- 3 · Nhật ký kiểm toán -->
+    <string name="adm_audit_filter_approvals">Phê duyệt</string>
+    <string name="adm_audit_filter_locks">Khóa</string>
+    <string name="adm_audit_filter_settings">Cài đặt</string>
+    <string name="adm_audit_today">Hôm nay</string>
+    <string name="adm_audit_yesterday">Hôm qua</string>
+    <string name="adm_audit_load_earlier">Tải hoạt động cũ hơn</string>
+    <string name="adm_audit_export">Xuất</string>
+    <string name="adm_audit_empty">Chưa có hoạt động</string>
+
+    <!-- 4 · Thông báo (tùy chọn) -->
+    <string name="adm_notif_push">Thông báo đẩy</string>
+    <string name="adm_notif_pending_title">Doanh nghiệp mới chờ duyệt</string>
+    <string name="adm_notif_pending_sub">Khi doanh nghiệp gửi để duyệt</string>
+    <string name="adm_notif_reported_title">Nội dung bị báo cáo</string>
+    <string name="adm_notif_reported_sub">Một tin đăng hoặc đánh giá bị gắn cờ</string>
+    <string name="adm_notif_team_title">Thay đổi đội ngũ</string>
+    <string name="adm_notif_team_sub">Admin được thêm hoặc gỡ</string>
+    <string name="adm_notif_sla_title">Vi phạm SLA</string>
+    <string name="adm_notif_sla_sub">Hàng đợi vượt mục tiêu xử lý</string>
+    <string name="adm_notif_email">Thông báo email</string>
+    <string name="adm_notif_digest_title">Tóm tắt hằng ngày</string>
+    <string name="adm_notif_digest_sub">Tóm tắt hoạt động hàng đợi lúc 8 giờ</string>
+    <string name="adm_notif_weekly_title">Báo cáo hằng tuần</string>
+    <string name="adm_notif_weekly_sub">Chỉ số kiểm duyệt mỗi thứ Hai</string>
+    <string name="adm_notif_security_title">Cảnh báo bảo mật</string>
+    <string name="adm_notif_security_sub">Đăng nhập mới &amp; thay đổi vai trò</string>
+    <string name="adm_notif_footnote">Không thể tắt cảnh báo bảo mật cho chủ sở hữu. Gửi tới admin@tourgo.app.</string>
+
+    <!-- 5 · Ngôn ngữ -->
+    <string name="adm_lang_app_language">Ngôn ngữ ứng dụng</string>
+    <string name="adm_lang_english_label">Tiếng Anh</string>
+    <string name="adm_lang_vietnamese_label">Tiếng Việt</string>
+    <string name="adm_lang_footnote">Đổi ngôn ngữ chỉ cập nhật bảng quản trị. Nội dung hiển thị cho du khách giữ ngôn ngữ gốc.</string>
+
+    <!-- 6 · Mật khẩu & 2FA -->
+    <string name="adm_pwd_strength_good">Khá · thêm ký hiệu để mật khẩu mạnh hơn</string>
+    <string name="adm_2fa_title">Xác thực hai lớp</string>
+    <string name="adm_2fa_on_sub">Bật · yêu cầu mỗi lần đăng nhập</string>
+    <string name="adm_2fa_off_sub">Tắt · tài khoản kém an toàn hơn</string>
+    <string name="adm_2fa_authenticator_title">Ứng dụng xác thực</string>
+    <string name="adm_2fa_authenticator_sub">Google Authenticator · thêm Th6 2025</string>
+    <string name="adm_2fa_active">ĐANG BẬT</string>
+    <string name="adm_2fa_sms_title">SMS dự phòng</string>
+    <string name="adm_2fa_recovery_title">Mã khôi phục</string>
+    <string name="adm_2fa_recovery_sub">8 mã chưa dùng · lưu nơi an toàn</string>
+
+    <!-- 7 · Trung tâm trợ giúp -->
+    <string name="adm_help_search_hint">Tìm bài viết trợ giúp</string>
+    <string name="adm_help_browse">Chủ đề</string>
+    <string name="adm_help_articles">%d bài viết</string>
+    <string name="adm_help_topic_moderation">Kiểm duyệt</string>
+    <string name="adm_help_topic_businesses">Doanh nghiệp</string>
+    <string name="adm_help_topic_security">Bảo mật</string>
+    <string name="adm_help_topic_team">Đội ngũ</string>
+    <string name="adm_help_popular">Câu hỏi thường gặp</string>
+    <string name="adm_help_q1">Làm sao để duyệt hoặc từ chối doanh nghiệp?</string>
+    <string name="adm_help_a1">Mở tab Kiểm duyệt, chạm vào thẻ doanh nghiệp chờ duyệt, rồi dùng nút Duyệt hoặc Từ chối. Khi từ chối, hệ thống gửi email kèm lý do của bạn.</string>
+    <string name="adm_help_q2">Điều gì xảy ra khi tôi khóa tài khoản?</string>
+    <string name="adm_help_a2">Doanh nghiệp mất quyền truy cập bảng điều khiển ngay lập tức nhưng các tin đã đăng vẫn hiển thị. Mở khóa bất cứ lúc nào trong Quản lý tài khoản.</string>
+    <string name="adm_help_q3">Ngưỡng tự ẩn được áp dụng thế nào?</string>
+    <string name="adm_help_a3">Khi một tin đăng đạt ngưỡng báo cáo đặt trong Chính sách kiểm duyệt, nó sẽ tự động bị ẩn và đưa vào hàng đợi xử lý.</string>
+    <string name="adm_help_q4">Tôi có thể đổi vai trò của admin khác không?</string>
+    <string name="adm_help_a4">Chủ sở hữu có thể. Mở Đội ngũ admin &amp; vai trò, chạm menu cạnh thành viên và chọn Đổi vai trò.</string>
+    <string name="adm_help_contact_sub">Phản hồi trung bình dưới 2 giờ</string>
+    <string name="adm_help_still_need">Vẫn cần trợ giúp?</string>
 
     <!-- Create Tour -->
     <string name="create_tour_title">Tạo tour mới</string>
@@ -941,5 +1088,46 @@
     <string name="biz_summary_pricing">Giá</string>
     <string name="biz_summary_pricing_value">Theo mùa · 3 phụ phí</string>
     <string name="biz_terms">Tôi đồng ý với Điều khoản Chủ nhà của TourGo và xác nhận tin đăng này tuân thủ quy định địa phương.</string>
+
+    <!-- ===================== Payment ===================== -->
+    <string name="payment_method_title">Phương thức thanh toán</string>
+    <string name="total_amount">Tổng tiền</string>
+    <string name="select_payment_method">Chọn phương thức thanh toán</string>
+    <string name="payment_vnpay" translatable="false">VNPay</string>
+    <string name="payment_momo" translatable="false">Momo</string>
+    <string name="payment_cod" translatable="false">COD</string>
+    <string name="select_bank">Chọn ngân hàng</string>
+    <string name="bank_all">Cổng thanh toán chung</string>
+    <string name="bank_ncb" translatable="false">NCB</string>
+    <string name="bank_vietcombank" translatable="false">Vietcombank</string>
+    <string name="bank_vietinbank" translatable="false">Vietinbank</string>
+    <string name="proceed_payment">Tiếp tục thanh toán</string>
+    <string name="payment_processing">Đang xử lý thanh toán…</string>
+    <string name="payment_success">Thanh toán thành công</string>
+    <string name="payment_failed">Thanh toán thất bại</string>
+    <string name="payment_cancelled">Đã hủy thanh toán</string>
+    <string name="payment_error">Lỗi thanh toán. Vui lòng thử lại.</string>
+    <string name="payment_redirect">Đang chuyển đến cổng thanh toán…</string>
+    <string name="payment_note">Hệ thống sẽ tự động xác nhận sau khi nhận được tiền</string>
+    <string name="already_pay">Tôi đã chuyển khoản</string>
+    <string name="payment_require">Vui lòng chuyển khoản ĐÚNG số tiền và nội dung để hệ thống tự động xác nhận thanh toán.</string>
+    <string name="note">Lưu ý</string>
+    <string name="copy">Sao chép</string>
+    <string name="transfer_detail">Nội dung chuyển khoản</string>
+    <string name="payment_amout">Số tiền</string>
+    <string name="account_holder">Chủ tài khoản</string>
+    <string name="account_number">Số tài khoản</string>
+    <string name="transfer_information">Thông tin chuyển khoản</string>
+    <string name="qr_scan">Quét mã QR để chuyển khoản</string>
+    <string name="bank_transfer">Chuyển khoản ngân hàng</string>
+    <string name="qr_transaction_code">Mã QR giao dịch</string>
+    <string name="scan_qr_to_verify">Quét để xác minh giao dịch</string>
+    <string name="not_paid">Chưa thanh toán</string>
+    <string name="error_create_transfer_information">Lỗi tạo thông tin chuyển khoản: </string>
+    <string name="not_get_transfer_information">Không nhận được thông tin chuyển khoản</string>
+    <string name="create_transfer_information">Đang tạo thông tin chuyển khoản...</string>
+    <string name="COD_error">Lỗi thanh toán COD: </string>
+    <string name="processing">Đang xử lý...</string>
+    <string name="payment_method_not_support">Phương thức thanh toán không hỗ trợ</string>
 
 </resources>

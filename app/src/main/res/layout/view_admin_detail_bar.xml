@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared Admin › Settings detail-screen header: round back button +
+     "Account · Admin Settings" breadcrumb + title + optional right action.
+     Mirrors the prototype's DetailBar (AdminDetail.jsx). Title text and the
+     right action are set per screen by AdminDetailActivity. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/admDetailBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
+
+        <FrameLayout
+            android:id="@+id/admDetailBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_gray_100"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="19dp"
+                android:layout_height="19dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_back"
+                app:tint="@color/adm_gray_900" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/adm_detail_crumb"
+                android:textColor="@color/adm_gray_400"
+                android:textSize="10.5sp" />
+
+            <TextView
+                android:id="@+id/admDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/adm_gray_900"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/admDetailAction"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_adm_circle"
+            android:backgroundTint="@color/adm_gray_100"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/admDetailActionIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_download"
+                app:tint="@color/adm_gray_700" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/adm_gray_100" />
+</LinearLayout>

@@ -105,7 +105,7 @@ public class BookingActivity extends AppCompatActivity {
         String checkIn = formatDate(checkInMillis);
         String checkOut = formatDate(checkOutMillis);
 
-        Booking booking = new Booking(userId, tourId, hotelId);
+        Booking booking = new Booking(userId, tourId, hotelId, checkIn, checkOut);
 
         showLoading(true);
         BookingService.createBooking(this, booking, new DataCallback<Booking>() {
@@ -170,6 +170,19 @@ public class BookingActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PaymentActivity.class);
         intent.putExtra(PaymentActivity.EXTRA_BOOKING_ID, bookingId);
         intent.putExtra(PaymentActivity.EXTRA_TOTAL_PRICE, totalPrice);
+
+        Fragment current = getSupportFragmentManager().findFragmentById(R.id.booking_container);
+        if (current != null && current.getArguments() != null) {
+            intent.putExtra(PaymentActivity.EXTRA_CHECK_IN_OUT,
+                    current.getArguments().getString("check_in_out", ""));
+            intent.putExtra(PaymentActivity.EXTRA_GUEST_INFO,
+                    current.getArguments().getString("guest_info", ""));
+
+            // Truyền phương thức thanh toán đã chọn từ BookingConfirmFragment
+            String paymentMethod = current.getArguments().getString("payment_method", "cod");
+            intent.putExtra(PaymentActivity.EXTRA_PAYMENT_METHOD, paymentMethod);
+        }
+
         startActivity(intent);
     }
 
@@ -188,3 +201,4 @@ public class BookingActivity extends AppCompatActivity {
         return c.getTimeInMillis();
     }
 }
+

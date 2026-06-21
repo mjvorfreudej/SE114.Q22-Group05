@@ -108,7 +108,7 @@ public class BookingRequestFragment extends Fragment {
             double taxes = roomPrice * 0.1;
             
             // Giữ nguyên giá trị phí dịch vụ (không quy đổi tỷ giá)
-            double serviceCharge = 50000.0;
+            double serviceCharge = 3000.0; //TODO: (DEV_MODE) Tạm đổi để test thanh toán :)) (Sửa thì nhớ sửa BE luôn)
             double total = roomPrice + taxes + serviceCharge;
 
             String checkInOut = summaryFormat.format(startDate.getTime()) + " - " + summaryFormat.format(endDate.getTime());

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Admin › Help center detail screen. Search field, a 2-up topic grid, an
+     expandable FAQ accordion (filled in code), and a dark contact-support card. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/adm_canvas"
+    android:orientation="vertical">
+
+    <include layout="@layout/view_admin_detail_bar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="20dp">
+
+            <!-- Search -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_adm_search_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_search_24"
+                    app:tint="@color/adm_gray_400" />
+
+                <EditText
+                    android:id="@+id/admHelpSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:fontFamily="@font/urbanist"
+                    android:hint="@string/adm_help_search_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textColor="@color/adm_gray_900"
+                    android:textColorHint="@color/adm_gray_400"
+                    android:textSize="14sp"
+                    tools:ignore="LabelFor" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_help_browse" />
+
+            <!-- Topic grid (2 × 2) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AdmTopicCard"
+                    android:layout_marginEnd="5dp">
+
+                    <include
+                        layout="@layout/view_admin_help_topic"
+                        android:id="@+id/admTopicModeration" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AdmTopicCard"
+                    android:layout_marginStart="5dp">
+
+                    <include
+                        layout="@layout/view_admin_help_topic"
+                        android:id="@+id/admTopicBusinesses" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AdmTopicCard"
+                    android:layout_marginEnd="5dp">
+
+                    <include
+                        layout="@layout/view_admin_help_topic"
+                        android:id="@+id/admTopicSecurity" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/AdmTopicCard"
+                    android:layout_marginStart="5dp">
+
+                    <include
+                        layout="@layout/view_admin_help_topic"
+                        android:id="@+id/admTopicTeam" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_help_popular" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/AdmDetailCard">
+
+                <LinearLayout
+                    android:id="@+id/admFaqContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="4dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/AdmSectionLabel"
+                android:text="@string/adm_help_still_need" />
+
+            <!-- Contact support (dark card) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/admHelpContact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/adm_gray_900"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="3dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_adm_glass_white">
+
+                        <ImageView
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_message_circle"
+                            app:tint="@color/white" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/adm_help_contact"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/adm_help_contact_sub"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_adm_circle"
+                        android:backgroundTint="@color/adm_blue_500">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_arrow_right"
+                            app:tint="@color/white" />
+                    </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
