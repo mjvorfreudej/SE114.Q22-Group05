@@ -52,6 +52,38 @@ public class ChatService {
                 });
     }
 
+    public static void getOrCreateRoomForBusiness(Context context, String userId, DataCallback<ChatRoom> callback) {
+        Map<String, String> body = new HashMap<>();
+        body.put("userId", userId);
+
+        RetrofitClient.getInstance(context)
+                .getChatApi()
+                .getOrCreateRoom(body)
+                .enqueue(new Callback<ApiResponse<ChatRoom>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<ChatRoom>> call, Response<ApiResponse<ChatRoom>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<ChatRoom> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess() && apiResponse.getData() != null) {
+                                callback.onSuccess(apiResponse.getData());
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<ChatRoom>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
     public static void getRooms(Context context, DataCallback<List<ChatRoom>> callback) {
         RetrofitClient.getInstance(context)
                 .getChatApi()

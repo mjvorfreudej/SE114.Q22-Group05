@@ -44,6 +44,12 @@ import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.google.android.material.button.MaterialButton;
 import java.util.HashMap;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.models.response.Tour;
+import android.content.Intent;
+import com.example.tourgo.models.response.ChatRoom;
+import com.example.tourgo.remote.service.ChatService;
+import com.example.tourgo.ui.chat.ChatActivity;
 import java.util.Map;
 import android.widget.Toast;
 
@@ -483,6 +489,35 @@ public class BusinessCalendarFragment extends Fragment {
         }
     }
 
+    private void contactCustomer(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(requireContext(), "Không có ID khách hàng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Toast.makeText(requireContext(), "Đang mở cuộc trò chuyện...", Toast.LENGTH_SHORT).show();
+        
+        ChatService.getOrCreateRoomForBusiness(requireContext(), userId, new DataCallback<ChatRoom>() {
+            @Override
+            public void onSuccess(ChatRoom chatRoom) {
+                if (isAdded()) {
+                    Intent intent = new Intent(requireContext(), ChatActivity.class);
+                    intent.putExtra("chat_room", chatRoom);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), 
+                        "Không thể mở cuộc trò chuyện: " + (msg != null ? msg : "Lỗi kết nối"), 
+                        Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void updateStatus(String bookingId, String newStatus, BottomSheetDialog dialog) {
         if (bookingId == null) return;
 
@@ -600,7 +635,7 @@ public class BusinessCalendarFragment extends Fragment {
             leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
             leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
             leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
-            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+            leftBtn.setOnClickListener(v -> contactCustomer(realBooking != null ? realBooking.getUserId() : null));
 
             // Right: Check-in (Hotel) or Complete (Tour)
             if (isHotel) {
@@ -627,7 +662,7 @@ public class BusinessCalendarFragment extends Fragment {
             leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
             leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
             leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
-            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+            leftBtn.setOnClickListener(v -> contactCustomer(realBooking != null ? realBooking.getUserId() : null));
 
             // Right: Trả phòng (Hotel)
             rightBtn.setText("Trả phòng");
@@ -649,7 +684,7 @@ public class BusinessCalendarFragment extends Fragment {
             leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
             leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
             leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
-            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+            leftBtn.setOnClickListener(v -> contactCustomer(realBooking != null ? realBooking.getUserId() : null));
         }
 
         sheet.findViewById(R.id.bizSheetClose).setOnClickListener(view -> dialog.dismiss());

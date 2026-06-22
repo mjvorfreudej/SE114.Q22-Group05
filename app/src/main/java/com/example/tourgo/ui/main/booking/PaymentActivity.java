@@ -17,6 +17,7 @@ import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
 import com.example.tourgo.interfaces.DataCallback;
 import com.example.tourgo.remote.service.BookingService;
+import com.example.tourgo.remote.service.PaymentService;
 import com.example.tourgo.ui.main.home.MainActivity;
 
 import java.text.NumberFormat;
@@ -74,7 +75,7 @@ public class PaymentActivity extends AppCompatActivity {
         }
 
         // According to requirement: Backend "COMPLETED" status means the order is PAID
-        BookingService.updateBookingStatus(this, bookingId, "COMPLETED", new DataCallback<Void>() {
+        PaymentService.updatePaymentStatus(this, bookingId, "COMPLETED", new DataCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
                 if (isFinishing()) return;
