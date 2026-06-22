@@ -174,7 +174,7 @@ public class BankTransferFragment extends Fragment {
                 String status = booking != null ? booking.getStatus() : null;
                 if (isPaidStatus(status)) {
                     if (getActivity() instanceof PaymentActivity) {
-                        ((PaymentActivity) getActivity()).showBookingSuccessAfterTransfer(transactionCode, transferNote);
+                        ((PaymentActivity) getActivity()).showBookingSuccessAfterTransfer(transactionCode, transferNote, bankAmount);
                     }
                 } else {
                     Toast.makeText(

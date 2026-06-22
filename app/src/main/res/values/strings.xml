@@ -1109,7 +1109,7 @@
     <string name="select_payment_method">Chọn phương thức thanh toán</string>
     <string name="payment_vnpay" translatable="false">VNPay</string>
     <string name="payment_momo" translatable="false">Momo</string>
-    <string name="payment_cod" translatable="false">COD</string>
+    <string name="payment_cod">Thanh toán trực tiếp</string>
     <string name="select_bank">Chọn ngân hàng</string>
     <string name="bank_all">Cổng thanh toán chung</string>
     <string name="bank_ncb" translatable="false">NCB</string>
@@ -1140,7 +1140,7 @@
     <string name="error_create_transfer_information">Lỗi tạo thông tin chuyển khoản: </string>
     <string name="not_get_transfer_information">Không nhận được thông tin chuyển khoản</string>
     <string name="create_transfer_information">Đang tạo thông tin chuyển khoản...</string>
-    <string name="COD_error">Lỗi thanh toán COD: </string>
+    <string name="COD_error">"Lỗi thanh toán PAY ON ARRIVAL: "</string>
     <string name="processing">Đang xử lý...</string>
     <string name="payment_method_not_support">Phương thức thanh toán không hỗ trợ</string>
 
