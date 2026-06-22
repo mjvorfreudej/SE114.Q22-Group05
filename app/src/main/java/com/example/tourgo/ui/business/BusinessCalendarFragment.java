@@ -39,6 +39,13 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Set;
 import java.util.HashSet;
+import com.example.tourgo.remote.service.BookingService;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
+import com.google.android.material.button.MaterialButton;
+import java.util.HashMap;
+import java.util.Map;
+import android.widget.Toast;
 
 /** Business › Calendar — monthly occupancy grid, today's bookings, timeline view, detail sheet. */
 public class BusinessCalendarFragment extends Fragment {
@@ -53,6 +60,7 @@ public class BusinessCalendarFragment extends Fragment {
     private int mStartBlank;
     private int mDays;
     private List<CalBooking> mBookings = new ArrayList<>();
+    private final Map<Integer, Booking> mIdToBookingMap = new HashMap<>();
 
     private TextView todayDateText;
     private TextView blockDatesBtn;
@@ -175,8 +183,10 @@ public class BusinessCalendarFragment extends Fragment {
 
     private void mapBookings(List<Booking> bookings) {
         mBookings.clear();
+        mIdToBookingMap.clear();
         for (Booking b : bookings) {
             int id = b.getId() != null ? b.getId().hashCode() : 0;
+            mIdToBookingMap.put(id, b);
             
             String guest = "Khách";
             String phone = "";
@@ -459,9 +469,57 @@ public class BusinessCalendarFragment extends Fragment {
     }
 
     // ── Detail sheet ────────────────────────────────────────────────────────────
+    private void dialContact(String phone) {
+        if (phone == null || phone.isEmpty()) {
+            Toast.makeText(requireContext(), "Không có số điện thoại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_DIAL);
+            intent.setData(android.net.Uri.parse("tel:" + phone));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(requireContext(), "Không thể thực hiện cuộc gọi", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateStatus(String bookingId, String newStatus, BottomSheetDialog dialog) {
+        if (bookingId == null) return;
+
+        android.app.ProgressDialog pd = new android.app.ProgressDialog(requireContext());
+        pd.setMessage("Đang cập nhật...");
+        pd.show();
+
+        BookingService.updateBusinessBookingStatus(requireContext(), bookingId, newStatus, new DataCallback<Booking>() {
+            @Override
+            public void onSuccess(Booking updated) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        pd.dismiss();
+                        dialog.dismiss();
+                        Toast.makeText(requireContext(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                        loadBookings(); // Reload to refresh calendar
+                    });
+                }
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String rawMessage) {
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        pd.dismiss();
+                        Toast.makeText(requireContext(), "Lỗi: " + rawMessage, Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+        });
+    }
+
     private void openBooking(CalBooking b) {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View sheet = LayoutInflater.from(requireContext()).inflate(R.layout.sheet_biz_booking, null, false);
+
+        Booking realBooking = mIdToBookingMap.get(b.id);
 
         AdminUi.avatar(sheet.findViewById(R.id.bizDetailAvatar), b.guest);
         ((TextView) sheet.findViewById(R.id.bizDetailGuest)).setText(b.guest);
@@ -474,12 +532,126 @@ public class BusinessCalendarFragment extends Fragment {
         LinearLayout summary = sheet.findViewById(R.id.bizDetailSummary);
         LayoutInflater inf = LayoutInflater.from(requireContext());
         addSummary(inf, summary, getString(R.string.biz_detail_contact), b.phone);
-        addSummary(inf, summary, getString(R.string.biz_detail_guests), "2 adults");
-        addSummary(inf, summary, getString(R.string.biz_detail_nights), "1 night");
-        addSummary(inf, summary, getString(R.string.biz_detail_total), "Paid");
+
+        // Dynamic guests count
+        int guestCount = (realBooking != null) ? realBooking.getGuests() : 2;
+        addSummary(inf, summary, getString(R.string.biz_detail_guests), guestCount + " khách");
+
+        // Dynamic nights count
+        int nightsCount = 1;
+        if (realBooking != null && realBooking.getCheckIn() != null && realBooking.getCheckOut() != null) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                java.util.Date dIn = sdf.parse(realBooking.getCheckIn());
+                java.util.Date dOut = sdf.parse(realBooking.getCheckOut());
+                long diff = dOut.getTime() - dIn.getTime();
+                nightsCount = (int) (diff / (24 * 60 * 60 * 1000));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        boolean isHotel = (realBooking != null && realBooking.getHotelId() != null);
+        if (isHotel) {
+            addSummary(inf, summary, getString(R.string.biz_detail_nights), nightsCount + " đêm");
+        } else {
+            addSummary(inf, summary, "Kiểu dịch vụ", "Chuyến đi (Tour)");
+        }
+        addSummary(inf, summary, getString(R.string.biz_detail_total), "Đã thanh toán");
+
+        MaterialButton leftBtn = sheet.findViewById(R.id.bizDetailContact);
+        MaterialButton rightBtn = sheet.findViewById(R.id.bizDetailCheckinBtn);
+
+        String currentStatus = (realBooking != null && realBooking.getStatus() != null) ? realBooking.getStatus().toUpperCase() : "PENDING";
+
+        // Reset layout params first
+        LinearLayout.LayoutParams leftLp = (LinearLayout.LayoutParams) leftBtn.getLayoutParams();
+        leftLp.weight = 1.0f;
+        leftLp.setMarginEnd(BizUi.dp(requireContext(), 5));
+        leftBtn.setLayoutParams(leftLp);
+        leftBtn.setVisibility(View.VISIBLE);
+        rightBtn.setVisibility(View.VISIBLE);
+
+        if ("PENDING".equals(currentStatus)) {
+            // Left: Reject
+            leftBtn.setText("Từ chối");
+            leftBtn.setIconResource(R.drawable.ic_close);
+            leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_red_700));
+            leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_red_700)));
+            leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_red_200)));
+            leftBtn.setOnClickListener(v -> {
+                if (realBooking != null) {
+                    updateStatus(realBooking.getId(), "CANCELLED", dialog);
+                }
+            });
+
+            // Right: Confirm
+            rightBtn.setText("Xác nhận");
+            rightBtn.setIconResource(R.drawable.ic_check);
+            rightBtn.setOnClickListener(v -> {
+                if (realBooking != null) {
+                    updateStatus(realBooking.getId(), "CONFIRMED", dialog);
+                }
+            });
+        } else if ("CONFIRMED".equals(currentStatus)) {
+            // Left: Contact
+            leftBtn.setText(R.string.biz_detail_contact);
+            leftBtn.setIconResource(R.drawable.ic_phone);
+            leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
+            leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
+            leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
+            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+
+            // Right: Check-in (Hotel) or Complete (Tour)
+            if (isHotel) {
+                rightBtn.setText("Nhận phòng");
+                rightBtn.setIconResource(R.drawable.ic_check);
+                rightBtn.setOnClickListener(v -> {
+                    if (realBooking != null) {
+                        updateStatus(realBooking.getId(), "CHECKED-IN", dialog);
+                    }
+                });
+            } else {
+                rightBtn.setText("Hoàn thành");
+                rightBtn.setIconResource(R.drawable.ic_check);
+                rightBtn.setOnClickListener(v -> {
+                    if (realBooking != null) {
+                        updateStatus(realBooking.getId(), "COMPLETED", dialog);
+                    }
+                });
+            }
+        } else if ("CHECKED-IN".equals(currentStatus)) {
+            // Left: Contact
+            leftBtn.setText(R.string.biz_detail_contact);
+            leftBtn.setIconResource(R.drawable.ic_phone);
+            leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
+            leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
+            leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
+            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+
+            // Right: Trả phòng (Hotel)
+            rightBtn.setText("Trả phòng");
+            rightBtn.setIconResource(R.drawable.ic_check);
+            rightBtn.setOnClickListener(v -> {
+                if (realBooking != null) {
+                    updateStatus(realBooking.getId(), "COMPLETED", dialog);
+                }
+            });
+        } else {
+            // COMPLETED or CANCELLED: Hide right button, Left is full width Contact
+            rightBtn.setVisibility(View.GONE);
+            leftLp.weight = 2.0f;
+            leftLp.setMarginEnd(0);
+            leftBtn.setLayoutParams(leftLp);
+
+            leftBtn.setText(R.string.biz_detail_contact);
+            leftBtn.setIconResource(R.drawable.ic_phone);
+            leftBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.adm_gray_900));
+            leftBtn.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_900)));
+            leftBtn.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.adm_gray_300)));
+            leftBtn.setOnClickListener(v -> dialContact(b.phone));
+        }
 
         sheet.findViewById(R.id.bizSheetClose).setOnClickListener(view -> dialog.dismiss());
-        sheet.findViewById(R.id.bizDetailCheckinBtn).setOnClickListener(view -> dialog.dismiss());
 
         dialog.setContentView(sheet);
         dialog.show();

@@ -15,6 +15,7 @@ public class Booking {
     @SerializedName("booking_date")
     private String bookingDate;
     private String status;
+    private int guests;
 
     @SerializedName("check_in")
     private String checkIn;
@@ -69,6 +70,7 @@ public class Booking {
         b.hotelId = json.optString("hotel_id", null);
         b.bookingDate = json.optString("booking_date", null);
         b.status = json.optString("status", "PENDING");
+        b.guests = json.optInt("guests", 1);
         return b;
     }
 
@@ -86,6 +88,7 @@ public class Booking {
             }
 
             json.put("status", status != null ? status : "PENDING");
+            json.put("guests", guests > 0 ? guests : 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -115,4 +118,7 @@ public class Booking {
 
     public String getCheckOut() { return checkOut; }
     public void setCheckOut(String checkOut) { this.checkOut = checkOut; }
+
+    public int getGuests() { return guests; }
+    public void setGuests(int guests) { this.guests = guests; }
 }

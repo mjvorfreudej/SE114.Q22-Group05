@@ -53,6 +53,9 @@ import com.example.tourgo.remote.service.ReviewService;
 import com.example.tourgo.data.local.SessionManager;
 import com.example.tourgo.remote.service.BookingService;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
+import com.example.tourgo.remote.service.ChatService;
+import com.example.tourgo.models.response.ChatRoom;
+import com.example.tourgo.ui.chat.ChatActivity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -117,11 +120,13 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnFavoriteDetail.setOnClickListener(v -> toggleFavorite());
+        binding.btnChatDetail.setOnClickListener(v -> initiateChat());
 
         if (isAdminMode) {
             binding.layoutBookingActions.setVisibility(View.GONE);
             binding.btnFavoriteDetail.setVisibility(View.GONE);
             binding.btnShare.setVisibility(View.GONE);
+            binding.btnChatDetail.setVisibility(View.GONE);
 
             boolean isApproved = false;
             if (isTourMode && tour != null && "APPROVED".equalsIgnoreCase(tour.getStatus())) {
@@ -141,6 +146,7 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             binding.layoutBookingActions.setVisibility(View.VISIBLE);
             binding.layoutAdminActions.setVisibility(View.GONE);
+            binding.btnChatDetail.setVisibility(View.VISIBLE);
         }
 
         binding.btnBookNow.setOnClickListener(v -> {
@@ -808,6 +814,45 @@ public class DetailActivity extends AppCompatActivity {
                     Toast.makeText(DetailActivity.this, R.string.adm_toast_revision_requested, Toast.LENGTH_SHORT).show();
                     finish();
                 });
+    }
+
+    private void initiateChat() {
+        if (!session.isLoggedIn()) {
+            Toast.makeText(this, R.string.err_login_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String businessId = null;
+        if (isTourMode && tour != null) {
+            businessId = tour.getBusinessesId();
+        } else if (!isTourMode && hotel != null) {
+            businessId = hotel.getBusinessesId();
+        }
+
+        if (businessId == null || businessId.isEmpty()) {
+            Toast.makeText(this, "Không thể xác định doanh nghiệp sở hữu bài đăng này", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Đang kết nối...", Toast.LENGTH_SHORT).show();
+
+        ChatService.getOrCreateRoom(this, businessId, new DataCallback<ChatRoom>() {
+            @Override
+            public void onSuccess(ChatRoom room) {
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(DetailActivity.this, ChatActivity.class);
+                    intent.putExtra("chat_room", room);
+                    startActivity(intent);
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) {
+                runOnUiThread(() -> {
+                    Toast.makeText(DetailActivity.this, "Không thể kết nối phòng chat: " + msg, Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 
     @Override protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }

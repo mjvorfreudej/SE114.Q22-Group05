@@ -478,6 +478,40 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="24dp">
 
+                <!-- Messages -->
+                <LinearLayout
+                    android:id="@+id/rowMessages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_message_circle"
+                        app:tint="@color/black" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/profile_messages"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right_24"
+                        app:tint="#9E9E9E" />
+                </LinearLayout>
+
                 <!-- Personal Information -->
                 <LinearLayout
                     android:id="@+id/rowPersonalInfo"

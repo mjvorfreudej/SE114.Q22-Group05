@@ -56,4 +56,10 @@ public class CreateHotelRequest {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    @com.google.gson.annotations.SerializedName("total_rooms")
+    private int totalRooms;
+
+    public int getTotalRooms() { return totalRooms; }
+    public void setTotalRooms(int totalRooms) { this.totalRooms = totalRooms; }
 }

@@ -76,6 +76,7 @@ public class AddListingActivity extends AppCompatActivity {
     private String listingCity = "";
     private int listingCapacity = 4;
     private double listingPrice = 0.0;
+    private int businessLimitCapacity = 5;
     private java.util.List<String> selectedAmenities = new java.util.ArrayList<>();
 
     // Availability Calendar states
@@ -219,6 +220,15 @@ public class AddListingActivity extends AppCompatActivity {
                         listingPrice = 0.0;
                     }
                 }
+
+                EditText etCapacity = content.findViewById(R.id.bizCapacityInput);
+                if (etCapacity != null) {
+                    try {
+                        businessLimitCapacity = Integer.parseInt(etCapacity.getText().toString().trim());
+                    } catch (NumberFormatException e) {
+                        businessLimitCapacity = "tour".equals(kind) ? 20 : 5;
+                    }
+                }
                 break;
         }
     }
@@ -242,6 +252,7 @@ public class AddListingActivity extends AppCompatActivity {
                             openUntilDate,
                             blockedDates != null ? new java.util.ArrayList<>(blockedDates) : null
                     );
+            request.setMaxParticipants(businessLimitCapacity);
 
             String rawAmenities = android.text.TextUtils.join(", ", selectedAmenities);
             if (!rawAmenities.isEmpty()) {
@@ -294,6 +305,7 @@ public class AddListingActivity extends AppCompatActivity {
                             openUntilDate,
                             blockedDates != null ? new java.util.ArrayList<>(blockedDates) : null
                     );
+            request.setTotalRooms(businessLimitCapacity);
 
             com.example.tourgo.remote.RetrofitClient.getInstance(this)
                     .getHotelApi()
@@ -743,6 +755,21 @@ public class AddListingActivity extends AppCompatActivity {
 
         if (etPrice != null && listingPrice > 0) {
             etPrice.setText(String.valueOf(listingPrice));
+        }
+
+        TextView tvCapacityLabel = content.findViewById(R.id.bizCapacityLabel);
+        ImageView ivCapacityIcon = content.findViewById(R.id.bizCapacityIcon);
+        EditText etCapacity = content.findViewById(R.id.bizCapacityInput);
+
+        boolean isHotel = "hotel".equals(kind);
+        if (tvCapacityLabel != null) {
+            tvCapacityLabel.setText(isHotel ? "Số lượng phòng tối đa" : "Số khách tối đa mỗi đoàn");
+        }
+        if (ivCapacityIcon != null) {
+            ivCapacityIcon.setImageResource(isHotel ? R.drawable.ic_home_24 : R.drawable.ic_users);
+        }
+        if (etCapacity != null) {
+            etCapacity.setText(String.valueOf(businessLimitCapacity));
         }
 
         season(

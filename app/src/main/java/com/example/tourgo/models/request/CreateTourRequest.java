@@ -50,4 +50,10 @@ public class CreateTourRequest {
 
     public String getName() { return name; }
     public String getStatus() { return status; }
+
+    @com.google.gson.annotations.SerializedName("max_participants")
+    private int maxParticipants;
+
+    public int getMaxParticipants() { return maxParticipants; }
+    public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
 }

@@ -109,6 +109,7 @@ public class BookingActivity extends AppCompatActivity {
         booking.setBookingDate(checkIn);
         booking.setCheckIn(checkIn);
         booking.setCheckOut(checkOut);
+        booking.setGuests(guests);
 
         showLoading(true);
         BookingService.createBooking(this, booking, new DataCallback<Booking>() {

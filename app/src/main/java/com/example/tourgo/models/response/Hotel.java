@@ -33,6 +33,8 @@ public class Hotel implements Serializable {
     private double latitude;
     private double longitude;
     private String status;
+    @SerializedName("businesses_id")
+    private String businessesId;
 
     public static class HotelImage implements Serializable {
         private String id;
@@ -146,4 +148,7 @@ public class Hotel implements Serializable {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getBusinessesId() { return businessesId; }
+    public void setBusinessesId(String businessesId) { this.businessesId = businessesId; }
 }

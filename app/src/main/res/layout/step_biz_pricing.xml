@@ -47,6 +47,45 @@
             xmlns:tools="http://schemas.android.com/tools" />
     </LinearLayout>
 
+    <!-- Capacity limit -->
+    <TextView
+        android:id="@+id/bizCapacityLabel"
+        style="@style/BizFieldLabel"
+        android:layout_marginTop="14dp"
+        android:text="Số lượng phòng tối đa" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@drawable/bg_biz_input"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp">
+
+        <ImageView
+            android:id="@+id/bizCapacityIcon"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_home_24"
+            app:tint="@color/adm_gray_400" />
+
+        <EditText
+            android:id="@+id/bizCapacityInput"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:hint="5"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLines="1"
+            android:textColor="@color/adm_gray_900"
+            android:textColorHint="@color/adm_gray_400"
+            android:textSize="13sp"
+            xmlns:tools="http://schemas.android.com/tools" />
+    </LinearLayout>
+
     <!-- Seasonal toggle card -->
     <LinearLayout
         android:layout_width="match_parent"

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="4dp">
+
+    <!-- Sender Avatar Container -->
+    <FrameLayout
+        android:id="@+id/chatMessageSenderAvatarContainer"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignWithParentIfMissing="true">
+
+        <TextView
+            android:id="@+id/chatMessageSenderInitialsAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/white" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/chatMessageSenderAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+    </FrameLayout>
+
+    <!-- Message Text Bubble -->
+    <LinearLayout
+        android:id="@+id/chatMessageBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/chatMessageSenderAvatarContainer"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="64dp"
+        android:background="@drawable/bg_chat_bubble_received"
+        android:orientation="vertical"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp">
+
+        <TextView
+            android:id="@+id/chatMessageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Received message text"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!-- Message Image View -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/chatMessageImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_toEndOf="@id/chatMessageSenderAvatarContainer"
+        android:layout_marginStart="8dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+
+</RelativeLayout>
