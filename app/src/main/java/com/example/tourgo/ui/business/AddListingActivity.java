@@ -671,9 +671,9 @@ public class AddListingActivity extends AppCompatActivity {
                 R.drawable.ic_wifi,
                 R.drawable.ic_pool,
                 R.drawable.ic_garage,
-                R.drawable.ic_tag,
+                R.drawable.ic_breakfast,
                 R.drawable.ic_workplace,
-                R.drawable.ic_settings
+                R.drawable.ic_snowflake
         };
 
         boolean[] on = {true, true, false, true, false, true};

@@ -15,13 +15,18 @@ public class Booking {
     @SerializedName("booking_date")
     private String bookingDate;
     private String status;
-    private int guests;
 
     @SerializedName("check_in")
     private String checkIn;
 
     @SerializedName("check_out")
     private String checkOut;
+
+    @SerializedName("num_guests")
+    private Integer numGuests;
+
+    @SerializedName("num_rooms")
+    private Integer numRooms;
 
     @SerializedName("users")
     private GuestInfo guestInfo;
@@ -70,7 +75,6 @@ public class Booking {
         b.hotelId = json.optString("hotel_id", null);
         b.bookingDate = json.optString("booking_date", null);
         b.status = json.optString("status", "PENDING");
-        b.guests = json.optInt("guests", 1);
         return b;
     }
 
@@ -88,7 +92,6 @@ public class Booking {
             }
 
             json.put("status", status != null ? status : "PENDING");
-            json.put("guests", guests > 0 ? guests : 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,6 +122,9 @@ public class Booking {
     public String getCheckOut() { return checkOut; }
     public void setCheckOut(String checkOut) { this.checkOut = checkOut; }
 
-    public int getGuests() { return guests; }
-    public void setGuests(int guests) { this.guests = guests; }
+    public Integer getNumGuests() { return numGuests; }
+    public void setNumGuests(Integer numGuests) { this.numGuests = numGuests; }
+
+    public Integer getNumRooms() { return numRooms; }
+    public void setNumRooms(Integer numRooms) { this.numRooms = numRooms; }
 }

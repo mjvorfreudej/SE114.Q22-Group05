@@ -534,7 +534,8 @@ public class BusinessCalendarFragment extends Fragment {
         addSummary(inf, summary, getString(R.string.biz_detail_contact), b.phone);
 
         // Dynamic guests count
-        int guestCount = (realBooking != null) ? realBooking.getGuests() : 2;
+        int guestCount = (realBooking != null && realBooking.getNumGuests() != null)
+                ? realBooking.getNumGuests() : 2;
         addSummary(inf, summary, getString(R.string.biz_detail_guests), guestCount + " khách");
 
         // Dynamic nights count
