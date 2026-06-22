@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SwitchCompat track: green-500 when ON, gray-300 when OFF. -->
+<!-- SwitchCompat track: navy (gray-900) when ON, gray-300 when OFF.
+     Matches the seasonal-pricing MaterialSwitch (theme colorPrimary). -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/adm_green_500" android:state_checked="true" />
+    <item android:color="@color/adm_gray_900" android:state_checked="true" />
     <item android:color="@color/adm_gray_300" />
 </selector>
