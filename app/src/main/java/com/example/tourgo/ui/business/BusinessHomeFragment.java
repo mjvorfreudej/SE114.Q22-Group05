@@ -14,7 +14,10 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import android.content.Intent;
 import androidx.fragment.app.Fragment;
+
+import com.example.tourgo.ui.chat.ChatListActivity;
 
 import com.example.tourgo.R;
 import com.example.tourgo.interfaces.ApiErrorCode;
@@ -97,6 +100,8 @@ public class BusinessHomeFragment extends Fragment {
                 R.string.biz_qa_calendar, () -> activity().goToTab(BusinessActivity.TAB_CALENDAR));
         addQuickAction(inf, qa, R.drawable.ic_star, R.color.adm_purple_100, R.color.adm_purple_500,
                 R.string.biz_qa_reviews, () -> activity().goToTab(BusinessActivity.TAB_REVIEWS));
+        addQuickAction(inf, qa, R.drawable.ic_message_circle, R.color.adm_blue_50, R.color.adm_blue_500,
+                R.string.profile_messages, () -> startActivity(new Intent(requireContext(), ChatListActivity.class)));
     }
 
     private BusinessActivity activity() {

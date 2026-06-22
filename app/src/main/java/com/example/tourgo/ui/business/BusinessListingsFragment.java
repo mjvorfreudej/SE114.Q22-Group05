@@ -21,6 +21,10 @@ import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.admin.AdminTabBar;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.example.tourgo.ui.business.BusinessMockData.Listing;
+import com.example.tourgo.models.response.Tour;
+import com.example.tourgo.models.response.Hotel;
+import com.example.tourgo.interfaces.ApiErrorCode;
+import com.example.tourgo.interfaces.DataCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,7 +119,8 @@ public class BusinessListingsFragment extends Fragment implements ListingAdapter
                                         item.getStatus(),
                                         item.getCategory(),
                                         0, // bookings
-                                        -1 // rating: -1 means no rating yet
+                                        -1, // rating: -1 means no rating yet
+                                        item.getId() // serverId
                                 ));
                             }
                             rebuildTabs();
@@ -135,6 +140,8 @@ public class BusinessListingsFragment extends Fragment implements ListingAdapter
         List<AdminTabBar.Tab> tabs = Arrays.asList(
                 new AdminTabBar.Tab("all", getString(R.string.biz_tab_all), allListings.size()),
                 new AdminTabBar.Tab("active", getString(R.string.biz_tab_active), count(allListings, "active")),
+                new AdminTabBar.Tab("pending", getString(R.string.biz_status_pending), count(allListings, "pending")),
+                new AdminTabBar.Tab("rejected", getString(R.string.biz_status_rejected), count(allListings, "rejected")),
                 new AdminTabBar.Tab("inactive", getString(R.string.biz_tab_inactive), count(allListings, "inactive")),
                 new AdminTabBar.Tab("draft", getString(R.string.biz_tab_draft), count(allListings, "draft"))
         );
@@ -184,6 +191,58 @@ public class BusinessListingsFragment extends Fragment implements ListingAdapter
     @Override
     public void onEdit(Listing l) {
         openAdd();
+    }
+
+    @Override
+    public void onView(Listing l) {
+        if (l.serverId == null) {
+            toast("Mock listings cannot be viewed.");
+            return;
+        }
+
+        // Show a progress indicator/toast
+        toast("Loading details...");
+
+        if ("tour".equals(l.cat)) {
+            com.example.tourgo.remote.service.TourService.getTourDetail(requireContext(), l.serverId, new DataCallback<Tour>() {
+                @Override
+                public void onSuccess(Tour tour) {
+                    if (isAdded()) {
+                        openDetailActivity(tour);
+                    }
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    if (isAdded()) {
+                        toast("Failed to load details: " + msg);
+                    }
+                }
+            });
+        } else {
+            com.example.tourgo.remote.service.HotelService.getHotelDetail(requireContext(), l.serverId, new DataCallback<Hotel>() {
+                @Override
+                public void onSuccess(Hotel hotel) {
+                    if (isAdded()) {
+                        openDetailActivity(hotel);
+                    }
+                }
+
+                @Override
+                public void onError(ApiErrorCode code, String msg) {
+                    if (isAdded()) {
+                        toast("Failed to load details: " + msg);
+                    }
+                }
+            });
+        }
+    }
+
+    private void openDetailActivity(Object obj) {
+        android.content.Intent intent = new android.content.Intent(requireContext(), com.example.tourgo.ui.main.detail.DetailActivity.class);
+        intent.putExtra("hotel_object", (java.io.Serializable) obj);
+        intent.putExtra("is_admin_mode", false);
+        startActivity(intent);
     }
 
     @Override

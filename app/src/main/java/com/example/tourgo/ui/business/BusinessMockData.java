@@ -31,12 +31,18 @@ public final class BusinessMockData {
         public final String name, loc, cat, status;
         public final int price, photoIndex, bookings;
         public final double rating; // < 0 means "no rating yet"
+        public final String serverId;
 
         public Listing(int id, String name, String loc, int price, int photoIndex,
                        String status, String cat, int bookings, double rating) {
+            this(id, name, loc, price, photoIndex, status, cat, bookings, rating, null);
+        }
+
+        public Listing(int id, String name, String loc, int price, int photoIndex,
+                       String status, String cat, int bookings, double rating, String serverId) {
             this.id = id; this.name = name; this.loc = loc; this.price = price;
             this.photoIndex = photoIndex; this.status = status; this.cat = cat;
-            this.bookings = bookings; this.rating = rating;
+            this.bookings = bookings; this.rating = rating; this.serverId = serverId;
         }
 
         public boolean hasRating() { return rating >= 0; }

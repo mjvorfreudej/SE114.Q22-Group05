@@ -28,6 +28,9 @@ public class Tour implements Serializable {
     @SerializedName("owner_id")
     private String ownerId;
 
+    @SerializedName("businesses_id")
+    private String businessesId;
+
     private float rating;
 
     @SerializedName("review_count")
@@ -145,6 +148,9 @@ public class Tour implements Serializable {
 
     public String getOwnerId() { return ownerId; }
     public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
+
+    public String getBusinessesId() { return businessesId != null ? businessesId : ownerId; }
+    public void setBusinessesId(String businessesId) { this.businessesId = businessesId; }
 
     public float getRating() { return rating; }
     public void setRating(float rating) { this.rating = rating; }

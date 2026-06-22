@@ -2,6 +2,7 @@ package com.example.tourgo.ui.business;
 
 import android.content.Intent;
 import android.os.Bundle;
+import com.example.tourgo.ui.chat.ChatListActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,10 @@ public class BusinessProfileFragment extends Fragment {
 
         LinearLayout prefs = v.findViewById(R.id.bizPrefRows);
         addRow(inf, prefs, R.drawable.ic_bell_20, R.string.biz_row_notifications, 0);
+        View msgRow = addRow(inf, prefs, R.drawable.ic_message_circle, R.string.profile_messages, 0);
+        if (msgRow != null) {
+            msgRow.setOnClickListener(view -> startActivity(new Intent(requireContext(), ChatListActivity.class)));
+        }
         View langRow = addRow(inf, prefs, R.drawable.ic_globe_24, R.string.biz_row_language, R.string.biz_row_language_value);
         if (langRow != null) {
             langRow.setOnClickListener(view -> showLanguageDialog());

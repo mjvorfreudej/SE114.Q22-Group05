@@ -159,6 +159,7 @@
         android:orientation="horizontal">
 
         <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/bizListingPhotoPreview"
             android:layout_width="0dp"
             android:layout_height="84dp"
             android:layout_marginEnd="3dp"

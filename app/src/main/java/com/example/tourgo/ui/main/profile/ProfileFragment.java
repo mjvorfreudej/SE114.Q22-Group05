@@ -37,6 +37,7 @@ import com.example.tourgo.ui.business.BusinessActivity;
 import com.example.tourgo.ui.business.BusinessRegistrationDetailActivity;
 import com.example.tourgo.ui.business.RegisterBusinessActivity;
 import com.example.tourgo.ui.main.booking.BookingHistorySection;
+import com.example.tourgo.ui.chat.ChatListActivity;
 import com.example.tourgo.utils.LocaleHelper;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.gson.Gson;
@@ -242,6 +243,11 @@ public class ProfileFragment extends Fragment {
         }
 
         // Other Settings Rows
+        View rowMessages = root.findViewById(R.id.rowMessages);
+        if (rowMessages != null) {
+            rowMessages.setOnClickListener(v -> startActivity(new Intent(requireContext(), ChatListActivity.class)));
+        }
+
         View rowPersonalInfo = root.findViewById(R.id.rowPersonalInfo);
         if (rowPersonalInfo != null) {
             rowPersonalInfo.setOnClickListener(v -> startActivity(new Intent(requireContext(), EditProfileActivity.class)));

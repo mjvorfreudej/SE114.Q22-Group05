@@ -14,6 +14,7 @@ import com.example.tourgo.remote.api.NotificationApi;
 import com.example.tourgo.remote.api.PaymentApi;
 import com.example.tourgo.remote.api.TourApi;
 import com.example.tourgo.remote.api.UserApi;
+import com.example.tourgo.remote.api.ChatApi;
 import com.example.tourgo.remote.interceptor.AuthInterceptor;
 
 import java.util.concurrent.TimeUnit;
@@ -119,5 +120,9 @@ public class RetrofitClient {
 
     public NotificationApi getNotificationApi() {
         return retrofit.create(NotificationApi.class);
+    }
+
+    public ChatApi getChatApi() {
+        return retrofit.create(ChatApi.class);
     }
 }

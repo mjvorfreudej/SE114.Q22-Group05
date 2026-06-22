@@ -32,6 +32,9 @@ public class Hotel implements Serializable {
     private List<HotelImage> hotelImages;
     private double latitude;
     private double longitude;
+    private String status;
+    @SerializedName("businesses_id")
+    private String businessesId;
 
     public static class HotelImage implements Serializable {
         private String id;
@@ -139,4 +142,13 @@ public class Hotel implements Serializable {
     public void setHotelImages(List<HotelImage> hotelImages) {
         this.hotelImages = hotelImages;
     }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getBusinessesId() { return businessesId; }
+    public void setBusinessesId(String businessesId) { this.businessesId = businessesId; }
 }

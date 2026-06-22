@@ -42,4 +42,10 @@ public interface BookingApi {
             @Path("bookingId") String bookingId,
             @Body UpdateStatusRequest status
     );
+
+    @PATCH("api/bookings/business/{bookingId}/status")
+    Call<ApiResponse<Booking>> updateBusinessBookingStatus(
+            @Path("bookingId") String bookingId,
+            @Body UpdateStatusRequest status
+    );
 }

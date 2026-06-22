@@ -36,8 +36,8 @@ public class CreateTourActivity extends AppCompatActivity {
 
     private static final String STATUS_PENDING = "PENDING";
 
-    private TextInputLayout tilName, tilDescription, tilDestination, tilDuration, tilPrice;
-    private TextInputEditText etName, etDescription, etDestination, etDuration, etPrice;
+    private TextInputLayout tilName, tilDescription, tilDestination, tilDuration, tilPrice, tilAmenities;
+    private TextInputEditText etName, etDescription, etDestination, etDuration, etPrice, etAmenities;
     private ImageView ivPreview;
     private LinearLayout placeholder;
     private TextView tvChangeImage;
@@ -65,12 +65,14 @@ public class CreateTourActivity extends AppCompatActivity {
         tilDestination = findViewById(R.id.tilTourDestination);
         tilDuration = findViewById(R.id.tilTourDuration);
         tilPrice = findViewById(R.id.tilTourPrice);
+        tilAmenities = findViewById(R.id.tilTourAmenities);
 
         etName = findViewById(R.id.etTourName);
         etDescription = findViewById(R.id.etTourDescription);
         etDestination = findViewById(R.id.etTourDestination);
         etDuration = findViewById(R.id.etTourDuration);
         etPrice = findViewById(R.id.etTourPrice);
+        etAmenities = findViewById(R.id.etTourAmenities);
 
         ivPreview = findViewById(R.id.ivTourPreview);
         placeholder = findViewById(R.id.imagePlaceholder);
@@ -145,6 +147,18 @@ public class CreateTourActivity extends AppCompatActivity {
                 emptyToNull(text(etDuration)),
                 STATUS_PENDING
         );
+
+        String rawAmenities = text(etAmenities);
+        if (!TextUtils.isEmpty(rawAmenities)) {
+            java.util.List<String> amenitiesList = new java.util.ArrayList<>();
+            for (String item : rawAmenities.split(",")) {
+                String trimmed = item.trim();
+                if (!trimmed.isEmpty()) {
+                    amenitiesList.add(trimmed);
+                }
+            }
+            request.setAmenities(amenitiesList);
+        }
 
         // 1) Create the tour on the server (saved as PENDING).
         TourService.createTour(this, request, new DataCallback<Tour>() {

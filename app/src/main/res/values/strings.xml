@@ -113,6 +113,7 @@
     <string name="profile_my_booking">Đơn đặt của tôi</string>
     <string name="profile_view_all">Xem tất cả</string>
     <string name="profile_settings">Cài đặt</string>
+    <string name="profile_messages">Tin nhắn</string>
     <string name="profile_personal_information">Thông tin cá nhân</string>
     <string name="profile_payment_methods">Phương thức thanh toán</string>
     <string name="profile_notifications">Thông báo</string>
@@ -404,6 +405,7 @@
     <string name="adm_mod_title">Hàng đợi duyệt</string>
     <string name="adm_tab_pending_listings">Tin chờ duyệt</string>
     <string name="adm_tab_user_reports">Báo cáo người dùng</string>
+    <string name="adm_tab_approved_listings">Tin đã đăng</string>
     <string name="adm_submitted">Đã gửi %s</string>
     <string name="adm_revision">SỬA LẠI</string>
     <string name="adm_review_listing">Duyệt tin đăng</string>
@@ -655,6 +657,7 @@
     <string name="create_tour_price_hint">Giá (VND)</string>
     <string name="create_tour_destination_hint">Điểm đến</string>
     <string name="create_tour_duration_hint">Thời lượng (vd: 2 ngày 1 đêm)</string>
+    <string name="create_tour_amenities_hint">Tiện nghi (phân cách bằng dấu phẩy, vd: Hướng dẫn viên, Du thuyền)</string>
     <string name="create_tour_section_image">Ảnh bìa</string>
     <string name="create_tour_pick_image">Chạm để chọn ảnh bìa</string>
     <string name="create_tour_change_image">Đổi ảnh</string>
@@ -954,6 +957,7 @@
     <string name="biz_status_pending">Chờ duyệt</string>
     <string name="biz_status_checkedin">Đã nhận phòng</string>
     <string name="biz_status_checkedout">Đã trả phòng</string>
+    <string name="biz_status_rejected">Bị từ chối</string>
 
     <!-- Reviews &amp; Reports -->
     <string name="biz_reputation">Uy tín</string>
