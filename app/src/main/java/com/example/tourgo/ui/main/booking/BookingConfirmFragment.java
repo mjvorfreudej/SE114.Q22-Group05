@@ -130,7 +130,8 @@ public class BookingConfirmFragment extends Fragment {
                 long checkIn = getArguments().getLong("check_in_millis", 0L);
                 long checkOut = getArguments().getLong("check_out_millis", 0L);
                 int guests = getArguments().getInt("guests", 0);
-                ((BookingActivity) getActivity()).submitBooking(checkIn, checkOut, guests, totalPrice);
+                int rooms = getArguments().getInt("rooms", 0);
+                ((BookingActivity) getActivity()).submitBooking(checkIn, checkOut, guests, rooms, totalPrice);
             }
         });
 

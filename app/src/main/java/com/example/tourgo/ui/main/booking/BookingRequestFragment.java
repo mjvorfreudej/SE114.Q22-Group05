@@ -147,6 +147,7 @@ public class BookingRequestFragment extends Fragment {
             args.putLong("check_in_millis", startDate.getTimeInMillis());
             args.putLong("check_out_millis", endDate.getTimeInMillis());
             args.putInt("guests", guestCount);
+            args.putInt("rooms", bedCount);
 
             BookingConfirmFragment nextFragment = new BookingConfirmFragment();
             nextFragment.setArguments(args);

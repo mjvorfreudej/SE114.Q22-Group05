@@ -22,6 +22,12 @@ public class Booking {
     @SerializedName("check_out")
     private String checkOut;
 
+    @SerializedName("num_guests")
+    private Integer numGuests;
+
+    @SerializedName("num_rooms")
+    private Integer numRooms;
+
     @SerializedName("users")
     private GuestInfo guestInfo;
 
@@ -115,4 +121,10 @@ public class Booking {
 
     public String getCheckOut() { return checkOut; }
     public void setCheckOut(String checkOut) { this.checkOut = checkOut; }
+
+    public Integer getNumGuests() { return numGuests; }
+    public void setNumGuests(Integer numGuests) { this.numGuests = numGuests; }
+
+    public Integer getNumRooms() { return numRooms; }
+    public void setNumRooms(Integer numRooms) { this.numRooms = numRooms; }
 }

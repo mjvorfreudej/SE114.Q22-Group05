@@ -82,7 +82,7 @@ public class BookingActivity extends AppCompatActivity {
         return tour;
     }
 
-    public void submitBooking(long checkInMillis, long checkOutMillis, int guests, double totalPrice) {
+    public void submitBooking(long checkInMillis, long checkOutMillis, int guests, int rooms, double totalPrice) {
         if (!validateBookingInputs(checkInMillis, checkOutMillis, guests)) {
             return;
         }
@@ -109,6 +109,8 @@ public class BookingActivity extends AppCompatActivity {
         booking.setBookingDate(checkIn);
         booking.setCheckIn(checkIn);
         booking.setCheckOut(checkOut);
+        booking.setNumGuests(guests);
+        booking.setNumRooms(rooms);
 
         showLoading(true);
         BookingService.createBooking(this, booking, new DataCallback<Booking>() {
