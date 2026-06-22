@@ -1024,8 +1024,12 @@ public class AddListingActivity extends AppCompatActivity {
                             currentCalendarView.get(java.util.Calendar.MONTH) + 1,
                             dayNumber);
                     isBlocked = blockedDates.contains(dayStr);
-                    isOpenRange = (openFromDate != null && openUntilDate != null &&
-                            dayStr.compareTo(openFromDate) >= 0 && dayStr.compareTo(openUntilDate) <= 0);
+                    isOpenRange = openFromDate != null && (
+                            (openUntilDate != null
+                                    && dayStr.compareTo(openFromDate) >= 0
+                                    && dayStr.compareTo(openUntilDate) <= 0)
+                            // Only the start date picked yet -> still highlight it.
+                            || (openUntilDate == null && dayStr.equals(openFromDate)));
                 }
 
                 View cell = buildMiniCell(
