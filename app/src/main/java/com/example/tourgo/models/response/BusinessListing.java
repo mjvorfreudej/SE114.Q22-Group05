@@ -20,4 +20,10 @@ public class BusinessListing {
     public String getStatus() { return status; }
     public String getCategory() { return category; }
     public String getCreatedAt() { return createdAt; }
+
+    private int bookings;
+    private double rating;
+
+    public int getBookings() { return bookings; }
+    public double getRating() { return rating; }
 }
