@@ -12,6 +12,9 @@ public class PaymentResponse {
     @SerializedName("transaction_code")
     private String transactionCode;
 
+    @SerializedName("amount")
+    private double amount;
+
     @SerializedName("bank_info")
     private BankInfo bankInfo;
 
@@ -25,6 +28,10 @@ public class PaymentResponse {
 
     public String getTransactionCode() {
         return transactionCode;
+    }
+
+    public double getAmount() {
+        return amount;
     }
 
     public BankInfo getBankInfo() {

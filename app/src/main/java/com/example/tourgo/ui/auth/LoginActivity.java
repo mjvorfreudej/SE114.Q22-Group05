@@ -167,7 +167,7 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 // Request an ID token (audience = our Web client ID) so the backend
                 // can verify it with Supabase signInWithIdToken.
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.default_web_client_id)) //TODO: Nếu không có string thì app sẽ crash vậy thì bắt User tự vào mà nhập à 
                 .requestEmail()
                 .build();
         googleClient = GoogleSignIn.getClient(this, gso);

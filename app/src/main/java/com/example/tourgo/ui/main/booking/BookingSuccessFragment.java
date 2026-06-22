@@ -2,6 +2,7 @@ package com.example.tourgo.ui.main.booking;
 import com.example.tourgo.ui.main.home.MainActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,16 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.tourgo.R;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+import java.text.NumberFormat;
+import java.util.EnumMap;
+import java.util.Locale;
+import java.util.Map;
 import com.example.tourgo.models.response.Hotel;
 import com.example.tourgo.models.response.Tour;
 
@@ -39,6 +50,7 @@ public class BookingSuccessFragment extends Fragment {
 
         ImageButton btnBack = view.findViewById(R.id.btnBack);
         ImageView ivHotel = view.findViewById(R.id.ivHotel);
+        ImageView ivTransactionQR = view.findViewById(R.id.ivTransactionQR);
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
@@ -74,18 +86,34 @@ public class BookingSuccessFragment extends Fragment {
 
         // Nhận và hiển thị dữ liệu từ arguments
         if (getArguments() != null) {
-            double total = getArguments().getDouble("total_price", 0.0);
+            double total = getArguments().getDouble("paid_amount", getArguments().getDouble("total_price", 0.0));
             String bookingDate = getArguments().getString("check_in_out", "");
             String guestInfo = getArguments().getString("guest_info", "");
+            String transactionCode = getArguments().getString("transaction_code", "");
+            String transferNote = getArguments().getString("transfer_note", transactionCode);
 
             if (hotel != null) {
                 tvTotalCost.setText(hotel.formatPrice(requireContext(), total));
             } else if (tour != null) {
                 tvTotalCost.setText(tour.formatPrice(requireContext(), total));
+            } else {
+                tvTotalCost.setText(formatCurrency(total));
             }
-            
+
             tvBookingDate.setText(bookingDate);
             tvGuestInfo.setText(guestInfo);
+
+            String qrContent = transferNote != null && !transferNote.isEmpty() ? transferNote : transactionCode;
+            if (qrContent != null && !qrContent.isEmpty()) {
+                Bitmap qrBitmap = createQrBitmap(qrContent, 180);
+                if (qrBitmap != null) {
+                    ivTransactionQR.setImageBitmap(qrBitmap);
+                } else {
+                    ivTransactionQR.setImageResource(R.drawable.ic_qr_code_placeholder);
+                }
+            } else {
+                ivTransactionQR.setImageResource(R.drawable.ic_qr_code_placeholder);
+            }
         }
 
         btnBack.setOnClickListener(v -> requireActivity().finish());
@@ -100,6 +128,37 @@ public class BookingSuccessFragment extends Fragment {
             startActivity(intent);
             requireActivity().finish();
         });
+    }
+
+    private String formatCurrency(double amount) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        formatter.setMaximumFractionDigits(0);
+        return formatter.format(amount);
+    }
+
+    private Bitmap createQrBitmap(String content, int sizePx) {
+        try {
+            Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+            hints.put(EncodeHintType.MARGIN, 1);
+
+            BitMatrix bitMatrix = new QRCodeWriter().encode(
+                    content,
+                    BarcodeFormat.QR_CODE,
+                    sizePx,
+                    sizePx,
+                    hints
+            );
+
+            Bitmap bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888);
+            for (int x = 0; x < sizePx; x++) {
+                for (int y = 0; y < sizePx; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+            return bitmap;
+        } catch (WriterException e) {
+            return null;
+        }
     }
 
     private void applyTopInset(View root) {
