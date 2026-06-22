@@ -575,13 +575,40 @@ public class BusinessCalendarFragment extends Fragment {
 
         // Dynamic nights count
         int nightsCount = 1;
-        if (realBooking != null && realBooking.getCheckIn() != null && realBooking.getCheckOut() != null) {
+        if (realBooking != null && realBooking.getCheckIn() != null) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                 java.util.Date dIn = sdf.parse(realBooking.getCheckIn());
-                java.util.Date dOut = sdf.parse(realBooking.getCheckOut());
-                long diff = dOut.getTime() - dIn.getTime();
-                nightsCount = (int) (diff / (24 * 60 * 60 * 1000));
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd", Locale.US);
+                ((TextView) sheet.findViewById(R.id.bizDetailCheckinDate)).setText(displayFormat.format(dIn));
+
+                if (realBooking.getCheckOut() != null) {
+                    java.util.Date dOut = sdf.parse(realBooking.getCheckOut());
+                    ((TextView) sheet.findViewById(R.id.bizDetailCheckoutDate)).setText(displayFormat.format(dOut));
+
+                    long diff = dOut.getTime() - dIn.getTime();
+                    nightsCount = (int) (diff / (24 * 60 * 60 * 1000));
+                } else {
+                    ((TextView) sheet.findViewById(R.id.bizDetailCheckoutDate)).setText("Trong ngày");
+                    nightsCount = 0;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                String[] parts = mMonthYearKey.split("_");
+                int year = Integer.parseInt(parts[0]);
+                int month = Integer.parseInt(parts[1]);
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, month);
+                cal.set(Calendar.DAY_OF_MONTH, b.day);
+
+                SimpleDateFormat displayFormat = new SimpleDateFormat("MMM dd", Locale.US);
+                ((TextView) sheet.findViewById(R.id.bizDetailCheckinDate)).setText(displayFormat.format(cal.getTime()));
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                ((TextView) sheet.findViewById(R.id.bizDetailCheckoutDate)).setText(displayFormat.format(cal.getTime()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

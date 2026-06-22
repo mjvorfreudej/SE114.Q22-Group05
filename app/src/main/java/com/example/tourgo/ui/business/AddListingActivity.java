@@ -171,7 +171,97 @@ public class AddListingActivity extends AppCompatActivity {
         }
     }
 
+    private boolean validateCurrentStep() {
+        switch (step) {
+            case 1:
+                EditText etName = content.findViewById(R.id.bizName);
+                EditText etDesc = content.findViewById(R.id.bizDesc);
+                if (etName != null) {
+                    String val = etName.getText().toString().trim();
+                    if (val.isEmpty()) {
+                        etName.setError("Tên không được để trống");
+                        return false;
+                    }
+                }
+                if (etDesc != null) {
+                    String val = etDesc.getText().toString().trim();
+                    if (val.isEmpty()) {
+                        etDesc.setError("Mô tả không được để trống");
+                        return false;
+                    }
+                }
+                break;
+            case 2:
+                EditText etAddr = content.findViewById(R.id.bizAddress);
+                EditText etCity = content.findViewById(R.id.bizCity);
+                if (etAddr != null) {
+                    String val = etAddr.getText().toString().trim();
+                    if (val.isEmpty()) {
+                        etAddr.setError("Địa chỉ không được để trống");
+                        return false;
+                    }
+                }
+                if (etCity != null) {
+                    String val = etCity.getText().toString().trim();
+                    if (val.isEmpty()) {
+                        etCity.setError("Thành phố không được để trống");
+                        return false;
+                    }
+                }
+                break;
+            case 3:
+                EditText etPrice = content.findViewById(R.id.bizPrice);
+                EditText etCapacity = content.findViewById(R.id.bizCapacityInput);
+                if (etPrice != null) {
+                    String priceStr = etPrice.getText().toString().trim();
+                    if (priceStr.isEmpty()) {
+                        etPrice.setError("Giá không được để trống");
+                        return false;
+                    }
+                    try {
+                        double p = Double.parseDouble(priceStr);
+                        if (p <= 0) {
+                            etPrice.setError("Giá phải lớn hơn 0");
+                            return false;
+                        }
+                    } catch (NumberFormatException e) {
+                        etPrice.setError("Giá phải là số hợp lệ");
+                        return false;
+                    }
+                }
+                if (etCapacity != null) {
+                    String capStr = etCapacity.getText().toString().trim();
+                    if (capStr.isEmpty()) {
+                        etCapacity.setError("Sức chứa không được để trống");
+                        return false;
+                    }
+                    try {
+                        int cap = Integer.parseInt(capStr);
+                        if ("tour".equals(kind)) {
+                            if (cap < 1 || cap > 500) {
+                                etCapacity.setError("Sức chứa tour phải từ 1 đến 500 người");
+                                return false;
+                            }
+                        } else {
+                            if (cap < 1 || cap > 100) {
+                                etCapacity.setError("Số lượng phòng phải từ 1 đến 100 phòng");
+                                return false;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        etCapacity.setError("Vui lòng nhập một số hợp lệ");
+                        return false;
+                    }
+                }
+                break;
+        }
+        return true;
+    }
+
     private void goNext() {
+        if (!validateCurrentStep()) {
+            return;
+        }
         saveCurrentStepData();
 
         if (step < TOTAL) {
