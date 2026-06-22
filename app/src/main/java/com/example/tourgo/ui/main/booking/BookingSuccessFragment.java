@@ -54,6 +54,7 @@ public class BookingSuccessFragment extends Fragment {
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
+        TextView tvConfirmationNumber = view.findViewById(R.id.tvConfirmationNumber);
         Button btnViewBooking = view.findViewById(R.id.btnViewBooking);
         Button btnBackHome = view.findViewById(R.id.btnBackHome);
 
@@ -102,6 +103,7 @@ public class BookingSuccessFragment extends Fragment {
 
             tvBookingDate.setText(bookingDate);
             tvGuestInfo.setText(guestInfo);
+            tvConfirmationNumber.setText((transactionCode != null && !transactionCode.isEmpty()) ? transactionCode : "-");
 
             String qrContent = transferNote != null && !transferNote.isEmpty() ? transferNote : transactionCode;
             if (qrContent != null && !qrContent.isEmpty()) {
