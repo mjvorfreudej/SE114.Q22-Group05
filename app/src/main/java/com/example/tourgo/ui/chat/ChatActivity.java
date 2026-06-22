@@ -34,6 +34,8 @@ import com.example.tourgo.remote.service.ChatService;
 
 import java.util.ArrayList;
 import java.util.List;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -67,6 +69,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
+            var imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
+            v.setPadding(0, 0, 0, imeInsets.bottom);
+            return insets;
+        });
 
         chatRoom = (ChatRoom) getIntent().getSerializableExtra("chat_room");
         if (chatRoom == null) {

@@ -146,7 +146,7 @@
         <activity
             android:name=".ui.chat.ChatActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"/>
 
 
         <!-- Shares exported files (e.g. the admin audit-log CSV) via content:// URIs. -->
