@@ -9,6 +9,7 @@ import com.example.tourgo.models.response.ApiResponse;
 import com.example.tourgo.models.response.PaymentResponse;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.remote.api.PaymentRequest;
+import com.example.tourgo.models.request.UpdatePaymentStatusRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +56,37 @@ public class PaymentService {
 
                     @Override
                     public void onFailure(Call<ApiResponse<PaymentResponse>> call, Throwable t) {
+                        ApiError error = ErrorHandler.parseError(t);
+                        callback.onError(error.getCode(), error.getMessage());
+                    }
+                });
+    }
+
+    public static void updatePaymentStatus(Context context, String bookingId, String status, DataCallback<Void> callback) {
+        UpdatePaymentStatusRequest request = new UpdatePaymentStatusRequest(bookingId, status);
+
+        RetrofitClient.getInstance(context)
+                .getPaymentApi()
+                .updatePaymentStatus(request)
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            ApiResponse<Void> apiResponse = response.body();
+                            if (apiResponse.getSuccess() != null && apiResponse.getSuccess()) {
+                                callback.onSuccess(null);
+                            } else {
+                                ApiError error = ErrorHandler.parseError(response);
+                                callback.onError(error.getCode(), error.getMessage());
+                            }
+                        } else {
+                            ApiError error = ErrorHandler.parseError(response);
+                            callback.onError(error.getCode(), error.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                         ApiError error = ErrorHandler.parseError(t);
                         callback.onError(error.getCode(), error.getMessage());
                     }
