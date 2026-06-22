@@ -118,8 +118,8 @@ public class BusinessListingsFragment extends Fragment implements ListingAdapter
                                         0, // photoIndex
                                         item.getStatus(),
                                         item.getCategory(),
-                                        0, // bookings
-                                        -1, // rating: -1 means no rating yet
+                                        item.getBookings(), // bookings
+                                        item.getRating() <= 0 ? -1 : item.getRating(), // rating
                                         item.getId() // serverId
                                 ));
                             }
