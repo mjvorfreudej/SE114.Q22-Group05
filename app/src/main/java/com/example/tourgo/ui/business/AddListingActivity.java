@@ -27,7 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.tourgo.R;
 import com.example.tourgo.ui.admin.AdminUi;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.materialswitch.MaterialSwitch;
+import androidx.appcompat.widget.SwitchCompat;
 import android.net.Uri;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -803,7 +803,7 @@ public class AddListingActivity extends AppCompatActivity {
         fee(content.findViewById(R.id.bizFeeLate), R.string.biz_fee_late, R.string.biz_fee_late_value);
         fee(content.findViewById(R.id.bizFeeExtra), R.string.biz_fee_extra_guest, R.string.biz_fee_extra_guest_value);
 
-        MaterialSwitch toggle = content.findViewById(R.id.bizSeasonalToggle);
+        SwitchCompat toggle = content.findViewById(R.id.bizSeasonalToggle);
         View rows = content.findViewById(R.id.bizSeasonRows);
 
         toggle.setOnCheckedChangeListener((b, checked) -> BizUi.show(rows, checked));
@@ -1024,8 +1024,12 @@ public class AddListingActivity extends AppCompatActivity {
                             currentCalendarView.get(java.util.Calendar.MONTH) + 1,
                             dayNumber);
                     isBlocked = blockedDates.contains(dayStr);
-                    isOpenRange = (openFromDate != null && openUntilDate != null &&
-                            dayStr.compareTo(openFromDate) >= 0 && dayStr.compareTo(openUntilDate) <= 0);
+                    isOpenRange = openFromDate != null && (
+                            (openUntilDate != null
+                                    && dayStr.compareTo(openFromDate) >= 0
+                                    && dayStr.compareTo(openUntilDate) <= 0)
+                            // Only the start date picked yet -> still highlight it.
+                            || (openUntilDate == null && dayStr.equals(openFromDate)));
                 }
 
                 View cell = buildMiniCell(

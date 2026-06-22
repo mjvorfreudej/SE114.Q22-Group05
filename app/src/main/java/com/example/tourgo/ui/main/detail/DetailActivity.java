@@ -272,9 +272,9 @@ public class DetailActivity extends AppCompatActivity {
         if (amenity == null) return R.drawable.ic_check_circle;
         String lower = amenity.toLowerCase().trim();
 
-        if (lower.contains("wifi") || lower.contains("mạng") || lower.contains("internet")) return R.drawable.ic_wifi;
+        if (lower.contains("wifi") || lower.contains("wi-fi") || lower.contains("mạng") || lower.contains("internet")) return R.drawable.ic_wifi;
         if (lower.contains("pool") || lower.contains("hồ bơi") || lower.contains("bể bơi")) return R.drawable.ic_pool;
-        if (lower.contains("air con") || lower.contains("máy lạnh") || lower.contains("điều hòa") || lower.contains("điều hoà") || lower.contains("máy điều hòa")) return R.drawable.ic_snowflake;
+        if (lower.contains("air con") || lower.contains("aircon") || lower.contains("a/c") || lower.contains("máy lạnh") || lower.contains("điều hòa") || lower.contains("điều hoà") || lower.contains("máy điều hòa")) return R.drawable.ic_snowflake;
         if (lower.contains("parking") || lower.contains("đỗ xe") || lower.contains("gửi xe") || lower.contains("garage")) return R.drawable.ic_garage;
         if (lower.contains("work") || lower.contains("gym") || lower.contains("làm việc") || lower.contains("văn phòng")) return R.drawable.ic_workplace;
         if (lower.contains("tour") || lower.contains("guide") || lower.contains("hướng dẫn") || lower.contains("desk")) return R.drawable.ic_tour;

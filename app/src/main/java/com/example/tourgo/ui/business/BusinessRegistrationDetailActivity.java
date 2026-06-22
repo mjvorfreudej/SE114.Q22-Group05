@@ -7,8 +7,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tourgo.R;
 import com.example.tourgo.models.response.ApiResponse;
@@ -36,7 +40,18 @@ public class BusinessRegistrationDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_business_registration_detail);
+
+        // Đẩy header xuống dưới thanh trạng thái / camera (tránh bị khuất).
+        View root = findViewById(R.id.registrationDetailRoot);
+        if (root != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+                Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(0, bars.top, 0, 0);
+                return insets;
+            });
+        }
 
         // Khởi tạo Views
         tvDetailStatus = findViewById(R.id.tvDetailStatus);
