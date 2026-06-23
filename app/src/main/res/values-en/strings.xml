@@ -682,7 +682,13 @@
     <!-- Admin moderation (businesses & users) -->
     <string name="adm_status_pending">Pending</string>
     <string name="adm_menu_approve">Approve</string>
+    <string name="adm_status_approved">Approved</string>
+    <string name="adm_btn_approve">Approve</string>
+    <string name="adm_btn_reject">Reject</string>
     <string name="adm_toast_biz_approved">%s approved</string>
+    <string name="adm_toast_biz_rejected">Rejected %s's application</string>
+    <string name="adm_err_load_pending">Failed to load pending list: %s</string>
+    <string name="adm_err_load_approved">Failed to load approved list: %s</string>
     <string name="adm_users_empty">No users found</string>
 
     <!-- ============================================================

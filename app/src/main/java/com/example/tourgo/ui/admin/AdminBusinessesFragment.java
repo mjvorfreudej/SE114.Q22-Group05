@@ -114,7 +114,7 @@ public class AdminBusinessesFragment extends Fragment {
                     setLoading(false);
                     rebuildUi();
                 }
-                ToastHelper.showError(requireContext(), "Lỗi tải danh sách chờ duyệt: " + msg);
+                ToastHelper.showError(requireContext(), getString(R.string.adm_err_load_pending, msg));
             }
         });
 
@@ -142,7 +142,7 @@ public class AdminBusinessesFragment extends Fragment {
                     setLoading(false);
                     rebuildUi();
                 }
-                ToastHelper.showError(requireContext(), "Lỗi tải danh sách đã duyệt: " + msg);
+                ToastHelper.showError(requireContext(), getString(R.string.adm_err_load_approved, msg));
             }
         });
     }
@@ -161,7 +161,7 @@ public class AdminBusinessesFragment extends Fragment {
         title.setText(getString(R.string.adm_biz_title, currentCount));
         List<AdminTabBar.Tab> tabList = new ArrayList<>();
         tabList.add(new AdminTabBar.Tab("pending", getString(R.string.adm_status_pending), mPendingList.size()));
-        tabList.add(new AdminTabBar.Tab("approved", "Đã duyệt", mApprovedList.size()));
+        tabList.add(new AdminTabBar.Tab("approved", getString(R.string.adm_status_approved), mApprovedList.size()));
         AdminTabBar.build(tabs, tabList, mActiveTab, id -> {
             mActiveTab = id;
             int count = "pending".equals(mActiveTab) ? mPendingList.size() : mApprovedList.size();
@@ -229,7 +229,7 @@ public class AdminBusinessesFragment extends Fragment {
             public void onSuccess(Void data) {
                 if (!isAdded()) return;
                 Toast.makeText(requireContext(),
-                        "Đã từ chối đơn đăng ký của " + biz.name, Toast.LENGTH_SHORT).show();
+                        getString(R.string.adm_toast_biz_rejected, biz.name), Toast.LENGTH_SHORT).show();
                 loadBusinesses();
             }
 
