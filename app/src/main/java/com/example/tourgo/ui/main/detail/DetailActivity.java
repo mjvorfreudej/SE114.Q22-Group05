@@ -55,7 +55,9 @@ import com.example.tourgo.remote.service.BookingService;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
 import com.example.tourgo.remote.service.ChatService;
 import com.example.tourgo.models.response.ChatRoom;
+import com.example.tourgo.models.response.ChatMessage;
 import com.example.tourgo.ui.chat.ChatActivity;
+import com.example.tourgo.ui.chat.ChatReadStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -817,18 +819,85 @@ public class DetailActivity extends AppCompatActivity {
                 });
     }
 
+    /** Business id that owns the listing currently shown (null if unknown). */
+    private String currentBusinessId() {
+        if (isTourMode && tour != null) return tour.getBusinessesId();
+        if (!isTourMode && hotel != null) return hotel.getBusinessesId();
+        return null;
+    }
+
+    /**
+     * Count badge on the chat button = partner messages newer than the local
+     * read marker for this listing's room. The backend has no chat unread count,
+     * so we resolve the room via {@code getRooms()} and tally client-side
+     * (see {@link ChatReadStore}). Best-effort: any failure just hides the badge.
+     */
+    private void refreshChatBadge() {
+        if (binding == null || isAdminMode) { hideChatBadge(); return; }
+        if (binding.btnChatDetail.getVisibility() != View.VISIBLE || !session.isLoggedIn()) {
+            hideChatBadge();
+            return;
+        }
+        final String businessId = currentBusinessId();
+        if (businessId == null || businessId.isEmpty()) { hideChatBadge(); return; }
+        final String myId = session.getUserId();
+
+        ChatService.getRooms(this, new DataCallback<List<ChatRoom>>() {
+            @Override
+            public void onSuccess(List<ChatRoom> rooms) {
+                ChatRoom match = null;
+                if (rooms != null) {
+                    for (ChatRoom r : rooms) {
+                        if (businessId.equals(r.getBusinessId())) { match = r; break; }
+                    }
+                }
+                if (match == null) { hideChatBadge(); return; }
+                final String roomId = match.getId();
+                ChatService.getMessages(DetailActivity.this, roomId, new DataCallback<List<ChatMessage>>() {
+                    @Override
+                    public void onSuccess(List<ChatMessage> msgs) {
+                        long lastRead = ChatReadStore.lastRead(DetailActivity.this, roomId);
+                        int unread = 0;
+                        if (msgs != null) {
+                            for (ChatMessage m : msgs) {
+                                if (myId != null && myId.equals(m.getSenderId())) continue;
+                                if (ChatReadStore.parseIso(m.getCreatedAt()) > lastRead) unread++;
+                            }
+                        }
+                        applyChatBadge(unread);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) { hideChatBadge(); }
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) { hideChatBadge(); }
+        });
+    }
+
+    private void applyChatBadge(int count) {
+        if (binding == null) return;
+        if (count > 0) {
+            binding.chatBadgeDetail.setText(count > 9 ? "9+" : String.valueOf(count));
+            binding.chatBadgeDetail.setVisibility(View.VISIBLE);
+        } else {
+            binding.chatBadgeDetail.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideChatBadge() {
+        if (binding != null) binding.chatBadgeDetail.setVisibility(View.GONE);
+    }
+
     private void initiateChat() {
         if (!session.isLoggedIn()) {
             Toast.makeText(this, R.string.err_login_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String businessId = null;
-        if (isTourMode && tour != null) {
-            businessId = tour.getBusinessesId();
-        } else if (!isTourMode && hotel != null) {
-            businessId = hotel.getBusinessesId();
-        }
+        String businessId = currentBusinessId();
 
         if (businessId == null || businessId.isEmpty()) {
             Toast.makeText(this, "Không thể xác định doanh nghiệp sở hữu bài đăng này", Toast.LENGTH_SHORT).show();
@@ -857,5 +926,9 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     @Override protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }
-    @Override protected void onResume() { super.onResume(); if (sliderRunnable != null) sliderHandler.postDelayed(sliderRunnable, 3000); }
+    @Override protected void onResume() {
+        super.onResume();
+        if (sliderRunnable != null) sliderHandler.postDelayed(sliderRunnable, 3000);
+        refreshChatBadge();
+    }
 }

@@ -71,14 +71,34 @@
                         android:layout_alignParentEnd="true"
                         android:orientation="horizontal">
 
-                        <ImageView
-                            android:id="@+id/btnChatDetail"
+                        <FrameLayout
                             android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_input_glass"
-                            android:padding="10dp"
-                            android:src="@drawable/ic_message_circle"
-                            app:tint="@android:color/white" />
+                            android:layout_height="40dp">
+
+                            <ImageView
+                                android:id="@+id/btnChatDetail"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:background="@drawable/bg_input_glass"
+                                android:padding="10dp"
+                                android:src="@drawable/ic_message_circle"
+                                app:tint="@android:color/white" />
+
+                            <TextView
+                                android:id="@+id/chatBadgeDetail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="16dp"
+                                android:layout_gravity="top|end"
+                                android:background="@drawable/bg_notif_count_badge"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:minWidth="16dp"
+                                android:paddingHorizontal="4dp"
+                                android:textColor="@color/white"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+                        </FrameLayout>
 
                         <ImageView
                             android:id="@+id/btnShare"

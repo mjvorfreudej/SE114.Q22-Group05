@@ -148,6 +148,19 @@ public class ChatActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (showLoading) progress.setVisibility(View.GONE);
                     if (data != null) {
+                        // Mark this room read up to its newest message so the Detail
+                        // chat badge clears (backend tracks no chat read-state).
+                        String latest = null;
+                        for (ChatMessage m : data) {
+                            String at = m.getCreatedAt();
+                            if (at != null && (latest == null || at.compareTo(latest) > 0)) {
+                                latest = at;
+                            }
+                        }
+                        if (latest != null) {
+                            ChatReadStore.markRead(ChatActivity.this, chatRoom.getId(), latest);
+                        }
+
                         // Only update and scroll if the list length has changed
                         int oldSize = messages.size();
                         if (data.size() != oldSize) {

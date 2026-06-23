@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
         refreshNotificationDot();
     }
 
-    /** Show the bell dot only when the traveler has unread notifications (live). */
+    /** Show the bell count badge only when the traveler has unread notifications (live). */
     private void refreshNotificationDot() {
         if (binding == null) return;
         NotificationService.unreadCount(requireContext(), NotificationMockData.Role.TRAVELER,
@@ -80,8 +80,13 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onSuccess(Integer unread) {
                         if (binding == null) return;
-                        binding.dotNotification.setVisibility(
-                                unread != null && unread > 0 ? View.VISIBLE : View.GONE);
+                        int n = unread != null ? unread : 0;
+                        if (n > 0) {
+                            binding.dotNotification.setText(n > 9 ? "9+" : String.valueOf(n));
+                            binding.dotNotification.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.dotNotification.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
