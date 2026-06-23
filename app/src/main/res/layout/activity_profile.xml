@@ -411,11 +411,18 @@
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipBookingPaid"
+                    android:id="@+id/chipBookingPending"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
+                    android:text="@string/booking_history_filter_pending" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipBookingPaid"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/booking_history_filter_paid" />
 
                 <com.google.android.material.chip.Chip

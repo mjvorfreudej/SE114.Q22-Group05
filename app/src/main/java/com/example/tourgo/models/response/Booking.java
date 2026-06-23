@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class Booking {
     private String id;
     @SerializedName("user_id")
@@ -37,6 +39,18 @@ public class Booking {
     @SerializedName("tours")
     private TourInfo tourInfo;
 
+    @SerializedName("guests")
+    private String guests;
+
+    @SerializedName("payments")
+    private List<PaymentInfo> payments;
+
+    public static class PaymentInfo {
+        @SerializedName("transaction_code")
+        private String transactionCode;
+        public String getTransactionCode() { return transactionCode; }
+    }
+
     public static class GuestInfo {
         private String name;
         private String phone;
@@ -57,6 +71,14 @@ public class Booking {
     public GuestInfo getGuestInfo() { return guestInfo; }
     public HotelInfo getHotelInfo() { return hotelInfo; }
     public TourInfo getTourInfo() { return tourInfo; }
+    public List<PaymentInfo> getPayments() { return payments; }
+
+    public String getTransactionCode() {
+        if (payments != null && !payments.isEmpty() && payments.get(0).getTransactionCode() != null) {
+            return payments.get(0).getTransactionCode();
+        }
+        return null;
+    }
 
     public Booking() {}
 
@@ -127,4 +149,12 @@ public class Booking {
 
     public Integer getNumRooms() { return numRooms; }
     public void setNumRooms(Integer numRooms) { this.numRooms = numRooms; }
+
+    public String getGuests() {
+        return guests;
+    }
+
+    public void setGuests(String Guests) {
+        this.guests = Guests;
+    }
 }

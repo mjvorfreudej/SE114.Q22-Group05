@@ -19,6 +19,10 @@ import java.util.List;
 /** Vertical list of past bookings with a coloured status badge. */
 public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAdapter.VH> {
 
+    public interface OnItemClickListener {
+        void onItemClick(Item item, int position);
+    }
+
     /** Flat display model so the adapter doesn't depend on how data is joined. */
     public static class Item {
         public final String title;
@@ -26,17 +30,35 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
         public final String priceText;
         public final String status;
         public final String imageUrl;
+        public final String bookingId;
+        public final String confirmationNumber;
+        public final double totalAmount;
+        public final String guestInfo;
 
         public Item(String title, String dateText, String priceText, String status, String imageUrl) {
+            this(title, dateText, priceText, status, imageUrl, null, null, 0.0, null);
+        }
+
+        public Item(String title, String dateText, String priceText, String status, String imageUrl,
+                    String bookingId, String confirmationNumber, double totalAmount, String guestInfo) {
             this.title = title;
             this.dateText = dateText;
             this.priceText = priceText;
             this.status = status;
             this.imageUrl = imageUrl;
+            this.bookingId = bookingId;
+            this.confirmationNumber = confirmationNumber;
+            this.totalAmount = totalAmount;
+            this.guestInfo = guestInfo;
         }
     }
 
     private final List<Item> items = new ArrayList<>();
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setData(List<Item> data) {
         items.clear();
@@ -67,6 +89,12 @@ public class BookingHistoryAdapter extends RecyclerView.Adapter<BookingHistoryAd
         } else {
             holder.image.setImageResource(R.drawable.hotel_1);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(item, position);
+            }
+        });
     }
 
     private void applyStatusColors(VH holder, String status) {
