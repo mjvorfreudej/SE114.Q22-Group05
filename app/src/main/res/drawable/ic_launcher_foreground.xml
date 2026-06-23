@@ -5,12 +5,14 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
     <!-- TourGo mark: mountain peaks + cloud.
-         Original art is on a 32x32 grid; scale 2x and center in the 108 safe zone. -->
+         Original art is on a 32x32 grid; scale 2x and center in the 108 safe zone.
+         translateY is nudged up (16 vs the geometric 22) so the bottom-heavy
+         mountains read as visually centred rather than sitting low. -->
     <group
         android:scaleX="2.0"
         android:scaleY="2.0"
         android:translateX="22"
-        android:translateY="22">
+        android:translateY="16">
 
         <!-- Soft sun disc behind the cloud -->
         <path
