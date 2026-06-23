@@ -159,6 +159,9 @@ public class ErrorHandler {
             case "NOT_FOUND":
                 code = ApiErrorCode.NOT_FOUND;
                 break;
+            case "RATE_LIMIT":
+                code = ApiErrorCode.RATE_LIMIT;
+                break;
             case "SERVER_ERROR":
                 code = ApiErrorCode.SERVER_ERROR;
                 break;
@@ -250,6 +253,12 @@ public class ErrorHandler {
             case SERVER_ERROR:
                 Toast.makeText(context,
                         context.getString(R.string.err_server),
+                        Toast.LENGTH_SHORT).show();
+                break;
+
+            case RATE_LIMIT:
+                Toast.makeText(context,
+                        context.getString(R.string.err_rate_limit),
                         Toast.LENGTH_SHORT).show();
                 break;
 
