@@ -71,8 +71,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
-            var imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
-            v.setPadding(0, 0, 0, imeInsets.bottom);
+            var sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            var ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            // Top: clear the status bar / camera notch. Bottom: keep the input above
+            // the keyboard when open, else above the navigation bar.
+            v.setPadding(0, sys.top, 0, Math.max(ime.bottom, sys.bottom));
             return insets;
         });
 

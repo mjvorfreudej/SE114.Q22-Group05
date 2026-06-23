@@ -248,7 +248,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 int iconRes = getAmenityIcon(amenity);
                 icon.setImageResource(iconRes);
-                label.setText(amenity);
+                label.setText(localizeAmenity(amenity));
                 container.addView(row);
             }
         }
@@ -268,6 +268,28 @@ public class DetailActivity extends AppCompatActivity {
                 addDurationAmenity(container, tour.getDuration());
             }
         }
+    }
+
+    /**
+     * Map a stored amenity to its localized display label so the chip follows the
+     * app's current language. Listings save the amenity in whatever language the
+     * owner used at creation time, so a Vietnamese-created hotel would otherwise
+     * show Vietnamese chips inside an English UI (and vice-versa). Keyword set is
+     * kept in sync with {@link #getAmenityIcon}; unknown / free-text amenities
+     * (e.g. tour highlights) fall through unchanged.
+     */
+    private String localizeAmenity(String amenity) {
+        if (amenity == null) return "";
+        String lower = amenity.toLowerCase().trim();
+
+        if (lower.contains("wifi") || lower.contains("wi-fi") || lower.contains("mạng") || lower.contains("internet")) return getString(R.string.biz_am_wifi);
+        if (lower.contains("pool") || lower.contains("hồ bơi") || lower.contains("bể bơi")) return getString(R.string.biz_am_pool);
+        if (lower.contains("air con") || lower.contains("aircon") || lower.contains("a/c") || lower.contains("máy lạnh") || lower.contains("điều hòa") || lower.contains("điều hoà")) return getString(R.string.biz_am_ac);
+        if (lower.contains("parking") || lower.contains("đỗ xe") || lower.contains("gửi xe") || lower.contains("garage")) return getString(R.string.biz_am_parking);
+        if (lower.contains("breakfast") || lower.contains("bữa sáng") || lower.contains("ăn sáng") || lower.contains("meal")) return getString(R.string.biz_am_breakfast);
+        if (lower.contains("workspace") || lower.contains("work") || lower.contains("làm việc") || lower.contains("văn phòng")) return getString(R.string.biz_am_workspace);
+
+        return amenity; // unknown / free-text: keep as entered
     }
 
     private int getAmenityIcon(String amenity) {
