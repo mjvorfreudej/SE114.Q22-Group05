@@ -78,6 +78,7 @@ public class AdminHomeFragment extends Fragment {
                 R.string.adm_qa_review_biz, "", 0, AdminActivity.TAB_BUSINESS);
         action(v, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                 R.string.adm_qa_review_reports, "", 0, AdminActivity.TAB_MODERATION);
+        wireReportsCard(v);
         action(v, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
                 R.string.adm_qa_browse_users, "", 0, AdminActivity.TAB_USERS);
 
@@ -131,6 +132,7 @@ public class AdminHomeFragment extends Fragment {
                 action(root, R.id.admActReports, R.drawable.ic_flag, R.color.adm_purple_100, R.color.adm_purple_500,
                         R.string.adm_qa_review_reports, getString(R.string.adm_qa_review_reports_sub, s.getReports()),
                         s.getReports(), AdminActivity.TAB_MODERATION);
+                wireReportsCard(root);
                 action(root, R.id.admActUsers, R.drawable.ic_users, R.color.adm_teal_100, R.color.adm_teal_500,
                         R.string.adm_qa_browse_users, getString(R.string.adm_qa_browse_users_sub, fmt(s.getUsers())),
                         0, AdminActivity.TAB_USERS);
@@ -272,6 +274,15 @@ public class AdminHomeFragment extends Fragment {
 
     private void goTab(int tab) {
         if (getActivity() instanceof AdminActivity) ((AdminActivity) getActivity()).goToTab(tab);
+    }
+
+    /** "Review reports" card → Moderation tab opened directly on the User Reports sub-tab. */
+    private void wireReportsCard(View root) {
+        root.findViewById(R.id.admActReports).setOnClickListener(v -> {
+            if (getActivity() instanceof AdminActivity) {
+                ((AdminActivity) getActivity()).goToModerationTab("reports");
+            }
+        });
     }
 
     /**
