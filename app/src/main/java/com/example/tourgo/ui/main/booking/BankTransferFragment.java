@@ -15,6 +15,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -46,6 +49,8 @@ public class BankTransferFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        applyTopInset(view);
 
         imgQrCode = view.findViewById(R.id.imgQrCode);
         tvBankName = view.findViewById(R.id.tvBankName);
@@ -84,6 +89,17 @@ public class BankTransferFragment extends Fragment {
         btnCheckPayment.setOnClickListener(v -> checkTransferPaymentStatus());
 
         view.findViewById(R.id.btnBack).setOnClickListener(v -> requireActivity().finish());
+    }
+
+    /** Pad the top by the status-bar height so the header isn't drawn under the status bar/notch. */
+    private void applyTopInset(View root) {
+        final int basePaddingTop = root.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), basePaddingTop + bars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
     }
 
     private String formatPrice(double amount) {
