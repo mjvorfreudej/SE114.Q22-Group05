@@ -364,16 +364,6 @@
                     android:textColor="@color/adm_gray_900"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:text="@string/adm_see_all"
-                    android:textColor="@color/adm_blue_500"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
             </RelativeLayout>
 
             <com.google.android.material.card.MaterialCardView
