@@ -272,9 +272,10 @@
     <string name="booking_add_bank">+ Thêm ngân hàng mới</string>
     <string name="booking_add_card">+ Thêm thẻ mới</string>
 
-    <string name="booking_success_title">Đặt phòng thành công!</string>
+    <string name="booking_success_title">Đặt chỗ thành công!</string>
+    <string name="booking_confirmed">Đặt chỗ của bạn đã được xác nhận</string>
     <string name="booking_stay_confirmed">Chỗ ở của bạn đã được xác nhận</string>
-    <string name="booking_success_msg">Yêu cầu đặt phòng của bạn đã được gửi đi. Vui lòng kiểm tra email để xác nhận.</string>
+    <string name="booking_success_msg">Yêu cầu đặt chỗ của bạn đã được gửi đi. Vui lòng kiểm tra email để xác nhận.</string>
     <string name="booking_date_label">Ngày đặt</string>
     <string name="booking_room_type">Loại phòng</string>
     <string name="booking_total_cost">Tổng chi phí</string>
@@ -679,6 +680,7 @@
 
     <!-- Booking history -->
     <string name="booking_history_title">Lịch sử đặt tour</string>
+    <string name="booking_history_filter_pending">Đợi thanh toán</string>
     <string name="booking_history_filter_paid">Đã thanh toán</string>
     <string name="booking_history_filter_completed">Hoàn thành</string>
     <string name="booking_history_empty">Không có đơn đặt nào</string>

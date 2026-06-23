@@ -47,9 +47,19 @@ public class BookingActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.booking_container, new BookingRequestFragment(), "request")
-                    .commit();
+            // Check if we should show the success fragment directly (from booking history)
+            String fragmentType = getIntent().getStringExtra("fragment");
+            if ("success".equals(fragmentType)) {
+                BookingSuccessFragment successFragment = new BookingSuccessFragment();
+                successFragment.setArguments(getIntent().getExtras());
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.booking_container, successFragment, "success")
+                        .commit();
+            } else {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.booking_container, new BookingRequestFragment(), "request")
+                        .commit();
+            }
         }
     }
 
