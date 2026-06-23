@@ -15,7 +15,6 @@ import com.example.tourgo.models.response.NotificationDto;
 import com.example.tourgo.remote.RetrofitClient;
 import com.example.tourgo.ui.notification.NotificationItem;
 import com.example.tourgo.ui.notification.NotificationMockData;
-import com.example.tourgo.ui.notification.NotificationStore;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,27 +35,17 @@ import retrofit2.Response;
  * Traveler and Business consoles by reading from {@code GET /api/notifications}
  * and writing read-state back to the server.
  *
- * <p>All three roles (Traveler, Business, Admin) are now served by the backend
- * feed; the local {@link NotificationMockData} seed only survives as the design
- * fallback. Callers don't need to know — they always go through this service.
+ * <p>All three roles (Traveler, Business, Admin) are served by the backend feed;
+ * {@link NotificationMockData} now only supplies the per-role UI config (category
+ * palettes, filter chips). Callers always go through this service.
  */
 public final class NotificationService {
 
     private NotificationService() {}
 
-    private static boolean isApiBacked(NotificationMockData.Role role) {
-        return role == NotificationMockData.Role.TRAVELER
-                || role == NotificationMockData.Role.BUSINESS
-                || role == NotificationMockData.Role.ADMIN;
-    }
-
     // ── Load ──────────────────────────────────────────────────────────────────
     public static void load(Context ctx, NotificationMockData.Role role,
                             DataCallback<List<NotificationItem>> callback) {
-        if (!isApiBacked(role)) {
-            callback.onSuccess(NotificationMockData.seed(ctx, role));
-            return;
-        }
         final Context app = ctx.getApplicationContext();
         RetrofitClient.getInstance(app)
                 .getNotificationApi()
@@ -103,11 +92,6 @@ public final class NotificationService {
     // ── Mark read ───────────────────────────────────────────────────────────────
     public static void markRead(Context ctx, NotificationMockData.Role role, String id,
                                 @Nullable DataCallback<Void> callback) {
-        if (!isApiBacked(role)) {
-            NotificationStore.markRead(ctx, role, id);
-            if (callback != null) callback.onSuccess(null);
-            return;
-        }
         RetrofitClient.getInstance(ctx.getApplicationContext())
                 .getNotificationApi()
                 .markAsRead(id)
@@ -116,11 +100,6 @@ public final class NotificationService {
 
     public static void markAllRead(Context ctx, NotificationMockData.Role role,
                                    List<String> ids, @Nullable DataCallback<Void> callback) {
-        if (!isApiBacked(role)) {
-            NotificationStore.markAllRead(ctx, role, ids);
-            if (callback != null) callback.onSuccess(null);
-            return;
-        }
         RetrofitClient.getInstance(ctx.getApplicationContext())
                 .getNotificationApi()
                 .markAllAsRead(role.name())
