@@ -688,7 +688,13 @@
     <!-- Admin moderation (businesses & users) -->
     <string name="adm_status_pending">Đang chờ</string>
     <string name="adm_menu_approve">Duyệt</string>
+    <string name="adm_status_approved">Đã duyệt</string>
+    <string name="adm_btn_approve">Phê duyệt</string>
+    <string name="adm_btn_reject">Từ chối</string>
     <string name="adm_toast_biz_approved">Đã duyệt %s</string>
+    <string name="adm_toast_biz_rejected">Đã từ chối đơn đăng ký của %s</string>
+    <string name="adm_err_load_pending">Lỗi tải danh sách chờ duyệt: %s</string>
+    <string name="adm_err_load_approved">Lỗi tải danh sách đã duyệt: %s</string>
     <string name="adm_users_empty">Không có người dùng</string>
 
     <!-- ===================== Traveler notifications (ui_kits/notifications/traveler.html) ===================== -->

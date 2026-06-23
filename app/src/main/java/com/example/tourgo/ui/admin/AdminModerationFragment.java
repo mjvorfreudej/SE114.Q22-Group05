@@ -51,6 +51,9 @@ public class AdminModerationFragment extends Fragment {
     private TextView empty;
     private String tab = "pending";
 
+    /** Optional argument: which sub-tab ("pending" | "approved" | "reports") to open initially. */
+    public static final String ARG_INITIAL_TAB = "initial_tab";
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -71,6 +74,11 @@ public class AdminModerationFragment extends Fragment {
         reportAdapter = new ReportAdapter(this::openReport);
         listingAdapter.setItems(listings);
         reportAdapter.setItems(reports);
+
+        if (savedInstanceState == null && getArguments() != null) {
+            String initial = getArguments().getString(ARG_INITIAL_TAB);
+            if (initial != null) tab = initial;
+        }
 
         tabsContainer = v.findViewById(R.id.admTopTabs);
         buildTabs();

@@ -1,36 +1,29 @@
 package com.example.tourgo.ui.notification;
 
-import android.content.Context;
-
 import androidx.annotation.ColorRes;
 import androidx.annotation.StringRes;
 
 import com.example.tourgo.R;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * In-memory sample data for the notification surfaces, mirroring the TourGo
- * design-system prototypes:
- *   · Traveler  → ui_kits/notifications/traveler.html
- *   · Business  → ui_kits/notifications/index.html ({@code role="business"})
- *   · Admin     → ui_kits/notifications/index.html ({@code role="admin"})
+ * Role-keyed UI configuration for the notification surfaces (bell → popover →
+ * center), shared across Traveler, Business and Admin.
  *
- * There is no notifications REST API in this app yet, so every surface is wired
- * to local state with optimistic mark-as-read updates — exactly as the HTML
- * prototypes behave. Record content (titles, bodies, timestamps, action labels)
- * is sourced from localized string resources (values/ + values-en/), so the whole
- * screen follows the app's active language.
- *
- * Everything here is keyed by {@link Role}: category palettes ({@code NOTIF_CATS}),
- * filter chips ({@code NOTIF_FILTERS}) and seed data ({@code NOTIF_DATA}) all differ
- * per role, matching the prototype's role-parameterised data model.
+ * <p>The actual notification rows are no longer seeded locally — every surface is
+ * served by the live backend feed through
+ * {@link com.example.tourgo.remote.service.NotificationService}
+ * ({@code GET /api/notifications}). What remains here is purely presentation:
+ * the per-role category palettes ({@code NOTIF_CATS}), the filter chips
+ * ({@code NOTIF_FILTERS}) and the date-group labels — all keyed by {@link Role},
+ * matching the design's role-parameterised model. The class keeps its historical
+ * name so the many {@code NotificationMockData.Role/Category/Filter} references
+ * across the UI stay stable.
  */
 public final class NotificationMockData {
 
@@ -155,203 +148,6 @@ public final class NotificationMockData {
             case ADMIN:    return FILTERS_ADMIN;
             default:       return FILTERS_TRAVELER;
         }
-    }
-
-    // ── Seed data (design NOTIF_DATA) ────────────────────────────────────────
-    // Text is resolved from string resources so it matches the active language.
-    public static List<NotificationItem> seed(Context ctx, Role role) {
-        List<NotificationItem> list;
-        switch (role) {
-            case BUSINESS: list = seedBusiness(ctx); break;
-            case ADMIN:    list = seedAdmin(ctx); break;
-            default:       list = seedTraveler(ctx); break;
-        }
-        // Overlay the persisted read-state so every surface (bell badge, popover,
-        // full center) agrees and a read notification stays read across reopens.
-        Set<String> read = NotificationStore.readIds(ctx, role);
-        if (!read.isEmpty()) {
-            for (NotificationItem n : list) {
-                if (read.contains(n.id)) n.read = true;
-            }
-        }
-        return list;
-    }
-
-    /** Live unread tally for a role, used to drive the home bell badge. */
-    public static int unreadCount(Context ctx, Role role) {
-        int unread = 0;
-        for (NotificationItem n : seed(ctx, role)) {
-            if (!n.read) unread++;
-        }
-        return unread;
-    }
-
-    private static List<NotificationItem> seedTraveler(Context ctx) {
-        List<NotificationItem> list = new ArrayList<>();
-
-        list.add(new NotificationItem("t1", "bookings", R.drawable.ic_check_circle,
-                ctx.getString(R.string.notif_t1_title),
-                ctx.getString(R.string.notif_t1_body),
-                ctx.getString(R.string.notif_t1_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t1_action), true))));
-
-        list.add(new NotificationItem("t2", "payments", R.drawable.ic_dollar,
-                ctx.getString(R.string.notif_t2_title),
-                ctx.getString(R.string.notif_t2_body),
-                ctx.getString(R.string.notif_t2_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t2_action), false))));
-
-        list.add(new NotificationItem("t3", "trips", R.drawable.ic_time,
-                ctx.getString(R.string.notif_t3_title),
-                ctx.getString(R.string.notif_t3_body),
-                ctx.getString(R.string.notif_t3_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t3_action), true))));
-
-        list.add(new NotificationItem("t4", "offers", R.drawable.ic_percent,
-                ctx.getString(R.string.notif_t4_title),
-                ctx.getString(R.string.notif_t4_body),
-                ctx.getString(R.string.notif_t4_when), NotificationItem.Group.TODAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t4_action), true))));
-
-        list.add(new NotificationItem("t5", "offers", R.drawable.ic_tag,
-                ctx.getString(R.string.notif_t5_title),
-                ctx.getString(R.string.notif_t5_body),
-                ctx.getString(R.string.notif_t5_when), NotificationItem.Group.TODAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t5_action), false))));
-
-        list.add(new NotificationItem("t6", "trips", R.drawable.ic_star,
-                ctx.getString(R.string.notif_t6_title),
-                ctx.getString(R.string.notif_t6_body),
-                ctx.getString(R.string.notif_t6_when), NotificationItem.Group.YESTERDAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t6_action), true))));
-
-        list.add(new NotificationItem("t7", "account", R.drawable.ic_shield_check,
-                ctx.getString(R.string.notif_t7_title),
-                ctx.getString(R.string.notif_t7_body),
-                ctx.getString(R.string.notif_t7_when), NotificationItem.Group.YESTERDAY, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        list.add(new NotificationItem("t8", "account", R.drawable.ic_settings,
-                ctx.getString(R.string.notif_t8_title),
-                ctx.getString(R.string.notif_t8_body),
-                ctx.getString(R.string.notif_t8_when), NotificationItem.Group.EARLIER, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        list.add(new NotificationItem("t9", "bookings", R.drawable.ic_calendar,
-                ctx.getString(R.string.notif_t9_title),
-                ctx.getString(R.string.notif_t9_body),
-                ctx.getString(R.string.notif_t9_when), NotificationItem.Group.EARLIER, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_t9_action), false))));
-
-        return list;
-    }
-
-    private static List<NotificationItem> seedBusiness(Context ctx) {
-        List<NotificationItem> list = new ArrayList<>();
-
-        list.add(new NotificationItem("b1", "orders", R.drawable.ic_calendar,
-                ctx.getString(R.string.notif_b1_title),
-                ctx.getString(R.string.notif_b1_body),
-                ctx.getString(R.string.notif_b1_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b1_action), true))));
-
-        list.add(new NotificationItem("b2", "orders", R.drawable.ic_dollar,
-                ctx.getString(R.string.notif_b2_title),
-                ctx.getString(R.string.notif_b2_body),
-                ctx.getString(R.string.notif_b2_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b2_action), false))));
-
-        list.add(new NotificationItem("b3", "operations", R.drawable.ic_alert_triangle,
-                ctx.getString(R.string.notif_b3_title),
-                ctx.getString(R.string.notif_b3_body),
-                ctx.getString(R.string.notif_b3_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b3_action), true))));
-
-        list.add(new NotificationItem("b4", "operations", R.drawable.ic_time,
-                ctx.getString(R.string.notif_b4_title),
-                ctx.getString(R.string.notif_b4_body),
-                ctx.getString(R.string.notif_b4_when), NotificationItem.Group.TODAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b4_action), false))));
-
-        list.add(new NotificationItem("b5", "support", R.drawable.ic_reply,
-                ctx.getString(R.string.notif_b5_title),
-                ctx.getString(R.string.notif_b5_body),
-                ctx.getString(R.string.notif_b5_when), NotificationItem.Group.TODAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b5_action), false))));
-
-        list.add(new NotificationItem("b6", "support", R.drawable.ic_star,
-                ctx.getString(R.string.notif_b6_title),
-                ctx.getString(R.string.notif_b6_body),
-                ctx.getString(R.string.notif_b6_when), NotificationItem.Group.YESTERDAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b6_action), true))));
-
-        list.add(new NotificationItem("b7", "promo", R.drawable.ic_rocket,
-                ctx.getString(R.string.notif_b7_title),
-                ctx.getString(R.string.notif_b7_body),
-                ctx.getString(R.string.notif_b7_when), NotificationItem.Group.YESTERDAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_b7_action), false))));
-
-        list.add(new NotificationItem("b8", "promo", R.drawable.ic_settings,
-                ctx.getString(R.string.notif_b8_title),
-                ctx.getString(R.string.notif_b8_body),
-                ctx.getString(R.string.notif_b8_when), NotificationItem.Group.EARLIER, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        return list;
-    }
-
-    private static List<NotificationItem> seedAdmin(Context ctx) {
-        List<NotificationItem> list = new ArrayList<>();
-
-        list.add(new NotificationItem("a1", "approvals", R.drawable.ic_shield_check,
-                ctx.getString(R.string.notif_a1_title),
-                ctx.getString(R.string.notif_a1_body),
-                ctx.getString(R.string.notif_a1_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_a1_action), true))));
-
-        list.add(new NotificationItem("a2", "approvals", R.drawable.ic_dollar,
-                ctx.getString(R.string.notif_a2_title),
-                ctx.getString(R.string.notif_a2_body),
-                ctx.getString(R.string.notif_a2_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_a2_action), true))));
-
-        list.add(new NotificationItem("a3", "system", R.drawable.ic_alert_triangle,
-                ctx.getString(R.string.notif_a3_title),
-                ctx.getString(R.string.notif_a3_body),
-                ctx.getString(R.string.notif_a3_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_a3_action), false))));
-
-        list.add(new NotificationItem("a4", "reports", R.drawable.ic_flag,
-                ctx.getString(R.string.notif_a4_title),
-                ctx.getString(R.string.notif_a4_body),
-                ctx.getString(R.string.notif_a4_when), NotificationItem.Group.TODAY, false,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_a4_action), true))));
-
-        list.add(new NotificationItem("a5", "reports", R.drawable.ic_user_x,
-                ctx.getString(R.string.notif_a5_title),
-                ctx.getString(R.string.notif_a5_body),
-                ctx.getString(R.string.notif_a5_when), NotificationItem.Group.TODAY, true,
-                Arrays.asList(new NotificationItem.QuickAction(ctx.getString(R.string.notif_a5_action), true))));
-
-        list.add(new NotificationItem("a6", "milestones", R.drawable.ic_flame,
-                ctx.getString(R.string.notif_a6_title),
-                ctx.getString(R.string.notif_a6_body),
-                ctx.getString(R.string.notif_a6_when), NotificationItem.Group.YESTERDAY, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        list.add(new NotificationItem("a7", "milestones", R.drawable.ic_users,
-                ctx.getString(R.string.notif_a7_title),
-                ctx.getString(R.string.notif_a7_body),
-                ctx.getString(R.string.notif_a7_when), NotificationItem.Group.YESTERDAY, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        list.add(new NotificationItem("a8", "system", R.drawable.ic_settings,
-                ctx.getString(R.string.notif_a8_title),
-                ctx.getString(R.string.notif_a8_body),
-                ctx.getString(R.string.notif_a8_when), NotificationItem.Group.EARLIER, true,
-                Collections.<NotificationItem.QuickAction>emptyList()));
-
-        return list;
     }
 
     @StringRes

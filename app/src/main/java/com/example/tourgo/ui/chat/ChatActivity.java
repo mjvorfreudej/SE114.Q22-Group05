@@ -71,8 +71,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootLayout), (v, insets) -> {
-            var imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime());
-            v.setPadding(0, 0, 0, imeInsets.bottom);
+            var sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            var ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            // Top: clear the status bar / camera notch. Bottom: keep the input above
+            // the keyboard when open, else above the navigation bar.
+            v.setPadding(0, sys.top, 0, Math.max(ime.bottom, sys.bottom));
             return insets;
         });
 
@@ -148,6 +151,19 @@ public class ChatActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (showLoading) progress.setVisibility(View.GONE);
                     if (data != null) {
+                        // Mark this room read up to its newest message so the Detail
+                        // chat badge clears (backend tracks no chat read-state).
+                        String latest = null;
+                        for (ChatMessage m : data) {
+                            String at = m.getCreatedAt();
+                            if (at != null && (latest == null || at.compareTo(latest) > 0)) {
+                                latest = at;
+                            }
+                        }
+                        if (latest != null) {
+                            ChatReadStore.markRead(ChatActivity.this, chatRoom.getId(), latest);
+                        }
+
                         // Only update and scroll if the list length has changed
                         int oldSize = messages.size();
                         if (data.size() != oldSize) {

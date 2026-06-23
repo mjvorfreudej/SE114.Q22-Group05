@@ -19,6 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
+import android.graphics.Color;
+import android.os.Build;
+import android.view.WindowManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
@@ -55,7 +59,9 @@ import com.example.tourgo.remote.service.BookingService;
 import com.example.tourgo.ui.admin.AdminMockData.PendingListing;
 import com.example.tourgo.remote.service.ChatService;
 import com.example.tourgo.models.response.ChatRoom;
+import com.example.tourgo.models.response.ChatMessage;
 import com.example.tourgo.ui.chat.ChatActivity;
+import com.example.tourgo.ui.chat.ChatReadStore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -83,7 +89,18 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+        // Transparent status bar (no scrim) so the hero gallery bleeds to the very
+        // top behind it; dark icons keep the clock/signal readable over the photo.
+        EdgeToEdge.enable(this, SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT));
+
+        // Let the window fill notch / rounded / waterfall edge regions too, so the
+        // hero gallery reaches the left/right screen edges instead of leaving a band.
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.layoutInDisplayCutoutMode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                ? WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                : WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        getWindow().setAttributes(lp);
+
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -246,7 +263,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 int iconRes = getAmenityIcon(amenity);
                 icon.setImageResource(iconRes);
-                label.setText(amenity);
+                label.setText(localizeAmenity(amenity));
                 container.addView(row);
             }
         }
@@ -266,6 +283,28 @@ public class DetailActivity extends AppCompatActivity {
                 addDurationAmenity(container, tour.getDuration());
             }
         }
+    }
+
+    /**
+     * Map a stored amenity to its localized display label so the chip follows the
+     * app's current language. Listings save the amenity in whatever language the
+     * owner used at creation time, so a Vietnamese-created hotel would otherwise
+     * show Vietnamese chips inside an English UI (and vice-versa). Keyword set is
+     * kept in sync with {@link #getAmenityIcon}; unknown / free-text amenities
+     * (e.g. tour highlights) fall through unchanged.
+     */
+    private String localizeAmenity(String amenity) {
+        if (amenity == null) return "";
+        String lower = amenity.toLowerCase().trim();
+
+        if (lower.contains("wifi") || lower.contains("wi-fi") || lower.contains("mạng") || lower.contains("internet")) return getString(R.string.biz_am_wifi);
+        if (lower.contains("pool") || lower.contains("hồ bơi") || lower.contains("bể bơi")) return getString(R.string.biz_am_pool);
+        if (lower.contains("air con") || lower.contains("aircon") || lower.contains("a/c") || lower.contains("máy lạnh") || lower.contains("điều hòa") || lower.contains("điều hoà")) return getString(R.string.biz_am_ac);
+        if (lower.contains("parking") || lower.contains("đỗ xe") || lower.contains("gửi xe") || lower.contains("garage")) return getString(R.string.biz_am_parking);
+        if (lower.contains("breakfast") || lower.contains("bữa sáng") || lower.contains("ăn sáng") || lower.contains("meal")) return getString(R.string.biz_am_breakfast);
+        if (lower.contains("workspace") || lower.contains("work") || lower.contains("làm việc") || lower.contains("văn phòng")) return getString(R.string.biz_am_workspace);
+
+        return amenity; // unknown / free-text: keep as entered
     }
 
     private int getAmenityIcon(String amenity) {
@@ -817,18 +856,85 @@ public class DetailActivity extends AppCompatActivity {
                 });
     }
 
+    /** Business id that owns the listing currently shown (null if unknown). */
+    private String currentBusinessId() {
+        if (isTourMode && tour != null) return tour.getBusinessesId();
+        if (!isTourMode && hotel != null) return hotel.getBusinessesId();
+        return null;
+    }
+
+    /**
+     * Count badge on the chat button = partner messages newer than the local
+     * read marker for this listing's room. The backend has no chat unread count,
+     * so we resolve the room via {@code getRooms()} and tally client-side
+     * (see {@link ChatReadStore}). Best-effort: any failure just hides the badge.
+     */
+    private void refreshChatBadge() {
+        if (binding == null || isAdminMode) { hideChatBadge(); return; }
+        if (binding.btnChatDetail.getVisibility() != View.VISIBLE || !session.isLoggedIn()) {
+            hideChatBadge();
+            return;
+        }
+        final String businessId = currentBusinessId();
+        if (businessId == null || businessId.isEmpty()) { hideChatBadge(); return; }
+        final String myId = session.getUserId();
+
+        ChatService.getRooms(this, new DataCallback<List<ChatRoom>>() {
+            @Override
+            public void onSuccess(List<ChatRoom> rooms) {
+                ChatRoom match = null;
+                if (rooms != null) {
+                    for (ChatRoom r : rooms) {
+                        if (businessId.equals(r.getBusinessId())) { match = r; break; }
+                    }
+                }
+                if (match == null) { hideChatBadge(); return; }
+                final String roomId = match.getId();
+                ChatService.getMessages(DetailActivity.this, roomId, new DataCallback<List<ChatMessage>>() {
+                    @Override
+                    public void onSuccess(List<ChatMessage> msgs) {
+                        long lastRead = ChatReadStore.lastRead(DetailActivity.this, roomId);
+                        int unread = 0;
+                        if (msgs != null) {
+                            for (ChatMessage m : msgs) {
+                                if (myId != null && myId.equals(m.getSenderId())) continue;
+                                if (ChatReadStore.parseIso(m.getCreatedAt()) > lastRead) unread++;
+                            }
+                        }
+                        applyChatBadge(unread);
+                    }
+
+                    @Override
+                    public void onError(ApiErrorCode code, String msg) { hideChatBadge(); }
+                });
+            }
+
+            @Override
+            public void onError(ApiErrorCode code, String msg) { hideChatBadge(); }
+        });
+    }
+
+    private void applyChatBadge(int count) {
+        if (binding == null) return;
+        if (count > 0) {
+            binding.chatBadgeDetail.setText(count > 9 ? "9+" : String.valueOf(count));
+            binding.chatBadgeDetail.setVisibility(View.VISIBLE);
+        } else {
+            binding.chatBadgeDetail.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideChatBadge() {
+        if (binding != null) binding.chatBadgeDetail.setVisibility(View.GONE);
+    }
+
     private void initiateChat() {
         if (!session.isLoggedIn()) {
             Toast.makeText(this, R.string.err_login_required, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String businessId = null;
-        if (isTourMode && tour != null) {
-            businessId = tour.getBusinessesId();
-        } else if (!isTourMode && hotel != null) {
-            businessId = hotel.getBusinessesId();
-        }
+        String businessId = currentBusinessId();
 
         if (businessId == null || businessId.isEmpty()) {
             Toast.makeText(this, "Không thể xác định doanh nghiệp sở hữu bài đăng này", Toast.LENGTH_SHORT).show();
@@ -857,5 +963,9 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     @Override protected void onPause() { super.onPause(); sliderHandler.removeCallbacks(sliderRunnable); }
-    @Override protected void onResume() { super.onResume(); if (sliderRunnable != null) sliderHandler.postDelayed(sliderRunnable, 3000); }
+    @Override protected void onResume() {
+        super.onResume();
+        if (sliderRunnable != null) sliderHandler.postDelayed(sliderRunnable, 3000);
+        refreshChatBadge();
+    }
 }

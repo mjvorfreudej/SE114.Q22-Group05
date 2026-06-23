@@ -100,7 +100,15 @@ public class AdminActivity extends AppCompatActivity {
 
     /** Allow a fragment (e.g. Home quick actions) to jump to another tab. */
     public void goToTab(int tab) {
-        selectTab(tab);
+        selectTab(tab, null);
+    }
+
+    /**
+     * Jump to the Moderation tab and open a specific sub-tab
+     * ("pending" | "approved" | "reports"), e.g. from the Home "Review reports" card.
+     */
+    public void goToModerationTab(String modTab) {
+        selectTab(TAB_MODERATION, modTab);
     }
 
     @Override
@@ -144,7 +152,13 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     private void selectTab(int tab) {
-        if (tab == currentTab) return;
+        selectTab(tab, null);
+    }
+
+    private void selectTab(int tab, String modTab) {
+        // Re-selecting the same tab is a no-op, unless we need to open a specific
+        // Moderation sub-tab (e.g. the Home "Review reports" card → User Reports).
+        if (tab == currentTab && modTab == null) return;
         currentTab = tab;
 
         int active = ContextCompat.getColor(this, R.color.adm_gray_900);
@@ -164,7 +178,15 @@ public class AdminActivity extends AppCompatActivity {
 
         Fragment f;
         switch (tab) {
-            case TAB_MODERATION: f = new AdminModerationFragment(); break;
+            case TAB_MODERATION:
+                AdminModerationFragment mod = new AdminModerationFragment();
+                if (modTab != null) {
+                    Bundle args = new Bundle();
+                    args.putString(AdminModerationFragment.ARG_INITIAL_TAB, modTab);
+                    mod.setArguments(args);
+                }
+                f = mod;
+                break;
             case TAB_BUSINESS:   f = new AdminBusinessesFragment(); break;
             case TAB_USERS:      f = new AdminUsersFragment(); break;
             case TAB_PROFILE:    f = new AdminProfileFragment(); break;
