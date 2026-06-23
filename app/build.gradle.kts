@@ -42,8 +42,28 @@ android {
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL") ?: ""}\"")
     }
 
+    // Shared keystore kept OUT of Git. Share the .jks file with the team via a
+    // private channel; each member sets its path + passwords in local.properties.
+    // Same keystore on every machine -> same SHA-1 -> Google/Facebook login works.
+    val keystorePath = properties.getProperty("KEYSTORE_FILE")
+    val hasSharedKeystore = keystorePath != null && rootProject.file(keystorePath).exists()
+    signingConfigs {
+        if (hasSharedKeystore) {
+            create("shared") {
+                storeFile = rootProject.file(keystorePath!!)
+                storePassword = properties.getProperty("KEYSTORE_PASSWORD")
+                keyAlias = properties.getProperty("KEY_ALIAS")
+                keyPassword = properties.getProperty("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            if (hasSharedKeystore) signingConfig = signingConfigs.getByName("shared")
+        }
         release {
+            if (hasSharedKeystore) signingConfig = signingConfigs.getByName("shared")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
