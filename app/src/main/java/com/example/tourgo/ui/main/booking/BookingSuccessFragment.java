@@ -49,8 +49,12 @@ public class BookingSuccessFragment extends Fragment {
         applyTopInset(view);
 
         ImageButton btnBack = view.findViewById(R.id.btnBack);
-        ImageView ivHotel = view.findViewById(R.id.ivHotel);
+        ImageView ivBookingImage = view.findViewById(R.id.ivBookingImage);
         ImageView ivTransactionQR = view.findViewById(R.id.ivTransactionQR);
+        TextView tvBookingConfirmed = view.findViewById(R.id.tvBookingConfirmed);
+        TextView tvBookingSuccessMsg = view.findViewById(R.id.tvBookingSuccessMsg);
+        TextView tvDateLabel = view.findViewById(R.id.tvDateLabel);
+        TextView tvGuestLabel = view.findViewById(R.id.tvGuestLabel);
         TextView tvTotalCost = view.findViewById(R.id.tvTotalCost);
         TextView tvBookingDate = view.findViewById(R.id.tvBookingDate);
         TextView tvGuestInfo = view.findViewById(R.id.tvGuestInfo);
@@ -65,24 +69,33 @@ public class BookingSuccessFragment extends Fragment {
             tour = ((BookingActivity) getActivity()).getTour();
         }
 
+        // Cập nhật tiêu đề và message tùy theo loại booking
         if (hotel != null) {
+            tvBookingConfirmed.setText(R.string.booking_stay_confirmed);
             if (hotel.getImageUrls() != null && !hotel.getImageUrls().isEmpty()) {
                 Glide.with(this)
                         .load(hotel.getImageUrls().get(0))
                         .placeholder(R.drawable.hotel_1)
                         .centerCrop()
-                        .into(ivHotel);
+                        .into(ivBookingImage);
             } else {
-                ivHotel.setImageResource(hotel.getImageResId() != 0 ? hotel.getImageResId() : R.drawable.hotel_1);
+                ivBookingImage.setImageResource(hotel.getImageResId() != 0 ? hotel.getImageResId() : R.drawable.hotel_1);
             }
+            // Label cho hotel: "Check-in / Check-out"
+            tvDateLabel.setText(R.string.booking_date_label);
+            tvGuestLabel.setText(R.string.main_guest);
         } else if (tour != null) {
-             if (tour.getImageUrls() != null && !tour.getImageUrls().isEmpty()) {
+            tvBookingConfirmed.setText(R.string.booking_confirmed);
+            if (tour.getImageUrls() != null && !tour.getImageUrls().isEmpty()) {
                 Glide.with(this)
                         .load(tour.getImageUrls().get(0))
                         .placeholder(R.drawable.hotel_1)
                         .centerCrop()
-                        .into(ivHotel);
+                        .into(ivBookingImage);
             }
+            // Label cho tour: "Tour Date" / "Participants"
+            tvDateLabel.setText(R.string.booking_date_label);
+            tvGuestLabel.setText(R.string.main_guest);
         }
 
         // Nhận và hiển thị dữ liệu từ arguments

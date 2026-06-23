@@ -1,6 +1,8 @@
 package com.example.tourgo.ui.main.booking;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -28,13 +30,14 @@ import java.util.List;
 /**
  * Wires the "Booking history" section.
  * UI Logic Mapping:
- * - Tab PAID: Shows backend status "COMPLETED" (which means paid).
+ * - Tab PENDING: Shows backend status "PENDING" (awaiting payment).
+ * - Tab PAID: Shows backend status "PAID" or "COMPLETED" (payment confirmed).
  * - Tab COMPLETED: Shows backend status "FINISHED" or "DONE" (trip ended).
  * - Displays max 2 items by default, toggles expand/collapse via "View All".
- * - PENDING items are strictly excluded from the PAID tab.
  */
 public class BookingHistorySection {
 
+    private static final String UI_STATUS_PENDING = "PENDING";
     private static final String UI_STATUS_PAID = "PAID";
     private static final String UI_STATUS_COMPLETED = "COMPLETED";
 
@@ -49,7 +52,8 @@ public class BookingHistorySection {
     private BookingHistoryAdapter adapter;
 
     private final List<BookingHistoryAdapter.Item> allItems = new ArrayList<>();
-    private String currentTab = UI_STATUS_PAID;
+    private final List<Booking> allBookings = new ArrayList<>();
+    private String currentTab = UI_STATUS_PENDING;
     private boolean isExpanded = false;
 
     public BookingHistorySection(Context context) {
@@ -70,10 +74,19 @@ public class BookingHistorySection {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setAdapter(adapter);
 
+        adapter.setOnItemClickListener((item, position) -> {
+            openBookingDetail(item);
+        });
+
         if (filterChips != null) {
             filterChips.setOnCheckedStateChangeListener((group, checkedIds) -> {
-                currentTab = checkedIds.contains(R.id.chipBookingCompleted)
-                        ? UI_STATUS_COMPLETED : UI_STATUS_PAID;
+                if (checkedIds.contains(R.id.chipBookingPending)) {
+                    currentTab = UI_STATUS_PENDING;
+                } else if (checkedIds.contains(R.id.chipBookingCompleted)) {
+                    currentTab = UI_STATUS_COMPLETED;
+                } else {
+                    currentTab = UI_STATUS_PAID;
+                }
                 isExpanded = false; // Collapse when switching tabs
                 applyFilter();
             });
@@ -118,7 +131,9 @@ public class BookingHistorySection {
             public void onSuccess(List<Booking> bookings) {
                 setLoading(false);
                 allItems.clear();
+                allBookings.clear();
                 if (bookings != null) {
+                    allBookings.addAll(bookings);
                     for (Booking booking : bookings) {
                         allItems.add(toItem(booking));
                     }
@@ -166,10 +181,35 @@ public class BookingHistorySection {
         String backendStatus = booking.getStatus() != null ? booking.getStatus().toUpperCase() : "PENDING";
         String uiStatus = backendStatus;
 
-        if (backendStatus.equals("COMPLETED")) {
-            uiStatus = UI_STATUS_PAID; // Backend COMPLETED means UI PAID
+        if (backendStatus.equals("PENDING")) {
+            uiStatus = UI_STATUS_PENDING; // Awaiting payment
+        } else if (backendStatus.equals("PAID") || backendStatus.equals("COMPLETED")) {
+            uiStatus = UI_STATUS_PAID; // Payment confirmed
         } else if (backendStatus.equals("FINISHED") || backendStatus.equals("DONE")) {
             uiStatus = UI_STATUS_COMPLETED; // Trip ended
+        }
+
+        // Prepare guest info string
+        String guestInfo = (booking.getGuests() != null ? booking.getGuests() : "1") + " Guest(s)";
+
+        // Get transaction code from payment
+        String transactionCode = booking.getTransactionCode();
+        if (transactionCode == null || transactionCode.isEmpty()) {
+            transactionCode = booking.getId(); // Fallback to booking ID
+        }
+
+        // Calculate total amount (you may need to adjust this based on your booking model)
+        double totalAmount = 0.0;
+        try {
+            if (priceText != null && !priceText.isEmpty()) {
+                // Extract number from price string
+                String numStr = priceText.replaceAll("[^0-9.]", "");
+                if (!numStr.isEmpty()) {
+                    totalAmount = Double.parseDouble(numStr);
+                }
+            }
+        } catch (Exception e) {
+            totalAmount = 0.0;
         }
 
         return new BookingHistoryAdapter.Item(
@@ -177,15 +217,18 @@ public class BookingHistorySection {
                 formatDate(booking.getBookingDate()),
                 priceText,
                 uiStatus,
-                imageUrl
+                imageUrl,
+                booking.getId(),
+                transactionCode,
+                totalAmount,
+                guestInfo
         );
     }
 
     private void applyFilter() {
         List<BookingHistoryAdapter.Item> filtered = new ArrayList<>();
         for (BookingHistoryAdapter.Item item : allItems) {
-            // Strictly filter by mapped UI status. 
-            // PENDING items will be ignored as they don't match PAID or COMPLETED tabs.
+            // Filter by mapped UI status
             if (currentTab.equals(item.status)) {
                 filtered.add(item);
             }
@@ -221,5 +264,58 @@ public class BookingHistorySection {
     private static String formatDate(String raw) {
         if (raw == null || raw.isEmpty()) return "";
         return raw.length() >= 10 ? raw.substring(0, 10) : raw;
+    }
+
+    private void openBookingDetail(BookingHistoryAdapter.Item item) {
+        if (item.bookingId == null) return;
+
+        // Find the original booking
+        Booking booking = null;
+        for (Booking b : allBookings) {
+            if (item.bookingId.equals(b.getId())) {
+                booking = b;
+                break;
+            }
+        }
+
+        if (booking == null) return;
+
+        // Determine if it's a hotel or tour
+        Hotel hotel = null;
+        Tour tour = null;
+
+        if (booking.getHotelId() != null) {
+            hotel = HotelRepository.getInstance().findHotelById(booking.getHotelId());
+        } else if (booking.getTourId() != null) {
+            tour = TourRepository.getInstance().findTourById(booking.getTourId());
+        }
+
+        // Prepare date string
+        String dateString = "";
+        if (booking.getCheckIn() != null && booking.getCheckOut() != null) {
+            dateString = formatDate(booking.getCheckIn()) + " - " + formatDate(booking.getCheckOut());
+        } else if (booking.getBookingDate() != null) {
+            dateString = formatDate(booking.getBookingDate());
+        }
+
+        // Create intent to BookingActivity showing the success fragment
+        Intent intent = new Intent(context, BookingActivity.class);
+
+        if (hotel != null) {
+            intent.putExtra("hotel", hotel);
+        } else if (tour != null) {
+            intent.putExtra("tour", tour);
+        }
+
+        // Pass booking details
+        Bundle extras = new Bundle();
+        extras.putString("fragment", "success");
+        extras.putDouble("total_price", item.totalAmount);
+        extras.putString("check_in_out", dateString);
+        extras.putString("guest_info", item.guestInfo);
+        extras.putString("transaction_code", item.confirmationNumber);
+        intent.putExtras(extras);
+
+        context.startActivity(intent);
     }
 }

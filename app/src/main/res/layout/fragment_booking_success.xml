@@ -55,7 +55,7 @@
                 app:cardElevation="0dp">
 
                 <ImageView
-                    android:id="@+id/ivHotel"
+                    android:id="@+id/ivBookingImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -63,15 +63,17 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
+                android:id="@+id/tvBookingConfirmed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/booking_stay_confirmed"
+                android:text="@string/booking_confirmed"
                 android:textColor="@android:color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvBookingSuccessMsg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -98,6 +100,7 @@
                         app:tint="@android:color/darker_gray" />
 
                     <TextView
+                        android:id="@+id/tvDateLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -128,6 +131,7 @@
                         app:tint="@android:color/darker_gray" />
 
                     <TextView
+                        android:id="@+id/tvGuestLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -145,35 +149,35 @@
                         android:textStyle="bold" />
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
+<!--                <RelativeLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginBottom="12dp">-->
 
-                    <ImageView
-                        android:id="@+id/icRoom"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_home_24"
-                        app:tint="@android:color/darker_gray" />
+<!--                    <ImageView-->
+<!--                        android:id="@+id/icRoom"-->
+<!--                        android:layout_width="20dp"-->
+<!--                        android:layout_height="20dp"-->
+<!--                        android:src="@drawable/ic_home_24"-->
+<!--                        app:tint="@android:color/darker_gray" />-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_toEndOf="@id/icRoom"
-                        android:text="@string/booking_room_type"
-                        android:textColor="@android:color/darker_gray" />
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="12dp"-->
+<!--                        android:layout_toEndOf="@id/icRoom"-->
+<!--                        android:text="@string/booking_room_type"-->
+<!--                        android:textColor="@android:color/darker_gray" />-->
 
-                    <TextView
-                        android:id="@+id/tvRoomType"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:text="Standard Room"
-                        android:textColor="@android:color/black"
-                        android:textStyle="bold" />
-                </RelativeLayout>
+<!--                    <TextView-->
+<!--                        android:id="@+id/tvRoomType"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignParentEnd="true"-->
+<!--                        android:text="Standard Room"-->
+<!--                        android:textColor="@android:color/black"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </RelativeLayout>-->
 
                 <RelativeLayout
                     android:layout_width="match_parent"

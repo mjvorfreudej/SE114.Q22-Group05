@@ -273,6 +273,7 @@
     <string name="booking_add_card">+ Add New Card</string>
 
     <string name="booking_success_title">Booking Success!</string>
+    <string name="booking_confirmed">Your Booking is Confirmed</string>
     <string name="booking_stay_confirmed">Your Stay is confirmed</string>
     <string name="booking_success_msg">Your booking request has been sent. Please check your email for confirmation.</string>
     <string name="booking_date_label">Booking Date</string>
@@ -675,6 +676,7 @@
 
     <!-- Booking history -->
     <string name="booking_history_title">Booking history</string>
+    <string name="booking_history_filter_pending">Awaiting Payment</string>
     <string name="booking_history_filter_paid">Paid</string>
     <string name="booking_history_filter_completed">Completed</string>
     <string name="booking_history_empty">No bookings found</string>
